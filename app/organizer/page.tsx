@@ -46,7 +46,8 @@ import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
 export default function OrganizerDashboard() {
   const { isLoading: authLoading, user: currentUser } = useAuth();
   const router = useRouter();
-  const { data: organizerEventList, isLoading: eventsLoading } = useOrganizerEvents();
+  const { data: organizerEventList, isLoading: eventsLoading } =
+    useOrganizerEvents();
   const { mutate: deleteEvent } = useDeleteEvent();
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -54,7 +55,9 @@ export default function OrganizerDashboard() {
 
   useEffect(() => {
     if (!currentUser && !authLoading) {
-      router.push(`/login?returnUrl=${encodeURIComponent(window.location.href)}`);
+      router.push(
+        `/login?returnUrl=${encodeURIComponent(window.location.href)}`
+      );
       return;
     }
     if (currentUser && !["ORGANIZER"].includes(currentUser.role)) {
@@ -73,16 +76,36 @@ export default function OrganizerDashboard() {
       </div>
     );
   }
+const organizerEvents = Array.isArray(organizerEventList)
+  ? organizerEventList.filter(
+      (event) => currentUser && event.organizerId === currentUser.id
+    )
+  : [];
 
-  const organizerEvents = Array.isArray(organizerEventList)
-    ? organizerEventList.filter((event: Event) => currentUser && event.organizerId === currentUser.id)
-    : [];
+  
 
   // Safe calculations
   const totalEvents = organizerEvents?.length || 0;
-  const totalTicketsSold = organizerEvents?.reduce((sum, event) => sum + (event.minted || 0), 0) || 0;
-  const totalRevenue = organizerEvents?.reduce((sum, event) => sum + ((event.minted || 0) * (event.price || 0)), 0) || 0;
-  const avgTicketsSold = totalEvents > 0 ? Math.round(totalTicketsSold / totalEvents) : 0;
+  const totalTicketsSold =
+    organizerEvents?.reduce((eventsum, event: Event) => {
+      const eventMinted =
+        event.ticketCategories?.reduce(
+          (catSum, cat) => catSum + (cat.minted || 0),
+          0
+        ) || 0;
+      return eventsum + eventMinted;
+    }, 0) || 0;
+  const totalRevenue =
+    organizerEvents?.reduce((sum, event: Event) => {
+      const eventRevenue =
+        event.ticketCategories?.reduce((catSum, cat) => {
+          return catSum + (cat.minted || 0) * (cat.price || 0);
+        }, 0) || 0;
+      return sum + eventRevenue;
+    }, 0) || 0;
+
+  const avgTicketsSold =
+    totalEvents > 0 ? Math.round(totalTicketsSold / totalEvents) : 0;
 
   const handleDeleteClick = (eventId: string) => {
     setDeleteEventId(eventId);
@@ -151,7 +174,9 @@ export default function OrganizerDashboard() {
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-xl sm:text-2xl font-bold">{totalEvents}</div>
+                  <div className="text-xl sm:text-2xl font-bold">
+                    {totalEvents}
+                  </div>
                   <p className="text-xs text-muted-foreground">Active events</p>
                 </CardContent>
               </Card>
@@ -170,8 +195,12 @@ export default function OrganizerDashboard() {
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-xl sm:text-2xl font-bold">{totalTicketsSold}</div>
-                  <p className="text-xs text-muted-foreground">Across all events</p>
+                  <div className="text-xl sm:text-2xl font-bold">
+                    {totalTicketsSold}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Across all events
+                  </p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -205,7 +234,9 @@ export default function OrganizerDashboard() {
           >
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl sm:text-2xl">Your Events</CardTitle>
+                <CardTitle className="text-xl sm:text-2xl">
+                  Your Events
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 {organizerEvents?.length > 0 ? (
@@ -217,7 +248,9 @@ export default function OrganizerDashboard() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.4, delay: index * 0.1 }}
                         className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-                        onClick={() => router.push(`/organizer/view-event/${event.id}`)}
+                        onClick={() =>
+                          router.push(`/organizer/view-event/${event.id}`)
+                        }
                       >
                         <img
                           src={event.bannerUrl || "/placeholder.svg"}
@@ -226,24 +259,47 @@ export default function OrganizerDashboard() {
                         />
                         <div className="flex-1 w-full sm:w-auto">
                           <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 mb-1">
-                            <h3 className="font-semibold text-sm sm:text-base">{event.name}</h3>
+                            <h3 className="font-semibold text-sm sm:text-base">
+                              {event.name}
+                            </h3>
                           </div>
                           <p className="text-xs sm:text-sm text-muted-foreground mb-1 sm:mb-2">
-                            {new Date(event.date).toLocaleDateString()} • {event.location}
+                            {new Date(event.date).toLocaleDateString()} •{" "}
+                            {event.location}
                           </p>
                           <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-xs sm:text-sm">
                             <span className="text-muted-foreground">
-                              {(event.minted || 0)}/{event.maxTickets || 0} sold
+                              {event.ticketCategories?.reduce(
+                                (sum, cat) => sum + (cat.minted || 0),
+                                0
+                              )}
+                              /
+                              {event.ticketCategories?.reduce(
+                                (sum, cat) => sum + (cat.maxTickets || 0),
+                                0
+                              )}{" "}
+                              sold
                             </span>
                             <span className="text-green-600 font-medium">
-                              {formatPrice((event.minted || 0) * (event.price || 0)).toLocaleString()} revenue
+                              {formatPrice(
+                                event.ticketCategories?.reduce(
+                                  (sum, cat) =>
+                                    sum + (cat.minted || 0) * (cat.price || 0),
+                                  0
+                                ) || 0
+                              ).toLocaleString()}{" "}
+                              revenue
                             </span>
                           </div>
                         </div>
                         <div className="flex flex-col items-end w-full sm:w-auto">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                              >
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
@@ -254,7 +310,9 @@ export default function OrganizerDashboard() {
                             >
                               <DropdownMenuItem
                                 onClick={() =>
-                                  router.push(`/organizer/update-event/${event.id}`)
+                                  router.push(
+                                    `/organizer/update-event/${event.id}`
+                                  )
                                 }
                                 className="text-sm text-gray-700 hover:bg-gray-100 rounded-md p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
                               >
@@ -273,12 +331,38 @@ export default function OrganizerDashboard() {
                             <div
                               className="bg-gradient-to-r from-blue-600 to-pink-600 h-2 rounded-full"
                               style={{
-                                width: `${event.maxTickets ? ((event.minted || 0) / event.maxTickets) * 100 : 0}%`,
+                                width: `${
+                                  event.ticketCategories
+                                    ? (event.ticketCategories.reduce(
+                                        (sum, cat) => sum + (cat.minted || 0),
+                                        0
+                                      ) /
+                                        event.ticketCategories.reduce(
+                                          (sum, cat) =>
+                                            sum + (cat.maxTickets || 0),
+                                          0
+                                        )) *
+                                      100
+                                    : 0
+                                }%`,
                               }}
                             />
                           </div>
                           <p className="text-xs sm:text-sm text-muted-foreground mt-1 text-right">
-                            {event.maxTickets ? Math.round(((event.minted || 0) / event.maxTickets) * 100) : 0}% sold
+                            {event.ticketCategories
+                              ? Math.round(
+                                  (event.ticketCategories.reduce(
+                                    (sum, cat) => sum + (cat.minted || 0),
+                                    0
+                                  ) /
+                                    event.ticketCategories.reduce(
+                                      (sum, cat) => sum + (cat.maxTickets || 0),
+                                      0
+                                    )) *
+                                    100
+                                )
+                              : 0}
+                            % sold
                           </p>
                         </div>
                       </motion.div>
@@ -287,9 +371,12 @@ export default function OrganizerDashboard() {
                 ) : (
                   <div className="text-center py-8">
                     <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No events yet</h3>
+                    <h3 className="text-lg font-semibold mb-2">
+                      No events yet
+                    </h3>
                     <p className="text-muted-foreground mb-4">
-                      Create your first event to start selling tickets and managing attendees.
+                      Create your first event to start selling tickets and
+                      managing attendees.
                     </p>
                     <Button asChild>
                       <Link href="/organizer/create-event">
