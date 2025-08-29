@@ -41,7 +41,7 @@ export default function ForgotPasswordPage() {
           localStorage.setItem(
             "otpPayload",
             JSON.stringify({
-              email: data.email,
+              email: data.email, 
               context: "forgot-password",
             })
           );

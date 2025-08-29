@@ -77,13 +77,16 @@ export default function EventDashboard() {
     );
   }
 
-  const organizerEvents = Array.isArray(organizerEventList)
-    ? organizerEventList.filter(
-        (event: Event) => currentUser && event.organizerId === currentUser.id
-      )
-    : [];
+const organizerEvents = Array.isArray(organizerEventList)
+  ? organizerEventList.filter(
+      (event) => currentUser && event.organizerId === currentUser.id
+    )
+  : [];
 
-  const event = organizerEvents.find((e: Event) => e.id === id);
+
+  const event: Event = organizerEvents.find((e: Event) => e.id === id);
+  console.log(event)
+ 
 
   if (!event) {
     return <div className="min-h-screen bg-background text-center py-8">Event not found</div>;
@@ -115,12 +118,24 @@ export default function EventDashboard() {
     setDeleteEventId(null);
   };
 
-  const totalTickets = event.maxTickets || 0;
-  const ticketsSold = event.minted || 0;
-  const totalRevenue = (event.minted || 0) * (event.price || 0);
-  const percentageSold = totalTickets > 0 ? Math.round((ticketsSold / totalTickets) * 100) : 0;
-  const avgTicketPrice = event.price || 0;
-  const lastUpdated = "12:53 PM WAT, August 21, 2025";
+  const totalTickets: number = event?.ticketCategories?.reduce(
+  (sum, cat) => sum + (cat.maxTickets || 0),
+  0
+) ?? 0;
+
+const ticketsSold: number = event?.ticketCategories?.reduce(
+  (sum, cat) => sum + (cat.minted || 0),
+  0
+) ?? 0;
+
+const totalRevenue: number = event?.ticketCategories?.reduce(
+  (sum, cat) => sum + (cat.minted || 0) * (cat.price || 0),
+  0
+) ?? 0;
+const percentageSold = totalTickets > 0 
+  ? Math.round((ticketsSold / totalTickets) * 100) 
+  : 0;
+  
 
   return (
     <div className="min-h-screen bg-background">

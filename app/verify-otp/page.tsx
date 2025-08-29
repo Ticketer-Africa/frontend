@@ -81,11 +81,14 @@ export default function VerifyOTPPage() {
 
     verifyOtp(result.data, {
       onSuccess: () => {
-        toast.success("OTP verified! You can now login.");
+        toast.success("OTP verified Sucessfully!");
+        const context = otpPayload?.context
         localStorage.removeItem("otpPayload");
-        const role = user?.role || "user";
-        if (role === "ORGANIZER") {
-          router.push("/organizer");
+        // const role = user?.role || "user";
+        if (context === "forgot-password") {
+           localStorage.setItem("resetEmail", email!);
+           localStorage.setItem("resetOtp", otp);
+          router.push("/reset-password");
         } else {
           router.push("/login");
         }
