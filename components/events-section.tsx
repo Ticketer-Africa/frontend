@@ -60,18 +60,22 @@ export function EventsSection() {
                   </h3>
 
                   <p className="text-gray-600 text-sm mb-4">
-                    {truncateText(event.description, 20)} {/* 20 words max */}
+                    {truncateText(event.description, 10)} {/* 20 words max */}
                   </p>
 
                   <div className="flex items-center text-gray-600 text-sm mb-2">
                     <MapPin className="w-4 h-4 mr-2" />
-                    <span>{event.location}</span>
+                    <span>{truncateText(event.location, 5)}</span>
                   </div>
 
-                  <div className="flex items-center text-gray-600 text-sm">
+                  {/* <div className="flex items-center text-gray-600 text-sm">
                     <Users className="w-4 h-4 mr-2" />
-                    <span>{event.minted} attending</span>
-                  </div>
+                    <span>
+                      {event.ticketCategories
+                        ? event.ticketCategories.reduce((acc, cur) => acc + (cur.minted ?? 0), 0)
+                        : 0} attending
+                    </span>
+                  </div> */}
                 </div>
               </div>
             </motion.div>

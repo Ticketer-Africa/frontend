@@ -71,7 +71,6 @@ export default function EventsPage() {
     "Party",
   ];
 
-
   const filteredEvents = events?.filter((event: Event) => {
     const matchesSearch =
       event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -253,12 +252,8 @@ export default function EventsPage() {
             const minPrice = ticketCategories.length
               ? Math.min(...ticketCategories.map((t) => t.price))
               : 0;
-            const maxPrice = ticketCategories.length
-              ? Math.max(...ticketCategories.map((t) => t.price))
-              : 0;
-            const priceRangeDisplay = ticketCategories.length
-              ? `${formatPrice(minPrice)} - ${formatPrice(maxPrice)}`
-              : "Free";
+            const priceRangeDisplay =
+              minPrice > 0 ? `From ${formatPrice(minPrice)}` : "Free";
 
             return (
               <motion.div
@@ -269,9 +264,9 @@ export default function EventsPage() {
                 className="group"
               >
                 <Link href={`/events/${event.slug}`}>
-                  <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+                  <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 flex flex-col">
                     {/* Image */}
-                    <div className="relative">
+                    <div className="relative flex-shrink-0">
                       <Image
                         src={event.bannerUrl || "/placeholder.svg"}
                         alt={event.name}
@@ -295,21 +290,21 @@ export default function EventsPage() {
                     </div>
 
                     {/* Price badge moved below image */}
-                    <div className="flex justify-end px-4 -mt-8 mb-2">
+                    <div className="flex justify-end px-4 -mt-8 mb-2 flex-shrink-0">
                       <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-blue-600 shadow-sm">
                         {priceRangeDisplay}
                       </div>
                     </div>
 
                     {/* Content */}
-                    <div className="p-6 space-y-4">
+                    <div className="p-6 flex flex-col justify-between flex-grow space-y-2">
                       {/* Event title */}
                       <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
                         {event.name}
                       </h3>
 
                       {/* Date & Location */}
-                      <div className="space-y-1 text-gray-600 text-sm">
+                      <div className="space-y-1 text-gray-600 text-sm min-h-[60px]">
                         <div className="flex items-center">
                           <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
                           <span>
@@ -323,21 +318,25 @@ export default function EventsPage() {
                       </div>
 
                       {/* Tickets */}
-                      <div className="text-gray-600">
+                      <div className="text-gray-600 min-h-[100px]">
                         <div className="flex items-center mb-1">
                           <Ticket className="w-4 h-4 mr-2 flex-shrink-0" />
                           <span className="text-sm font-medium">
                             Ticket Options
                           </span>
                         </div>
-                        <div className="">
-                          {ticketCategories.map((ticket) => (
+                        <div className="space-y-2">
+                          {ticketCategories.slice(0, 1).map((ticket) => (
                             <div
                               key={ticket.id}
-                              className="flex justify-between items-center text-sm space-y-2"
+                              className="flex justify-between items-center text-sm"
                             >
-                              <span>
-                                {ticket.name} ({formatPrice(ticket.price)})
+                              <span className="line-clamp-1">
+                                {ticket.name} (
+                                {ticket.price === 0
+                                  ? "Free"
+                                  : formatPrice(ticket.price)}
+                                )
                               </span>
                               <span
                                 className={
@@ -351,13 +350,18 @@ export default function EventsPage() {
                               </span>
                             </div>
                           ))}
+                          {ticketCategories.length > 1 && (
+                            <div className="text-sm text-gray-500">
+                              +{ticketCategories.length - 1} more options
+                            </div>
+                          )}
                         </div>
                       </div>
 
                       {/* View details button */}
                       <Button
                         size="lg"
-                        className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full font-semibold"
+                        className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full font-semibold mt-auto"
                       >
                         View Details
                       </Button>

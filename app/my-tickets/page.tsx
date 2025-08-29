@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar, MapPin, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  Calendar,
+  MapPin,
+  ChevronDown,
+  ChevronUp,
+  Ticket as TicketIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -172,12 +178,13 @@ export default function MyTicketsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="flex items-center justify-between mb-8">
+          {/* Mobile-optimized header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900">My Tickets</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">My Tickets</h1>
               <p className="text-gray-600 mt-1">Manage your event tickets</p>
             </div>
-            <div className="text-right">
+            <div className="text-left sm:text-right">
               <p className="text-sm text-gray-600">Total Tickets</p>
               <p className="text-2xl font-bold text-gray-900">
                 {userTickets?.length || 0}
@@ -186,7 +193,7 @@ export default function MyTicketsPage() {
           </div>
 
           {groupedTickets && Object.keys(groupedTickets).length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {Object.entries(groupedTickets).map(
                 (
                   [eventId, { event, tickets, ticketCount, statusSummary }],
@@ -199,15 +206,27 @@ export default function MyTicketsPage() {
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                   >
                     <Card className="bg-white/80 backdrop-blur-md rounded-xl shadow-xl border border-gray-100/20">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
+                      <CardHeader className="pb-4">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                           <div className="flex-1">
                             <Link href={`/events/${eventId}`}>
-                              <CardTitle className="text-lg font-semibold text-gray-900 line-clamp-2 hover:text-blue-600 transition-colors">
+                              <CardTitle className="text-lg sm:text-xl font-bold text-gray-900 line-clamp-2 hover:text-blue-600 transition-colors">
                                 {event.name}
                               </CardTitle>
                             </Link>
-                            <div className="flex space-x-2 mt-2">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-3 gap-2 text-sm text-gray-600">
+                              <div className="flex items-center space-x-2">
+                                <Calendar className="h-4 w-4 text-gray-500" />
+                                <span>{formatDate(event.date)}</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <MapPin className="h-4 w-4 text-gray-500" />
+                                <span className="line-clamp-1">
+                                  {event.location}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex flex-wrap gap-2 mt-3">
                               <Badge variant="success">
                                 {statusSummary.active} Active
                               </Badge>
@@ -223,28 +242,16 @@ export default function MyTicketsPage() {
                               )}
                             </div>
                           </div>
+                          <div className="text-left sm:text-right sm:ml-4 flex-shrink-0">
+                            <p className="text-sm text-gray-600">Total Tickets</p>
+                            <p className="text-2xl font-bold text-gray-900">
+                              {ticketCount}
+                            </p>
+                          </div>
                         </div>
                       </CardHeader>
 
-                      <CardContent className="space-y-2">
-                        <div className="space-y-2 text-sm text-gray-600">
-                          <div className="flex items-center space-x-2">
-                            <Calendar className="h-4 w-4 text-gray-500" />
-                            <span>{formatDate(event.date)}</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <MapPin className="h-4 w-4 text-gray-500" />
-                            <span className="line-clamp-1">
-                              {event.location}
-                            </span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <span className="font-semibold">
-                              Tickets: {ticketCount}
-                            </span>
-                          </div>
-                        </div>
-
+                      <CardContent>
                         <Button
                           className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                           onClick={(e) => toggleEventExpansion(eventId, e)}
@@ -257,76 +264,111 @@ export default function MyTicketsPage() {
                           ) : (
                             <>
                               <ChevronDown className="h-4 w-4 mr-2" /> View
-                              Tickets
+                              Tickets ({ticketCount})
                             </>
                           )}
                         </Button>
 
                         {expandedEvent === eventId && (
-                          <div className="mt-4">
-                            <div className="flex justify-between items-center mb-2">
-                              <span className="text-sm font-medium text-gray-600">
-                                {ticketCount} Ticket{ticketCount > 1 ? "s" : ""}
-                              </span>
-                            </div>
-                            <div className="max-h-[200px] overflow-y-auto border border-gray-100 rounded-lg">
-                              {tickets.map((ticket) => (
-                                <div
+                          <motion.div 
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="mt-6"
+                          >
+                            {/* Mobile-first ticket layout */}
+                            <div className="space-y-3">
+                              {tickets.map((ticket, ticketIndex) => (
+                                <motion.div
                                   key={ticket.id}
-                                  className="flex justify-between items-center p-3 hover:bg-gray-50 transition-colors border-b last:border-b-0"
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{
+                                    duration: 0.3,
+                                    delay: ticketIndex * 0.05,
+                                  }}
                                 >
-                                  <div>
-                                    <Link href={`/ticket/${ticket.id}`}>
-                                      <p className="text-sm font-medium text-gray-900 hover:underline">
-                                        Ticket #{ticket.code}
-                                      </p>
-                                    </Link>
-                                    <Badge
-                                      variant={getStatusColor(ticket)}
-                                      className="mt-1"
-                                    >
-                                      {getStatusText(ticket)}
-                                    </Badge>
-                                    {ticket.ticketCategory && (
-                                      <p className="text-xs text-gray-600 mt-1">
-                                        Category: {ticket.ticketCategory.name}
-                                      </p>
-                                    )}
-                                    <div className="flex items-center space-x-2">
-                                      <span className="text-sm text-gray-600">
-                                        Original Price:
-                                      </span>
-                                      <span className="font-semibold">
-                                        {formatPrice(
-                                          ticket?.ticketCategory?.price ?? 0
-                                        )}
-                                      </span>
+                                  <div className="bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200">
+                                    {/* Mobile-optimized layout */}
+                                    <div className="flex items-start space-x-3">
+                                      <div className="bg-blue-100 p-2 rounded-lg flex-shrink-0">
+                                        <TicketIcon className="h-5 w-5 text-blue-600" />
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        {/* Header row */}
+                                        <div className="flex items-start justify-between gap-3">
+                                          <div className="flex-1 min-w-0">
+                                            <Link href={`/ticket/${ticket.id}`}>
+                                              <h4 className="font-semibold text-gray-900 hover:text-blue-600 transition-colors text-base truncate">
+                                                Ticket #{ticket.code}
+                                              </h4>
+                                            </Link>
+                                            {ticket.ticketCategory && (
+                                              <p className="text-sm text-gray-600 mt-1 truncate">
+                                                {ticket.ticketCategory.name}
+                                              </p>
+                                            )}
+                                          </div>
+                                          <span className="text-base font-bold text-gray-900 flex-shrink-0">
+                                            {ticket?.ticketCategory?.price == 0
+                                              ? "Free"
+                                              : formatPrice(
+                                                  ticket?.ticketCategory?.price ?? 0
+                                                )}
+                                          </span>
+                                        </div>
+
+                                        {/* Status and action row */}
+                                        <div className="flex items-center justify-between mt-3 gap-2">
+                                          <Badge
+                                            variant={getStatusColor(ticket)}
+                                            className="text-xs flex-shrink-0"
+                                          >
+                                            {getStatusText(ticket)}
+                                          </Badge>
+                                          
+                                          <div className="flex-shrink-0">
+                                            {!ticket.isListed && !ticket.isUsed && (
+                                              <Button
+                                                size="sm"
+                                                className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-3 py-1 text-xs h-7 shadow-lg hover:shadow-xl transition-all duration-300"
+                                                onClick={(e) =>
+                                                  handleListForResale(ticket, e)
+                                                }
+                                                disabled={ticket?.ticketCategory?.price === 0}
+                                              >
+                                                List for Resale
+                                              </Button>
+                                            )}
+                                            {ticket.isListed && (
+                                              <Button
+                                                size="sm"
+                                                className="bg-gray-400 text-white rounded-full px-3 py-1 text-xs h-7"
+                                                disabled
+                                              >
+                                                Listed: {formatPrice(ticket.resalePrice ?? 0)}
+                                              </Button>
+                                            )}
+                                            {ticket.isUsed && (
+                                              <Button
+                                                size="sm"
+                                                variant="outline"
+                                                className="rounded-full px-3 py-1 text-xs h-7"
+                                                disabled
+                                              >
+                                                Used
+                                              </Button>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
-
-                                  {!ticket.isListed && !ticket.isUsed && (
-                                    <Button
-                                      className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
-                                      onClick={(e) =>
-                                        handleListForResale(ticket, e)
-                                      }
-                                    >
-                                      List for Resale
-                                    </Button>
-                                  )}
-                                  {ticket.isListed && (
-                                    <Button
-                                      className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
-                                      disabled
-                                    >
-                                      Listed for
-                                      {formatPrice(ticket.resalePrice ?? 0)}
-                                    </Button>
-                                  )}
-                                </div>
+                                </motion.div>
                               ))}
                             </div>
-                          </div>
+                          </motion.div>
                         )}
                       </CardContent>
                     </Card>

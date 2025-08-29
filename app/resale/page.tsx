@@ -24,7 +24,7 @@ import {
 } from "@/services/tickets/tickets.queries";
 import { BuyResaleModal } from "@/components/buy-resale-modal";
 import { toast } from "sonner";
-import { TicketResale } from "@/types/tickets.type";
+import { Ticket, TicketResale } from "@/types/tickets.type";
 
 export default function ResalePage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -144,8 +144,8 @@ export default function ResalePage() {
 
         {/* Resale Tickets Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredTickets?.map((ticket, index) => {
-            const originalPrice = ticket.event.price;
+          {filteredTickets?.map((ticket: Ticket, index) => {
+            const originalPrice = ticket?.ticketCategory?.price ?? 0;
             const resalePrice = ticket.resalePrice || 0;
             const savings = originalPrice - resalePrice;
             const isDiscounted = resalePrice < originalPrice;

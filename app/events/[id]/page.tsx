@@ -16,6 +16,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useEventBySlug } from "@/services/events/events.queries";
 import {
+  useBuyResaleTicket,
   useMyTickets,
   useResaleListings,
 } from "@/services/tickets/tickets.queries";
@@ -24,6 +25,7 @@ import { TicketPurchaseModal } from "@/components/ticket-purchase-modal";
 import { formatDate, formatPrice } from "@/lib/dummy-data";
 import { TicketResale } from "@/types/tickets.type";
 import { toast } from "sonner";
+import { BuyResaleModal } from "@/components/buy-resale-modal";
 
 export interface TicketCategory {
   id: string;
@@ -35,6 +37,7 @@ export interface TicketCategory {
 
 export default function EventPage({ params }: { params: { id: string } }) {
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
+  const [isResaleModalOpen, setIsResaleModalOpen] = useState(false);
   const [selectedResaleTicket, setSelectedResaleTicket] =
     useState<TicketResale | null>(null);
   const [selectedTicketCategories, setSelectedTicketCategories] = useState<
@@ -44,6 +47,8 @@ export default function EventPage({ params }: { params: { id: string } }) {
   const { user } = useAuth();
   const { data: event, isLoading, error } = useEventBySlug(params.id);
   const { data: resaleTickets = [] } = useResaleListings(event?.id);
+    const { mutateAsync: buyResaleTicket, isPending: isBuyPending } =
+      useBuyResaleTicket();
 
   // Debug logging
   useEffect(() => {
@@ -88,9 +93,17 @@ export default function EventPage({ params }: { params: { id: string } }) {
       return;
     }
     setSelectedResaleTicket(ticket);
-    setSelectedTicketCategories([]);
-    setQuantities({ [ticket.id]: 1 });
-    setIsPurchaseModalOpen(true);
+    setIsResaleModalOpen(true);
+  };
+
+  const handleConfirmBuy = async (ticketId: string) => {
+    try {
+      const response = await buyResaleTicket({ ticketIds: [ticketId] });
+      window.location.href = response.checkoutUrl;
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error?.message || "Failed to initiate purchase");
+    }
   };
 
   const handleBuyTickets = () => {
@@ -304,6 +317,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                               </p>
                               <Button
                                 size="sm"
+                                className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full"
                                 onClick={() => handleBuyResaleTicket(ticket)}
                               >
                                 Buy
@@ -459,6 +473,19 @@ export default function EventPage({ params }: { params: { id: string } }) {
         }}
         quantities={quantities}
         setQuantities={setQuantities}
+      />
+
+      {/* Resale Purchase Modal */}
+      <BuyResaleModal
+        isOpen={isResaleModalOpen}
+        onClose={() => {
+          setIsResaleModalOpen(false);
+          setSelectedResaleTicket(null);
+        }}
+        selectedTicket={selectedResaleTicket}
+        onConfirmBuy={handleConfirmBuy}
+        isPending={isBuyPending}
+        isAuthenticated={!!user}
       />
     </div>
   );

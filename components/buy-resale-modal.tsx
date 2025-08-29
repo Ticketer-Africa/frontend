@@ -79,16 +79,11 @@ export function BuyResaleModal({
                 {formatPrice(selectedTicket.resalePrice ?? 0)}
               </span>
             </div>
-            <div className="flex justify-between items-center mt-2">
-              <span className="text-sm text-gray-600">Service Fee (5%):</span>
-              <span className="text-sm text-gray-900">
-                {formatPrice((selectedTicket.resalePrice ?? 0) * 0.05)}
-              </span>
-            </div>
+            
             <div className="flex justify-between items-center mt-2 font-semibold">
               <span className="text-sm text-gray-900">Total:</span>
               <span className="text-gray-900">
-                {formatPrice((selectedTicket.resalePrice ?? 0) * 1.05)}
+                {formatPrice((selectedTicket.resalePrice ?? 0))}
               </span>
             </div>
           </div>
