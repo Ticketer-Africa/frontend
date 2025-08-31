@@ -1,5 +1,6 @@
 "use client";
 
+import { Logo } from "@/components/layout/logo";
 import Axios from "@/services/axios";
 import { useRouter } from "next/navigation";
 import {
@@ -76,8 +77,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center space-y-4">
-          <div className="w-10 h-10 border-4 border-t-transparent border-blue-600 rounded-full animate-spin" />
-          <p className="text-gray-600">Loading authentication...</p>
+          <div className="relative">
+            {/* Logo with glowing effect */}
+            <Logo
+              size="lg"
+              withText={true}
+              text="Ticketer"
+              imgSrc="/logo.png"
+              className="animate-pulse-glow"
+            />
+          </div>
         </div>
       </div>
     );
