@@ -1,4 +1,3 @@
-"use client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getAdminStats, getAdminUsers, getAdminEvents, adminToggleEvent, getAdminTransactions, getAdminOrganizers, getAdminUserDetails, getAdminRevenue, getAdminDailyRevenue, getEventCategories } from "./admin";
 
