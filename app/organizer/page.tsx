@@ -77,11 +77,10 @@ export default function OrganizerDashboard() {
     );
   }
 const organizerEvents = Array.isArray(organizerEventList)
-  ? organizerEventList.filter(
-      (event) => currentUser && event.organizerId === currentUser.id
-    )
+  ? organizerEventList
   : [];
 
+  
   
 
   // Safe calculations
