@@ -1,12 +1,45 @@
+import { StringDecoder } from "string_decoder";
+
 export interface Transaction {
   id: string;
-  user: { name: string };
-  event: { name: string };
+  reference?: string;
+  user: { name?: string; email?: string } | null;
+  event: { name?: string } | null; // keep event object for Prisma consistency
+  type?: "DEPOSIT" | "WITHDRAWAL" | "PURCHASE" | "RESALE" | "FUND" | "WITHDRAW";
   amount: number;
-  createdAt: string; // or Date if your backend returns Date
-  tickets: any[];    // can be more specific if you know ticket structure
-  status: string;
+  status: "SUCCESS" | "PENDING" | "FAILED";
+  paymentMethod: string;
+  createdAt: string | number | Date;
+  tickets?: {
+    ticket: {
+      id: string;
+      code: string;
+    } | null;
+  }[];
+  ticketCount?: number; 
+  name: string; 
+  email?: string; 
+  date: string | number | Date; 
+
+  // 👇 new derived field for convenience
+  eventName: string;
 }
+export default interface Event {
+  id: string;
+  name: string;
+  description: string;
+  location: string;
+  date: string;            // ISO date string from backend
+  category: string;
+  isActive: boolean;       // straight from backend
+  organizer: string;       // organizer name (fallback "Unknown")
+  ticketsSold: number;     // computed from ticketCategories
+  totalTickets: number;    // computed from ticketCategories
+  revenue: number;         // computed from ticketCategories
+  status: "Active" | "Completed"; // derived for filtering
+}
+
+
 
 // Define the shape your ActivityCard expects
 export interface RecentTransaction {
@@ -34,6 +67,10 @@ export interface User {
   role: string;
   isVerified: boolean;
   createdAt: string;
+
+  // New fields from backend
+  eventsCount: number;
+  totalSpent: number;
 }
 
 export interface RecentUser {
@@ -43,7 +80,6 @@ export interface RecentUser {
   joinedDate: string;
   avatar: string; // maybe initials
 }
-
 
 export interface EventCategory {
   name: string;

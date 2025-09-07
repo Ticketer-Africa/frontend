@@ -48,6 +48,8 @@ import {
   User,
 } from "@/types/admin.type";
 import { Transaction } from "@/types/admin.type";
+import router from "next/navigation";
+import { useRouter } from "next/navigation";
 
 
 export default function AdminDashboard() {
@@ -78,22 +80,32 @@ export default function AdminDashboard() {
   } = useAdminDailyRevenue();
   const {data:eventCategories, isLoading:loadingEventCategories, error:eventCategoriesError} = useEventCategories()
 
-  console.log(eventCategories);
-
+  
   const isLoading = loadingTransaction || loadingStats;
-
+  
   // Safely map transactions only if transactions exist
   const recentTransactions: RecentTransaction[] = (transactions ?? []).map(
-    (txn: Transaction) => ({
+  (txn: Transaction) => {
+    // Determine the type
+    const type = txn.event ? "Event" : txn.type ?? "Other"; // txn.type could be "WITHDRAW" or "DEPOSIT"
+    
+    // Set the display name for event or transaction type
+    const displayName = txn.event?.name ?? txn.type ?? "Transaction";
+
+    return {
       id: txn.id,
-      name: txn.user?.name ?? "Unknown Buyer",
-      event: txn.event?.name ?? "Unknown Event",
+      name: txn.user?.name ?? "Unknown User",
+      event: displayName, // shows event name OR "WITHDRAW"/"DEPOSIT"
       amount: txn.amount,
       date: txn.createdAt,
       ticketCount: txn.tickets?.length ?? 0,
       status: txn.status,
-    })
-  );
+      type, // optional: keep type to style differently if needed
+    };
+  }
+);
+
+  console.log(transactions);
 
   const recentEvents: RecentEvent[] = (events ?? []).map((event: any) => {
     const ticketsSold =
@@ -221,50 +233,7 @@ const eventTypeData: EventCategoryChartData[] = (eventCategories ?? []).map(
           />
         </div>
 
-        {/* Priority Alerts Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="bg-gradient-to-r from-red-50 to-red-100 p-6 border-b border-red-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-red-100 rounded-lg">
-                  <AlertTriangle className="h-5 w-5 text-red-600" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-slate-900">
-                    Priority Alerts
-                  </h3>
-                  <p className="text-sm text-slate-600">
-                    Issues requiring immediate attention
-                  </p>
-                </div>
-              </div>
-              <button className="px-4 py-2 text-sm text-blue-600 hover:text-blue-800 font-medium hover:bg-white rounded-lg transition-colors">
-                Manage All
-              </button>
-            </div>
-          </div>
-          <div className="p-6 space-y-4">
-            <AlertItem
-              message="Payment dispute for Event: Tech Conference 2024"
-              severity="high"
-              time="2 hours ago"
-              amount="₦45,000"
-            />
-            <AlertItem
-              message="User unable to access purchased ticket"
-              severity="medium"
-              time="4 hours ago"
-              amount="₦12,500"
-            />
-            <AlertItem
-              message="Organizer requesting payout review (Business Summit)"
-              severity="low"
-              time="6 hours ago"
-              amount="₦78,000"
-            />
-          </div>
-        </div>
-
+        
         {/* Analytics Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Revenue Chart */}
@@ -611,6 +580,14 @@ function AlertItem({ message, severity, time, amount }: any) {
 }
 
 function ActivityCard({ title, items, type, icon }: any) {
+ const router = useRouter(); // App Router's router
+
+  const handleViewAll = () => {
+    if (type === "transaction") router.push("/admin/transactions");
+    else if (type === "event") router.push("/admin/events");
+    else if (type === "user") router.push("/admin/users");
+  };
+  
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
       <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-6 border-b border-slate-200">
@@ -619,7 +596,7 @@ function ActivityCard({ title, items, type, icon }: any) {
             {icon}
             <h3 className="font-semibold text-slate-900">{title}</h3>
           </div>
-          <button className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors flex items-center gap-1">
+          <button onClick={handleViewAll} className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors flex items-center gap-1">
             View All
             <ArrowUpRight className="h-3 w-3" />
           </button>
