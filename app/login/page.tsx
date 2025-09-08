@@ -38,7 +38,7 @@ export default function LoginPage() {
   });
 
   const onSubmit = (data: LoginSchema) => {
-    loginMutation.mutate(data, {
+    loginMutation.mutate({...data, email: data.email.toLowerCase()}, {
       onSuccess: () => {
         location.href = "/explore";
       },

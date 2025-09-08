@@ -35,7 +35,7 @@ export default function ForgotPasswordPage() {
 
   const onSubmit = (data: ForgotPasswordSchema) => {
     forgotPasswordMutation.mutate(
-      { email: data.email },
+      { email: data.email.toLowerCase() },
       {
         onSuccess: () => {
           localStorage.setItem(
