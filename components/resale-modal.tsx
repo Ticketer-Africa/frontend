@@ -4,7 +4,7 @@ import { Ticket } from "@/types/tickets.type";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatDate, formatPrice } from "@/lib/dummy-data";
+import { formatDate, formatPrice } from "@/lib/helpers";
 import { useState } from "react";
 import { useBankCodes } from "@/services/banks/bank.queries";
 import { Bank } from "@/types/bank.type";

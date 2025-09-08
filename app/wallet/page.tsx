@@ -17,7 +17,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { PayoutModal } from "@/components/payout-modal";
 import { TransactionDetailsModal } from "@/components/transaction-details-modal";
-import { formatPrice } from "@/lib/dummy-data";
+import { formatPrice } from "@/lib/helpers";
 import PinModal from "@/components/pin-modal";
 
 interface Transaction {

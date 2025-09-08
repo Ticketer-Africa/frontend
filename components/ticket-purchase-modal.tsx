@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { X, Plus, Minus, Lock } from "lucide-react";
-import { formatDate, formatPrice, formatTime } from "@/lib/dummy-data";
+import { formatDate, formatPrice, formatTime } from "@/lib/helpers";
 import { useAuth } from "@/lib/auth-context";
 import { useBuyTicket } from "@/services/tickets/tickets.queries";
 import { toast } from "sonner";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Users,
   Ticket,
@@ -50,7 +50,7 @@ import {
 import { Transaction } from "@/types/admin.type";
 import router from "next/navigation";
 import { useRouter } from "next/navigation";
-
+import { useAuth } from "@/lib/auth-context";
 
 export default function AdminDashboard() {
   const {
@@ -78,32 +78,50 @@ export default function AdminDashboard() {
     isLoading: loadingDailyRevenue,
     error: dailyRevenueError,
   } = useAdminDailyRevenue();
-  const {data:eventCategories, isLoading:loadingEventCategories, error:eventCategoriesError} = useEventCategories()
+  const {
+    data: eventCategories,
+    isLoading: loadingEventCategories,
+    error: eventCategoriesError,
+  } = useEventCategories();
+  const { isLoading: authLoading, user: currentUser } = useAuth();
+  const router = useRouter();
 
-  
+  useEffect(() => {
+      if (!currentUser && !authLoading) {
+        router.push(
+          `/login?returnUrl=${encodeURIComponent(window.location.href)}`
+        );
+        return;
+      }
+      if (currentUser && !["ADMIN", "SUPERADMIN"].includes(currentUser.role)) {
+        router.push("/explore");
+        return;
+      }
+    }, [currentUser, authLoading, router]);
+
   const isLoading = loadingTransaction || loadingStats;
-  
+
   // Safely map transactions only if transactions exist
   const recentTransactions: RecentTransaction[] = (transactions ?? []).map(
-  (txn: Transaction) => {
-    // Determine the type
-    const type = txn.event ? "Event" : txn.type ?? "Other"; // txn.type could be "WITHDRAW" or "DEPOSIT"
-    
-    // Set the display name for event or transaction type
-    const displayName = txn.event?.name ?? txn.type ?? "Transaction";
+    (txn: Transaction) => {
+      // Determine the type
+      const type = txn.event ? "Event" : txn.type ?? "Other"; // txn.type could be "WITHDRAW" or "DEPOSIT"
 
-    return {
-      id: txn.id,
-      name: txn.user?.name ?? "Unknown User",
-      event: displayName, // shows event name OR "WITHDRAW"/"DEPOSIT"
-      amount: txn.amount,
-      date: txn.createdAt,
-      ticketCount: txn.tickets?.length ?? 0,
-      status: txn.status,
-      type, // optional: keep type to style differently if needed
-    };
-  }
-);
+      // Set the display name for event or transaction type
+      const displayName = txn.event?.name ?? txn.type ?? "Transaction";
+
+      return {
+        id: txn.id,
+        name: txn.user?.name ?? "Unknown User",
+        event: displayName, // shows event name OR "WITHDRAW"/"DEPOSIT"
+        amount: txn.amount,
+        date: txn.createdAt,
+        ticketCount: txn.tickets?.length ?? 0,
+        status: txn.status,
+        type, // optional: keep type to style differently if needed
+      };
+    }
+  );
 
   console.log(transactions);
 
@@ -149,17 +167,16 @@ export default function AdminDashboard() {
   const latestTickets =
     chartData.length > 0 ? chartData[chartData.length - 1].ticketsSold : 0;
 
-    const colors: string[] = ["#6366F1", "#EC4899", "#10B981", "#F59E0B"];
+  const colors: string[] = ["#6366F1", "#EC4899", "#10B981", "#F59E0B"];
 
-const eventTypeData: EventCategoryChartData[] = (eventCategories ?? []).map(
-  (item: EventCategory, index: number): EventCategoryChartData => ({
-    name: item.name,
-    value: parseFloat(item.value), // "75.00" -> 75
-    count: item.count,
-    color: colors[index % colors.length],
-  })
-);
-
+  const eventTypeData: EventCategoryChartData[] = (eventCategories ?? []).map(
+    (item: EventCategory, index: number): EventCategoryChartData => ({
+      name: item.name,
+      value: parseFloat(item.value), // "75.00" -> 75
+      count: item.count,
+      color: colors[index % colors.length],
+    })
+  );
 
   if (isLoading) return <p>Loading Dashboard...</p>;
   return (
@@ -233,7 +250,6 @@ const eventTypeData: EventCategoryChartData[] = (eventCategories ?? []).map(
           />
         </div>
 
-        
         {/* Analytics Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Revenue Chart */}
@@ -580,14 +596,14 @@ function AlertItem({ message, severity, time, amount }: any) {
 }
 
 function ActivityCard({ title, items, type, icon }: any) {
- const router = useRouter(); // App Router's router
+  const router = useRouter(); // App Router's router
 
   const handleViewAll = () => {
     if (type === "transaction") router.push("/admin/transactions");
     else if (type === "event") router.push("/admin/events");
     else if (type === "user") router.push("/admin/users");
   };
-  
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
       <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-6 border-b border-slate-200">
@@ -596,7 +612,10 @@ function ActivityCard({ title, items, type, icon }: any) {
             {icon}
             <h3 className="font-semibold text-slate-900">{title}</h3>
           </div>
-          <button onClick={handleViewAll} className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors flex items-center gap-1">
+          <button
+            onClick={handleViewAll}
+            className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors flex items-center gap-1"
+          >
             View All
             <ArrowUpRight className="h-3 w-3" />
           </button>
@@ -698,8 +717,9 @@ function ActivityCard({ title, items, type, icon }: any) {
                       <span
                         className={`px-2 py-1 rounded text-xs font-medium ${
                           item.role === "ORGANIZER"
-                            ? "bg-purple-100 text-purple-800" :
-                            item.role === "USER" ? "text-green-800 bg-green-100" 
+                            ? "bg-purple-100 text-purple-800"
+                            : item.role === "USER"
+                            ? "text-green-800 bg-green-100"
                             : "bg-blue-100 text-blue-800"
                         }`}
                       >

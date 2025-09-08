@@ -15,7 +15,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ArrowLeft, ArrowRight, Upload, Check, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { formatPrice } from "@/lib/dummy-data";
+import { formatPrice } from "@/lib/helpers";
 
 // Zod Schema for frontend form handling (includes id for React state)
 const formSchema = z.object({
@@ -162,7 +162,7 @@ export default function CreateEventPage() {
     // Validate submission data against submissionSchema
     const validatedData = submissionSchema.parse(submissionData);
 
-   const fullDate = new Date(`${validatedData.date}T${validatedData.time}`);
+    const fullDate = new Date(`${validatedData.date}T${validatedData.time}`);
     const isoDate = fullDate.toISOString();
     const formData = new FormData();
     formData.append("name", validatedData.name);
@@ -170,16 +170,18 @@ export default function CreateEventPage() {
     formData.append("category", validatedData.category.toUpperCase());
     formData.append("location", validatedData.location);
     formData.append("date", isoDate);
-    formData.append("ticketCategories", JSON.stringify(validatedData.ticketCategories));
+    formData.append(
+      "ticketCategories",
+      JSON.stringify(validatedData.ticketCategories)
+    );
     if (validatedData.banner) {
       formData.append("file", validatedData.banner);
     }
     // 🔍 Log what's inside FormData
-  console.log("FormData being sent:");
-  for (const [key, value] of formData.entries()) {
-    console.log(key, value);
-  }
-
+    console.log("FormData being sent:");
+    for (const [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
 
     try {
       await createEvent(formData);
@@ -188,7 +190,6 @@ export default function CreateEventPage() {
       console.error("Event creation failed:", error);
     }
   };
-  
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -538,7 +539,9 @@ export default function CreateEventPage() {
                               )}
                             </div>
                             <div className="space-y-2">
-                              <Label htmlFor={`ticketCategories.${index}.price`}>
+                              <Label
+                                htmlFor={`ticketCategories.${index}.price`}
+                              >
                                 Price (₦)
                               </Label>
                               <Input
@@ -551,7 +554,10 @@ export default function CreateEventPage() {
                               />
                               {errors.ticketCategories?.[index]?.price && (
                                 <p className="text-sm text-red-600">
-                                  {errors.ticketCategories[index].price?.message}
+                                  {
+                                    errors.ticketCategories[index].price
+                                      ?.message
+                                  }
                                 </p>
                               )}
                             </div>
@@ -565,12 +571,17 @@ export default function CreateEventPage() {
                                 id={`ticketCategories.${index}.maxTickets`}
                                 type="number"
                                 placeholder="Number of tickets"
-                                {...register(`ticketCategories.${index}.maxTickets`)}
+                                {...register(
+                                  `ticketCategories.${index}.maxTickets`
+                                )}
                                 min="1"
                               />
                               {errors.ticketCategories?.[index]?.maxTickets && (
                                 <p className="text-sm text-red-600">
-                                  {errors.ticketCategories[index].maxTickets?.message}
+                                  {
+                                    errors.ticketCategories[index].maxTickets
+                                      ?.message
+                                  }
                                 </p>
                               )}
                             </div>
@@ -673,10 +684,13 @@ export default function CreateEventPage() {
                             </p>
                           </div>
                           <div>
-                            <span className="text-gray-600">Ticket Categories:</span>
+                            <span className="text-gray-600">
+                              Ticket Categories:
+                            </span>
                             {ticketCategories.map((cat) => (
                               <p key={cat.id} className="font-medium">
-                                {cat.name}: {formatPrice(cat.price)} ({cat.maxTickets} tickets)
+                                {cat.name}: {formatPrice(cat.price)} (
+                                {cat.maxTickets} tickets)
                               </p>
                             ))}
                           </div>
@@ -704,12 +718,13 @@ export default function CreateEventPage() {
                           <div className="flex justify-between">
                             <span>If all tickets sell:</span>
                             <span className="font-medium">
-                              
-                              {formatPrice(ticketCategories
-                                .reduce(
-                                  (sum, cat) => sum + cat.price * cat.maxTickets * 0.95,
+                              {formatPrice(
+                                ticketCategories.reduce(
+                                  (sum, cat) =>
+                                    sum + cat.price * cat.maxTickets * 0.95,
                                   0
-                                ))}
+                                )
+                              )}
                             </span>
                           </div>
                         </div>

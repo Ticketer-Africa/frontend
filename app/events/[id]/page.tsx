@@ -23,7 +23,7 @@ import {
 } from "@/services/tickets/tickets.queries";
 import { useAuth } from "@/lib/auth-context";
 import { TicketPurchaseModal } from "@/components/ticket-purchase-modal";
-import { formatDate, formatPrice } from "@/lib/dummy-data";
+import { formatDate, formatPrice } from "@/lib/helpers";
 import { TicketResale } from "@/types/tickets.type";
 import { toast } from "sonner";
 import { BuyResaleModal } from "@/components/buy-resale-modal";
@@ -124,7 +124,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
 
   // Calculate total price for selected tickets
   const totalPrice = selectedTicketCategories.reduce((total, cat) => {
-    return total + (cat.price * (quantities[cat.id] || 1));
+    return total + cat.price * (quantities[cat.id] || 1);
   }, 0);
 
   if (isLoading) {

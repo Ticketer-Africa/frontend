@@ -1,29 +1,32 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import Link from "next/link"
-import { Calendar, MapPin, Users, Star } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import type { Event } from "@/types/events.type"
-import { formatDate, formatPrice, formatTime } from "@/lib/dummy-data"
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { Calendar, MapPin, Users, Star } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import type { Event } from "@/types/events.type";
+import { formatDate, formatPrice, formatTime } from "@/lib/helpers";
 
 interface EventCardProps {
-  event: Event
-   onBuyClick?: (event: Event) => void
+  event: Event;
+  onBuyClick?: (event: Event) => void;
 }
 
 export function EventCard({ event }: EventCardProps) {
-
-  const availableTickets = event.maxTickets - event.minted
-  const soldOutPercentage = (event.minted / event.maxTickets) * 100
+  const availableTickets = event.maxTickets - event.minted;
+  const soldOutPercentage = (event.minted / event.maxTickets) * 100;
 
   return (
     <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
       <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
         <div className="relative">
-          <img src={event.bannerUrl || "/placeholder.svg"} alt={event.name} className="w-full h-48 object-cover" />
+          <img
+            src={event.bannerUrl || "/placeholder.svg"}
+            alt={event.name}
+            className="w-full h-48 object-cover"
+          />
           {/* {event.featured && (
             <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground">Featured</Badge>
           )} */}
@@ -37,8 +40,12 @@ export function EventCard({ event }: EventCardProps) {
         <CardContent className="p-6">
           <div className="space-y-4">
             <div>
-              <h3 className="font-semibold text-lg text-foreground line-clamp-2 mb-2">{event.name}</h3>
-              <p className="text-muted-foreground text-sm line-clamp-2">{event.description}</p>
+              <h3 className="font-semibold text-lg text-foreground line-clamp-2 mb-2">
+                {event.name}
+              </h3>
+              <p className="text-muted-foreground text-sm line-clamp-2">
+                {event.description}
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -74,13 +81,18 @@ export function EventCard({ event }: EventCardProps) {
 
             <div className="flex items-center justify-between pt-2">
               <div className="space-y-1">
-                <div className="text-2xl font-bold text-foreground">{formatPrice(event.price)}</div>
+                <div className="text-2xl font-bold text-foreground">
+                  {formatPrice(event.price)}
+                </div>
                 <div className="flex items-center text-sm text-muted-foreground">
                   <Star className="h-3 w-3 mr-1 fill-current text-yellow-500" />
                   <span>4.8 (124 reviews)</span>
                 </div>
               </div>
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
+              <Button
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                asChild
+              >
                 <Link href={`/events/${event.id}`}>View Details</Link>
               </Button>
             </div>
@@ -88,5 +100,6 @@ export function EventCard({ event }: EventCardProps) {
         </CardContent>
       </Card>
     </motion.div>
-  )
+  );
 }
+

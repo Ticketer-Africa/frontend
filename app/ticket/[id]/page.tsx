@@ -14,7 +14,7 @@ import {
 import { ResaleModal } from "@/components/resale-modal";
 import { QRCodeDisplay } from "@/components/qr-code-display";
 import { useAuth } from "@/lib/auth-context";
-import { formatDate, formatPrice } from "@/lib/dummy-data";
+import { formatDate, formatPrice } from "@/lib/helpers";
 import { toast } from "sonner";
 import { Ticket, ListResalePayload } from "@/types/tickets.type";
 
@@ -27,7 +27,8 @@ export default function TicketDetailPage({
   const { user } = useAuth();
   const [isResaleModalOpen, setIsResaleModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
-  const { mutateAsync: listResale, isPending: isResalePending } = useListResale();
+  const { mutateAsync: listResale, isPending: isResalePending } =
+    useListResale();
 
   const ticket = userTickets?.find((t) => t.id === params.id);
   const event = ticket?.event;
@@ -47,7 +48,9 @@ export default function TicketDetailPage({
   const handleListForResale = () => {
     if (!ticket) return;
     if (ticket.resaleCount >= 1) {
-      toast.error("This ticket has already been resold once and cannot be listed again.");
+      toast.error(
+        "This ticket has already been resold once and cannot be listed again."
+      );
       return;
     }
     setSelectedTicket(ticket);
@@ -107,7 +110,8 @@ export default function TicketDetailPage({
             Ticket Not Found
           </h1>
           <p className="text-gray-600 mb-4">
-            The ticket you're looking for doesn't exist or is missing required information.
+            The ticket you're looking for doesn't exist or is missing required
+            information.
           </p>
           <Button
             asChild
@@ -208,7 +212,9 @@ export default function TicketDetailPage({
                         <div className="flex justify-between">
                           <span className="text-gray-600">Original Price:</span>
                           <span className="font-semibold text-gray-900">
-                            {originalPrice > 0 ? `${formatPrice(originalPrice)}` : "Free"}
+                            {originalPrice > 0
+                              ? `${formatPrice(originalPrice)}`
+                              : "Free"}
                           </span>
                         </div>
                         {ticket.isListed && ticket.resalePrice && (
@@ -258,10 +264,16 @@ export default function TicketDetailPage({
                         <Button
                           className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                           onClick={handleListForResale}
-                          disabled={ticket.isListed || isResalePending || ticket.resaleCount >= 1}
+                          disabled={
+                            ticket.isListed ||
+                            isResalePending ||
+                            ticket.resaleCount >= 1
+                          }
                         >
                           {ticket.isListed
-                            ? `Listed for ${formatPrice(ticket.resalePrice || 0)}`
+                            ? `Listed for ${formatPrice(
+                                ticket.resalePrice || 0
+                              )}`
                             : ticket.resaleCount >= 1
                             ? "Cannot Resell Again"
                             : "List for Resale"}

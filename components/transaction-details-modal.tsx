@@ -3,7 +3,7 @@
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Calendar, Ticket } from "lucide-react";
-import { formatPrice, formatDate } from "@/lib/dummy-data";
+import { formatPrice, formatDate } from "@/lib/helpers";
 
 interface Transaction {
   id: string;

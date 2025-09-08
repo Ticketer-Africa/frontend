@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   CreditCard,
   Search,
@@ -17,6 +17,8 @@ import {
 } from "lucide-react";
 import { useAdminTransactions } from "@/services/admin/admin.queries";
 import { Transaction } from "@/types/admin.type";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
 
 export default function AdminTransactionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,6 +33,22 @@ export default function AdminTransactionsPage() {
     isLoading,
     error: transactionsError,
   } = useAdminTransactions();
+
+  const { isLoading: authLoading, user: currentUser } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!currentUser && !authLoading) {
+      router.push(
+        `/login?returnUrl=${encodeURIComponent(window.location.href)}`
+      );
+      return;
+    }
+    if (currentUser && !["ADMIN", "SUPERADMIN"].includes(currentUser.role)) {
+      router.push("/explore");
+      return;
+    }
+  }, [currentUser, authLoading, router]);
 
   // Transform real data to match required format
   const allTransactions = useMemo(() => {
@@ -51,12 +69,21 @@ export default function AdminTransactionsPage() {
     return allTransactions
       .filter((txn: Transaction) => {
         const matchesSearch =
-          (txn.user?.name?.toLowerCase() ?? "").includes(searchTerm.toLowerCase()) ||
-          (txn.user?.email?.toLowerCase() ?? "").includes(searchTerm.toLowerCase()) ||
-          (txn.event?.name?.toLowerCase() ?? "").includes(searchTerm.toLowerCase()) ||
-          (txn.reference?.toLowerCase() ?? "").includes(searchTerm.toLowerCase());
+          (txn.user?.name?.toLowerCase() ?? "").includes(
+            searchTerm.toLowerCase()
+          ) ||
+          (txn.user?.email?.toLowerCase() ?? "").includes(
+            searchTerm.toLowerCase()
+          ) ||
+          (txn.event?.name?.toLowerCase() ?? "").includes(
+            searchTerm.toLowerCase()
+          ) ||
+          (txn.reference?.toLowerCase() ?? "").includes(
+            searchTerm.toLowerCase()
+          );
 
-        const matchesStatus = statusFilter === "ALL" || txn.status === statusFilter;
+        const matchesStatus =
+          statusFilter === "ALL" || txn.status === statusFilter;
 
         const matchesDate = () => {
           if (dateFilter === "ALL") return true;
@@ -67,10 +94,14 @@ export default function AdminTransactionsPage() {
             case "TODAY":
               return txnDate.toDateString() === today.toDateString();
             case "WEEK":
-              const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+              const weekAgo = new Date(
+                today.getTime() - 7 * 24 * 60 * 60 * 1000
+              );
               return txnDate >= weekAgo;
             case "MONTH":
-              const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+              const monthAgo = new Date(
+                today.getTime() - 30 * 24 * 60 * 60 * 1000
+              );
               return txnDate >= monthAgo;
             default:
               return true;
@@ -100,9 +131,22 @@ export default function AdminTransactionsPage() {
             bValue = new Date(b.date).getTime();
         }
 
-        return sortOrder === "asc" ? (aValue > bValue ? 1 : -1) : aValue < bValue ? 1 : -1;
+        return sortOrder === "asc"
+          ? aValue > bValue
+            ? 1
+            : -1
+          : aValue < bValue
+          ? 1
+          : -1;
       });
-  }, [allTransactions, searchTerm, statusFilter, dateFilter, sortBy, sortOrder]);
+  }, [
+    allTransactions,
+    searchTerm,
+    statusFilter,
+    dateFilter,
+    sortBy,
+    sortOrder,
+  ]);
 
   // Calculate stats
   const totalRevenue = allTransactions.reduce(
@@ -133,7 +177,9 @@ export default function AdminTransactionsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-slate-600 text-sm sm:text-base">Loading Transactions...</p>
+        <p className="text-slate-600 text-sm sm:text-base">
+          Loading Transactions...
+        </p>
       </div>
     );
   }
@@ -141,7 +187,9 @@ export default function AdminTransactionsPage() {
   if (transactionsError) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-600 text-sm sm:text-base">Error loading transactions: {transactionsError.message}</p>
+        <p className="text-red-600 text-sm sm:text-base">
+          Error loading transactions: {transactionsError.message}
+        </p>
       </div>
     );
   }
@@ -157,18 +205,16 @@ export default function AdminTransactionsPage() {
                 <CreditCard className="h-5 sm:h-6 w-5 sm:w-6 text-blue-600" />
                 All Transactions
               </h1>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1">Manage and monitor all platform transactions</p>
+              <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                Manage and monitor all platform transactions
+              </p>
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto">
-              <button
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors text-xs sm:text-sm"
-              >
+              <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors text-xs sm:text-sm">
                 <RefreshCw className="h-3 sm:h-4 w-3 sm:w-4" />
                 Refresh
               </button>
-              <button
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm"
-              >
+              <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm">
                 <Download className="h-3 sm:h-4 w-3 sm:w-4" />
                 Export CSV
               </button>
@@ -264,25 +310,48 @@ export default function AdminTransactionsPage() {
             <table className="w-full hidden sm:table">
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
-                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm">Transaction</th>
-                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm">Customer</th>
-                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm hidden lg:table-cell">Event</th>
-                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm hidden md:table-cell">Amount</th>
-                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm hidden lg:table-cell">Date</th>
-                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm">Status</th>
-                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm">Actions</th>
+                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm">
+                    Transaction
+                  </th>
+                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm">
+                    Customer
+                  </th>
+                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm hidden lg:table-cell">
+                    Event
+                  </th>
+                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm hidden md:table-cell">
+                    Amount
+                  </th>
+                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm hidden lg:table-cell">
+                    Date
+                  </th>
+                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm">
+                    Status
+                  </th>
+                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
                 {filteredTransactions.map((transaction: Transaction) => (
-                  <tr key={transaction.id} className="hover:bg-slate-50 transition-colors">
+                  <tr
+                    key={transaction.id}
+                    className="hover:bg-slate-50 transition-colors"
+                  >
                     <td className="px-4 sm:px-6 py-4">
                       <div>
-                        <p className="font-semibold text-slate-900 text-sm sm:text-base">#{transaction.id}</p>
-                        <p className="text-xs sm:text-sm text-slate-600">{transaction.reference}</p>
+                        <p className="font-semibold text-slate-900 text-sm sm:text-base">
+                          #{transaction.id}
+                        </p>
+                        <p className="text-xs sm:text-sm text-slate-600">
+                          {transaction.reference}
+                        </p>
                         <div className="flex items-center gap-1 mt-1">
                           <Ticket className="h-3 w-3 text-slate-400" />
-                          <span className="text-xs text-slate-500">{transaction.ticketCount} tickets</span>
+                          <span className="text-xs text-slate-500">
+                            {transaction.ticketCount} tickets
+                          </span>
                         </div>
                       </div>
                     </td>
@@ -294,17 +363,27 @@ export default function AdminTransactionsPage() {
                           </span>
                         </div>
                         <div>
-                          <p className="font-medium text-slate-900 text-sm sm:text-base">{transaction.name}</p>
-                          <p className="text-xs sm:text-sm text-slate-600">{transaction.email}</p>
+                          <p className="font-medium text-slate-900 text-sm sm:text-base">
+                            {transaction.name}
+                          </p>
+                          <p className="text-xs sm:text-sm text-slate-600">
+                            {transaction.email}
+                          </p>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 sm:px-6 py-4 hidden lg:table-cell">
-                      <p className="font-medium text-slate-900 text-xs sm:text-sm">{transaction.event?.name}</p>
-                      <p className="text-xs sm:text-sm text-slate-600">{transaction.type}</p>
+                      <p className="font-medium text-slate-900 text-xs sm:text-sm">
+                        {transaction.event?.name}
+                      </p>
+                      <p className="text-xs sm:text-sm text-slate-600">
+                        {transaction.type}
+                      </p>
                     </td>
                     <td className="px-4 sm:px-6 py-4 hidden md:table-cell">
-                      <p className="font-bold text-slate-900 text-xs sm:text-sm">₦{transaction.amount.toLocaleString()}</p>
+                      <p className="font-bold text-slate-900 text-xs sm:text-sm">
+                        ₦{transaction.amount.toLocaleString()}
+                      </p>
                     </td>
                     <td className="px-4 sm:px-6 py-4 hidden lg:table-cell">
                       <div className="flex items-center gap-2">
@@ -313,7 +392,9 @@ export default function AdminTransactionsPage() {
                           <p className="text-xs sm:text-sm font-medium text-slate-900">
                             {new Date(transaction.date).toLocaleDateString()}
                           </p>
-                          <p className="text-xs text-slate-600">{new Date(transaction.date).toLocaleTimeString()}</p>
+                          <p className="text-xs text-slate-600">
+                            {new Date(transaction.date).toLocaleTimeString()}
+                          </p>
                         </div>
                       </div>
                     </td>
@@ -327,9 +408,15 @@ export default function AdminTransactionsPage() {
                             : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {transaction.status === "SUCCESS" && <CheckCircle className="h-3 w-3" />}
-                        {transaction.status === "PENDING" && <Clock className="h-3 w-3" />}
-                        {transaction.status === "FAILED" && <XCircle className="h-3 w-3" />}
+                        {transaction.status === "SUCCESS" && (
+                          <CheckCircle className="h-3 w-3" />
+                        )}
+                        {transaction.status === "PENDING" && (
+                          <Clock className="h-3 w-3" />
+                        )}
+                        {transaction.status === "FAILED" && (
+                          <XCircle className="h-3 w-3" />
+                        )}
                         {transaction.status}
                       </span>
                     </td>
@@ -360,8 +447,12 @@ export default function AdminTransactionsPage() {
                         </span>
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-900 text-sm">#{transaction.id}</p>
-                        <p className="text-xs text-slate-600">{transaction.name}</p>
+                        <p className="font-semibold text-slate-900 text-sm">
+                          #{transaction.id}
+                        </p>
+                        <p className="text-xs text-slate-600">
+                          {transaction.name}
+                        </p>
                       </div>
                     </div>
                     <button
@@ -375,21 +466,33 @@ export default function AdminTransactionsPage() {
                     <div className="mt-3 space-y-3">
                       <div className="flex items-center gap-2">
                         <Ticket className="h-3 w-3 text-slate-400" />
-                        <span className="text-xs text-slate-500">{transaction.ticketCount} tickets</span>
+                        <span className="text-xs text-slate-500">
+                          {transaction.ticketCount} tickets
+                        </span>
                       </div>
-                      <p className="text-xs text-slate-600">{transaction.reference}</p>
-                      <p className="text-xs text-slate-600">{transaction.email}</p>
+                      <p className="text-xs text-slate-600">
+                        {transaction.reference}
+                      </p>
+                      <p className="text-xs text-slate-600">
+                        {transaction.email}
+                      </p>
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-slate-600">Event:</span>
-                        <span className="text-xs font-medium text-slate-900">{transaction.event?.name}</span>
+                        <span className="text-xs font-medium text-slate-900">
+                          {transaction.event?.name}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-slate-600">Type:</span>
-                        <span className="text-xs text-slate-600">{transaction.type}</span>
+                        <span className="text-xs text-slate-600">
+                          {transaction.type}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-slate-600">Amount:</span>
-                        <span className="font-bold text-xs text-slate-900">₦{transaction.amount.toLocaleString()}</span>
+                        <span className="font-bold text-xs text-slate-900">
+                          ₦{transaction.amount.toLocaleString()}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Calendar className="h-3 w-3 text-slate-400" />
@@ -397,7 +500,9 @@ export default function AdminTransactionsPage() {
                           <p className="text-xs font-medium text-slate-900">
                             {new Date(transaction.date).toLocaleDateString()}
                           </p>
-                          <p className="text-xs text-slate-600">{new Date(transaction.date).toLocaleTimeString()}</p>
+                          <p className="text-xs text-slate-600">
+                            {new Date(transaction.date).toLocaleTimeString()}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -410,9 +515,15 @@ export default function AdminTransactionsPage() {
                               : "bg-red-100 text-red-800"
                           }`}
                         >
-                          {transaction.status === "SUCCESS" && <CheckCircle className="h-3 w-3" />}
-                          {transaction.status === "PENDING" && <Clock className="h-3 w-3" />}
-                          {transaction.status === "FAILED" && <XCircle className="h-3 w-3" />}
+                          {transaction.status === "SUCCESS" && (
+                            <CheckCircle className="h-3 w-3" />
+                          )}
+                          {transaction.status === "PENDING" && (
+                            <Clock className="h-3 w-3" />
+                          )}
+                          {transaction.status === "FAILED" && (
+                            <XCircle className="h-3 w-3" />
+                          )}
                           {transaction.status}
                         </span>
                       </div>
@@ -434,8 +545,12 @@ export default function AdminTransactionsPage() {
           {filteredTransactions.length === 0 && (
             <div className="text-center py-12">
               <CreditCard className="h-10 sm:h-12 w-10 sm:w-12 text-slate-400 mx-auto mb-4" />
-              <p className="text-slate-600 font-medium text-sm sm:text-base">No transactions found</p>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1">Try adjusting your filters or search terms</p>
+              <p className="text-slate-600 font-medium text-sm sm:text-base">
+                No transactions found
+              </p>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                Try adjusting your filters or search terms
+              </p>
             </div>
           )}
         </div>
@@ -443,7 +558,8 @@ export default function AdminTransactionsPage() {
         {/* Pagination */}
         <div className="flex items-center justify-between mt-6 px-4 sm:px-0">
           <p className="text-xs sm:text-sm text-slate-600">
-            Showing {filteredTransactions.length} of {allTransactions.length} transactions
+            Showing {filteredTransactions.length} of {allTransactions.length}{" "}
+            transactions
           </p>
         </div>
       </div>
@@ -480,8 +596,12 @@ function StatCard({
           {icon}
         </div>
         <div>
-          <p className="text-lg sm:text-2xl font-bold text-slate-900">{value}</p>
-          <p className="text-xs sm:text-sm text-slate-600 font-medium">{title}</p>
+          <p className="text-lg sm:text-2xl font-bold text-slate-900">
+            {value}
+          </p>
+          <p className="text-xs sm:text-sm text-slate-600 font-medium">
+            {title}
+          </p>
         </div>
       </div>
     </div>

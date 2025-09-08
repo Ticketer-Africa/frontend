@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Users,
   Search,
@@ -20,6 +20,8 @@ import {
   Edit,
 } from "lucide-react";
 import { useAdminUsers } from "@/services/admin/admin.queries";
+import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
 
 export default function AdminUsersPage() {
   const { data: users, isLoading: loadingUsers, error } = useAdminUsers();
@@ -29,6 +31,22 @@ export default function AdminUsersPage() {
   const [sortBy, setSortBy] = useState("joinedDate");
   const [sortOrder, setSortOrder] = useState("desc");
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+
+  const { isLoading: authLoading, user: currentUser } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!currentUser && !authLoading) {
+      router.push(
+        `/login?returnUrl=${encodeURIComponent(window.location.href)}`
+      );
+      return;
+    }
+    if (currentUser && !["ADMIN", "SUPERADMIN"].includes(currentUser.role)) {
+      router.push("/explore");
+      return;
+    }
+  }, [currentUser, authLoading, router]);
 
   // Normalize incoming users
   const allUsers = useMemo(() => {
@@ -91,7 +109,8 @@ export default function AdminUsersPage() {
         (user.location ?? "").toString().toLowerCase().includes(term);
 
       const matchesRole = roleFilter === "ALL" || user.role === roleFilter;
-      const matchesStatus = statusFilter === "ALL" || user.status === statusFilter;
+      const matchesStatus =
+        statusFilter === "ALL" || user.status === statusFilter;
 
       return matchesSearch && matchesRole && matchesStatus;
     });
@@ -129,10 +148,17 @@ export default function AdminUsersPage() {
   // Summary stats
   const totalUsers = allUsers.length;
   const activeUsers = allUsers.filter((u: any) => u.status === "ACTIVE").length;
-  const inactiveUsers = allUsers.filter((u: any) => u.status === "INACTIVE").length;
-  const suspendedUsers = allUsers.filter((u: any) => u.status === "SUSPENDED").length;
+  const inactiveUsers = allUsers.filter(
+    (u: any) => u.status === "INACTIVE"
+  ).length;
+  const suspendedUsers = allUsers.filter(
+    (u: any) => u.status === "SUSPENDED"
+  ).length;
   const organizers = allUsers.filter((u: any) => u.role === "ORGANIZER").length;
-  const totalRevenue = allUsers.reduce((s: number, u: any) => s + (u.totalSpent ?? 0), 0);
+  const totalRevenue = allUsers.reduce(
+    (s: number, u: any) => s + (u.totalSpent ?? 0),
+    0
+  );
 
   // Toggle row expansion for mobile
   const toggleRow = (userId: string) => {
@@ -173,7 +199,9 @@ export default function AdminUsersPage() {
                 <Users className="h-5 sm:h-6 w-5 sm:w-6 text-blue-600" />
                 All Users
               </h1>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1">Manage and monitor all platform users</p>
+              <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                Manage and monitor all platform users
+              </p>
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto">
               <button
@@ -183,9 +211,7 @@ export default function AdminUsersPage() {
                 <RefreshCw className="h-4 w-4" />
                 Refresh
               </button>
-              <button
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
+              <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                 <Download className="h-4 w-4" />
                 Export
               </button>
@@ -202,7 +228,10 @@ export default function AdminUsersPage() {
           <SimpleStat title="Inactive" value={inactiveUsers} />
           <SimpleStat title="Suspended" value={suspendedUsers} />
           <SimpleStat title="Organizers" value={organizers} />
-          <SimpleStat title="Total Revenue" value={`₦${totalRevenue.toLocaleString()}`} />
+          <SimpleStat
+            title="Total Revenue"
+            value={`₦${totalRevenue.toLocaleString()}`}
+          />
         </div>
 
         {/* Filters */}
@@ -263,27 +292,48 @@ export default function AdminUsersPage() {
             <table className="w-full hidden sm:table">
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
-                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-sm">User</th>
-                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-sm">Contact</th>
-                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-sm">Role & Status</th>
-                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-sm hidden lg:table-cell">Stats</th>
-                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-sm hidden lg:table-cell">Joined</th>
-                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-sm">Actions</th>
+                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-sm">
+                    User
+                  </th>
+                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-sm">
+                    Contact
+                  </th>
+                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-sm">
+                    Role & Status
+                  </th>
+                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-sm hidden lg:table-cell">
+                    Stats
+                  </th>
+                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-sm hidden lg:table-cell">
+                    Joined
+                  </th>
+                  <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-sm">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
                 {filteredUsers.map((user: any) => (
-                  <tr key={user.id} className="hover:bg-slate-50 transition-colors">
+                  <tr
+                    key={user.id}
+                    className="hover:bg-slate-50 transition-colors"
+                  >
                     <td className="px-4 sm:px-6 py-4">
                       <div className="flex items-center gap-3 sm:gap-4">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
-                          <span className="text-xs sm:text-sm font-bold text-white">{user.avatar}</span>
+                          <span className="text-xs sm:text-sm font-bold text-white">
+                            {user.avatar}
+                          </span>
                         </div>
                         <div>
-                          <p className="font-semibold text-slate-900 text-sm sm:text-base">{user.name ?? "Unknown"}</p>
+                          <p className="font-semibold text-slate-900 text-sm sm:text-base">
+                            {user.name ?? "Unknown"}
+                          </p>
                           <div className="flex items-center gap-1 mt-1">
                             <MapPin className="h-3 w-3 text-slate-400" />
-                            <span className="text-xs text-slate-500">{user.location ?? "-"}</span>
+                            <span className="text-xs text-slate-500">
+                              {user.location ?? "-"}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -292,7 +342,9 @@ export default function AdminUsersPage() {
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <Mail className="h-3 sm:h-4 w-3 sm:w-4 text-slate-400" />
-                          <span className="text-xs sm:text-sm text-slate-600">{user.email ?? "-"}</span>
+                          <span className="text-xs sm:text-sm text-slate-600">
+                            {user.email ?? "-"}
+                          </span>
                         </div>
                       </div>
                     </td>
@@ -307,7 +359,9 @@ export default function AdminUsersPage() {
                               : "bg-gray-100 text-gray-800"
                           }`}
                         >
-                          {user.role === "ADMIN" && <Shield className="h-3 w-3" />}
+                          {user.role === "ADMIN" && (
+                            <Shield className="h-3 w-3" />
+                          )}
                           {user.role ?? "USER"}
                         </span>
                         <div>
@@ -320,9 +374,15 @@ export default function AdminUsersPage() {
                                 : "bg-red-100 text-red-800"
                             }`}
                           >
-                            {user.status === "ACTIVE" && <CheckCircle className="h-3 w-3" />}
-                            {user.status === "INACTIVE" && <Clock className="h-3 w-3" />}
-                            {user.status === "SUSPENDED" && <Ban className="h-3 w-3" />}
+                            {user.status === "ACTIVE" && (
+                              <CheckCircle className="h-3 w-3" />
+                            )}
+                            {user.status === "INACTIVE" && (
+                              <Clock className="h-3 w-3" />
+                            )}
+                            {user.status === "SUSPENDED" && (
+                              <Ban className="h-3 w-3" />
+                            )}
                             {user.status}
                           </span>
                         </div>
@@ -331,12 +391,20 @@ export default function AdminUsersPage() {
                     <td className="px-4 sm:px-6 py-4 hidden lg:table-cell">
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs sm:text-sm text-slate-600">Events:</span>
-                          <span className="text-xs sm:text-sm font-semibold text-slate-900">{user.eventsCount ?? 0}</span>
+                          <span className="text-xs sm:text-sm text-slate-600">
+                            Events:
+                          </span>
+                          <span className="text-xs sm:text-sm font-semibold text-slate-900">
+                            {user.eventsCount ?? 0}
+                          </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-xs sm:text-sm text-slate-600">Spent:</span>
-                          <span className="text-xs sm:text-sm font-semibold text-slate-900">₦{(user.totalSpent ?? 0).toLocaleString()}</span>
+                          <span className="text-xs sm:text-sm text-slate-600">
+                            Spent:
+                          </span>
+                          <span className="text-xs sm:text-sm font-semibold text-slate-900">
+                            ₦{(user.totalSpent ?? 0).toLocaleString()}
+                          </span>
                         </div>
                       </div>
                     </td>
@@ -345,7 +413,9 @@ export default function AdminUsersPage() {
                         <Calendar className="h-3 sm:h-4 w-3 sm:w-4 text-slate-400" />
                         <div>
                           <p className="text-xs sm:text-sm font-medium text-slate-900">
-                            {user.joinedDate ? new Date(user.joinedDate).toLocaleDateString() : "-"}
+                            {user.joinedDate
+                              ? new Date(user.joinedDate).toLocaleDateString()
+                              : "-"}
                           </p>
                         </div>
                       </div>
@@ -384,11 +454,17 @@ export default function AdminUsersPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
-                        <span className="text-xs font-bold text-white">{user.avatar}</span>
+                        <span className="text-xs font-bold text-white">
+                          {user.avatar}
+                        </span>
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-900 text-sm">{user.name ?? "Unknown"}</p>
-                        <p className="text-xs text-slate-600">{user.email ?? "-"}</p>
+                        <p className="font-semibold text-slate-900 text-sm">
+                          {user.name ?? "Unknown"}
+                        </p>
+                        <p className="text-xs text-slate-600">
+                          {user.email ?? "-"}
+                        </p>
                       </div>
                     </div>
                     <button
@@ -402,7 +478,9 @@ export default function AdminUsersPage() {
                     <div className="mt-3 space-y-3">
                       <div className="flex items-center gap-2">
                         <MapPin className="h-3 w-3 text-slate-400" />
-                        <span className="text-xs text-slate-500">{user.location ?? "-"}</span>
+                        <span className="text-xs text-slate-500">
+                          {user.location ?? "-"}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <span
@@ -414,7 +492,9 @@ export default function AdminUsersPage() {
                               : "bg-gray-100 text-gray-800"
                           }`}
                         >
-                          {user.role === "ADMIN" && <Shield className="h-3 w-3" />}
+                          {user.role === "ADMIN" && (
+                            <Shield className="h-3 w-3" />
+                          )}
                           {user.role ?? "USER"}
                         </span>
                         <span
@@ -424,27 +504,41 @@ export default function AdminUsersPage() {
                               : user.status === "INACTIVE"
                               ? "bg-yellow-100 text-yellow-800"
                               : "bg-red-100 text-red-800"
-                            }`}
+                          }`}
                         >
-                          {user.status === "ACTIVE" && <CheckCircle className="h-3 w-3" />}
-                          {user.status === "INACTIVE" && <Clock className="h-3 w-3" />}
-                          {user.status === "SUSPENDED" && <Ban className="h-3 w-3" />}
+                          {user.status === "ACTIVE" && (
+                            <CheckCircle className="h-3 w-3" />
+                          )}
+                          {user.status === "INACTIVE" && (
+                            <Clock className="h-3 w-3" />
+                          )}
+                          {user.status === "SUSPENDED" && (
+                            <Ban className="h-3 w-3" />
+                          )}
                           {user.status}
                         </span>
                       </div>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-slate-600">Events:</span>
-                          <span className="text-xs font-semibold text-slate-900">{user.eventsCount ?? 0}</span>
+                          <span className="text-xs text-slate-600">
+                            Events:
+                          </span>
+                          <span className="text-xs font-semibold text-slate-900">
+                            {user.eventsCount ?? 0}
+                          </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-slate-600">Spent:</span>
-                          <span className="text-xs font-semibold text-slate-900">₦{(user.totalSpent ?? 0).toLocaleString()}</span>
+                          <span className="text-xs font-semibold text-slate-900">
+                            ₦{(user.totalSpent ?? 0).toLocaleString()}
+                          </span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Calendar className="h-3 w-3 text-slate-400" />
                           <span className="text-xs text-slate-900">
-                            {user.joinedDate ? new Date(user.joinedDate).toLocaleDateString() : "-"}
+                            {user.joinedDate
+                              ? new Date(user.joinedDate).toLocaleDateString()
+                              : "-"}
                           </span>
                         </div>
                       </div>
@@ -475,15 +569,21 @@ export default function AdminUsersPage() {
           {filteredUsers.length === 0 && (
             <div className="text-center py-12">
               <Users className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-              <p className="text-slate-600 font-medium text-sm sm:text-base">No users found</p>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1">Try adjusting your filters or search terms</p>
+              <p className="text-slate-600 font-medium text-sm sm:text-base">
+                No users found
+              </p>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                Try adjusting your filters or search terms
+              </p>
             </div>
           )}
         </div>
 
         {/* Pagination */}
         <div className="flex items-center justify-between mt-6 px-4 sm:px-0">
-          <p className="text-xs sm:text-sm text-slate-600">Showing {filteredUsers.length} of {allUsers.length} users</p>
+          <p className="text-xs sm:text-sm text-slate-600">
+            Showing {filteredUsers.length} of {allUsers.length} users
+          </p>
         </div>
       </div>
     </div>
@@ -498,8 +598,12 @@ function SimpleStat({ title, value }: { title: string; value: any }) {
           <Users className="h-4 sm:h-5 w-4 sm:w-5" />
         </div>
         <div>
-          <p className="text-lg sm:text-2xl font-bold text-slate-900">{value}</p>
-          <p className="text-xs sm:text-sm text-slate-600 font-medium">{title}</p>
+          <p className="text-lg sm:text-2xl font-bold text-slate-900">
+            {value}
+          </p>
+          <p className="text-xs sm:text-sm text-slate-600 font-medium">
+            {title}
+          </p>
         </div>
       </div>
     </div>

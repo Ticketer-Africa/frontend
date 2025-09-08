@@ -5,7 +5,7 @@ import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Calendar, MapPin, Shield } from "lucide-react";
-import { formatDate, formatPrice } from "@/lib/dummy-data";
+import { formatDate, formatPrice } from "@/lib/helpers";
 
 interface BuyResaleModalProps {
   isOpen: boolean;
@@ -79,11 +79,11 @@ export function BuyResaleModal({
                 {formatPrice(selectedTicket.resalePrice ?? 0)}
               </span>
             </div>
-            
+
             <div className="flex justify-between items-center mt-2 font-semibold">
               <span className="text-sm text-gray-900">Total:</span>
               <span className="text-gray-900">
-                {formatPrice((selectedTicket.resalePrice ?? 0))}
+                {formatPrice(selectedTicket.resalePrice ?? 0)}
               </span>
             </div>
           </div>

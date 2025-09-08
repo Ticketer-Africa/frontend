@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { parseTicketData, type QRTicketData } from "@/lib/qr-utils";
 import { useVerifyTicket } from "@/services/tickets/tickets.queries";
 import { useAuth } from "@/lib/auth-context";
-import { formatDate, formatPrice } from "@/lib/dummy-data";
+import { formatDate, formatPrice } from "@/lib/helpers";
 import { toast } from "sonner";
 
 interface TicketCategory {
