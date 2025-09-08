@@ -57,9 +57,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         console.error("Failed to fetch user:", error);
         setUser(null);
-        router.push(
-          `/login?returnUrl=${encodeURIComponent(window.location.href)}`
-        );
         localStorage.removeItem("ticketer-user");
       } finally {
         setIsLoading(false);
