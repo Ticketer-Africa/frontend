@@ -44,9 +44,12 @@ export default function LoginPage() {
       {
         onSuccess: () => {
           const returnUrl = searchParams.get("returnUrl");
-          if (returnUrl) {
+
+          // Only redirect if returnUrl exists and is not the login page
+          if (returnUrl && !returnUrl.includes("/login")) {
             location.href = returnUrl;
           } else {
+            // Fallback to explore page
             location.href = "/explore";
           }
         },
