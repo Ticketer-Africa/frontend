@@ -1,12 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MapPin, Users } from "lucide-react";
+import { MapPin } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAllEvents } from "@/services/events/events.queries";
 import { Event } from "@/types/events.type";
 import { truncateText } from "@/utils/trauncate";
+import { Button } from "@/components/ui/button"; 
 
 export function EventsSection() {
   const router = useRouter();
@@ -30,8 +31,9 @@ export function EventsSection() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {events?.map((event: Event, index: number) => (
+        {/* Events grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+          {events?.slice(0, 3).map((event: Event, index: number) => (
             <motion.div
               key={event.id}
               initial={{ opacity: 0, y: 30 }}
@@ -60,26 +62,28 @@ export function EventsSection() {
                   </h3>
 
                   <p className="text-gray-600 text-sm mb-4">
-                    {truncateText(event.description, 10)} {/* 20 words max */}
+                    {truncateText(event.description, 10)}
                   </p>
 
                   <div className="flex items-center text-gray-600 text-sm mb-2">
                     <MapPin className="w-4 h-4 mr-2" />
                     <span>{truncateText(event.location, 5)}</span>
                   </div>
-
-                  {/* <div className="flex items-center text-gray-600 text-sm">
-                    <Users className="w-4 h-4 mr-2" />
-                    <span>
-                      {event.ticketCategories
-                        ? event.ticketCategories.reduce((acc, cur) => acc + (cur.minted ?? 0), 0)
-                        : 0} attending
-                    </span>
-                  </div> */}
                 </div>
               </div>
             </motion.div>
           ))}
+        </div>
+
+        {/* Explore More Button */}
+        <div className="text-center">
+          <Button
+            size="lg"
+            onClick={() => router.push("/explore")}
+            className="bg-[#1E88E5] hover:bg-blue-500 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            Explore More Events
+          </Button>
         </div>
       </div>
     </section>

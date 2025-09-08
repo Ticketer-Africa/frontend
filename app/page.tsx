@@ -24,22 +24,6 @@ import { FeaturesSection } from "@/components/features-section";
 import { EventsSection } from "@/components/events-section";
 import { WhyChooseSection } from "@/components/why-choose-section";
 
-// Animation Components
-const FloatingElement = ({
-  children,
-  delay = 0,
-}: {
-  children: React.ReactNode;
-  delay?: number;
-}) => (
-  <motion.div
-    initial={{ y: 0 }}
-    animate={{ y: [-10, 10, -10] }}
-    transition={{ duration: 6, repeat: Number.POSITIVE_INFINITY, delay }}
-  >
-    {children}
-  </motion.div>
-);
 
 const StaggerContainer = ({
   children,
@@ -90,32 +74,6 @@ export default function HomePage() {
   return (
     <div className="bg-background">
       <HeroSection />
-
-      {/* Stats Section */}
-      <section className="py-16 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { number: "50K+", label: "Events Hosted", icon: Calendar },
-              { number: "2M+", label: "Happy Customers", icon: Users },
-              { number: "500+", label: "Cities Worldwide", icon: MapPin },
-              { number: "4.9", label: "Average Rating", icon: Star },
-            ].map((stat, index) => (
-              <StaggerItem key={index}>
-                <Card className="text-center p-6 hover:shadow-lg transition-shadow">
-                  <CardContent className="p-0">
-                    <stat.icon className="h-8 w-8 mx-auto mb-4 text-primary" />
-                    <div className="text-3xl font-bold text-foreground mb-2">
-                      {stat.number}
-                    </div>
-                    <div className="text-muted-foreground">{stat.label}</div>
-                  </CardContent>
-                </Card>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-        </div>
-      </section>
       <EventsSection />
       <FeaturesSection />
       <WhyChooseSection />
