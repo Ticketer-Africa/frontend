@@ -58,7 +58,7 @@ export function ResaleModal({
       className="max-w-lg rounded-xl"
     >
       {selectedTicket && (
-        <div className="space-y-4">
+        <div className="overflow-y-auto max-h-[70vh] space-y-4">
           <div>
             <h3 className="font-semibold text-lg text-gray-900">
               {selectedTicket.event.name}
