@@ -19,6 +19,7 @@ import { useVerifyTicket } from "@/services/tickets/tickets.queries";
 import { useAuth } from "@/lib/auth-context";
 import { formatDate, formatPrice } from "@/lib/helpers";
 import { toast } from "sonner";
+import { useEventById } from "@/services/events/events.queries";
 
 interface TicketCategory {
   name: string;
@@ -87,9 +88,10 @@ export default function VerifyTicketPage() {
           code: parsedData.code,
           eventId: parsedData.eventId,
         });
+        console.log(response);
 
         setVerification({
-          isValid: response.isValid,
+          isValid: response.status === "VALID",
           ticket: {
             id: response.ticketId,
             code: response.code,
@@ -114,8 +116,9 @@ export default function VerifyTicketPage() {
     verify();
   }, [searchParams, verifyTicket]);
 
+  const { data: event } = useEventById(ticketData?.eventId || "");
+
   const ticket = verification?.ticket;
-  const event = ticket?.event;
 
   if (isVerifying) {
     return (
@@ -299,7 +302,7 @@ export default function VerifyTicketPage() {
                       <span className="text-gray-600">Category Price:</span>
                       <p className="font-semibold text-gray-900">
                         {ticket.ticketCategory?.price
-                          ? `₦${formatPrice(ticket.ticketCategory.price)}`
+                          ? `${formatPrice(ticket.ticketCategory.price)}`
                           : "Free"}
                       </p>
                     </div>
