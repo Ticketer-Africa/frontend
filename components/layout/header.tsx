@@ -151,13 +151,16 @@ export function Header() {
                     className="absolute right-0 mt-2 w-56 bg-white border border-gray-100/20 rounded-xl shadow-xl py-2 z-50"
                   >
                     <div className="flex items-center px-4 py-3 border-b border-gray-100">
-                      <img
-                        src={
-                          user.profileImage || "https://via.placeholder.com/40"
-                        }
-                        alt="Profile"
-                        className="w-10 h-10 rounded-full object-cover mr-3"
-                      />
+                      <Avatar className="w-8 h-8">
+                        <AvatarImage
+                          src={user.profileImage ?? undefined}
+                          alt={user.name}
+                          className="w-10 h-10 rounded-full object-cover mr-3"
+                        ></AvatarImage>
+                        <AvatarFallback className="bg-blue-100 text-blue-600 text-sm">
+                          {user.profileImage || user.name.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
                       <div>
                         <p className="text-sm font-semibold text-gray-900">
                           {user.name}
