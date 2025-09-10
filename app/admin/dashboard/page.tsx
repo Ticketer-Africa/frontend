@@ -719,3 +719,4 @@ function ActivityCard({ title, items, type, icon }: any) {
     </div>
   );
 }
+
