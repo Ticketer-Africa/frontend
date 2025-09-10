@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { Logo } from "./logo";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -129,11 +130,16 @@ export function Header() {
                   className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-full px-4 py-2 transition-all duration-300"
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                 >
-                  <img
-                    src={user.profileImage || "https://via.placeholder.com/32"}
-                    alt="Profile"
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
+                  <Avatar className="w-8 h-8">
+                    <AvatarImage
+                      src={user.profileImage ?? undefined}
+                      alt={user.name}
+                      className="w-8 h-8 rounded-full object-cover"
+                    ></AvatarImage>
+                    <AvatarFallback className="bg-blue-100 text-blue-600 text-sm">
+                      {user.profileImage || user.name.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
                   <span>{user.name}</span>
                 </Button>
 
@@ -248,13 +254,16 @@ export function Header() {
                 <>
                   <hr className="my-2 border-gray-100" />
                   <div className="flex items-center px-4 py-3 border-b border-gray-100">
-                    <img
-                      src={
-                        user.profileImage || "https://via.placeholder.com/40"
-                      }
-                      alt="Profile"
-                      className="w-10 h-10 rounded-full object-cover mr-3"
-                    />
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage
+                        src={user.profileImage ?? undefined}
+                        alt={user.name}
+                        className="w-10 h-10 rounded-full object-cover mr-3"
+                      ></AvatarImage>
+                      <AvatarFallback className="bg-blue-100 text-blue-600 text-sm">
+                        {user.profileImage || user.name.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
                     <div>
                       <p className="text-sm font-semibold text-gray-900">
                         {user.name}
@@ -311,4 +320,3 @@ export function Header() {
     </header>
   );
 }
-
