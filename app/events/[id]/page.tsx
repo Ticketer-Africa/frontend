@@ -27,6 +27,7 @@ import { formatDate, formatPrice } from "@/lib/helpers";
 import { TicketResale } from "@/types/tickets.type";
 import { toast } from "sonner";
 import { BuyResaleModal } from "@/components/buy-resale-modal";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export interface TicketCategory {
   id: string;
@@ -291,13 +292,17 @@ export default function EventPage({ params }: { params: { id: string } }) {
                             className="flex items-center justify-between p-4 border rounded-lg"
                           >
                             <div className="flex items-center space-x-3">
-                              <img
-                                src={
-                                  ticket.user.profileImage || "/placeholder.svg"
-                                }
-                                alt={ticket.user.name}
-                                className="w-8 h-8 rounded-full"
-                              />
+                              <Avatar className="w-8 h-8">
+                                <AvatarImage
+                                  src={ticket.user.profileImage ?? undefined}
+                                  alt={ticket.user.name}
+                                  className="w-8 h-8 rounded-full"
+                                ></AvatarImage>
+                                <AvatarFallback className="bg-blue-100 text-blue-600 text-sm">
+                                  {ticket.user.profileImage ||
+                                    ticket.user.name.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
                               <div>
                                 <p className="font-medium">
                                   {ticket.user.name}

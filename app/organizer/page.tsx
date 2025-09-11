@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { currentUser, formatPrice } from "@/lib/helpers";
+import { formatPrice } from "@/lib/helpers";
 import { Header } from "@/components/layout/header";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
