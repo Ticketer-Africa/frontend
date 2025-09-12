@@ -12,9 +12,9 @@ import { useAuth } from "@/lib/auth-context";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useUpdateUser } from "@/api/user/user.queries";
+import { useUpdateUser } from "@/services/user/user.queries";
 import { useRouter } from "next/navigation";
-import { useChangePassword } from "@/api/auth/auth.queries";
+import { useChangePassword } from "@/services/auth/auth.queries";
 
 const profileSchema = z.object({
   name: z.string().min(2, { message: "Name is too short" }),
@@ -397,4 +397,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-

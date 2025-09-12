@@ -15,16 +15,18 @@ import {
   TrendingUp,
   User,
   Shield,
+  Trash2,
 } from "lucide-react";
-import { formatPrice, formatDate } from "@/lib/dummy-data";
+import { formatPrice, formatDate } from "@/lib/helpers";
 import { useAuth } from "@/lib/auth-context";
 import {
   useResaleListings,
   useBuyResaleTicket,
-} from "@/api/tickets/tickets.queries";
+} from "@/services/tickets/tickets.queries";
+import { useRemoveResaleTicket } from "@/services/tickets/tickets.queries";
 import { BuyResaleModal } from "@/components/buy-resale-modal";
 import { toast } from "sonner";
-import { TicketResale } from "@/types/tickets.type";
+import { Ticket, TicketResale } from "@/types/tickets.type";
 
 export default function ResalePage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,7 +38,7 @@ export default function ResalePage() {
   const { data: resaleTickets, isLoading } = useResaleListings();
   const { mutateAsync: buyResaleTicket, isPending: isBuyPending } =
     useBuyResaleTicket();
-  console.log(resaleTickets);
+  const removeMutation = useRemoveResaleTicket();
 
   const filteredTickets = resaleTickets?.filter(
     (ticket) =>
@@ -144,8 +146,8 @@ export default function ResalePage() {
 
         {/* Resale Tickets Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredTickets?.map((ticket, index) => {
-            const originalPrice = ticket.event.price;
+          {filteredTickets?.map((ticket: Ticket, index) => {
+            const originalPrice = ticket?.ticketCategory?.price ?? 0;
             const resalePrice = ticket.resalePrice || 0;
             const savings = originalPrice - resalePrice;
             const isDiscounted = resalePrice < originalPrice;
@@ -167,15 +169,30 @@ export default function ResalePage() {
                     className="w-full h-48 object-cover"
                   />
 
-                  {/* Price Badge */}
-                  <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 shadow">
-                    <div className="text-sm font-semibold text-blue-600">
-                      {formatPrice(resalePrice)}
-                    </div>
-                    {isDiscounted && (
-                      <div className="text-xs text-gray-500 line-through">
-                        {formatPrice(originalPrice)}
+                  {/* Price + Delete */}
+                  <div className="absolute top-4 right-4 flex items-center space-x-2">
+                    {/* Price Badge */}
+                    <div className="bg-white rounded-full px-3 py-1 shadow text-center">
+                      <div className="text-sm font-semibold text-blue-600">
+                        {formatPrice(resalePrice)}
                       </div>
+                      {isDiscounted && (
+                        <div className="text-xs text-gray-500 line-through">
+                          {formatPrice(originalPrice)}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Delete Button (only for owner) */}
+                    {user?.id === ticket.user.id && (
+                      <button
+                        onClick={() => removeMutation.mutate(ticket.id)}
+                        disabled={removeMutation.isPending}
+                        className="p-2 rounded-full bg-red-100 hover:bg-red-200 transition"
+                        title="Remove from resale"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </button>
                     )}
                   </div>
 
@@ -376,4 +393,3 @@ export default function ResalePage() {
     </div>
   );
 }
-

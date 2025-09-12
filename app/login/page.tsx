@@ -7,13 +7,13 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sparkles, Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
-import { useLogin } from "@/api/auth/auth.queries";
+import { useLogin } from "@/services/auth/auth.queries";
 import { Logo } from "@/components/layout/logo";
 
 // 🧠 Zod Schema
@@ -27,6 +27,7 @@ type LoginSchema = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const loginMutation = useLogin();
 
   const {
@@ -38,11 +39,22 @@ export default function LoginPage() {
   });
 
   const onSubmit = (data: LoginSchema) => {
-    loginMutation.mutate(data, {
-      onSuccess: () => {
-        location.href = "/explore";
-      },
-    });
+    loginMutation.mutate(
+      { ...data, email: data.email.toLowerCase() },
+      {
+        onSuccess: () => {
+          const returnUrl = searchParams.get("returnUrl");
+
+          // Only redirect if returnUrl exists and is not the login page
+          if (returnUrl && !returnUrl.includes("/login")) {
+            location.href = returnUrl;
+          } else {
+            // Fallback to explore page
+            location.href = "/explore";
+          }
+        },
+      }
+    );
   };
 
   return (
@@ -182,4 +194,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

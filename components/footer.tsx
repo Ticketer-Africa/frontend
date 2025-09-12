@@ -12,7 +12,7 @@ const footerLinks = {
     "Terms of Service",
     "Privacy Policy",
     "Cookie Policy",
-    "Refund Policy",
+    "Refund Policy",,
   ],
   Organizers: ["Sell Tickets", "Event Planning", "Pricing", "Resources"],
 };

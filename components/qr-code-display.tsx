@@ -67,8 +67,8 @@ export function QRCodeDisplay({ ticket, userId, showControls = true }: QRCodeDis
 
       if (navigator.share && navigator.canShare({ files: [file] })) {
         await navigator.share({
-          title: `Ticket QR Code - ${ticket.event.title}`,
-          text: `QR Code for ${ticket.event.title}`,
+          title: `Ticket QR Code - ${ticket.event.name}`,
+          text: `QR Code for ${ticket.event.name}`,
           files: [file],
         })
       } else {
@@ -109,7 +109,7 @@ export function QRCodeDisplay({ ticket, userId, showControls = true }: QRCodeDis
           <div className="bg-white p-4 rounded-lg border-2 border-dashed border-muted-foreground/25">
             <img
               src={qrCodeUrl || "/placeholder.svg"}
-              alt={`QR Code for ${ticket.eventTitle}`}
+              alt={`QR Code for ${ticket.event.name}`}
               className="w-full h-auto max-w-[200px] mx-auto"
             />
           </div>
@@ -127,7 +127,7 @@ export function QRCodeDisplay({ ticket, userId, showControls = true }: QRCodeDis
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">Verification Code:</span>
-            <code className="text-sm bg-muted px-2 py-1 rounded">{ticket.verificationCode || "GENERATING..."}</code>
+            <code className="text-sm bg-muted px-2 py-1 rounded">{ticket.code || "GENERATING..."}</code>
           </div>
 
           <div className="flex space-x-2">
@@ -153,7 +153,7 @@ export function QRCodeDisplay({ ticket, userId, showControls = true }: QRCodeDis
 
           <div className="text-xs text-muted-foreground text-center">
             <p>Present this QR code at the event entrance</p>
-            <p>Valid for: {ticket.eventTitle}</p>
+            <p>Valid for: {ticket.event.name}</p>
           </div>
         </div>
       )}

@@ -11,13 +11,13 @@ import {
   useWalletBalance,
   useWalletTransactions,
   useWalletPinStatus,
-} from "@/api/wallet/wallet.queries";
+} from "@/services/wallet/wallet.queries";
 import { useAuth } from "@/lib/auth-context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { PayoutModal } from "@/components/payout-modal";
 import { TransactionDetailsModal } from "@/components/transaction-details-modal";
-import { formatPrice } from "@/lib/dummy-data";
+import { formatPrice } from "@/lib/helpers";
 import PinModal from "@/components/pin-modal";
 
 interface Transaction {
@@ -525,4 +525,3 @@ export default function WalletPage() {
     </div>
   );
 }
-

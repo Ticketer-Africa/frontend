@@ -3,14 +3,19 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus, Minus, CreditCard, Lock } from "lucide-react";
-import { formatDate, formatPrice, formatTime } from "@/lib/dummy-data";
+import { X, Plus, Minus, Lock } from "lucide-react";
+import { formatDate, formatPrice, formatTime } from "@/lib/helpers";
 import { useAuth } from "@/lib/auth-context";
-import { useBuyTicket } from "@/api/tickets/tickets.queries";
+import { useBuyTicket } from "@/services/tickets/tickets.queries";
 import { toast } from "sonner";
+import { TicketCategory } from "@/app/events/[id]/page";
+import {
+  BuyTicketPayload,
+  TicketResale,
+  TicketCategoryItem,
+} from "@/types/tickets.type";
 
 interface Event {
   id: string;
@@ -22,25 +27,57 @@ interface Event {
 
 interface TicketPurchaseModalProps {
   event: Event;
+  ticketCategories?: TicketCategory[];
+  resaleTicket?: TicketResale | null;
   isOpen: boolean;
   onClose: () => void;
+  quantities: { [key: string]: number };
+  setQuantities: React.Dispatch<
+    React.SetStateAction<{ [key: string]: number }>
+  >;
 }
 
 export function TicketPurchaseModal({
   event,
+  ticketCategories,
+  resaleTicket,
   isOpen,
   onClose,
+  quantities,
+  setQuantities,
 }: TicketPurchaseModalProps) {
   const { user } = useAuth();
-  const [ticketQuantity, setTicketQuantity] = useState(1);
   const [step, setStep] = useState<"quantity" | "auth" | "payment" | "success">(
     "quantity"
   );
-  const [isLoggedIn] = useState(false); // Simulate auth state
   const { mutateAsync: buyTicket, isPending: isBuying } = useBuyTicket();
 
-  const subtotal = event.price * ticketQuantity;
-  const total = subtotal;
+  const calculateSubtotal = () => {
+    if (resaleTicket) {
+      return (
+        (resaleTicket.resalePrice || 0) * (quantities[resaleTicket.id] || 1)
+      );
+    }
+    return (
+      ticketCategories?.reduce((sum, category) => {
+        const quantity = quantities[category.id] || 0;
+        return sum + category.price * quantity;
+      }, 0) || 0
+    );
+  };
+
+  const subtotal = calculateSubtotal();
+  const total = subtotal; // Add tax/fees if needed
+
+  const handleQuantityChange = (categoryId: string, delta: number) => {
+    setQuantities((prev) => {
+      const newQuantity = Math.max(
+        1,
+        Math.min(8, (prev[categoryId] || 1) + delta)
+      );
+      return { ...prev, [categoryId]: newQuantity };
+    });
+  };
 
   const handleContinue = () => {
     if (!user) {
@@ -51,25 +88,41 @@ export function TicketPurchaseModal({
   };
 
   const handlePurchase = async () => {
+    if (!ticketCategories && !resaleTicket) {
+      toast.error("Please select a ticket category or resale ticket.");
+      return;
+    }
+
+    const payload: BuyTicketPayload = resaleTicket
+      ? {
+          resaleTicketId: resaleTicket.id,
+          quantity: quantities[resaleTicket.id] || 1,
+        }
+      : {
+          eventId: event.id,
+          ticketCategories: ticketCategories?.map((category) => ({
+            ticketCategoryId: category.id,
+            quantity: quantities[category.id] || 1,
+          })),
+        };
+
+    console.log("Purchase payload:", payload);
+
     try {
-      const data = await buyTicket({
-        eventId: event.id,
-        quantity: ticketQuantity,
-      });
+      const data = await buyTicket(payload);
 
       if (data?.checkoutUrl) {
-        window.open(data.checkoutUrl); // opens in new tab
-      } else {
-        console.error("No checkout URL returned from buyTicket.");
+        window.location.href = data.checkoutUrl;
       }
-    } catch (err) {
-      // Handle error (e.g., show notification)
+    } catch (err: any) {
+      console.error("Purchase failed:", err);
+      toast.error(err.message || "Purchase failed. Try again.");
     }
   };
 
   const resetModal = () => {
     setStep("quantity");
-    setTicketQuantity(1);
+    setQuantities({});
     onClose();
   };
 
@@ -82,7 +135,7 @@ export function TicketPurchaseModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={resetModal}
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
           />
 
@@ -91,7 +144,7 @@ export function TicketPurchaseModal({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden"
+            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[70vh] overflow-y-auto"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
@@ -129,54 +182,118 @@ export function TicketPurchaseModal({
                   </div>
 
                   {/* Quantity Selector */}
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700 mb-3 block">
-                      Number of tickets
-                    </Label>
-                    <div className="flex items-center justify-center space-x-4">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setTicketQuantity(Math.max(1, ticketQuantity - 1))
-                        }
-                        disabled={ticketQuantity <= 1}
-                        className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
-                      >
-                        <Minus className="w-4 h-4" />
-                      </Button>
-
-                      <div className="text-2xl font-bold text-gray-900 w-12 text-center">
-                        {ticketQuantity}
+                  {resaleTicket ? (
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                        Number of Resale Tickets
+                      </Label>
+                      <div className="flex items-center justify-center space-x-4">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            handleQuantityChange(resaleTicket.id, -1)
+                          }
+                          disabled={(quantities[resaleTicket.id] || 1) <= 1}
+                          className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </Button>
+                        <div className="text-2xl font-bold text-gray-900 w-12 text-center">
+                          {quantities[resaleTicket.id] || 1}
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            handleQuantityChange(resaleTicket.id, 1)
+                          }
+                          disabled={(quantities[resaleTicket.id] || 1) >= 8}
+                          className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </Button>
                       </div>
-
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setTicketQuantity(Math.min(8, ticketQuantity + 1))
-                        }
-                        disabled={ticketQuantity >= 8}
-                        className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </Button>
+                      <p className="text-xs text-gray-500 text-center mt-2">
+                        Maximum 8 tickets per order
+                      </p>
                     </div>
-                    <p className="text-xs text-gray-500 text-center mt-2">
-                      Maximum 8 tickets per order
-                    </p>
-                  </div>
+                  ) : (
+                    ticketCategories?.map((category) => (
+                      <div key={category.id}>
+                        <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                          {category.name} ({formatPrice(category.price)})
+                        </Label>
+                        <div className="flex items-center justify-center space-x-4">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              handleQuantityChange(category.id, -1)
+                            }
+                            disabled={(quantities[category.id] || 0) <= 0}
+                            className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </Button>
+                          <div className="text-2xl font-bold text-gray-900 w-12 text-center">
+                            {quantities[category.id] || 0}
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleQuantityChange(category.id, 1)}
+                            disabled={
+                              (quantities[category.id] || 0) >= 8 ||
+                              category.maxTickets - category.minted <=
+                                (quantities[category.id] || 0)
+                            }
+                            className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        <p className="text-xs text-gray-500 text-center mt-2">
+                          {category.maxTickets - category.minted} tickets
+                          available
+                        </p>
+                      </div>
+                    ))
+                  )}
 
                   {/* Price Breakdown */}
                   <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">
-                        {ticketQuantity} × {formatPrice(event.price)}
-                      </span>
-                      <span className="text-gray-900">
-                        {formatPrice(subtotal)}
-                      </span>
-                    </div>
+                    {resaleTicket ? (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">
+                          {quantities[resaleTicket.id] || 1} ×{" "}
+                          {formatPrice(resaleTicket.resalePrice || 0)}
+                        </span>
+                        <span className="text-gray-900">
+                          {formatPrice(subtotal)}
+                        </span>
+                      </div>
+                    ) : (
+                      ticketCategories?.map(
+                        (category) =>
+                          quantities[category.id] > 0 && (
+                            <div
+                              key={category.id}
+                              className="flex justify-between text-sm"
+                            >
+                              <span className="text-gray-600">
+                                {quantities[category.id]} × {category.name} (
+                                {formatPrice(category.price)})
+                              </span>
+                              <span className="text-gray-900">
+                                {formatPrice(
+                                  category.price * quantities[category.id]
+                                )}
+                              </span>
+                            </div>
+                          )
+                      )
+                    )}
                     <div className="border-t border-gray-200 pt-2 flex justify-between font-semibold">
                       <span className="text-gray-900">Total</span>
                       <span className="text-gray-900">
@@ -187,6 +304,13 @@ export function TicketPurchaseModal({
 
                   <Button
                     onClick={handleContinue}
+                    disabled={
+                      resaleTicket
+                        ? false
+                        : !ticketCategories?.some(
+                            (cat) => quantities[cat.id] > 0
+                          )
+                    }
                     className="w-full h-12 bg-[#1E88E5] hover:bg-blue-500 text-white font-semibold rounded-xl"
                   >
                     Continue to Checkout
@@ -248,7 +372,12 @@ export function TicketPurchaseModal({
                         {event.name}
                       </span>
                       <Badge variant="secondary">
-                        {ticketQuantity} tickets
+                        {resaleTicket
+                          ? `${quantities[resaleTicket.id] || 1} tickets`
+                          : `${Object.values(quantities).reduce(
+                              (sum, qty) => sum + qty,
+                              0
+                            )} tickets`}
                       </Badge>
                     </div>
                     <div className="text-sm text-gray-600 mb-3">
@@ -327,4 +456,3 @@ export function TicketPurchaseModal({
     </AnimatePresence>
   );
 }
-

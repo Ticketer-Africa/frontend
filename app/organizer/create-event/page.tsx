@@ -6,26 +6,35 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Link from "next/link";
-import { useCreateEvent } from "@/api/events/events.queries";
+import { useCreateEvent } from "@/services/events/events.queries";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, ArrowRight, Upload, Check } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { ArrowLeft, ArrowRight, Upload, Check, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
+import { formatPrice } from "@/lib/helpers";
 
-// Zod Schema
-const createEventSchema = z.object({
+// Zod Schema for frontend form handling (includes id for React state)
+const formSchema = z.object({
   name: z.string().min(3, "Event name is required"),
   description: z.string().min(10, "Description is required"),
   category: z.string().min(1, "Category is required"),
   location: z.string().min(3, "Location is required"),
   date: z.string().min(1, "Date is required"),
   time: z.string().min(1, "Time is required"),
-  price: z.coerce.number().min(0, "Price is required"),
-  quantity: z.coerce.number().min(1, "Total tickets is required"),
+  ticketCategories: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string().min(3, "Category name is required"),
+        price: z.coerce.number().min(0, "Price must be non-negative"),
+        maxTickets: z.coerce.number().min(1, "At least 1 ticket is required"),
+      })
+    )
+    .min(1, "At least one ticket category is required"),
   banner: z
     .any()
     .refine(
@@ -39,7 +48,37 @@ const createEventSchema = z.object({
     .optional(),
 });
 
-type CreateEventForm = z.infer<typeof createEventSchema>;
+// Zod Schema for backend submission (excludes id)
+const submissionSchema = z.object({
+  name: z.string().min(3, "Event name is required"),
+  description: z.string().min(10, "Description is required"),
+  category: z.string().min(1, "Category is required"),
+  location: z.string().min(3, "Location is required"),
+  date: z.string().min(1, "Date is required"),
+  time: z.string().min(1, "Time is required"),
+  ticketCategories: z
+    .array(
+      z.object({
+        name: z.string().min(3, "Category name is required"),
+        price: z.coerce.number().min(0, "Price must be non-negative"),
+        maxTickets: z.coerce.number().min(1, "At least 1 ticket is required"),
+      })
+    )
+    .min(1, "At least one ticket category is required"),
+  banner: z
+    .any()
+    .refine(
+      (file) => !file || file.size <= 10 * 1024 * 1024,
+      "File size must be ≤10MB"
+    )
+    .refine(
+      (file) => !file || ["image/png", "image/jpeg"].includes(file.type),
+      "File must be PNG or JPG"
+    )
+    .optional(),
+});
+
+type CreateEventForm = z.infer<typeof formSchema>;
 
 export default function CreateEventPage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -72,7 +111,7 @@ export default function CreateEventPage() {
     formState: { errors },
     reset,
   } = useForm<CreateEventForm>({
-    resolver: zodResolver(createEventSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -80,8 +119,7 @@ export default function CreateEventPage() {
       location: "",
       date: "",
       time: "",
-      price: 0,
-      quantity: 1,
+      ticketCategories: [{ id: "1", name: "Regular", price: 0, maxTickets: 1 }],
       banner: undefined,
     },
   });
@@ -97,32 +135,52 @@ export default function CreateEventPage() {
       router.push("/explore");
       return;
     }
-  }, [currentUser, router]);
+  }, [currentUser, router, isLoading]);
 
   const previewUrl = watch("banner")
     ? URL.createObjectURL(watch("banner"))
     : null;
 
+  const ticketCategories = watch("ticketCategories") || [];
   const canProceedStep1 = watch("name") && watch("description");
   const canProceedStep2 =
     watch("location") &&
     watch("date") &&
     watch("time") &&
-    watch("price") &&
-    watch("quantity");
+    ticketCategories.length > 0 &&
+    ticketCategories.every(
+      (cat) => cat.name && cat.price >= 0 && cat.maxTickets >= 1
+    );
 
   const onSubmit = async (data: CreateEventForm) => {
-    const fullDate = `${data.date}T${data.time}`;
+    // Map ticketCategories to exclude id for backend submission
+    const submissionData = {
+      ...data,
+      ticketCategories: data.ticketCategories.map(({ id, ...rest }) => rest),
+    };
+
+    // Validate submission data against submissionSchema
+    const validatedData = submissionSchema.parse(submissionData);
+
+    const fullDate = new Date(`${validatedData.date}T${validatedData.time}`);
+    const isoDate = fullDate.toISOString();
     const formData = new FormData();
-    formData.append("name", data.name);
-    formData.append("description", data.description);
-    formData.append("category", data.category.toUpperCase());
-    formData.append("location", data.location);
-    formData.append("date", fullDate);
-    formData.append("price", data.price.toString());
-    formData.append("maxTickets", data.quantity.toString());
-    if (data.banner) {
-      formData.append("file", data.banner);
+    formData.append("name", validatedData.name);
+    formData.append("description", validatedData.description);
+    formData.append("category", validatedData.category.toUpperCase());
+    formData.append("location", validatedData.location);
+    formData.append("date", isoDate);
+    formData.append(
+      "ticketCategories",
+      JSON.stringify(validatedData.ticketCategories)
+    );
+    if (validatedData.banner) {
+      formData.append("file", validatedData.banner);
+    }
+    // 🔍 Log what's inside FormData
+    console.log("FormData being sent:");
+    for (const [key, value] of formData.entries()) {
+      console.log(key, value);
     }
 
     try {
@@ -136,6 +194,21 @@ export default function CreateEventPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) setValue("banner", file);
+  };
+
+  const handleAddCategory = () => {
+    const newId = (ticketCategories.length + 1).toString();
+    const newCategories = [
+      ...ticketCategories,
+      { id: newId, name: "", price: 0, maxTickets: 1 },
+    ];
+    setValue("ticketCategories", newCategories);
+  };
+
+  const handleRemoveCategory = (id: string) => {
+    if (ticketCategories.length === 1) return; // Prevent removing the last category
+    const newCategories = ticketCategories.filter((cat) => cat.id !== id);
+    setValue("ticketCategories", newCategories);
   };
 
   const handleNext = () => {
@@ -154,7 +227,16 @@ export default function CreateEventPage() {
   };
 
   const handleCreateAnother = () => {
-    reset();
+    reset({
+      name: "",
+      description: "",
+      category: "",
+      location: "",
+      date: "",
+      time: "",
+      ticketCategories: [{ id: "1", name: "Regular", price: 0, maxTickets: 1 }],
+      banner: undefined,
+    });
     setCurrentStep(1);
     setIsSubmitted(false);
   };
@@ -429,71 +511,135 @@ export default function CreateEventPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="price">Ticket Price (₦) *</Label>
-                        <Input
-                          id="price"
-                          type="number"
-                          placeholder="0 for free events"
-                          {...register("price")}
-                          min="0"
-                          step="100"
-                        />
-                        <p className="text-xs text-gray-500">
-                          Set to 0 for free events
+                    <div className="space-y-4">
+                      <Label>Ticket Categories *</Label>
+                      {ticketCategories.map((category, index) => (
+                        <motion.div
+                          key={category.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="border border-gray-200 rounded-lg p-4 space-y-4"
+                        >
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                              <Label htmlFor={`ticketCategories.${index}.name`}>
+                                Category Name
+                              </Label>
+                              <Input
+                                id={`ticketCategories.${index}.name`}
+                                placeholder="e.g., VIP, General Admission"
+                                {...register(`ticketCategories.${index}.name`)}
+                                disabled={index === 0} // Disable name for default "Regular"
+                              />
+                              {errors.ticketCategories?.[index]?.name && (
+                                <p className="text-sm text-red-600">
+                                  {errors.ticketCategories[index].name?.message}
+                                </p>
+                              )}
+                            </div>
+                            <div className="space-y-2">
+                              <Label
+                                htmlFor={`ticketCategories.${index}.price`}
+                              >
+                                Price (₦)
+                              </Label>
+                              <Input
+                                id={`ticketCategories.${index}.price`}
+                                type="number"
+                                placeholder="0 for free"
+                                {...register(`ticketCategories.${index}.price`)}
+                                min="0"
+                                step="100"
+                              />
+                              {errors.ticketCategories?.[index]?.price && (
+                                <p className="text-sm text-red-600">
+                                  {
+                                    errors.ticketCategories[index].price
+                                      ?.message
+                                  }
+                                </p>
+                              )}
+                            </div>
+                            <div className="space-y-2">
+                              <Label
+                                htmlFor={`ticketCategories.${index}.maxTickets`}
+                              >
+                                Total Tickets
+                              </Label>
+                              <Input
+                                id={`ticketCategories.${index}.maxTickets`}
+                                type="number"
+                                placeholder="Number of tickets"
+                                {...register(
+                                  `ticketCategories.${index}.maxTickets`
+                                )}
+                                min="1"
+                              />
+                              {errors.ticketCategories?.[index]?.maxTickets && (
+                                <p className="text-sm text-red-600">
+                                  {
+                                    errors.ticketCategories[index].maxTickets
+                                      ?.message
+                                  }
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          {index > 0 && (
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleRemoveCategory(category.id)}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Remove
+                            </Button>
+                          )}
+                        </motion.div>
+                      ))}
+                      {errors.ticketCategories && (
+                        <p className="text-sm text-red-600">
+                          {errors.ticketCategories.message}
                         </p>
-                        {errors.price && (
-                          <p className="text-sm text-red-600">
-                            {errors.price.message}
-                          </p>
-                        )}
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="quantity">Total Tickets *</Label>
-                        <Input
-                          id="quantity"
-                          type="number"
-                          placeholder="Number of tickets"
-                          {...register("quantity")}
-                          min="1"
-                        />
-                        {errors.quantity && (
-                          <p className="text-sm text-red-600">
-                            {errors.quantity.message}
-                          </p>
-                        )}
-                      </div>
+                      )}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="bg-transparent"
+                        onClick={handleAddCategory}
+                      >
+                        Add Category
+                      </Button>
                     </div>
 
-                    {watch("price") > 0 && (
+                    {ticketCategories.some((cat) => cat.price > 0) && (
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                         <h4 className="font-medium text-blue-900 mb-2">
                           Pricing Breakdown
                         </h4>
-                        <div className="space-y-1 text-sm text-blue-800">
-                          <div className="flex justify-between">
-                            <span>Ticket Price:</span>
-                            <span>₦{watch("price").toLocaleString()}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Platform Fee (5%):</span>
-                            <span>
-                              ₦
-                              {Math.round(
-                                watch("price") * 0.05
-                              ).toLocaleString()}
-                            </span>
-                          </div>
-                          <div className="flex justify-between font-medium border-t border-blue-300 pt-1">
-                            <span>You receive per ticket:</span>
-                            <span>
-                              ₦
-                              {Math.round(
-                                watch("price") * 0.95
-                              ).toLocaleString()}
-                            </span>
-                          </div>
+                        <div className="space-y-2 text-sm text-blue-800">
+                          {ticketCategories.map((cat, index) => (
+                            <div key={cat.id} className="space-y-1">
+                              <div className="flex justify-between">
+                                <span>{cat.name} Price:</span>
+                                <span>{formatPrice(cat.price)}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Platform Fee (5%):</span>
+                                <span>
+                                  {formatPrice(Math.round(cat.price * 0.05))}
+                                </span>
+                              </div>
+                              <div className="flex justify-between font-medium border-t border-blue-300 pt-1">
+                                <span>You receive per {cat.name} ticket:</span>
+                                <span>
+                                  {formatPrice(Math.round(cat.price * 0.95))}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
@@ -511,10 +657,6 @@ export default function CreateEventPage() {
                             <span className="text-gray-600">Name:</span>
                             <p className="font-medium">{watch("name")}</p>
                           </div>
-                          {/* <div>
-                            <span className="text-gray-600">Category:</span>
-                            <p className="font-medium">{watch("category")}</p>
-                          </div> */}
                           <div>
                             <span className="text-gray-600">Description:</span>
                             <p className="font-medium line-clamp-3">
@@ -542,18 +684,15 @@ export default function CreateEventPage() {
                             </p>
                           </div>
                           <div>
-                            <span className="text-gray-600">Price:</span>
-                            <p className="font-medium">
-                              {watch("price") === 0
-                                ? "Free"
-                                : `₦${watch("price").toLocaleString()}`}
-                            </p>
-                          </div>
-                          <div>
                             <span className="text-gray-600">
-                              Total Tickets:
+                              Ticket Categories:
                             </span>
-                            <p className="font-medium">{watch("quantity")}</p>
+                            {ticketCategories.map((cat) => (
+                              <p key={cat.id} className="font-medium">
+                                {cat.name}: {formatPrice(cat.price)} (
+                                {cat.maxTickets} tickets)
+                              </p>
+                            ))}
                           </div>
                         </div>
                       </div>
@@ -570,7 +709,7 @@ export default function CreateEventPage() {
                       </div>
                     )}
 
-                    {watch("price") > 0 && (
+                    {ticketCategories.some((cat) => cat.price > 0) && (
                       <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                         <h4 className="font-medium text-green-900 mb-2">
                           Revenue Projection
@@ -579,12 +718,13 @@ export default function CreateEventPage() {
                           <div className="flex justify-between">
                             <span>If all tickets sell:</span>
                             <span className="font-medium">
-                              ₦
-                              {(
-                                watch("price") *
-                                watch("quantity") *
-                                0.95
-                              ).toLocaleString()}
+                              {formatPrice(
+                                ticketCategories.reduce(
+                                  (sum, cat) =>
+                                    sum + cat.price * cat.maxTickets * 0.95,
+                                  0
+                                )
+                              )}
                             </span>
                           </div>
                         </div>

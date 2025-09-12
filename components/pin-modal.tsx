@@ -10,7 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { useSetWalletPin } from "@/api/wallet/wallet.queries";
+import { useSetWalletPin } from "@/services/wallet/wallet.queries";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { SetWalletPinPayload } from "@/types/wallet.type";

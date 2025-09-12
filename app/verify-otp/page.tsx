@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/input-otp";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { toast } from "sonner";
-import { useVerifyOtp, useResendOtp } from "@/api/auth/auth.queries";
+import { useVerifyOtp, useResendOtp } from "@/services/auth/auth.queries";
 import { ResendOtpDto } from "@/types/auth.type";
 import { z } from "zod";
 import { useAuth } from "@/lib/auth-context";
@@ -81,11 +81,14 @@ export default function VerifyOTPPage() {
 
     verifyOtp(result.data, {
       onSuccess: () => {
-        toast.success("OTP verified! You can now login.");
+        toast.success("OTP verified Sucessfully!");
+        const context = otpPayload?.context
         localStorage.removeItem("otpPayload");
-        const role = user?.role || "user";
-        if (role === "ORGANIZER") {
-          router.push("/organizer");
+        // const role = user?.role || "user";
+        if (context === "forgot-password") {
+           localStorage.setItem("resetEmail", email!);
+           localStorage.setItem("resetOtp", otp);
+          router.push("/reset-password");
         } else {
           router.push("/login");
         }
@@ -208,4 +211,3 @@ export default function VerifyOTPPage() {
     </div>
   );
 }
-
