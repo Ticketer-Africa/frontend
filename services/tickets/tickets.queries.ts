@@ -96,6 +96,7 @@ export const useVerifyTicket = () => {
   });
 };
 
+
 // Remove resale ticket
 export const useRemoveResaleTicket = () => {
   const queryClient = useQueryClient();

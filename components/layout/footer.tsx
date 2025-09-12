@@ -11,6 +11,7 @@ import {
   Phone,
   MapPin,
 } from "lucide-react";
+import { Button } from "@/components/ui/button"
 import { Logo } from "./logo";
 
 export function Footer() {
@@ -40,7 +41,7 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
+          
           <div className="space-y-4">
             <h3 className="font-semibold">Quick Links</h3>
             <div className="space-y-2 text-sm">
@@ -89,6 +90,7 @@ export function Footer() {
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4" />
                 <span>ticketerafrica@gmail.com</span>
+                <span className="text-sm">ticketerafrica@gmail.com</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4" />
@@ -97,13 +99,17 @@ export function Footer() {
               <div className="flex items-center space-x-2">
                 <MapPin className="h-4 w-4" />
                 <span>Lagos, Nigeria</span>
+                <span className="text-sm">Lagos, Nigeria</span>
               </div>
             </div>
           </div>
         </div>
-
         <div className="border-t border-white/20 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center text-sm">
           <p>© {new Date().getFullYear()} Ticketer. All rights reserved.</p>
+        <div className="border-t mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-muted-[#1E88E5] text-sm">
+            © {new Date().getFullYear()} Ticketer. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
