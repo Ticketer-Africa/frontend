@@ -37,15 +37,16 @@ export function Footer() {
             anyone else.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <Input
-              type="email"
-              placeholder="Enter your email"
-              className="bg-gray-800 border-gray-700 text-white placeholder-gray-400 rounded-full px-6 py-3"
-            />
-            <Button className="bg-[#1E88E5] hover:bg-blue-500 rounded-full px-8 py-3 font-semibold">
-              Subscribe
-            </Button>
-          </div>
+  <Input
+    type="email"
+    placeholder="Enter your email"
+    className="bg-gray-800 border-gray-700 text-white placeholder-gray-400 rounded-full px-6 py-3"
+  />
+  <Button className="bg-[#1E88E5] hover:bg-blue-500 rounded-full px-8 py-3 font-semibold">
+    Subscribe
+  </Button>
+</div>
+
         </motion.div>
 
         {/* Main Footer Content */}

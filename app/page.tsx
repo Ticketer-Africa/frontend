@@ -23,6 +23,7 @@ import { HeroSection } from "@/components/hero-section";
 import { FeaturesSection } from "@/components/features-section";
 import { EventsSection } from "@/components/events-section";
 import { WhyChooseSection } from "@/components/why-choose-section";
+import { PricingSection } from "@/components/pricing";
 
 
 const StaggerContainer = ({
@@ -76,6 +77,7 @@ export default function HomePage() {
       <HeroSection />
       <EventsSection />
       <FeaturesSection />
+      <PricingSection />
       <WhyChooseSection />
       <Footer />
     </div>
