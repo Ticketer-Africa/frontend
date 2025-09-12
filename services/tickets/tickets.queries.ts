@@ -8,6 +8,7 @@ import {
   verifyTicket,
   getMyListings,
   getBoughtFromResale,
+  removeResaleTicket,
 } from "./tickets";
 import {
   BuyTicketPayload,
@@ -90,6 +91,21 @@ export const useVerifyTicket = () => {
       eventId: string;
     }) => verifyTicket(payload),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["myTickets"] });
+    },
+  });
+};
+
+
+// Remove resale ticket
+export const useRemoveResaleTicket = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (ticketId: string) => removeResaleTicket(ticketId),
+    onSuccess: () => {
+      // Invalidate relevant caches so UI updates instantly
+      queryClient.invalidateQueries({ queryKey: ["resaleListings"] });
+      queryClient.invalidateQueries({ queryKey: ["myResaleListings"] });
       queryClient.invalidateQueries({ queryKey: ["myTickets"] });
     },
   });

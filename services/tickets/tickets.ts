@@ -5,6 +5,7 @@ import {
   Ticket,
   TicketResponse,
   TicketResale,
+  TicketCategory,
 } from "@/types/tickets.type";
 import { toast } from "sonner";
 
@@ -111,3 +112,18 @@ export const getBoughtFromResale = async (): Promise<Ticket[]> => {
   const res = await axios.get("/tickets/bought-from-resale");
   return res.data;
 };
+
+// REMOVE ticket from resale
+export const removeResaleTicket = async (ticketId: string): Promise<TicketResale> => {
+  try {
+    const res = await axios.post("/tickets/resale/remove", { ticketId });
+    toast.success(res.data.message || "Ticket removed from resale successfully");
+    return res.data;
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.message || "Failed to remove resale ticket";
+    toast.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+};
+
