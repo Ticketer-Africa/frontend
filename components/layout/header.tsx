@@ -150,7 +150,7 @@ export function Header() {
                     exit={{ opacity: 0, y: -10 }}
                     className="absolute right-0 mt-2 w-56 bg-white border border-gray-100/20 rounded-xl shadow-xl py-2 z-50"
                   >
-                    <div className="flex items-center px-4 py-3 border-b border-gray-100">
+                    <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
                       <Avatar className="w-8 h-8">
                         <AvatarImage
                           src={user.profileImage ?? undefined}
