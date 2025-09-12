@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Calendar,
   Search,
@@ -19,6 +19,8 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useAdminEvents } from "@/services/admin/admin.queries";
+import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
 
 export default function AdminEventsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,24 +32,41 @@ export default function AdminEventsPage() {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const { data: events, isLoading: loadingEvents, error } = useAdminEvents();
+  const { isLoading: authLoading, user: currentUser } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!currentUser && !authLoading) {
+      router.push(
+        `/login?returnUrl=${encodeURIComponent(window.location.href)}`
+      );
+      return;
+    }
+    if (currentUser && !["ADMIN", "SUPERADMIN"].includes(currentUser.role)) {
+      router.push("/explore");
+      return;
+    }
+  }, [currentUser, authLoading, router]);
 
   // Transform API response → UI format
   const allEvents = useMemo(() => {
     if (!events) return [];
     return events.map((ev: any) => {
-      const totalTickets = ev.ticketCategories?.reduce(
-        (sum: number, cat: any) => sum + (cat.maxTickets || 0),
-        0
-      ) || 0;
+      const totalTickets =
+        ev.ticketCategories?.reduce(
+          (sum: number, cat: any) => sum + (cat.maxTickets || 0),
+          0
+        ) || 0;
 
-      const ticketsSold = ev.ticketCategories?.reduce(
-        (sum: number, cat: any) => sum + (cat.minted || 0),
-        0
-      ) || 0;
+      const ticketsSold =
+        ev.ticketCategories?.reduce(
+          (sum: number, cat: any) => sum + (cat.minted || 0),
+          0
+        ) || 0;
 
       const revenue =
         ev.ticketCategories?.reduce(
-          (sum: number, cat: any) => sum + (cat.price * cat.minted),
+          (sum: number, cat: any) => sum + cat.price * cat.minted,
           0
         ) || 0;
 
@@ -113,10 +132,20 @@ export default function AdminEventsPage() {
 
   // Stats
   const totalEvents = allEvents.length;
-  const activeEvents = allEvents.filter((event: any) => event.status === "Active").length;
-  const completedEvents = allEvents.filter((event: any) => event.status === "Completed").length;
-  const totalRevenue = allEvents.reduce((sum: any, event: any) => sum + event.revenue, 0);
-  const totalTicketsSold = allEvents.reduce((sum: any, event: any) => sum + event.ticketsSold, 0);
+  const activeEvents = allEvents.filter(
+    (event: any) => event.status === "Active"
+  ).length;
+  const completedEvents = allEvents.filter(
+    (event: any) => event.status === "Completed"
+  ).length;
+  const totalRevenue = allEvents.reduce(
+    (sum: any, event: any) => sum + event.revenue,
+    0
+  );
+  const totalTicketsSold = allEvents.reduce(
+    (sum: any, event: any) => sum + event.ticketsSold,
+    0
+  );
 
   // Toggle row expansion for mobile
   const toggleRow = (eventId: string) => {
@@ -141,7 +170,9 @@ export default function AdminEventsPage() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-red-600 text-sm sm:text-base">Failed to load events</p>
+        <p className="text-red-600 text-sm sm:text-base">
+          Failed to load events
+        </p>
       </div>
     );
   }
@@ -157,7 +188,9 @@ export default function AdminEventsPage() {
                 <Calendar className="h-5 sm:h-6 w-5 sm:w-6 text-blue-600" />
                 All Events
               </h1>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1">Manage and monitor all platform events</p>
+              <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                Manage and monitor all platform events
+              </p>
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 w-full sm:w-auto">
               <button
@@ -292,7 +325,11 @@ export default function AdminEventsPage() {
 
         {/* Events Display */}
         {viewMode === "table" ? (
-          <EventsTable events={filteredEvents} toggleRow={toggleRow} expandedRows={expandedRows} />
+          <EventsTable
+            events={filteredEvents}
+            toggleRow={toggleRow}
+            expandedRows={expandedRows}
+          />
         ) : (
           <EventsGrid events={filteredEvents} />
         )}
@@ -300,8 +337,12 @@ export default function AdminEventsPage() {
         {filteredEvents.length === 0 && (
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
             <Calendar className="h-10 sm:h-12 w-10 sm:w-12 text-slate-400 mx-auto mb-4" />
-            <p className="text-slate-600 font-medium text-sm sm:text-base">No events found</p>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">Try adjusting your filters or search terms</p>
+            <p className="text-slate-600 font-medium text-sm sm:text-base">
+              No events found
+            </p>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Try adjusting your filters or search terms
+            </p>
           </div>
         )}
 
@@ -316,40 +357,71 @@ export default function AdminEventsPage() {
   );
 }
 
-function EventsTable({ events, toggleRow, expandedRows }: { events: any[]; toggleRow: (id: string) => void; expandedRows: Set<string> }) {
+function EventsTable({
+  events,
+  toggleRow,
+  expandedRows,
+}: {
+  events: any[];
+  toggleRow: (id: string) => void;
+  expandedRows: Set<string>;
+}) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full hidden sm:table">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
-              <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm">Event</th>
-              <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm">Organizer</th>
-              <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm hidden lg:table-cell">Date & Location</th>
-              <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm hidden md:table-cell">Tickets</th>
-              <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm hidden lg:table-cell">Revenue</th>
-              <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm">Status</th>
-              <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm">Actions</th>
+              <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm">
+                Event
+              </th>
+              <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm">
+                Organizer
+              </th>
+              <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm hidden lg:table-cell">
+                Date & Location
+              </th>
+              <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm hidden md:table-cell">
+                Tickets
+              </th>
+              <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm hidden lg:table-cell">
+                Revenue
+              </th>
+              <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm">
+                Status
+              </th>
+              <th className="text-left px-4 sm:px-6 py-3 sm:py-4 font-semibold text-slate-900 text-xs sm:text-sm">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
             {events.map((event) => {
               const percentage = (event.ticketsSold / event.totalTickets) * 100;
               return (
-                <tr key={event.id} className="hover:bg-slate-50 transition-colors">
+                <tr
+                  key={event.id}
+                  className="hover:bg-slate-50 transition-colors"
+                >
                   <td className="px-4 sm:px-6 py-4">
                     <div className="flex items-center gap-3 sm:gap-4">
                       <div className="w-12 sm:w-16 h-10 sm:h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                         <Calendar className="h-5 sm:h-6 w-5 sm:w-6 text-white" />
                       </div>
                       <div>
-                        <p className="font-semibold text-slate-900 text-sm sm:text-base">{event.name}</p>
-                        <p className="text-xs sm:text-sm text-slate-600">{event.category}</p>
+                        <p className="font-semibold text-slate-900 text-sm sm:text-base">
+                          {event.name}
+                        </p>
+                        <p className="text-xs sm:text-sm text-slate-600">
+                          {event.category}
+                        </p>
                       </div>
                     </div>
                   </td>
                   <td className="px-4 sm:px-6 py-4">
-                    <p className="font-medium text-slate-900 text-xs sm:text-sm">{event.organizer}</p>
+                    <p className="font-medium text-slate-900 text-xs sm:text-sm">
+                      {event.organizer}
+                    </p>
                   </td>
                   <td className="px-4 sm:px-6 py-4 hidden lg:table-cell">
                     <div className="flex items-center gap-2 mb-1">
@@ -360,7 +432,9 @@ function EventsTable({ events, toggleRow, expandedRows }: { events: any[]; toggl
                     </div>
                     <div className="flex items-center gap-2">
                       <MapPin className="h-3 sm:h-4 w-3 sm:w-4 text-slate-400" />
-                      <span className="text-xs sm:text-sm text-slate-600">{event.location}</span>
+                      <span className="text-xs sm:text-sm text-slate-600">
+                        {event.location}
+                      </span>
                     </div>
                   </td>
                   <td className="px-4 sm:px-6 py-4 hidden md:table-cell">
@@ -388,7 +462,9 @@ function EventsTable({ events, toggleRow, expandedRows }: { events: any[]; toggl
                     </div>
                   </td>
                   <td className="px-4 sm:px-6 py-4 hidden lg:table-cell">
-                    <p className="font-bold text-slate-900 text-xs sm:text-sm">₦{event.revenue.toLocaleString()}</p>
+                    <p className="font-bold text-slate-900 text-xs sm:text-sm">
+                      ₦{event.revenue.toLocaleString()}
+                    </p>
                   </td>
                   <td className="px-4 sm:px-6 py-4">
                     <span
@@ -400,9 +476,15 @@ function EventsTable({ events, toggleRow, expandedRows }: { events: any[]; toggl
                           : "bg-red-100 text-red-800"
                       }`}
                     >
-                      {event.status === "Active" && <CheckCircle className="h-3 w-3" />}
-                      {event.status === "Completed" && <Clock className="h-3 w-3" />}
-                      {event.status === "Cancelled" && <XCircle className="h-3 w-3" />}
+                      {event.status === "Active" && (
+                        <CheckCircle className="h-3 w-3" />
+                      )}
+                      {event.status === "Completed" && (
+                        <Clock className="h-3 w-3" />
+                      )}
+                      {event.status === "Cancelled" && (
+                        <XCircle className="h-3 w-3" />
+                      )}
                       {event.status}
                     </span>
                   </td>
@@ -435,7 +517,9 @@ function EventsTable({ events, toggleRow, expandedRows }: { events: any[]; toggl
                     <Calendar className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="font-semibold text-slate-900 text-sm">{event.name}</p>
+                    <p className="font-semibold text-slate-900 text-sm">
+                      {event.name}
+                    </p>
                     <p className="text-xs text-slate-600">{event.category}</p>
                   </div>
                 </div>
@@ -450,7 +534,9 @@ function EventsTable({ events, toggleRow, expandedRows }: { events: any[]; toggl
                 <div className="mt-3 space-y-3">
                   <div className="flex items-center gap-2">
                     <Users className="h-3 w-3 text-slate-400" />
-                    <span className="text-xs text-slate-600">{event.organizer}</span>
+                    <span className="text-xs text-slate-600">
+                      {event.organizer}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="h-3 w-3 text-slate-400" />
@@ -460,13 +546,21 @@ function EventsTable({ events, toggleRow, expandedRows }: { events: any[]; toggl
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin className="h-3 w-3 text-slate-400" />
-                    <span className="text-xs text-slate-600">{event.location}</span>
+                    <span className="text-xs text-slate-600">
+                      {event.location}
+                    </span>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-slate-600">Tickets: {event.ticketsSold} / {event.totalTickets}</span>
+                      <span className="text-slate-600">
+                        Tickets: {event.ticketsSold} / {event.totalTickets}
+                      </span>
                       <span className="font-semibold text-slate-900">
-                        {((event.ticketsSold / event.totalTickets) * 100).toFixed(0)}%
+                        {(
+                          (event.ticketsSold / event.totalTickets) *
+                          100
+                        ).toFixed(0)}
+                        %
                       </span>
                     </div>
                     <div className="w-full bg-slate-200 rounded-full h-2">
@@ -474,17 +568,24 @@ function EventsTable({ events, toggleRow, expandedRows }: { events: any[]; toggl
                         className={`h-2 rounded-full transition-all ${
                           (event.ticketsSold / event.totalTickets) * 100 > 80
                             ? "bg-green-500"
-                            : (event.ticketsSold / event.totalTickets) * 100 > 50
+                            : (event.ticketsSold / event.totalTickets) * 100 >
+                              50
                             ? "bg-blue-500"
                             : "bg-yellow-500"
                         }`}
-                        style={{ width: `${(event.ticketsSold / event.totalTickets) * 100}%` }}
+                        style={{
+                          width: `${
+                            (event.ticketsSold / event.totalTickets) * 100
+                          }%`,
+                        }}
                       ></div>
                     </div>
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-slate-600">Revenue:</span>
-                    <span className="font-bold text-slate-900">₦{event.revenue.toLocaleString()}</span>
+                    <span className="font-bold text-slate-900">
+                      ₦{event.revenue.toLocaleString()}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span
@@ -496,9 +597,15 @@ function EventsTable({ events, toggleRow, expandedRows }: { events: any[]; toggl
                           : "bg-red-100 text-red-800"
                       }`}
                     >
-                      {event.status === "Active" && <CheckCircle className="h-3 w-3" />}
-                      {event.status === "Completed" && <Clock className="h-3 w-3" />}
-                      {event.status === "Cancelled" && <XCircle className="h-3 w-3" />}
+                      {event.status === "Active" && (
+                        <CheckCircle className="h-3 w-3" />
+                      )}
+                      {event.status === "Completed" && (
+                        <Clock className="h-3 w-3" />
+                      )}
+                      {event.status === "Cancelled" && (
+                        <XCircle className="h-3 w-3" />
+                      )}
                       {event.status}
                     </span>
                   </div>
@@ -529,7 +636,10 @@ function EventsGrid({ events }: { events: any[] }) {
       {events.map((event) => {
         const percentage = (event.ticketsSold / event.totalTickets) * 100;
         return (
-          <div key={event.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-all">
+          <div
+            key={event.id}
+            className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition-all"
+          >
             <div className="h-32 sm:h-48 bg-gradient-to-r from-blue-500 to-purple-600 relative">
               <div className="absolute inset-0 bg-black/20"></div>
               <div className="absolute top-3 sm:top-4 right-3 sm:right-4">
@@ -547,11 +657,15 @@ function EventsGrid({ events }: { events: any[] }) {
               </div>
               <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 text-white">
                 <p className="text-sm sm:text-lg font-bold">{event.name}</p>
-                <p className="text-xs sm:text-sm opacity-90">{event.category}</p>
+                <p className="text-xs sm:text-sm opacity-90">
+                  {event.category}
+                </p>
               </div>
             </div>
             <div className="p-4 sm:p-6">
-              <p className="text-slate-600 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">{event.description}</p>
+              <p className="text-slate-600 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">
+                {event.description}
+              </p>
               <div className="space-y-2 sm:space-y-3">
                 <div className="flex items-center gap-2">
                   <Clock className="h-3 sm:h-4 w-3 sm:w-4 text-slate-400" />
@@ -561,11 +675,15 @@ function EventsGrid({ events }: { events: any[] }) {
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-3 sm:h-4 w-3 sm:w-4 text-slate-400" />
-                  <span className="text-xs sm:text-sm text-slate-600">{event.location}</span>
+                  <span className="text-xs sm:text-sm text-slate-600">
+                    {event.location}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="h-3 sm:h-4 w-3 sm:w-4 text-slate-400" />
-                  <span className="text-xs sm:text-sm text-slate-600">by {event.organizer}</span>
+                  <span className="text-xs sm:text-sm text-slate-600">
+                    by {event.organizer}
+                  </span>
                 </div>
               </div>
               <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-slate-200">
@@ -630,11 +748,16 @@ function StatCard({ title, value, icon, color }: any) {
           {icon}
         </div>
         <div>
-          <p className="text-lg sm:text-2xl font-bold text-slate-900">{value}</p>
-          <p className="text-xs sm:text-sm text-slate-600 font-medium">{title}</p>
+          <p className="text-lg sm:text-2xl font-bold text-slate-900">
+            {value}
+          </p>
+          <p className="text-xs sm:text-sm text-slate-600 font-medium">
+            {title}
+          </p>
         </div>
       </div>
     </div>
   );
 }
+
 

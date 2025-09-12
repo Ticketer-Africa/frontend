@@ -4,7 +4,7 @@ import { Ticket } from "@/types/tickets.type";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatDate, formatPrice } from "@/lib/dummy-data";
+import { formatDate, formatPrice } from "@/lib/helpers";
 import { useState } from "react";
 import { useBankCodes } from "@/services/banks/bank.queries";
 import { Bank } from "@/types/bank.type";
@@ -58,7 +58,7 @@ export function ResaleModal({
       className="max-w-lg rounded-xl"
     >
       {selectedTicket && (
-        <div className="space-y-4">
+        <div className="overflow-y-auto max-h-[70vh] space-y-4">
           <div>
             <h3 className="font-semibold text-lg text-gray-900">
               {selectedTicket.event.name}

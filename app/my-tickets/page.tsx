@@ -19,7 +19,7 @@ import {
   useListResale,
 } from "@/services/tickets/tickets.queries";
 import { Ticket, ListResalePayload } from "@/types/tickets.type";
-import { formatDate, formatPrice } from "@/lib/dummy-data";
+import { formatDate, formatPrice } from "@/lib/helpers";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
@@ -181,7 +181,9 @@ export default function MyTicketsPage() {
           {/* Mobile-optimized header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">My Tickets</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
+                My Tickets
+              </h1>
               <p className="text-gray-600 mt-1">Manage your event tickets</p>
             </div>
             <div className="text-left sm:text-right">
@@ -243,7 +245,9 @@ export default function MyTicketsPage() {
                             </div>
                           </div>
                           <div className="text-left sm:text-right sm:ml-4 flex-shrink-0">
-                            <p className="text-sm text-gray-600">Total Tickets</p>
+                            <p className="text-sm text-gray-600">
+                              Total Tickets
+                            </p>
                             <p className="text-2xl font-bold text-gray-900">
                               {ticketCount}
                             </p>
@@ -270,7 +274,7 @@ export default function MyTicketsPage() {
                         </Button>
 
                         {expandedEvent === eventId && (
-                          <motion.div 
+                          <motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
@@ -314,7 +318,8 @@ export default function MyTicketsPage() {
                                             {ticket?.ticketCategory?.price == 0
                                               ? "Free"
                                               : formatPrice(
-                                                  ticket?.ticketCategory?.price ?? 0
+                                                  ticket?.ticketCategory
+                                                    ?.price ?? 0
                                                 )}
                                           </span>
                                         </div>
@@ -327,27 +332,37 @@ export default function MyTicketsPage() {
                                           >
                                             {getStatusText(ticket)}
                                           </Badge>
-                                          
+
                                           <div className="flex-shrink-0">
-                                            {!ticket.isListed && !ticket.isUsed && (
-                                              <Button
-                                                size="sm"
-                                                className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-3 py-1 text-xs h-7 shadow-lg hover:shadow-xl transition-all duration-300"
-                                                onClick={(e) =>
-                                                  handleListForResale(ticket, e)
-                                                }
-                                                disabled={ticket?.ticketCategory?.price === 0}
-                                              >
-                                                List for Resale
-                                              </Button>
-                                            )}
+                                            {!ticket.isListed &&
+                                              !ticket.isUsed && (
+                                                <Button
+                                                  size="sm"
+                                                  className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-3 py-1 text-xs h-7 shadow-lg hover:shadow-xl transition-all duration-300"
+                                                  onClick={(e) =>
+                                                    handleListForResale(
+                                                      ticket,
+                                                      e
+                                                    )
+                                                  }
+                                                  disabled={
+                                                    ticket?.ticketCategory
+                                                      ?.price === 0
+                                                  }
+                                                >
+                                                  List for Resale
+                                                </Button>
+                                              )}
                                             {ticket.isListed && (
                                               <Button
                                                 size="sm"
                                                 className="bg-gray-400 text-white rounded-full px-3 py-1 text-xs h-7"
                                                 disabled
                                               >
-                                                Listed: {formatPrice(ticket.resalePrice ?? 0)}
+                                                Listed:{" "}
+                                                {formatPrice(
+                                                  ticket.resalePrice ?? 0
+                                                )}
                                               </Button>
                                             )}
                                             {ticket.isUsed && (

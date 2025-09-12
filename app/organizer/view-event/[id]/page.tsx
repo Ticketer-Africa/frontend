@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { currentUser } from "@/lib/dummy-data";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter, useParams } from "next/navigation";
 import {
@@ -40,14 +39,15 @@ import {
   DialogTrigger,
 } from "@radix-ui/react-dialog";
 import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
-import { formatPrice } from "@/lib/dummy-data";
+import { formatPrice } from "@/lib/helpers";
 
 export default function EventDashboard() {
   const { isLoading: authLoading, user: currentUser } = useAuth();
   const router = useRouter();
   const params = useParams();
   const { id } = params; // Extract id from dynamic route
-  const { data: organizerEventList, isLoading: eventsLoading } = useOrganizerEvents();
+  const { data: organizerEventList, isLoading: eventsLoading } =
+    useOrganizerEvents();
   const { mutate: deleteEvent } = useDeleteEvent();
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -71,23 +71,27 @@ export default function EventDashboard() {
       <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-[#1E88E5] mx-auto mb-4" />
-          <p className="text-lg text-muted-foreground">Loading event details...</p>
+          <p className="text-lg text-muted-foreground">
+            Loading event details...
+          </p>
         </div>
       </div>
     );
   }
 
-const organizerEvents = Array.isArray(organizerEventList)
-  ? organizerEventList
-  : [];
-
+  const organizerEvents = Array.isArray(organizerEventList)
+    ? organizerEventList
+    : [];
 
   const event: Event = organizerEvents.find((e: Event) => e.id === id);
-  console.log(event)
- 
+  console.log(event);
 
   if (!event) {
-    return <div className="min-h-screen bg-background text-center py-8">Event not found</div>;
+    return (
+      <div className="min-h-screen bg-background text-center py-8">
+        Event not found
+      </div>
+    );
   }
 
   const handleDeleteClick = (eventId: string) => {
@@ -116,24 +120,23 @@ const organizerEvents = Array.isArray(organizerEventList)
     setDeleteEventId(null);
   };
 
-  const totalTickets: number = event?.ticketCategories?.reduce(
-  (sum, cat) => sum + (cat.maxTickets || 0),
-  0
-) ?? 0;
+  const totalTickets: number =
+    event?.ticketCategories?.reduce(
+      (sum, cat) => sum + (cat.maxTickets || 0),
+      0
+    ) ?? 0;
 
-const ticketsSold: number = event?.ticketCategories?.reduce(
-  (sum, cat) => sum + (cat.minted || 0),
-  0
-) ?? 0;
+  const ticketsSold: number =
+    event?.ticketCategories?.reduce((sum, cat) => sum + (cat.minted || 0), 0) ??
+    0;
 
-const totalRevenue: number = event?.ticketCategories?.reduce(
-  (sum, cat) => sum + (cat.minted || 0) * (cat.price || 0),
-  0
-) ?? 0;
-const percentageSold = totalTickets > 0 
-  ? Math.round((ticketsSold / totalTickets) * 100) 
-  : 0;
-  
+  const totalRevenue: number =
+    event?.ticketCategories?.reduce(
+      (sum, cat) => sum + (cat.minted || 0) * (cat.price || 0),
+      0
+    ) ?? 0;
+  const percentageSold =
+    totalTickets > 0 ? Math.round((ticketsSold / totalTickets) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -148,7 +151,8 @@ const percentageSold = totalTickets > 0
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold">{event.name}</h1>
               <p className="text-sm sm:text-base text-muted-foreground">
-                Welcome back, {currentUser && currentUser.name}! Managing {event.name}
+                Welcome back, {currentUser && currentUser.name}! Managing{" "}
+                {event.name}
               </p>
             </div>
             <Button
@@ -180,7 +184,9 @@ const percentageSold = totalTickets > 0
                   <div className="text-xl sm:text-2xl font-bold">
                     {totalTickets}
                   </div>
-                  <p className="text-xs text-muted-foreground">Available tickets</p>
+                  <p className="text-xs text-muted-foreground">
+                    Available tickets
+                  </p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -198,7 +204,9 @@ const percentageSold = totalTickets > 0
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-xl sm:text-2xl font-bold">{ticketsSold}</div>
+                  <div className="text-xl sm:text-2xl font-bold">
+                    {ticketsSold}
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     Out of {totalTickets}
                   </p>
@@ -219,7 +227,9 @@ const percentageSold = totalTickets > 0
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-xl sm:text-2xl font-bold">{percentageSold}%</div>
+                  <div className="text-xl sm:text-2xl font-bold">
+                    {percentageSold}%
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -253,7 +263,9 @@ const percentageSold = totalTickets > 0
           >
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl sm:text-2xl">Event Details</CardTitle>
+                <CardTitle className="text-xl sm:text-2xl">
+                  Event Details
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 border rounded-lg">
@@ -264,10 +276,13 @@ const percentageSold = totalTickets > 0
                   />
                   <div className="flex-1">
                     <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 mb-1">
-                      <h3 className="font-semibold text-base sm:text-lg">{event.name}</h3>
+                      <h3 className="font-semibold text-base sm:text-lg">
+                        {event.name}
+                      </h3>
                     </div>
                     <p className="text-sm sm:text-base text-muted-foreground mb-2">
-                      {new Date(event.date).toLocaleDateString()} • {event.location}
+                      {new Date(event.date).toLocaleDateString()} •{" "}
+                      {event.location}
                     </p>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-sm">
                       <span className="text-muted-foreground">
@@ -291,7 +306,9 @@ const percentageSold = totalTickets > 0
                         className="bg-white shadow-lg rounded-md border border-gray-200 mt-2"
                       >
                         <DropdownMenuItem
-                          onClick={() => router.push(`/organizer/update-event/${event.id}`)}
+                          onClick={() =>
+                            router.push(`/organizer/update-event/${event.id}`)
+                          }
                           className="text-sm text-gray-700 hover:bg-gray-100 rounded-md p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
                         >
                           <Edit className="mr-2 h-4 w-4" /> Update Event
@@ -341,7 +358,9 @@ const percentageSold = totalTickets > 0
                 <CardTitle className="text-xl sm:text-2xl">Analytics</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Sales trends and insights coming soon.</p>
+                <p className="text-muted-foreground">
+                  Sales trends and insights coming soon.
+                </p>
               </CardContent>
             </Card>
           </motion.div>

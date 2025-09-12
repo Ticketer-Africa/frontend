@@ -12,7 +12,6 @@ import {
   MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Logo } from "./logo";
 
 export function Footer() {
@@ -72,10 +71,10 @@ export function Footer() {
             <h3 className="font-semibold text-[#1E88E5]">Support</h3>
             <div className="space-y-2">
               {[
-                { href: "/help", label: "Help Center" },
-                { href: "/contact", label: "Contact Us" },
-                { href: "/privacy", label: "Privacy Policy" },
-                { href: "/terms", label: "Terms of Service" },
+                { href: "/", label: "Help Center" },
+                { href: "/", label: "Contact Us" },
+                { href: "/", label: "Privacy Policy" },
+                { href: "/", label: "Terms of Service" },
               ].map((link) => (
                 <Link
                   key={link.href}
@@ -94,7 +93,7 @@ export function Footer() {
             <div className="space-y-3">
               <div className="flex items-center space-x-2 text-muted-[#1E88E5]">
                 <Mail className="h-4 w-4" />
-                <span className="text-sm">support@ticketer.africa</span>
+                <span className="text-sm">ticketerafrica@gmail.com</span>
               </div>
               <div className="flex items-center space-x-2 text-muted-[#1E88E5]">
                 <Phone className="h-4 w-4" />
@@ -102,7 +101,7 @@ export function Footer() {
               </div>
               <div className="flex items-center space-x-2 text-muted-[#1E88E5]">
                 <MapPin className="h-4 w-4" />
-                <span className="text-sm">New York, NY</span>
+                <span className="text-sm">Lagos, Nigeria</span>
               </div>
             </div>
           </div>
@@ -112,21 +111,8 @@ export function Footer() {
           <p className="text-muted-[#1E88E5] text-sm">
             © {new Date().getFullYear()} Ticketer. All rights reserved.
           </p>
-          <div className="flex items-center space-x-4 mt-4 md:mt-0">
-            <span className="text-sm text-muted-[#1E88E5]">Stay updated:</span>
-            <div className="flex space-x-2">
-              <Input placeholder="Enter email" className="w-40" />
-              <Button
-                size="sm"
-                className="bg-primary hover:bg-primary/90 text-primary-[#1E88E5]"
-              >
-                Subscribe
-              </Button>
-            </div>
-          </div>
         </div>
       </div>
     </footer>
   );
 }
-

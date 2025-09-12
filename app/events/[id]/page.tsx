@@ -9,6 +9,7 @@ import {
   Clock,
   Shield,
   ArrowLeft,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -22,10 +23,11 @@ import {
 } from "@/services/tickets/tickets.queries";
 import { useAuth } from "@/lib/auth-context";
 import { TicketPurchaseModal } from "@/components/ticket-purchase-modal";
-import { formatDate, formatPrice } from "@/lib/dummy-data";
+import { formatDate, formatPrice } from "@/lib/helpers";
 import { TicketResale } from "@/types/tickets.type";
 import { toast } from "sonner";
 import { BuyResaleModal } from "@/components/buy-resale-modal";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export interface TicketCategory {
   id: string;
@@ -47,8 +49,8 @@ export default function EventPage({ params }: { params: { id: string } }) {
   const { user } = useAuth();
   const { data: event, isLoading, error } = useEventBySlug(params.id);
   const { data: resaleTickets = [] } = useResaleListings(event?.id);
-    const { mutateAsync: buyResaleTicket, isPending: isBuyPending } =
-      useBuyResaleTicket();
+  const { mutateAsync: buyResaleTicket, isPending: isBuyPending } =
+    useBuyResaleTicket();
 
   // Debug logging
   useEffect(() => {
@@ -120,6 +122,11 @@ export default function EventPage({ params }: { params: { id: string } }) {
     setSelectedResaleTicket(null);
     setIsPurchaseModalOpen(true);
   };
+
+  // Calculate total price for selected tickets
+  const totalPrice = selectedTicketCategories.reduce((total, cat) => {
+    return total + cat.price * (quantities[cat.id] || 1);
+  }, 0);
 
   if (isLoading) {
     return (
@@ -285,13 +292,17 @@ export default function EventPage({ params }: { params: { id: string } }) {
                             className="flex items-center justify-between p-4 border rounded-lg"
                           >
                             <div className="flex items-center space-x-3">
-                              <img
-                                src={
-                                  ticket.user.profileImage || "/placeholder.svg"
-                                }
-                                alt={ticket.user.name}
-                                className="w-8 h-8 rounded-full"
-                              />
+                              <Avatar className="w-8 h-8">
+                                <AvatarImage
+                                  src={ticket.user.profileImage ?? undefined}
+                                  alt={ticket.user.name}
+                                  className="w-8 h-8 rounded-full"
+                                ></AvatarImage>
+                                <AvatarFallback className="bg-blue-100 text-blue-600 text-sm">
+                                  {ticket.user.profileImage ||
+                                    ticket.user.name.charAt(0)}
+                                </AvatarFallback>
+                              </Avatar>
                               <div>
                                 <p className="font-medium">
                                   {ticket.user.name}
@@ -408,15 +419,6 @@ export default function EventPage({ params }: { params: { id: string } }) {
                             );
                           }
                         )}
-                        {selectedTicketCategories.length > 0 && (
-                          <Button
-                            className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full"
-                            size="lg"
-                            onClick={handleBuyTickets}
-                          >
-                            Proceed to Checkout
-                          </Button>
-                        )}
                       </>
                     ) : (
                       <p className="text-gray-600">
@@ -458,6 +460,46 @@ export default function EventPage({ params }: { params: { id: string } }) {
           </div>
         </div>
       </section>
+
+      {/* Floating Cart */}
+      {selectedTicketCategories.length > 0 && (
+        <motion.div
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4 border-t border-gray-200 z-50 md:mx-auto md:max-w-3xl md:rounded-t-lg"
+        >
+          <div className="flex flex-col space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="font-semibold text-lg">Selected Tickets</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSelectedTicketCategories([]);
+                  setQuantities({});
+                }}
+              >
+                <X className="h-4 w-4" />
+                <span className="sr-only">Clear cart</span>
+              </Button>
+            </div>
+            <div className="flex justify-between items-center">
+              <p className="font-semibold">Total:</p>
+              <p className="font-bold text-lg">
+                {totalPrice > 0 ? `${formatPrice(totalPrice)}` : "Free"}
+              </p>
+            </div>
+            <Button
+              className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full"
+              size="lg"
+              onClick={handleBuyTickets}
+            >
+              Proceed to Checkout
+            </Button>
+          </div>
+        </motion.div>
+      )}
 
       {/* Purchase Modal */}
       <TicketPurchaseModal

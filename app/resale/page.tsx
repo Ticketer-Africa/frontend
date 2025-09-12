@@ -16,7 +16,7 @@ import {
   User,
   Shield,
 } from "lucide-react";
-import { formatPrice, formatDate } from "@/lib/dummy-data";
+import { formatPrice, formatDate } from "@/lib/helpers";
 import { useAuth } from "@/lib/auth-context";
 import {
   useResaleListings,

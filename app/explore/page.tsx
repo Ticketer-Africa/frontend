@@ -15,7 +15,7 @@ import {
   Loader2,
   Ticket,
 } from "lucide-react";
-import { formatPrice, formatDate, formatTime } from "@/lib/dummy-data";
+import { formatPrice, formatDate, formatTime } from "@/lib/helpers";
 import { useAllEvents } from "@/services/events/events.queries";
 import { Event, TicketCategory } from "@/types/events.type";
 

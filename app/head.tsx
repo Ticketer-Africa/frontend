@@ -14,12 +14,12 @@ export default function Head() {
       <link rel="icon" type="image/png" sizes="16x16" href="/logo.png" />
 
       {/* Open Graph + Twitter Meta Tags */}
-      <meta property="og:title" content="Ticketer - Event Ticketing Platform" />
+      <meta property="og:title" content="Ticketer Africa- Event Ticketing Platform" />
       <meta
         property="og:description"
         content="Discover and book tickets for amazing events"
       />
-      <meta property="og:image" content="/og-image.png" />
+      <meta property="og:image" content="/logo.png" />
       <meta property="og:url" content="https://ticketer.com" />
       <meta property="og:type" content="website" />
 
@@ -32,7 +32,7 @@ export default function Head() {
         name="twitter:description"
         content="Discover and book tickets for amazing events"
       />
-      <meta name="twitter:image" content="/og-image.png" />
+      <meta name="twitter:image" content="/logo.png" />
     </>
   );
 }

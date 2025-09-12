@@ -17,7 +17,7 @@ import { ArrowLeft, ArrowRight, Upload, Check, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useQuery } from "@tanstack/react-query";
-import { formatPrice } from "@/lib/dummy-data";
+import { formatPrice } from "@/lib/helpers";
 
 // Valid event categories (title case for UI display)
 const categories = [
@@ -175,7 +175,14 @@ export default function UpdateEventPage() {
               price: cat.price,
               maxTickets: cat.maxTickets,
             }))
-          : [{ id: "1", name: "Regular", price: event.price || 0, maxTickets: event.maxTickets || 1 }]
+          : [
+              {
+                id: "1",
+                name: "Regular",
+                price: event.price || 0,
+                maxTickets: event.maxTickets || 1,
+              },
+            ]
       );
     }
   }, [event, eventLoading, setValue]);
@@ -237,7 +244,10 @@ export default function UpdateEventPage() {
     formData.append("category", validatedData.category);
     formData.append("location", validatedData.location);
     formData.append("date", isoDate);
-    formData.append("ticketCategories", JSON.stringify(validatedData.ticketCategories));
+    formData.append(
+      "ticketCategories",
+      JSON.stringify(validatedData.ticketCategories)
+    );
     if (validatedData.banner instanceof File) {
       formData.append("file", validatedData.banner);
     }
@@ -504,7 +514,9 @@ export default function UpdateEventPage() {
                                 : "outline"
                             }
                             size="sm"
-                            onClick={() => setValue("category", category.toUpperCase())}
+                            onClick={() =>
+                              setValue("category", category.toUpperCase())
+                            }
                             className={
                               watch("category") === category.toUpperCase()
                                 ? "bg-[#1E88E5] hover:bg-blue-500 text-white"
@@ -554,7 +566,9 @@ export default function UpdateEventPage() {
                           variant="outline"
                           size="sm"
                           className="mt-2 bg-transparent"
-                          onClick={() => document.getElementById("banner")?.click()}
+                          onClick={() =>
+                            document.getElementById("banner")?.click()
+                          }
                           disabled={isPending || isSubmitting}
                         >
                           Choose File
@@ -648,7 +662,9 @@ export default function UpdateEventPage() {
                               )}
                             </div>
                             <div className="space-y-2">
-                              <Label htmlFor={`ticketCategories.${index}.price`}>
+                              <Label
+                                htmlFor={`ticketCategories.${index}.price`}
+                              >
                                 Price (₦)
                               </Label>
                               <Input
@@ -662,7 +678,10 @@ export default function UpdateEventPage() {
                               />
                               {errors.ticketCategories?.[index]?.price && (
                                 <p className="text-sm text-red-600">
-                                  {errors.ticketCategories[index].price?.message}
+                                  {
+                                    errors.ticketCategories[index].price
+                                      ?.message
+                                  }
                                 </p>
                               )}
                             </div>
@@ -676,13 +695,21 @@ export default function UpdateEventPage() {
                                 id={`ticketCategories.${index}.maxTickets`}
                                 type="number"
                                 placeholder="Number of tickets"
-                                {...register(`ticketCategories.${index}.maxTickets`)}
-                                min={event?.ticketCategories?.[index]?.soldTickets || 1}
+                                {...register(
+                                  `ticketCategories.${index}.maxTickets`
+                                )}
+                                min={
+                                  event?.ticketCategories?.[index]
+                                    ?.soldTickets || 1
+                                }
                                 disabled={isPending || isSubmitting}
                               />
                               {errors.ticketCategories?.[index]?.maxTickets && (
                                 <p className="text-sm text-red-600">
-                                  {errors.ticketCategories[index].maxTickets?.message}
+                                  {
+                                    errors.ticketCategories[index].maxTickets
+                                      ?.message
+                                  }
                                 </p>
                               )}
                             </div>
@@ -794,10 +821,13 @@ export default function UpdateEventPage() {
                             </p>
                           </div>
                           <div>
-                            <span className="text-gray-600">Ticket Categories:</span>
+                            <span className="text-gray-600">
+                              Ticket Categories:
+                            </span>
                             {ticketCategories.map((cat) => (
                               <p key={cat.id} className="font-medium">
-                                {cat.name}: {formatPrice(cat.price)} ({cat.maxTickets} tickets)
+                                {cat.name}: {formatPrice(cat.price)} (
+                                {cat.maxTickets} tickets)
                               </p>
                             ))}
                           </div>
@@ -825,13 +855,13 @@ export default function UpdateEventPage() {
                           <div className="flex justify-between">
                             <span>If all tickets sell:</span>
                             <span className="font-medium">
-                              
-                              {formatPrice(ticketCategories
-                                .reduce(
-                                  (sum, cat) => sum + cat.price * cat.maxTickets * 0.95,
+                              {formatPrice(
+                                ticketCategories.reduce(
+                                  (sum, cat) =>
+                                    sum + cat.price * cat.maxTickets * 0.95,
                                   0
-                                ))
-                                }
+                                )
+                              )}
                             </span>
                           </div>
                         </div>
