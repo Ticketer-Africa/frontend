@@ -47,7 +47,7 @@ export function WhyChooseSection() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-600 bg-clip-text text-transparent mb-4 p-2">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
             Why Choose Ticketer?
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">

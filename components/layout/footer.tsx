@@ -16,30 +16,27 @@ import { Logo } from "./logo";
 
 export function Footer() {
   return (
-    <footer className="bg-black text-white border-t">
-      <div className="container mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+    <footer className="bg-muted/50 border-t">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
-          {/* Brand */}
-          <div className="flex flex-col items-center sm:items-start space-y-4 text-center sm:text-left">
-            <div className="flex justify-center sm:justify-start">
-              <Logo />
-            </div>
-            <p className="text-sm sm:text-base">
+          <div className="space-y-4">
+            <Logo />
+            <p className="text-muted-[#1E88E5]">
               Your gateway to unforgettable experiences. Discover and book
               amazing events worldwide.
             </p>
-            <div className="flex justify-center sm:justify-start space-x-3 mt-2">
+            <div className="flex space-x-4">
               {[Facebook, Twitter, Instagram, Youtube].map((Icon, index) => (
                 <motion.div
                   key={index}
-                  whileHover={{ scale: 1.2 }}
+                  whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="hover:text-[#1E88E5] transition-colors"
+                    className="text-muted-[#1E88E5] hover:text-primary"
                   >
                     <Icon className="h-5 w-5" />
                   </Button>
@@ -49,9 +46,9 @@ export function Footer() {
           </div>
 
           {/* Quick Links */}
-          <div className="space-y-4 text-center sm:text-left">
+          <div className="space-y-4">
             <h3 className="font-semibold text-[#1E88E5]">Quick Links</h3>
-            <div className="flex flex-col space-y-2">
+            <div className="space-y-2">
               {[
                 { href: "/explore", label: "Explore Events" },
                 { href: "/organizer", label: "Create Event" },
@@ -61,7 +58,7 @@ export function Footer() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="hover:text-[#1E88E5] transition-colors text-sm sm:text-base"
+                  className="block text-muted-[#1E88E5] hover:text-primary transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -70,9 +67,9 @@ export function Footer() {
           </div>
 
           {/* Support */}
-          <div className="space-y-4 text-center sm:text-left">
+          <div className="space-y-4">
             <h3 className="font-semibold text-[#1E88E5]">Support</h3>
-            <div className="flex flex-col space-y-2">
+            <div className="space-y-2">
               {[
                 { href: "/", label: "Help Center" },
                 { href: "/", label: "Contact Us" },
@@ -82,7 +79,7 @@ export function Footer() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="hover:text-[#1E88E5] transition-colors text-sm sm:text-base"
+                  className="block text-muted-[#1E88E5] hover:text-primary transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -91,27 +88,29 @@ export function Footer() {
           </div>
 
           {/* Contact */}
-          <div className="space-y-4 text-center sm:text-left">
+          <div className="space-y-4">
             <h3 className="font-semibold text-[#1E88E5]">Contact Info</h3>
-            <div className="flex flex-col space-y-2">
-              <div className="flex items-center justify-center sm:justify-start space-x-2  text-sm sm:text-base">
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2 text-muted-[#1E88E5]">
                 <Mail className="h-4 w-4" />
-                <span>ticketerafrica@gmail.com</span>
+                <span className="text-sm">ticketerafrica@gmail.com</span>
               </div>
-              <div className="flex items-center justify-center sm:justify-start space-x-2  text-sm sm:text-base">
+              <div className="flex items-center space-x-2 text-muted-[#1E88E5]">
                 <Phone className="h-4 w-4" />
-                <span>+1 (555) 123-4567</span>
+                <span className="text-sm">+1 (555) 123-4567</span>
               </div>
-              <div className="flex items-center justify-center sm:justify-start space-x-2 text-sm sm:text-base">
+              <div className="flex items-center space-x-2 text-muted-[#1E88E5]">
                 <MapPin className="h-4 w-4" />
-                <span>Lagos, Nigeria</span>
+                <span className="text-sm">Lagos, Nigeria</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-10 pt-6 flex flex-col sm:flex-row justify-center sm:justify-between items-center  text-sm">
-          <p>© {new Date().getFullYear()} Ticketer. All rights reserved.</p>
+        <div className="border-t mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-muted-[#1E88E5] text-sm">
+            © {new Date().getFullYear()} Ticketer. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

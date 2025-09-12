@@ -1,4 +1,4 @@
-import { Mutation, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   buyTicket,
   buyResaleTicket,
@@ -8,7 +8,6 @@ import {
   verifyTicket,
   getMyListings,
   getBoughtFromResale,
-  removeResaleTicket,
 } from "./tickets";
 import {
   BuyTicketPayload,
@@ -93,30 +92,5 @@ export const useVerifyTicket = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["myTickets"] });
     },
-  });
-};
-
-
-//remove resale tickker
-export const useRemoveResaleTicket = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: removeResaleTicket,
-    onMutate: async (ticketId: string) => {
-      await queryClient.cancelQueries({ queryKey: ["resaleTickets"] });
-      const previous = queryClient.getQueryData<TicketResale[]>(["resaleTickets"]);
-      if (previous) {
-        queryClient.setQueryData(
-          ["resaleTickets"],
-          previous.filter((t) => t.id !== ticketId)
-        );
-      }
-      return { previous };
-    },
-    onError: (_, __, context: any) => {
-      if (context?.previous) queryClient.setQueryData(["resaleTickets"], context.previous);
-    },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ["resaleTickets"] }),
   });
 };
