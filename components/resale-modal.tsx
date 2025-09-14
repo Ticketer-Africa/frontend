@@ -58,7 +58,8 @@ export function ResaleModal({
       className="max-w-lg rounded-xl"
     >
       {selectedTicket && (
-        <div className="overflow-y-auto max-h-[70vh] space-y-4">
+        <div className="
+        ">
           <div>
             <h3 className="font-semibold text-lg text-gray-900">
               {selectedTicket.event.name}
@@ -107,9 +108,9 @@ export function ResaleModal({
               disabled={selectedTicket.resaleCount >= 1}
             />
             <p className="text-xs text-gray-500">
-              You'll receive
+              You'll receive {" "}
               {formatPrice(
-                Math.round(Number.parseFloat(resalePrice || "0") * 0.95)
+                Math.round(Number.parseFloat(resalePrice || "0") * 0.85)
               )}{" "}
               after 5% service fee
             </p>
