@@ -88,7 +88,6 @@ export default function VerifyTicketPage() {
           code: parsedData.code,
           eventId: parsedData.eventId,
         });
-        console.log(response);
 
         setVerification({
           isValid: response.status === "VALID",

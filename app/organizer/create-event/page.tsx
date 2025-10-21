@@ -177,11 +177,7 @@ export default function CreateEventPage() {
     if (validatedData.banner) {
       formData.append("file", validatedData.banner);
     }
-    // 🔍 Log what's inside FormData
-    console.log("FormData being sent:");
-    for (const [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
+
 
     try {
       await createEvent(formData);

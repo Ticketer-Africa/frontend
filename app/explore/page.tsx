@@ -39,20 +39,45 @@ export default function EventsPage() {
     );
   }
 
-  const locations: any[] = [
-    ...new Set(
-      events
-        ?.map((event: Event) => event?.location?.split(",")[1]?.trim())
-        .filter(Boolean)
-    ),
-  ];
+const locations: string[] = Array.from(
+  new Set(
+    events
+      ?.map((event: Event) => {
+        if (!event.location) return null;
+        const parts = event.location.split(",");
+        return parts.length > 1 ? parts[1].trim() : event.location.trim();
+      })
+      .filter(Boolean)
+  )
+);
 
-  const priceRanges = [
-    { label: "Under N5000", value: "0-5000" },
-    { label: "N5000 - N10000", value: "5000-10000" },
-    { label: "N10000 - N20000", value: "10000-20000" },
-    { label: "Over N20000", value: "20000" },
-  ];
+
+// Gather all ticket prices from every event
+const allPrices = events
+  ?.flatMap((event: Event) =>
+    event.ticketCategories?.map((t: TicketCategory) => t.price)
+  )
+  .filter((price: number) => typeof price === "number" && price >= 0);
+
+let priceRanges: { label: string; value: string }[] = [];
+
+if (allPrices?.length) {
+  const minPrice = Math.min(...allPrices);
+  const maxPrice = Math.max(...allPrices);
+
+  if (minPrice < 5000)
+    priceRanges.push({ label: "Under ₦5,000", value: "0-5000" });
+
+  if (maxPrice > 5000)
+    priceRanges.push({ label: "₦5,000 - ₦10,000", value: "5000-10000" });
+
+  if (maxPrice > 10000)
+    priceRanges.push({ label: "₦10,000 - ₦50,000", value: "10000-50000" });
+
+  if (maxPrice > 20000)
+    priceRanges.push({ label: "Over ₦50,000", value: "50000" });
+}
+
 
   const categories = [
     "Music",
@@ -84,28 +109,24 @@ export default function EventsPage() {
 
     let matchesPrice = true;
     if (priceRange && event.ticketCategories?.length) {
-      const minPrice = Math.min(
-        ...event.ticketCategories.map((t: TicketCategory) => t.price)
-      );
-      const maxPrice = Math.max(
-        ...event.ticketCategories.map((t: TicketCategory) => t.price)
-      );
+  matchesPrice = event.ticketCategories.some((t: TicketCategory) => {
+    const price = t.price;
 
-      switch (priceRange) {
-        case "0-5000":
-          matchesPrice = maxPrice < 5000;
-          break;
-        case "5000-10000":
-          matchesPrice = minPrice >= 5000 && maxPrice <= 10000;
-          break;
-        case "10000-20000":
-          matchesPrice = minPrice >= 10000 && maxPrice <= 20000;
-          break;
-        case "20000":
-          matchesPrice = minPrice > 20000;
-          break;
-      }
+    switch (priceRange) {
+      case "0-5000":
+        return price >= 0 && price <= 5000;
+      case "5000-10000":
+        return price >= 5000 && price <= 10000;
+      case "10000-50000":
+        return price >= 10000 && price <= 50000;
+      case "50000":
+        return price >= 50000;
+      default:
+        return true;
     }
+  });
+}
+
 
     return matchesSearch && matchesLocation && matchesCategory && matchesPrice;
   });

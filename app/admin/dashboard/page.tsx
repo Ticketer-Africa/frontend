@@ -123,7 +123,6 @@ export default function AdminDashboard() {
     }
   );
 
-  console.log(transactions);
 
   const recentEvents: RecentEvent[] = (events ?? []).map((event: any) => {
     const ticketsSold =
@@ -564,7 +563,6 @@ function AlertItem({ message, severity, time, amount }: any) {
 
   // ✅ Example usage:
   const config = getConfig("high");
-  console.log(config.bg); // "bg-red-100"
 
   return (
     <div

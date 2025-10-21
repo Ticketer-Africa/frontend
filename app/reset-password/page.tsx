@@ -56,7 +56,6 @@ const onSubmit = async (data: ResetPasswordSchema) => {
     newPassword: data.password,
   };
 
-  console.log("🚀 Reset password payload:", payload);
 
   resetpasswordMutation.mutate(
     {

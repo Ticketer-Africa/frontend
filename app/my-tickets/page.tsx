@@ -42,7 +42,6 @@ export default function MyTicketsPage() {
     }
   }, [currentUser, isLoading, router]);
 
-  console.log(userTickets);
 
   // Group tickets by event ID
   const groupedTickets = userTickets?.reduce(
@@ -106,12 +105,10 @@ export default function MyTicketsPage() {
     try {
       await listResale(resalePayload, {
         onSuccess: () => {
-          toast.success("Ticket listed for resale successfully!");
           setIsResaleModalOpen(false);
           setSelectedTicket(null);
         },
         onError: (error) => {
-          toast.error(error.message || "Failed to list ticket for resale.");
         },
       });
     } catch (err: any) {

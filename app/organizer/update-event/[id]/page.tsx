@@ -252,11 +252,6 @@ export default function UpdateEventPage() {
       formData.append("file", validatedData.banner);
     }
 
-    // Log FormData for debugging
-    console.log("FormData being sent:");
-    for (const [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
 
     try {
       await updateEvent({ eventId, data: formData });

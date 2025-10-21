@@ -62,7 +62,6 @@ export default function ResalePage() {
       const response = await buyResaleTicket({ ticketIds: [ticketId] });
       window.location.href = response.checkoutUrl;
     } catch (error: any) {
-      console.log(error);
       toast.error(error?.message || "Failed to initiate purchase");
     }
   };

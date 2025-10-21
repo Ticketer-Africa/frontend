@@ -84,7 +84,6 @@ export default function EventDashboard() {
     : [];
 
   const event: Event = organizerEvents.find((e: Event) => e.id === id);
-  console.log(event);
 
   if (!event) {
     return (

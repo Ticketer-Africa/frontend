@@ -54,11 +54,6 @@ export default function EventPage({ params }: { params: { id: string } }) {
 
   // Debug logging
   useEffect(() => {
-    console.log("EventPage params:", params);
-    console.log("Event data:", event);
-    console.log(error);
-    console.log("Event fetch status:", { isLoading, error });
-    console.log("Resale tickets:", resaleTickets);
     if (error) {
       toast.error(
         "Failed to load event: " + (error.message || "Unknown error")
@@ -103,7 +98,6 @@ export default function EventPage({ params }: { params: { id: string } }) {
       const response = await buyResaleTicket({ ticketIds: [ticketId] });
       window.location.href = response.checkoutUrl;
     } catch (error: any) {
-      console.log(error);
       toast.error(error?.message || "Failed to initiate purchase");
     }
   };

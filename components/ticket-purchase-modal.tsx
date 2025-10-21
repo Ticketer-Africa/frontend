@@ -106,7 +106,6 @@ export function TicketPurchaseModal({
           })),
         };
 
-    console.log("Purchase payload:", payload);
 
     try {
       const data = await buyTicket(payload);
