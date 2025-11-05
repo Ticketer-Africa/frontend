@@ -9,6 +9,16 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-}
 
-export default nextConfig
+  async redirects() {
+    return [
+      {
+        source: '/events',
+        destination: '/explore',
+        permanent: true, // 308 redirect, good for SEO
+      },
+    ];
+  },
+};
+
+export default nextConfig;
