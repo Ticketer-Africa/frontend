@@ -6,6 +6,7 @@ export default function Head() {
         name="description"
         content="Discover and book tickets for amazing events"
       />
+      <meta name="google-site-verification" content="eSIkb-QiBu3FEf4pafVtK3nTZTFTpDLOOCCMc7r8q1I" />
 
       {/* Favicon Icons */}
       <link rel="icon" href="/logo.png" />
