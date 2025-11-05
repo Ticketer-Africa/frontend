@@ -13,6 +13,14 @@ export interface ResaleTicket {
   createdAt: string;
 }
 
+export interface TicketCategory {
+  id: string;
+  name: string;
+  price: number;
+  maxTickets: number;
+  minted: number;
+}
+
 export interface Event {
   id: string;
   name: string;
@@ -26,11 +34,12 @@ export interface Event {
   organizerId: string;
   createdAt: string;
   updatedAt: string;
+  slug: string;
   maxTickets: number;
   minted: number;
   organizerd: string;
-
   tickets: ResaleTicket[]; 
+  ticketCategories? :  TicketCategory[]
 }
 
 export interface CreateEventDTO {
@@ -44,13 +53,12 @@ export interface CreateEventDTO {
 }
 
 export interface UpdateEventDTO {
-  title?: string;
+  name?: string;
   description?: string;
   price?: number;
   location?: string;
-  startDate?: string;
-  endDate?: string;
-  image?: File;
+  date?:string
+  category?:string
 }
 
 export interface EventFilterDTO {
@@ -61,4 +69,8 @@ export interface EventFilterDTO {
   startDate?: string;
   endDate?: string;
   isActive?: boolean;
+}
+
+export interface deleteEventDTO{
+  id: string
 }

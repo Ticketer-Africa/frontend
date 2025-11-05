@@ -1,4 +1,4 @@
-import axios from "@/api/axios";
+import axios from "@/services/axios";
 import { toast } from "sonner";
 import {
   LoginDto,
@@ -45,7 +45,8 @@ export const verifyOtp = async (dto: VerifyOtpDto): Promise<BasicResponse> => {
     toast.success(res.data.message || "OTP verified successfully");
     return res.data;
   } catch (error: any) {
-    const errorMessage = error.response?.data?.message || "Failed to verify OTP";
+    const errorMessage =
+      error.response?.data?.message || "Failed to verify OTP";
     toast.error(errorMessage);
     throw new Error(errorMessage);
   }
@@ -58,13 +59,14 @@ export const resendOtp = async (dto: ResendOtpDto): Promise<BasicResponse> => {
     toast.success(res.data.message || "OTP resent successfully");
     return res.data;
   } catch (error: any) {
-    const errorMessage = error.response?.data?.message || "Failed to resend OTP";
+    const errorMessage =
+      error.response?.data?.message || "Failed to resend OTP";
     toast.error(errorMessage);
     throw new Error(errorMessage);
   }
 };
 
-// FORGOT PASSWORD
+// FORGOT Password
 export const forgotPassword = async (
   dto: ForgotPasswordDto
 ): Promise<BasicResponse> => {
@@ -73,7 +75,8 @@ export const forgotPassword = async (
     toast.success(res.data.message || "Password reset link sent successfully");
     return res.data;
   } catch (error: any) {
-    const errorMessage = error.response?.data?.message || "Failed to send password reset link";
+    const errorMessage =
+      error.response?.data?.message || "Failed to send password reset link";
     toast.error(errorMessage);
     throw new Error(errorMessage);
   }
@@ -88,7 +91,8 @@ export const resetPassword = async (
     toast.success(res.data.message || "Password reset successfully");
     return res.data;
   } catch (error: any) {
-    const errorMessage = error.response?.data?.message || "Failed to reset password";
+    const errorMessage =
+      error.response?.data?.message || "Failed to reset password";
     toast.error(errorMessage);
     throw new Error(errorMessage);
   }
@@ -103,7 +107,8 @@ export const changePassword = async (
     toast.success(res.data.message || "Password changed successfully");
     return res.data;
   } catch (error: any) {
-    const errorMessage = error.response?.data?.message || "Failed to change password";
+    const errorMessage =
+      error.response?.data?.message || "Failed to change password";
     toast.error(errorMessage);
     throw new Error(errorMessage);
   }

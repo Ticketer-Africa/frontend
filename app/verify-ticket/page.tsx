@@ -9,23 +9,47 @@ import {
   AlertCircle,
   Calendar,
   MapPin,
-  User,
+  Ticket,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { parseTicketData, type QRTicketData } from "@/lib/qr-utils";
-import { Header } from "@/components/layout/header";
-import { useVerifyTicket } from "@/api/tickets/tickets.queries";
+import { useVerifyTicket } from "@/services/tickets/tickets.queries";
 import { useAuth } from "@/lib/auth-context";
-import { formatDate, formatPrice } from "@/lib/dummy-data";
+import { formatDate, formatPrice } from "@/lib/helpers";
 import { toast } from "sonner";
-import { Ticket } from "@/types/tickets.type";
+import { useEventById } from "@/services/events/events.queries";
+
+interface TicketCategory {
+  name: string;
+  price: number;
+}
+
+interface TicketEvent {
+  id: string;
+  name: string;
+  date: Date | string;
+  location: string;
+  bannerUrl?: string;
+}
+
+interface Ticket {
+  id: string;
+  code: string;
+  eventId: string;
+  ticketCategory?: TicketCategory;
+  isUsed: boolean;
+  isListed: boolean;
+  resalePrice?: number;
+  event?: TicketEvent;
+}
 
 interface TicketVerification {
   isValid: boolean;
   ticket?: Ticket;
   scannedAt?: string;
+  message?: string;
 }
 
 export default function VerifyTicketPage() {
@@ -46,12 +70,14 @@ export default function VerifyTicketPage() {
         const dataParam = searchParams.get("data");
         if (!dataParam) {
           setError("Invalid verification link");
+          toast.error("Invalid verification link");
           return;
         }
 
         const parsedData = parseTicketData(dataParam);
         if (!parsedData || !parsedData.eventId) {
           setError("Invalid ticket data");
+          toast.error("Invalid ticket data");
           return;
         }
 
@@ -64,20 +90,34 @@ export default function VerifyTicketPage() {
         });
 
         setVerification({
-          isValid: response.isValid,
-          ticket: response.ticket,
+          isValid: response.status === "VALID",
+          ticket: {
+            id: response.ticketId,
+            code: response.code,
+            eventId: response.eventId,
+            ticketCategory: response.ticketCategory,
+            isUsed: response.markedUsed,
+            isListed: !!response.resalePrice,
+            resalePrice: response.resalePrice,
+            event: response.event
+              ? (response.event as unknown as TicketEvent)
+              : undefined,
+          },
           scannedAt: new Date().toISOString(),
+          message: response.message,
         });
       } catch (err: any) {
         setError(err?.message || "Verification failed. Please try again.");
+        toast.error(err?.message || "Verification failed. Please try again.");
       }
     };
 
     verify();
   }, [searchParams, verifyTicket]);
 
+  const { data: event } = useEventById(ticketData?.eventId || "");
+
   const ticket = verification?.ticket;
-  const event = ticket?.event;
 
   if (isVerifying) {
     return (
@@ -134,7 +174,6 @@ export default function VerifyTicketPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
-      <Header />
       <div className="container mx-auto max-w-2xl py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -154,7 +193,8 @@ export default function VerifyTicketPage() {
                     Ticket Valid ✓
                   </CardTitle>
                   <p className="text-gray-600">
-                    This ticket has been successfully verified
+                    {verification.message ||
+                      "This ticket has been successfully verified"}
                   </p>
                 </>
               ) : (
@@ -164,7 +204,8 @@ export default function VerifyTicketPage() {
                     Invalid Ticket ✗
                   </CardTitle>
                   <p className="text-gray-600">
-                    This ticket could not be verified
+                    {verification?.message ||
+                      "This ticket could not be verified"}
                   </p>
                 </>
               )}
@@ -230,7 +271,7 @@ export default function VerifyTicketPage() {
                       <div className="space-y-1 text-sm text-gray-600">
                         <div className="flex items-center space-x-2">
                           <Calendar className="h-4 w-4 text-gray-500" />
-                          <span>{formatDate(event.date)}</span>
+                          <span>{formatDate(new Date(event.date))}</span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <MapPin className="h-4 w-4 text-gray-500" />
@@ -245,14 +286,23 @@ export default function VerifyTicketPage() {
               {/* Ticket Details */}
               {ticket && (
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-900">
+                  <h3 className="font-semibold text-gray-900 flex items-center">
+                    <Ticket className="h-4 w-4 mr-2 text-gray-500" />
                     Ticket Information
                   </h3>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="text-gray-600">Original Price:</span>
+                      <span className="text-gray-600">Category:</span>
                       <p className="font-semibold text-gray-900">
-                        ₦{formatPrice(event?.price || 0)}
+                        {ticket.ticketCategory?.name || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">Category Price:</span>
+                      <p className="font-semibold text-gray-900">
+                        {ticket.ticketCategory?.price
+                          ? `${formatPrice(ticket.ticketCategory.price)}`
+                          : "Free"}
                       </p>
                     </div>
                     <div>
@@ -298,7 +348,7 @@ export default function VerifyTicketPage() {
                     <Button
                       variant="outline"
                       className="flex-1 bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900"
-                      onClick={() => window.close()}
+                      onClick={() => (window.location.href = "/")}
                     >
                       Close
                     </Button>
@@ -307,7 +357,7 @@ export default function VerifyTicketPage() {
                   <Button
                     variant="outline"
                     className="w-full bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900"
-                    onClick={() => window.close()}
+                    onClick={() => (window.location.href = "/")}
                   >
                     Close
                   </Button>
@@ -322,8 +372,10 @@ export default function VerifyTicketPage() {
                     <p className="font-medium">Security Notice</p>
                     <p>
                       This verification was performed at{" "}
-                      {new Date().toLocaleString()}. Each ticket can only be
-                      used once for entry.
+                      {new Date().toLocaleString("en-US", {
+                        timeZone: "Africa/Lagos",
+                      })}
+                      . Each ticket can only be used once for entry.
                     </p>
                   </div>
                 </div>
@@ -335,4 +387,3 @@ export default function VerifyTicketPage() {
     </div>
   );
 }
-

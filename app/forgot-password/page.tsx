@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sparkles, Mail, AlertCircle } from "lucide-react";
-import { useForgotPassword } from "@/api/auth/auth.queries";
+import { useForgotPassword } from "@/services/auth/auth.queries";
 
 // ✅ Zod Schema
 const forgotPasswordSchema = z.object({
@@ -35,13 +35,13 @@ export default function ForgotPasswordPage() {
 
   const onSubmit = (data: ForgotPasswordSchema) => {
     forgotPasswordMutation.mutate(
-      { email: data.email },
+      { email: data.email.toLowerCase() },
       {
         onSuccess: () => {
           localStorage.setItem(
             "otpPayload",
             JSON.stringify({
-              email: data.email,
+              email: data.email, 
               context: "forgot-password",
             })
           );
@@ -139,4 +139,3 @@ export default function ForgotPasswordPage() {
     </div>
   );
 }
-

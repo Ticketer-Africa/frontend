@@ -1,6 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import * as eventsAPI from "@/api/events/events";
-import { CreateEventDTO, EventFilterDTO, UpdateEventDTO } from "@/types/events.type";
+import * as eventsAPI from "@/services/events/events";
+import {
+  CreateEventDTO,
+  EventFilterDTO,
+  UpdateEventDTO,
+} from "@/types/events.type";
 
 export const useAllEvents = () => {
   return useQuery({
@@ -24,10 +28,29 @@ export const useEventById = (eventId: string) => {
   });
 };
 
+export const useEventBySlug = (slug: string) => {
+  return useQuery({
+    queryKey: ["event", slug],
+    queryFn: () => eventsAPI.getEventBySlug(slug),
+    enabled: !!slug, 
+    retry: 1,
+  });
+};
+
 export const useCreateEvent = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: FormData) => eventsAPI.createEvent(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+    },
+  });
+};
+
+export const useDeleteEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (eventId: string) => eventsAPI.deleteEvent(eventId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
     },
@@ -42,14 +65,14 @@ export const useUpdateEvent = () => {
       data,
     }: {
       eventId: string;
-      data: UpdateEventDTO;
+      data: FormData; // Only accept FormData, matching useCreateEvent
     }) => eventsAPI.updateEvent(eventId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      // Invalidate specific event
     },
   });
 };
-
 export const useToggleEventStatus = () => {
   const queryClient = useQueryClient();
   return useMutation({

@@ -7,20 +7,16 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useMyTickets, useListResale } from "@/api/tickets/tickets.queries";
+import {
+  useMyTickets,
+  useListResale,
+} from "@/services/tickets/tickets.queries";
 import { ResaleModal } from "@/components/resale-modal";
 import { QRCodeDisplay } from "@/components/qr-code-display";
 import { useAuth } from "@/lib/auth-context";
-import { formatDate, formatPrice } from "@/lib/dummy-data";
+import { formatDate, formatPrice } from "@/lib/helpers";
 import { toast } from "sonner";
-import { Ticket } from "@/types/tickets.type";
-
-export interface ListResalePayload {
-  ticketId: string;
-  resalePrice: number;
-  bankCode: string;
-  accountNumber: string;
-}
+import { Ticket, ListResalePayload } from "@/types/tickets.type";
 
 export default function TicketDetailPage({
   params,
@@ -51,6 +47,12 @@ export default function TicketDetailPage({
 
   const handleListForResale = () => {
     if (!ticket) return;
+    if (ticket.resaleCount >= 1) {
+      toast.error(
+        "This ticket has already been resold once and cannot be listed again."
+      );
+      return;
+    }
     setSelectedTicket(ticket);
     setIsResaleModalOpen(true);
   };
@@ -72,12 +74,20 @@ export default function TicketDetailPage({
       accountNumber: payload.accountNumber,
     };
 
-    await listResale(resalePayload, {
-      onSuccess: () => {
-        setIsResaleModalOpen(false);
-        setSelectedTicket(null);
-      },
-    });
+    try {
+      await listResale(resalePayload, {
+        onSuccess: () => {
+          toast.success("Ticket listed for resale successfully!");
+          setIsResaleModalOpen(false);
+          setSelectedTicket(null);
+        },
+        onError: (error) => {
+          toast.error(error.message || "Failed to list ticket for resale.");
+        },
+      });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to list ticket for resale.");
+    }
   };
 
   if (isLoading) {
@@ -92,7 +102,7 @@ export default function TicketDetailPage({
     );
   }
 
-  if (isError || !ticket || !event) {
+  if (isError || !ticket || !event || !ticket.ticketCategory) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -100,7 +110,8 @@ export default function TicketDetailPage({
             Ticket Not Found
           </h1>
           <p className="text-gray-600 mb-4">
-            The ticket you're looking for doesn't exist.
+            The ticket you're looking for doesn't exist or is missing required
+            information.
           </p>
           <Button
             asChild
@@ -112,6 +123,8 @@ export default function TicketDetailPage({
       </div>
     );
   }
+
+  const originalPrice = ticket.ticketCategory.price;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -191,16 +204,24 @@ export default function TicketDetailPage({
                           </code>
                         </div>
                         <div className="flex justify-between">
+                          <span className="text-gray-600">Category:</span>
+                          <span className="font-semibold text-gray-900">
+                            {ticket.ticketCategory.name}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
                           <span className="text-gray-600">Original Price:</span>
                           <span className="font-semibold text-gray-900">
-                            ₦{formatPrice(event.price)}
+                            {originalPrice > 0
+                              ? `${formatPrice(originalPrice)}`
+                              : "Free"}
                           </span>
                         </div>
                         {ticket.isListed && ticket.resalePrice && (
                           <div className="flex justify-between">
                             <span className="text-gray-600">Listed for:</span>
                             <span className="font-semibold text-orange-600">
-                              ₦{formatPrice(ticket.resalePrice)}
+                              {formatPrice(ticket.resalePrice)}
                             </span>
                           </div>
                         )}
@@ -243,12 +264,18 @@ export default function TicketDetailPage({
                         <Button
                           className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                           onClick={handleListForResale}
-                          disabled={ticket.isListed || isResalePending}
+                          disabled={
+                            ticket.isListed ||
+                            isResalePending ||
+                            ticket.resaleCount >= 1
+                          }
                         >
                           {ticket.isListed
-                            ? `Listed for ₦${formatPrice(
+                            ? `Listed for ${formatPrice(
                                 ticket.resalePrice || 0
                               )}`
+                            : ticket.resaleCount >= 1
+                            ? "Cannot Resell Again"
                             : "List for Resale"}
                         </Button>
                         <Button
@@ -278,4 +305,3 @@ export default function TicketDetailPage({
     </div>
   );
 }
-

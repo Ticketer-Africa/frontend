@@ -4,9 +4,9 @@ import { Ticket } from "@/types/tickets.type";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatDate, formatPrice } from "@/lib/dummy-data";
+import { formatDate, formatPrice } from "@/lib/helpers";
 import { useState } from "react";
-import { useBankCodes } from "@/api/banks/bank.queries";
+import { useBankCodes } from "@/services/banks/bank.queries";
 import { Bank } from "@/types/bank.type";
 
 interface ResaleModalProps {
@@ -36,6 +36,9 @@ export function ResaleModal({
 
   const handleSubmit = () => {
     if (!resalePrice || !bankCode || !accountNumber) return;
+    if ((selectedTicket?.resaleCount ?? 0) >= 1) {
+      return; // Prevent submission if ticket has been resold once
+    }
     onConfirmResale({ resalePrice, bankCode, accountNumber });
     setResalePrice("");
     setBankCode("");
@@ -55,7 +58,8 @@ export function ResaleModal({
       className="max-w-lg rounded-xl"
     >
       {selectedTicket && (
-        <div className="space-y-4">
+        <div className="
+        ">
           <div>
             <h3 className="font-semibold text-lg text-gray-900">
               {selectedTicket.event.name}
@@ -69,13 +73,19 @@ export function ResaleModal({
             <p className="text-sm text-gray-600">
               Ticket #{selectedTicket.code}
             </p>
+            <p className="text-sm text-gray-600">
+              Category: {selectedTicket.ticketCategory?.name}
+            </p>
           </div>
 
           <div className="border rounded-lg p-4 bg-gray-50">
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Original Price:</span>
               <span className="font-semibold text-gray-900">
-                {formatPrice(selectedTicket.event.price)}
+                {selectedTicket.ticketCategory?.price &&
+                selectedTicket.ticketCategory.price > 0
+                  ? `${formatPrice(selectedTicket.ticketCategory.price)}`
+                  : "Free"}
               </span>
             </div>
           </div>
@@ -95,12 +105,13 @@ export function ResaleModal({
               onChange={(e) => setResalePrice(e.target.value)}
               min="0"
               step="100"
+              disabled={selectedTicket.resaleCount >= 1}
             />
             <p className="text-xs text-gray-500">
-              You'll receive ₦
-              {Math.round(
-                Number.parseFloat(resalePrice || "0") * 0.95
-              ).toLocaleString()}{" "}
+              You'll receive {" "}
+              {formatPrice(
+                Math.round(Number.parseFloat(resalePrice || "0") * 0.85)
+              )}{" "}
               after 5% service fee
             </p>
           </div>
@@ -117,6 +128,7 @@ export function ResaleModal({
               value={bankCode}
               onChange={(e) => setBankCode(e.target.value)}
               className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-700"
+              disabled={isLoading || selectedTicket.resaleCount >= 1}
             >
               <option value="">-- Select your bank --</option>
               {banks?.map((bank: Bank) => (
@@ -125,6 +137,12 @@ export function ResaleModal({
                 </option>
               ))}
             </select>
+            {isLoading && (
+              <p className="text-xs text-gray-500">Loading banks...</p>
+            )}
+            {error && (
+              <p className="text-xs text-red-500">Failed to load banks</p>
+            )}
             <p className="text-xs text-gray-500">
               Pick your bank from the list
             </p>
@@ -142,11 +160,21 @@ export function ResaleModal({
               placeholder="Enter account number"
               value={accountNumber}
               onChange={(e) => setAccountNumber(e.target.value)}
+              disabled={selectedTicket.resaleCount >= 1}
             />
             <p className="text-xs text-gray-500">
               Enter your 10-digit account number
             </p>
           </div>
+
+          {selectedTicket.resaleCount >= 1 && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-sm text-red-800">
+                <strong>Note:</strong> This ticket has already been resold once
+                and cannot be listed again.
+              </p>
+            </div>
+          )}
 
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p className="text-sm text-blue-800">
@@ -172,7 +200,8 @@ export function ResaleModal({
                 Number.parseFloat(resalePrice) <= 0 ||
                 !bankCode ||
                 !accountNumber ||
-                isPending
+                isPending ||
+                selectedTicket.resaleCount >= 1
               }
             >
               {isPending ? "Listing..." : "List for Sale"}

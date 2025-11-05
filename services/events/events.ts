@@ -1,9 +1,10 @@
-import axios from "@/api/axios";
+import axios from "@/services/axios";
 import { toast } from "sonner";
 import {
   CreateEventDTO,
   UpdateEventDTO,
   EventFilterDTO,
+  deleteEventDTO,
 } from "@/types/events.type";
 
 // FETCH all events
@@ -29,20 +30,43 @@ export const createEvent = async (formData: FormData) => {
     toast.success(res.data.message || "Event created successfully");
     return res.data;
   } catch (error: any) {
-    const errorMessage = error.response?.data?.message || "Failed to create event";
+    const errorMessage =
+      error.response?.data?.message || "Failed to create event";
+    toast.error(errorMessage);
+    console.log(errorMessage)
+    throw new Error(errorMessage);
+  }
+};
+
+//Delete an event
+export const deleteEvent = async (eventId: string) => {
+  try {
+    const res = await axios.delete(`/events/${eventId}`);
+    console.log("everything is fineee");
+    toast.success(res.data.message) || "Event deleted successfully";
+    return res.data;
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data.message || "Failed to delete event";
     toast.error(errorMessage);
     throw new Error(errorMessage);
   }
 };
 
 // UPDATE an event
-export const updateEvent = async (eventId: string, data: UpdateEventDTO) => {
+export const updateEvent = async (eventId: string, formData: FormData) => {
   try {
-    const res = await axios.patch(`/events/${eventId}`, data);
+    const res = await axios.patch(`/events/${eventId}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data", // Explicitly set to match createEvent
+      },
+    });
     toast.success(res.data.message || "Event updated successfully");
     return res.data;
   } catch (error: any) {
-    const errorMessage = error.response?.data?.message || "Failed to update event";
+    const errorMessage =
+      error.response?.data?.message || "Failed to update event";
+    console.error("Update error:", errorMessage, error.response?.data);
     toast.error(errorMessage);
     throw new Error(errorMessage);
   }
@@ -55,7 +79,8 @@ export const toggleEventStatus = async (eventId: string) => {
     toast.success(res.data.message || "Event status toggled successfully");
     return res.data;
   } catch (error: any) {
-    const errorMessage = error.response?.data?.message || "Failed to toggle event status";
+    const errorMessage =
+      error.response?.data?.message || "Failed to toggle event status";
     toast.error(errorMessage);
     throw new Error(errorMessage);
   }
@@ -64,6 +89,12 @@ export const toggleEventStatus = async (eventId: string) => {
 // FETCH event by ID
 export const getEventById = async (eventId: string) => {
   const res = await axios.get(`/events/${eventId}`);
+  return res.data;
+};
+
+// FETCH event by SLUG
+export const getEventBySlug = async (slug: string) => {
+  const res = await axios.get(`/events/slug/${slug}`);
   return res.data;
 };
 

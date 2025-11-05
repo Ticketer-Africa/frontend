@@ -17,11 +17,11 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { useWithdrawWallet } from "@/api/wallet/wallet.queries";
+import { useWithdrawWallet } from "@/services/wallet/wallet.queries";
 import { toast } from "sonner";
-import { formatPrice } from "@/lib/dummy-data";
+import { formatPrice } from "@/lib/helpers";
 import { useAuth } from "@/lib/auth-context";
-import { useBankCodes } from "@/api/banks/bank.queries";
+import { useBankCodes } from "@/services/banks/bank.queries";
 import { Bank } from "@/types/bank.type";
 
 // Define Zod schema for WithdrawPayload
@@ -182,7 +182,7 @@ export function PayoutModal({
             <div className="w-full">
               <p className="text-sm text-gray-600">Available Balance</p>
               <p className="text-2xl font-bold text-gray-900">
-                ₦{formatPrice(availableBalance)}
+                {formatPrice(availableBalance)}
               </p>
             </div>
             <div className="w-full">
@@ -214,11 +214,12 @@ export function PayoutModal({
                   <SelectValue placeholder="Select a bank" />
                 </SelectTrigger>
                 <SelectContent>
-                  {banks.map((bank: Bank) => (
-                    <SelectItem key={bank.code} value={bank.code}>
-                      {bank.name}
-                    </SelectItem>
-                  ))}
+                  {banks &&
+                    banks?.map((bank: Bank) => (
+                      <SelectItem key={bank.code} value={bank.code}>
+                        {bank.name}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
