@@ -133,7 +133,7 @@ export default function TicketDetailPage({
           <Button
             variant="ghost"
             asChild
-            className="text-gray-700 hover:text-blue-600"
+            className="text-gray-700 hover:text-[#1E88E5]"
           >
             <Link href="/my-tickets">
               <ArrowLeft className="h-4 w-4 mr-2" />

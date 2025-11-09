@@ -57,7 +57,7 @@ export function EventsSection() {
 
                 {/* Content */}
                 <div className="p-5">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-[#1E88E5] transition-colors">
                     {event.name}
                   </h3>
 

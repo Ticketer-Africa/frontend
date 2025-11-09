@@ -142,7 +142,7 @@ export default function MyTicketsPage() {
         className="fixed inset-0 bg-gray-50 bg-opacity-90 flex items-center justify-center z-50"
       >
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-[#1E88E5] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Loading Authentication...
           </h2>
@@ -209,7 +209,7 @@ export default function MyTicketsPage() {
                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                           <div className="flex-1">
                             <Link href={`/events/${eventId}`}>
-                              <CardTitle className="text-lg sm:text-xl font-bold text-gray-900 line-clamp-2 hover:text-blue-600 transition-colors">
+                              <CardTitle className="text-lg sm:text-xl font-bold text-gray-900 line-clamp-2 hover:text-[#1E88E5] transition-colors">
                                 {event.name}
                               </CardTitle>
                             </Link>
@@ -294,14 +294,14 @@ export default function MyTicketsPage() {
                                     {/* Mobile-optimized layout */}
                                     <div className="flex items-start space-x-3">
                                       <div className="bg-blue-100 p-2 rounded-lg flex-shrink-0">
-                                        <TicketIcon className="h-5 w-5 text-blue-600" />
+                                        <TicketIcon className="h-5 w-5 text-[#1E88E5]" />
                                       </div>
                                       <div className="flex-1 min-w-0">
                                         {/* Header row */}
                                         <div className="flex items-start justify-between gap-3">
                                           <div className="flex-1 min-w-0">
                                             <Link href={`/ticket/${ticket.id}`}>
-                                              <h4 className="font-semibold text-gray-900 hover:text-blue-600 transition-colors text-base truncate">
+                                              <h4 className="font-semibold text-gray-900 hover:text-[#1E88E5] transition-colors text-base truncate">
                                                 Ticket #{ticket.code}
                                               </h4>
                                             </Link>

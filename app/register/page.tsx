@@ -111,7 +111,7 @@ export default function RegisterPage() {
           <CardHeader className="text-center flex justify-center items-center flex-col space-y-2 p-8">
             <Logo withText={false} size="sm" />
             <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
-            <p className="text-muted-foreground">Join Ticketer today</p>
+            <p className="text-muted-foreground">Join Ticketer Africa today</p>
           </CardHeader>
 
           <CardContent className="space-y-6">

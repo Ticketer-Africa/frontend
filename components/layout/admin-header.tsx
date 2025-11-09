@@ -28,11 +28,11 @@ export function AdminHeader() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/admin/dashboard" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-r from-[#1E88E5] to-indigo-600 rounded-lg flex items-center justify-center">
               <Shield className="h-4 w-4 text-white" />
             </div>
-            <span className="font-bold text-xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Ticketer Admin
+            <span className="font-bold text-xl bg-gradient-to-r from-[#1E88E5] to-indigo-600 bg-clip-text text-transparent">
+              Ticketer Africa Admin
             </span>
           </Link>
 
@@ -64,7 +64,7 @@ export function AdminHeader() {
           {/* Desktop Admin Actions */}
           <div className="hidden md:flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <Shield className="h-4 w-4 text-blue-600" />
+              <Shield className="h-4 w-4 text-[#1E88E5]" />
               <span className="text-sm font-medium">Admin Portal</span>
             </div>
             <div className="flex items-center space-x-2">
@@ -131,7 +131,7 @@ export function AdminHeader() {
               {/* Mobile Admin Actions */}
               <div className="pt-4 border-t">
                 <div className="flex items-center space-x-2 mb-4">
-                  <Shield className="h-4 w-4 text-blue-600" />
+                  <Shield className="h-4 w-4 text-[#1E88E5]" />
                   <span className="text-sm font-medium">Admin Portal</span>
                 </div>
                 <div className="flex space-x-2">
@@ -158,4 +158,3 @@ export function AdminHeader() {
     </header>
   );
 }
-

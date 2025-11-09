@@ -128,7 +128,7 @@ export default function VerifyTicketPage() {
           transition={{ duration: 0.6 }}
           className="text-center"
         >
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-[#1E88E5] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Verifying Ticket...
           </h2>
@@ -367,7 +367,7 @@ export default function VerifyTicketPage() {
               {/* Security Notice */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <div className="flex items-start space-x-2">
-                  <AlertCircle className="h-4 w-4 text-blue-600 mt-0.5" />
+                  <AlertCircle className="h-4 w-4 text-[#1E88E5] mt-0.5" />
                   <div className="text-sm text-blue-800">
                     <p className="font-medium">Security Notice</p>
                     <p>

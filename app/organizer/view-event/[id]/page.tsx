@@ -323,7 +323,7 @@ export default function EventDashboard() {
                     </DropdownMenu>
                     <div className="w-full sm:w-32 bg-muted rounded-full h-2 mt-2">
                       <div
-                        className="bg-gradient-to-r from-blue-600 to-pink-600 h-2 rounded-full"
+                        className="bg-gradient-to-r from-[#1E88E5] to-pink-600 h-2 rounded-full"
                         style={{
                           width: `${percentageSold}%`,
                         }}

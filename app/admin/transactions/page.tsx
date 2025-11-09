@@ -202,7 +202,7 @@ export default function AdminTransactionsPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-center sm:text-left">
               <h1 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2 justify-center sm:justify-start">
-                <CreditCard className="h-5 sm:h-6 w-5 sm:w-6 text-blue-600" />
+                <CreditCard className="h-5 sm:h-6 w-5 sm:w-6 text-[#1E88E5]" />
                 All Transactions
               </h1>
               <p className="text-xs sm:text-sm text-slate-600 mt-1">
@@ -214,7 +214,7 @@ export default function AdminTransactionsPage() {
                 <RefreshCw className="h-3 sm:h-4 w-3 sm:w-4" />
                 Refresh
               </button>
-              <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm">
+              <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-[#1E88E5] text-white rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm">
                 <Download className="h-3 sm:h-4 w-3 sm:w-4" />
                 Export CSV
               </button>
@@ -422,7 +422,7 @@ export default function AdminTransactionsPage() {
                     </td>
                     <td className="px-4 sm:px-6 py-4">
                       <div className="flex items-center gap-1 sm:gap-2">
-                        <button className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                        <button className="p-2 text-slate-600 hover:text-[#1E88E5] hover:bg-blue-50 rounded-lg transition-colors">
                           <Eye className="h-3 sm:h-4 w-3 sm:w-4" />
                         </button>
                         <button className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
@@ -528,7 +528,7 @@ export default function AdminTransactionsPage() {
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <button className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                        <button className="p-2 text-slate-600 hover:text-[#1E88E5] hover:bg-blue-50 rounded-lg transition-colors">
                           <Eye className="h-3 w-3" />
                         </button>
                         <button className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
@@ -584,7 +584,7 @@ function StatCard({
     green: "from-green-500 to-green-600",
     yellow: "from-yellow-500 to-yellow-600",
     red: "from-red-500 to-red-600",
-    blue: "from-blue-500 to-blue-600",
+    blue: "from-blue-500 to-[#1E88E5]",
   };
 
   return (

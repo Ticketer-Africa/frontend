@@ -16,7 +16,7 @@ import { Logo } from "./logo";
 
 export function Footer() {
   return (
-    <footer className="bg-black text-white">
+    <footer className="bg-white border-t-[1px] text-black">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
@@ -94,7 +94,9 @@ export function Footer() {
           </div>
         </div>
         <div className="border-t border-white/20 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center text-sm">
-          <p>© {new Date().getFullYear()} Ticketer. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} Ticketer Africa. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

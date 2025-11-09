@@ -29,7 +29,7 @@ export default function ResetPasswordPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token"); // resetToken from OTP step
-  const resetpasswordMutation = useResetPassword()
+  const resetpasswordMutation = useResetPassword();
 
   const {
     register,
@@ -39,48 +39,47 @@ export default function ResetPasswordPage() {
     resolver: zodResolver(resetPasswordSchema),
   });
 
-const onSubmit = async (data: ResetPasswordSchema) => {
-  // ✅ Get stored reset details
-  const email = localStorage.getItem("resetEmail");
-  const otp = localStorage.getItem("resetOtp");
+  const onSubmit = async (data: ResetPasswordSchema) => {
+    // ✅ Get stored reset details
+    const email = localStorage.getItem("resetEmail");
+    const otp = localStorage.getItem("resetOtp");
 
-  if (!email || !otp) {
-    alert("Reset session expired. Please request a new OTP.");
-    router.push("/forgot-password");
-    return;
-  }
+    if (!email || !otp) {
+      alert("Reset session expired. Please request a new OTP.");
+      router.push("/forgot-password");
+      return;
+    }
 
-  const payload = {
-    email,
-    otp,
-    newPassword: data.password,
-  };
-
-
-  resetpasswordMutation.mutate(
-    {
+    const payload = {
       email,
       otp,
       newPassword: data.password,
-    },
-    {
-      onSuccess: () => {
-        // Cleanup
-        localStorage.removeItem("resetEmail");
-        localStorage.removeItem("resetOtp");
+    };
 
-        router.push("/login");
+    resetpasswordMutation.mutate(
+      {
+        email,
+        otp,
+        newPassword: data.password,
       },
-      onError: (err: any) => {
-        console.error(err);
-        alert(
-          err?.response?.data?.message || "Failed to reset password. Try again."
-        );
-      },
-    }
-  );
-};
+      {
+        onSuccess: () => {
+          // Cleanup
+          localStorage.removeItem("resetEmail");
+          localStorage.removeItem("resetOtp");
 
+          router.push("/login");
+        },
+        onError: (err: any) => {
+          console.error(err);
+          alert(
+            err?.response?.data?.message ||
+              "Failed to reset password. Try again."
+          );
+        },
+      }
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-16">
@@ -108,9 +107,9 @@ const onSubmit = async (data: ResetPasswordSchema) => {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center space-x-2 mb-6">
-              <Sparkles className="w-8 h-8 text-blue-600" />
+              <Sparkles className="w-8 h-8 text-[#1E88E5]" />
               <span className="text-2xl font-bold text-gray-900">
-                Ticketer
+                Ticketer Africa
               </span>
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">

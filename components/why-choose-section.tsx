@@ -31,7 +31,7 @@ const benefits = [
     title: "Best Prices",
     description:
       "Compare prices and find the best deals with our price guarantee.",
-    color: "text-blue-600",
+    color: "text-[#1E88E5]",
   },
 ];
 
@@ -48,7 +48,7 @@ export function WhyChooseSection() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-            Why Choose Ticketer?
+            Why Choose Ticketer Africa?
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             We're not just another ticketing platform. We're your trusted
@@ -90,28 +90,28 @@ export function WhyChooseSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
           viewport={{ once: true }}
-          className="mt-16 text-center bg-gradient-to-r from-blue-600 to-blue-600 rounded-3xl p-12 text-white"
+          className="mt-16 text-center bg-gradient-to-r from-[#1E88E5] to-[#1E88E5] rounded-3xl p-12 text-white"
         >
           <h3 className="text-2xl sm:text-3xl font-bold mb-4">
             Ready to get started?
           </h3>
           <p className="text-lg mb-8 opacity-90">
-            Join thousands of happy customers who trust Ticketer for their
-            events.
+            Join thousands of happy customers who trust Ticketer Africa for
+            their events.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => router.push("/events")}
-              className="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
+              className="bg-white text-[#1E88E5] px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
             >
               Start Exploring
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition-colors"
+              className="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-[#1E88E5] transition-colors"
             >
               Learn More
             </motion.button>
@@ -121,4 +121,3 @@ export function WhyChooseSection() {
     </section>
   );
 }
-

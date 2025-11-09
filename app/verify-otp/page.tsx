@@ -82,12 +82,12 @@ export default function VerifyOTPPage() {
     verifyOtp(result.data, {
       onSuccess: () => {
         toast.success("OTP verified Sucessfully!");
-        const context = otpPayload?.context
+        const context = otpPayload?.context;
         localStorage.removeItem("otpPayload");
         // const role = user?.role || "user";
         if (context === "forgot-password") {
-           localStorage.setItem("resetEmail", email!);
-           localStorage.setItem("resetOtp", otp);
+          localStorage.setItem("resetEmail", email!);
+          localStorage.setItem("resetOtp", otp);
           router.push("/reset-password");
         } else {
           router.push("/login");
@@ -138,10 +138,10 @@ export default function VerifyOTPPage() {
         <Card className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/20">
           <CardHeader className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-4">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-blue-600 to-pink-600 flex items-center justify-center">
+              <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-[#1E88E5] to-pink-600 flex items-center justify-center">
                 <span className="text-white font-bold text-sm">T</span>
               </div>
-              <span className="font-bold text-xl">Ticketer</span>
+              <span className="font-bold text-xl">Ticketer Africa</span>
             </div>
             <CardTitle className="text-2xl">Verify Your Email</CardTitle>
             <p className="text-muted-foreground">
@@ -186,7 +186,7 @@ export default function VerifyOTPPage() {
                   <button
                     disabled={isResending || secondsLeft > 0}
                     onClick={handleResend}
-                    className="text-blue-600 hover:underline disabled:opacity-50"
+                    className="text-[#1E88E5] hover:underline disabled:opacity-50"
                   >
                     Resend Code
                   </button>

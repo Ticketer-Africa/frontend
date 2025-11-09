@@ -258,7 +258,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-semibold text-slate-900 flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-blue-600" />
+                    <TrendingUp className="h-5 w-5 text-[#1E88E5]" />
                     Daily Revenue
                   </h3>
                   <p className="text-sm text-slate-600 mt-1">
@@ -443,7 +443,7 @@ export default function AdminDashboard() {
             title="Recent Transactions"
             items={recentTransactions}
             type="transaction"
-            icon={<CreditCard className="h-5 w-5 text-blue-600" />}
+            icon={<CreditCard className="h-5 w-5 text-[#1E88E5]" />}
           />
           <ActivityCard
             title="Recent Events"
@@ -465,7 +465,7 @@ export default function AdminDashboard() {
 
 function MetricCard({ title, value, change, isPositive, icon, color }: any) {
   const colorClasses: any = {
-    blue: "from-blue-500 to-blue-600",
+    blue: "from-blue-500 to-[#1E88E5]",
     green: "from-green-500 to-green-600",
     purple: "from-purple-500 to-purple-600",
     orange: "from-orange-500 to-orange-600",
@@ -522,7 +522,7 @@ function AlertItem({ message, severity, time, amount }: any) {
   //     bg: "bg-blue-50",
   //     border: "border-blue-200",
   //     badge: "bg-blue-100 text-blue-800 border-blue-200",
-  //     button: "bg-blue-600 hover:bg-blue-700"
+  //     button: "bg-[#1E88E5] hover:bg-blue-700"
   //   },
   // };
 
@@ -612,7 +612,7 @@ function ActivityCard({ title, items, type, icon }: any) {
           </div>
           <button
             onClick={handleViewAll}
-            className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors flex items-center gap-1"
+            className="text-sm text-[#1E88E5] hover:text-blue-800 font-medium transition-colors flex items-center gap-1"
           >
             View All
             <ArrowUpRight className="h-3 w-3" />
