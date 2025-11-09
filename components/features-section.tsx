@@ -10,7 +10,7 @@ const features = [
     title: "Buy Tickets Easily",
     description:
       "Browse and purchase tickets for your favorite events with just a few clicks.",
-    color: "text-blue-600",
+    color: "text-[#1E88E5]",
   },
   {
     icon: RefreshCw,
@@ -25,7 +25,7 @@ const features = [
     title: "Organizer Dashboard & Wallet",
     description:
       "Comprehensive tools for event management and instant payouts.",
-    color: "text-blue-600",
+    color: "text-[#1E88E5]",
   },
   {
     icon: CreditCard,

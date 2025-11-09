@@ -18,7 +18,10 @@ export default function Head() {
       <link rel="icon" type="image/png" sizes="16x16" href="/logo.png" />
 
       {/* Open Graph + Twitter Meta Tags */}
-      <meta property="og:title" content="Ticketer Africa - Event Ticketing Platform" />
+      <meta
+        property="og:title"
+        content="Ticketer Africa - Event Ticketing Platform"
+      />
       <meta
         property="og:description"
         content="Discover and book tickets for amazing events across Africa."

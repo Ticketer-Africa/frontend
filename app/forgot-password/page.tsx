@@ -41,7 +41,7 @@ export default function ForgotPasswordPage() {
           localStorage.setItem(
             "otpPayload",
             JSON.stringify({
-              email: data.email, 
+              email: data.email,
               context: "forgot-password",
             })
           );
@@ -85,10 +85,10 @@ export default function ForgotPasswordPage() {
                 whileHover={{ rotate: 180 }}
                 transition={{ duration: 0.3 }}
               >
-                <Sparkles className="w-8 h-8 text-blue-600" />
+                <Sparkles className="w-8 h-8 text-[#1E88E5]" />
               </motion.div>
-              <span className="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                Ticketer
+              <span className="text-2xl font-bold text-gray-900 group-hover:text-[#1E88E5] transition-colors">
+                Ticketer Africa
               </span>
             </Link>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">

@@ -140,7 +140,7 @@ export default function WalletPage() {
         className="fixed inset-0 bg-gray-50 bg-opacity-90 flex items-center justify-center z-50"
       >
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-[#1E88E5] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Loading...
           </h2>
@@ -224,7 +224,7 @@ export default function WalletPage() {
           transition={{ duration: 0.6 }}
           className="text-center"
         >
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-[#1E88E5] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Loading Wallet...
           </h2>
@@ -287,7 +287,7 @@ export default function WalletPage() {
               <Card className="bg-white rounded-xl shadow-lg border border-gray-100">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2 text-gray-900">
-                    <Wallet className="h-5 w-5 text-blue-600" />
+                    <Wallet className="h-5 w-5 text-[#1E88E5]" />
                     <span>Available Balance</span>
                   </CardTitle>
                 </CardHeader>
@@ -342,7 +342,7 @@ export default function WalletPage() {
                 </div>
                 <div className="space-y-2">
                   <p className="text-sm text-gray-600">Total Withdrawn</p>
-                  <p className="text-2xl font-bold text-blue-600">
+                  <p className="text-2xl font-bold text-[#1E88E5]">
                     {formatPrice(
                       filteredTransactions
                         .filter(
@@ -354,7 +354,7 @@ export default function WalletPage() {
                 </div>
                 <div className="space-y-2">
                   <p className="text-sm text-gray-600">Transactions</p>
-                  <p className="text-2xl font-bold text-blue-600">
+                  <p className="text-2xl font-bold text-[#1E88E5]">
                     {filteredTransactions.length || "0"}
                   </p>
                 </div>
@@ -463,7 +463,7 @@ export default function WalletPage() {
                             onClick={() => handlePageChange(page)}
                             className={
                               currentPage === page
-                                ? "bg-blue-600 text-white"
+                                ? "bg-[#1E88E5] text-white"
                                 : ""
                             }
                           >

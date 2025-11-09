@@ -196,7 +196,7 @@ export default function AdminUsersPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-center sm:text-left">
               <h1 className="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2 justify-center sm:justify-start">
-                <Users className="h-5 sm:h-6 w-5 sm:w-6 text-blue-600" />
+                <Users className="h-5 sm:h-6 w-5 sm:w-6 text-[#1E88E5]" />
                 All Users
               </h1>
               <p className="text-xs sm:text-sm text-slate-600 mt-1">
@@ -211,7 +211,7 @@ export default function AdminUsersPage() {
                 <RefreshCw className="h-4 w-4" />
                 Refresh
               </button>
-              <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-[#1E88E5] text-white rounded-lg hover:bg-blue-700 transition-colors">
                 <Download className="h-4 w-4" />
                 Export
               </button>
@@ -422,7 +422,7 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-4 sm:px-6 py-4">
                       <div className="flex items-center gap-1 sm:gap-2">
-                        <button className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                        <button className="p-2 text-slate-600 hover:text-[#1E88E5] hover:bg-blue-50 rounded-lg transition-colors">
                           <Eye className="h-3 sm:h-4 w-3 sm:w-4" />
                         </button>
                         <button className="p-2 text-slate-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
@@ -543,7 +543,7 @@ export default function AdminUsersPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <button className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                        <button className="p-2 text-slate-600 hover:text-[#1E88E5] hover:bg-blue-50 rounded-lg transition-colors">
                           <Eye className="h-3 w-3" />
                         </button>
                         <button className="p-2 text-slate-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors">
@@ -594,7 +594,7 @@ function SimpleStat({ title, value }: { title: string; value: any }) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-6">
       <div className="flex items-center gap-3 sm:gap-4">
-        <div className="p-2 sm:p-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg">
+        <div className="p-2 sm:p-3 rounded-xl bg-gradient-to-r from-blue-500 to-[#1E88E5] text-white shadow-lg">
           <Users className="h-4 sm:h-5 w-4 sm:w-5" />
         </div>
         <div>

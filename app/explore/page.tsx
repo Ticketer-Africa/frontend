@@ -296,7 +296,7 @@ if (allPrices?.length) {
                         className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
                       />
                       {/* Category badge */}
-                      <div className="absolute top-4 left-4 capitalize bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-blue-600">
+                      <div className="absolute top-4 left-4 capitalize bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-[#1E88E5]">
                         {event.category}
                       </div>
                       {/* Almost sold out badge */}
@@ -312,7 +312,7 @@ if (allPrices?.length) {
 
                     {/* Price badge moved below image */}
                     <div className="flex justify-end px-4 -mt-8 mb-2 flex-shrink-0">
-                      <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-blue-600 shadow-sm">
+                      <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-[#1E88E5] shadow-sm">
                         {priceRangeDisplay}
                       </div>
                     </div>
@@ -320,7 +320,7 @@ if (allPrices?.length) {
                     {/* Content */}
                     <div className="p-6 flex flex-col justify-between flex-grow space-y-2">
                       {/* Event title */}
-                      <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
+                      <h3 className="text-xl font-semibold text-gray-900 group-hover:text-[#1E88E5] transition-colors line-clamp-2">
                         {event.name}
                       </h3>
 
@@ -415,7 +415,7 @@ if (allPrices?.length) {
                 setSelectedCategory("");
               }}
               variant="outline"
-              className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white rounded-full bg-transparent"
+              className="border-[#1E88E5] text-[#1E88E5] hover:bg-[#1E88E5] hover:text-white rounded-full bg-transparent"
             >
               Clear Filters
             </Button>

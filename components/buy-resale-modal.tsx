@@ -58,7 +58,7 @@ export function BuyResaleModal({
           {/* Seller Info */}
           <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
             <Avatar className="w-8 h-8">
-              <AvatarFallback className="bg-blue-100 text-blue-600 text-sm">
+              <AvatarFallback className="bg-blue-100 text-[#1E88E5] text-sm">
                 {selectedTicket.user.name.charAt(0)}
               </AvatarFallback>
             </Avatar>

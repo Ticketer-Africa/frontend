@@ -112,8 +112,8 @@ export function Header() {
                 href={item.href}
                 className={`text-sm font-semibold transition-colors ${
                   isActive(item.href)
-                    ? "text-blue-600 border-b-2 border-blue-600"
-                    : "text-gray-700 hover:text-blue-600"
+                    ? "text-[#1E88E5] border-b-2 border-[#1E88E5]"
+                    : "text-gray-700 hover:text-[#1E88E5]"
                 }`}
               >
                 {item.name}
@@ -136,7 +136,7 @@ export function Header() {
                       alt={user.name}
                       className="w-8 h-8 rounded-full object-cover"
                     ></AvatarImage>
-                    <AvatarFallback className="bg-blue-100 text-blue-600 text-sm">
+                    <AvatarFallback className="bg-blue-100 text-[#1E88E5] text-sm">
                       {user.profileImage || user.name.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
@@ -157,7 +157,7 @@ export function Header() {
                           alt={user.name}
                           className="w-10 h-10 rounded-full object-cover mr-3"
                         ></AvatarImage>
-                        <AvatarFallback className="bg-blue-100 text-blue-600 text-sm">
+                        <AvatarFallback className="bg-blue-100 text-[#1E88E5] text-sm">
                           {user.profileImage || user.name.charAt(0)}
                         </AvatarFallback>
                       </Avatar>
@@ -198,7 +198,7 @@ export function Header() {
               <div className="flex items-center space-x-2">
                 <Button
                   variant="ghost"
-                  className="text-gray-700 hover:text-blue-600"
+                  className="text-gray-700 hover:text-[#1E88E5]"
                   asChild
                 >
                   <Link href="/login">Sign In</Link>
@@ -244,8 +244,8 @@ export function Header() {
                   href={item.href}
                   className={`block px-4 py-3 text-sm font-semibold rounded-lg transition-colors ${
                     isActive(item.href)
-                      ? "bg-blue-50 text-blue-600"
-                      : "text-gray-700 hover:bg-gray-50 hover:text-blue-600"
+                      ? "bg-blue-50 text-[#1E88E5]"
+                      : "text-gray-700 hover:bg-gray-50 hover:text-[#1E88E5]"
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -263,7 +263,7 @@ export function Header() {
                         alt={user.name}
                         className="w-10 h-10 rounded-full object-cover mr-3"
                       ></AvatarImage>
-                      <AvatarFallback className="bg-blue-100 text-blue-600 text-sm">
+                      <AvatarFallback className="bg-blue-100 text-[#1E88E5] text-sm">
                         {user.profileImage || user.name.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
@@ -282,7 +282,7 @@ export function Header() {
                     <Link
                       key={item.name}
                       href={item.href}
-                      className="flex items-center px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors"
+                      className="flex items-center px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#1E88E5] rounded-lg transition-colors"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <item.icon className="h-4 w-4 mr-3 text-gray-500" />
@@ -291,7 +291,7 @@ export function Header() {
                   ))}
                   <button
                     onClick={handleLogout}
-                    className="flex items-center w-full px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors"
+                    className="flex items-center w-full px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#1E88E5] rounded-lg transition-colors"
                   >
                     <LogOut className="h-4 w-4 mr-3 text-gray-500" />
                     Sign Out
@@ -302,7 +302,7 @@ export function Header() {
                   <hr className="my-2 border-gray-100" />
                   <Link
                     href="/login"
-                    className="block px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors"
+                    className="block px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#1E88E5] rounded-lg transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Sign In

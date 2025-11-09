@@ -321,7 +321,7 @@ export default function UpdateEventPage() {
         className="fixed inset-0 bg-gray-50 bg-opacity-90 flex items-center justify-center z-50"
       >
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-[#1E88E5] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Loading...
           </h2>
@@ -422,7 +422,7 @@ export default function UpdateEventPage() {
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                     step <= currentStep
-                      ? "bg-blue-600 text-white"
+                      ? "bg-[#1E88E5] text-white"
                       : "bg-gray-200 text-gray-600"
                   }`}
                 >
@@ -431,7 +431,7 @@ export default function UpdateEventPage() {
                 {step < 3 && (
                   <div
                     className={`w-16 h-1 mx-2 ${
-                      step < currentStep ? "bg-blue-600" : "bg-gray-200"
+                      step < currentStep ? "bg-[#1E88E5]" : "bg-gray-200"
                     }`}
                   />
                 )}

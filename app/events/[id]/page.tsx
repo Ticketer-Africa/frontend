@@ -126,7 +126,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center space-y-4">
-          <div className="w-10 h-10 border-4 border-t-transparent border-blue-600 rounded-full animate-spin" />
+          <div className="w-10 h-10 border-4 border-t-transparent border-[#1E88E5] rounded-full animate-spin" />
           <p className="text-gray-600">Loading event details...</p>
         </div>
       </div>
@@ -292,7 +292,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                                   alt={ticket.user.name}
                                   className="w-8 h-8 rounded-full"
                                 ></AvatarImage>
-                                <AvatarFallback className="bg-blue-100 text-blue-600 text-sm">
+                                <AvatarFallback className="bg-blue-100 text-[#1E88E5] text-sm">
                                   {ticket.user.profileImage ||
                                     ticket.user.name.charAt(0)}
                                 </AvatarFallback>
@@ -381,7 +381,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                                 </div>
                                 <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
                                   <div
-                                    className="bg-gradient-to-r from-blue-600 to-pink-600 h-2 rounded-full"
+                                    className="bg-gradient-to-r from-[#1E88E5] to-pink-600 h-2 rounded-full"
                                     style={{
                                       width: `${
                                         (ticketCategory.minted /

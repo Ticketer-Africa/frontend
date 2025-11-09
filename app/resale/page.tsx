@@ -75,7 +75,7 @@ export default function ResalePage() {
           transition={{ duration: 0.6 }}
           className="text-center"
         >
-          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-[#1E88E5] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Loading Resale Tickets...
           </h2>
@@ -131,7 +131,7 @@ export default function ResalePage() {
                   <span>All sellers verified</span>
                 </div>
                 <div className="flex items-center">
-                  <TrendingDown className="w-4 h-4 mr-1 text-blue-600" />
+                  <TrendingDown className="w-4 h-4 mr-1 text-[#1E88E5]" />
                   <span>Best prices guaranteed</span>
                 </div>
               </div>
@@ -172,7 +172,7 @@ export default function ResalePage() {
                   <div className="absolute top-4 right-4 flex items-center space-x-2">
                     {/* Price Badge */}
                     <div className="bg-white rounded-full px-3 py-1 shadow text-center">
-                      <div className="text-sm font-semibold text-blue-600">
+                      <div className="text-sm font-semibold text-[#1E88E5]">
                         {formatPrice(resalePrice)}
                       </div>
                       {isDiscounted && (
@@ -246,7 +246,7 @@ export default function ResalePage() {
                         src={ticket.user.profileImage ?? undefined}
                         alt={ticket.user.name}
                       ></AvatarImage>
-                      <AvatarFallback className="bg-blue-100 text-blue-600 text-sm">
+                      <AvatarFallback className="bg-blue-100 text-[#1E88E5] text-sm">
                         {ticket.user.profileImage ||
                           ticket?.user.name.charAt(0)}
                       </AvatarFallback>
@@ -270,7 +270,7 @@ export default function ResalePage() {
                         {formatPrice(resalePrice)}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-xs text-blue-600 mt-1">
+                    <div className="flex items-center justify-between text-xs text-[#1E88E5] mt-1">
                       <span>Original price</span>
                       <span className={isDiscounted ? "line-through" : ""}>
                         {formatPrice(originalPrice)}
@@ -321,7 +321,7 @@ export default function ResalePage() {
               <Button
                 onClick={() => setSearchQuery("")}
                 variant="outline"
-                className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white rounded-full bg-transparent"
+                className="border-[#1E88E5] text-[#1E88E5] hover:bg-[#1E88E5] hover:text-white rounded-full bg-transparent"
               >
                 Clear Search
               </Button>
@@ -355,7 +355,7 @@ export default function ResalePage() {
 
             <div className="text-center">
               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <TrendingDown className="w-6 h-6 text-blue-600" />
+                <TrendingDown className="w-6 h-6 text-[#1E88E5]" />
               </div>
               <h4 className="font-semibold text-gray-900 mb-2">Best Prices</h4>
               <p className="text-sm text-gray-600">
@@ -365,7 +365,7 @@ export default function ResalePage() {
 
             <div className="text-center">
               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <User className="w-6 h-6 text-blue-600" />
+                <User className="w-6 h-6 text-[#1E88E5]" />
               </div>
               <h4 className="font-semibold text-gray-900 mb-2">
                 Buyer Protection

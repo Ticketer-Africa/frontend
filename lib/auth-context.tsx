@@ -82,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             <Logo
               size="lg"
               withText={true}
-              text="Ticketer"
+              text="Ticketer Africa"
               imgSrc="/logo.png"
               className="animate-pulse-glow"
             />
@@ -106,4 +106,3 @@ export function useAuth() {
   }
   return context;
 }
-

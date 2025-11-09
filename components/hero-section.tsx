@@ -60,7 +60,7 @@ export function HeroSection() {
           className="text-4xl sm:text-5xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight px-2 sm:px-4 max-w-4xl mx-auto"
         >
           Buy. Sell. Enjoy Events{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-600">
+          <span className="text-transparent bg-clip-text bg-[#1E88E5]">
             Effortlessly.
           </span>
         </motion.h1>
@@ -92,7 +92,7 @@ export function HeroSection() {
             variant="outline"
             size="lg"
             onClick={() => router.push("/register")}
-            className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-4 text-lg font-semibold rounded-full transition-all duration-300 bg-transparent w-full sm:w-auto"
+            className="border-2 border-[#1E88E5] text-[#1E88E5] hover:bg-[#1E88E5] hover:text-white px-8 py-4 text-lg font-semibold rounded-full transition-all duration-300 bg-transparent w-full sm:w-auto"
           >
             Become an Organizer
           </Button>
