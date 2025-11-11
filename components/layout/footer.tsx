@@ -62,10 +62,9 @@ export function Footer() {
             <h3 className="font-semibold">Support</h3>
             <div className="space-y-2 text-sm">
               {[
-                { href: "/", label: "Help Center" },
-                { href: "/", label: "Contact Us" },
-                { href: "/", label: "Privacy Policy" },
-                { href: "/", label: "Terms of Service" },
+                { href: "#faq", label: "FAQs" },
+                { href: "#pricing", label: "Pricing" },
+                { href: "/terms", label: "Terms of Service" },
               ].map((link) => (
                 <Link key={link.href} href={link.href} className="block">
                   {link.label}
@@ -84,7 +83,7 @@ export function Footer() {
               </div>
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4" />
-                <span>+1 (555) 123-4567</span>
+                <span>+234 (903) 750-4159</span>
               </div>
               <div className="flex items-center space-x-2">
                 <MapPin className="h-4 w-4" />

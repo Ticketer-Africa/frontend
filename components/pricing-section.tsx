@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export function PricingSection() {
   return (
-    <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+    <section id="pricing" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
       <div className="max-w-4xl mx-auto text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
