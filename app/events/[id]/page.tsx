@@ -244,13 +244,16 @@ export default function EventPage({ params }: { params: { id: string } }) {
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center space-x-4">
-                      <img
-                        src={
-                          event.organizer?.profileImage || "/placeholder.svg"
-                        }
-                        alt={event.organizer?.name || "Organizer"}
-                        className="w-12 h-12 rounded-full"
-                      />
+                      <Avatar>
+                        <AvatarImage
+                          src={event?.organizer?.profileImage ?? undefined}
+                          alt={event?.organizer?.name}
+                          className="w-12 h-12 rounded-full object-cover "
+                        ></AvatarImage>
+                        <AvatarFallback className="bg-blue-100 text-[#1E88E5] text-sm">
+                          {event?.organizer?.name.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
                       <div>
                         <div className="flex items-center space-x-2">
                           <h3 className="font-semibold">

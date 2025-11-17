@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ChevronUp,
   Ticket as TicketIcon,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,8 +16,19 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { ResaleModal } from "@/components/resale-modal";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   useMyTickets,
   useListResale,
+  useRemoveResaleTicket,
 } from "@/services/tickets/tickets.queries";
 import { Ticket, ListResalePayload } from "@/types/tickets.type";
 import { formatDate, formatPrice } from "@/lib/helpers";
@@ -31,6 +43,8 @@ export default function MyTicketsPage() {
   const { data: userTickets } = useMyTickets();
   const { mutateAsync: listResale, isPending: isResalePending } =
     useListResale();
+  const removeMutation = useRemoveResaleTicket();
+  const [ticketToRemove, setTicketToRemove] = useState<string | null>(null);
   const { isLoading, user: currentUser } = useAuth();
   const router = useRouter();
 
@@ -41,7 +55,6 @@ export default function MyTicketsPage() {
       );
     }
   }, [currentUser, isLoading, router]);
-
 
   // Group tickets by event ID
   const groupedTickets = userTickets?.reduce(
@@ -108,8 +121,7 @@ export default function MyTicketsPage() {
           setIsResaleModalOpen(false);
           setSelectedTicket(null);
         },
-        onError: (error) => {
-        },
+        onError: (error) => {},
       });
     } catch (err: any) {
       toast.error(err.message || "Failed to list ticket for resale.");
@@ -351,16 +363,30 @@ export default function MyTicketsPage() {
                                                 </Button>
                                               )}
                                             {ticket.isListed && (
-                                              <Button
-                                                size="sm"
-                                                className="bg-gray-400 text-white rounded-full px-3 py-1 text-xs h-7"
-                                                disabled
-                                              >
-                                                Listed:{" "}
-                                                {formatPrice(
-                                                  ticket.resalePrice ?? 0
-                                                )}
-                                              </Button>
+                                              <div className="flex items-center space-x-2">
+                                                <Button
+                                                  size="sm"
+                                                  className="bg-gray-400 text-white rounded-full px-2 text-xs h-6"
+                                                  disabled
+                                                >
+                                                  {formatPrice(
+                                                    ticket.resalePrice ?? 0
+                                                  )}
+                                                </Button>
+
+                                                <Button
+                                                  onClick={() =>
+                                                    setTicketToRemove(ticket.id)
+                                                  }
+                                                  disabled={
+                                                    removeMutation.isPending
+                                                  }
+                                                  className="p-0 rounded-full bg-transparent hover:bg-transparent"
+                                                  title="Remove from resale"
+                                                >
+                                                  <Trash2 className="w-4 h-4 text-red-600 hover:text-red-700 transition-colors" />
+                                                </Button>
+                                              </div>
                                             )}
                                             {ticket.isUsed && (
                                               <Button
@@ -409,6 +435,46 @@ export default function MyTicketsPage() {
           )}
         </motion.div>
       </div>
+
+      <AlertDialog
+        open={!!ticketToRemove}
+        onOpenChange={(open) => !open && setTicketToRemove(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove ticket from resale?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This ticket will no longer be available for others to purchase.
+              You can list it again later if you change your mind (as long as it
+              hasn't been resold before).
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (ticketToRemove) {
+                  removeMutation.mutate(ticketToRemove, {
+                    onSuccess: () => {
+                      toast.success("Ticket removed from resale");
+                      setTicketToRemove(null);
+                    },
+                    onError: (error: any) => {
+                      toast.error(
+                        error.message || "Failed to remove ticket from resale"
+                      );
+                    },
+                  });
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700"
+              disabled={removeMutation.isPending}
+            >
+              {removeMutation.isPending ? "Removing..." : "Remove from Resale"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <ResaleModal
         isOpen={isResaleModalOpen}

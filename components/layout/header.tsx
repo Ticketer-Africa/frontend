@@ -256,7 +256,7 @@ export function Header() {
               {user ? (
                 <>
                   <hr className="my-2 border-gray-100" />
-                  <div className="flex items-center px-4 py-3 border-b border-gray-100">
+                  <div className="flex items-center px-4 py-3 gap-2 border-b border-gray-100">
                     <Avatar className="w-8 h-8">
                       <AvatarImage
                         src={user.profileImage ?? undefined}
