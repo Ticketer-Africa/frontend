@@ -5,8 +5,6 @@ export default function sitemap() {
 
   return [
     { url: `${baseUrl}/`, lastModified: new Date() },
-    { url: `${baseUrl}/login`, lastModified: new Date() },
-    { url: `${baseUrl}/register`, lastModified: new Date() },
     { url: `${baseUrl}/explore`, lastModified: new Date() },
     { url: `${baseUrl}/resale`, lastModified: new Date() },
   ];
