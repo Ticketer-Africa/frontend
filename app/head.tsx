@@ -11,6 +11,8 @@ export default function Head() {
         content="eSIkb-QiBu3FEf4pafVtK3nTZTFTpDLOOCCMc7r8q1I"
       />
 
+      <link rel="canonical" href="https://ticketer.africa" />
+
       {/* Favicon Icons */}
       <link rel="icon" href="/logo.png" />
       <link rel="apple-touch-icon" href="/logo.png" />
@@ -40,6 +42,19 @@ export default function Head() {
         content="Discover and book tickets for amazing events across Africa."
       />
       <meta name="twitter:image" content="https://ticketer.africa/logo.png" />
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "Ticketer Africa",
+            url: "https://ticketer.africa",
+            logo: "https://ticketer.africa/logo.png",
+          }),
+        }}
+      />
     </>
   );
 }

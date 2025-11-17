@@ -13,9 +13,15 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: '/events',
-        destination: '/explore',
-        permanent: true, // 308 redirect, good for SEO
+        source: "/events",
+        destination: "/explore",
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.ticketer.africa" }],
+        destination: "https://ticketer.africa/:path*",
+        permanent: true,
       },
     ];
   },
