@@ -15,7 +15,6 @@ import {
   TrendingUp,
   User,
   Shield,
-  Trash2,
 } from "lucide-react";
 import { formatPrice, formatDate } from "@/lib/helpers";
 import { useAuth } from "@/lib/auth-context";
@@ -26,6 +25,37 @@ import {
 import { BuyResaleModal } from "@/components/buy-resale-modal";
 import { toast } from "sonner";
 import { Ticket, TicketResale } from "@/types/tickets.type";
+
+export const metadata = {
+  title: "Resale Marketplace - Ticketer Africa",
+  description:
+    "Buy verified resale tickets or list your unused event tickets safely and securely.",
+  alternates: {
+    canonical: "https://ticketer.africa/resale",
+  },
+  openGraph: {
+    title: "Resale Marketplace - Ticketer Africa",
+    description:
+      "List tickets for resale or buy from verified sellers with full security.",
+    url: "https://ticketer.africa/resale",
+    siteName: "Ticketer Africa",
+    type: "website",
+    images: [
+      {
+        url: "https://ticketer.africa/logo.png",
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Resale Marketplace - Ticketer Africa",
+    description:
+      "Buy and sell event tickets in a safe and verified marketplace.",
+    images: ["https://ticketer.africa/logo.png"],
+  },
+};
 
 export default function ResalePage() {
   const [searchQuery, setSearchQuery] = useState("");
