@@ -17,6 +17,19 @@ import { useBecomeOrganizer } from "@/services/user/user.queries";
 import { toast } from "sonner";
 import { Logo } from "@/components/layout/logo";
 
+export const metadata = {
+  title: "Create an Account - Ticketer Africa",
+  description:
+    "Register to buy tickets, explore events, and access your personal dashboard.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+  alternates: {
+    canonical: "https://ticketer.africa/register",
+  },
+};
+
 // 🧠 ZOD SCHEMA + TYPE
 const registerSchema = z
   .object({

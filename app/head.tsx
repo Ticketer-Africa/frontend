@@ -10,9 +10,6 @@ export default function Head() {
         name="google-site-verification"
         content="eSIkb-QiBu3FEf4pafVtK3nTZTFTpDLOOCCMc7r8q1I"
       />
-
-      <link rel="canonical" href="https://ticketer.africa" />
-
       {/* Favicon Icons */}
       <link rel="icon" href="/logo.png" />
       <link rel="apple-touch-icon" href="/logo.png" />

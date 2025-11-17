@@ -19,6 +19,36 @@ import { formatPrice, formatDate, formatTime } from "@/lib/helpers";
 import { useAllEvents } from "@/services/events/events.queries";
 import { Event, TicketCategory } from "@/types/events.type";
 
+export const metadata = {
+  title: "Explore Events - Ticketer Africa",
+  description:
+    "Browse events happening across Africa. Concerts, festivals, conferences and more — all in one place.",
+  alternates: {
+    canonical: "https://ticketer.africa/explore",
+  },
+  openGraph: {
+    title: "Explore Events - Ticketer Africa",
+    description: "Discover upcoming events near you and across Africa.",
+    url: "https://ticketer.africa/explore",
+    siteName: "Ticketer Africa",
+    type: "website",
+    images: [
+      {
+        url: "https://ticketer.africa/logo.png",
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Explore Events - Ticketer Africa",
+    description:
+      "Discover and book tickets for events happening across Africa.",
+    images: ["https://ticketer.africa/logo.png"],
+  },
+};
+
 export default function EventsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
@@ -39,45 +69,43 @@ export default function EventsPage() {
     );
   }
 
-const locations: string[] = Array.from(
-  new Set(
-    events
-      ?.map((event: Event) => {
-        if (!event.location) return null;
-        const parts = event.location.split(",");
-        return parts.length > 1 ? parts[1].trim() : event.location.trim();
-      })
-      .filter(Boolean)
-  )
-);
+  const locations: string[] = Array.from(
+    new Set(
+      events
+        ?.map((event: Event) => {
+          if (!event.location) return null;
+          const parts = event.location.split(",");
+          return parts.length > 1 ? parts[1].trim() : event.location.trim();
+        })
+        .filter(Boolean)
+    )
+  );
 
+  // Gather all ticket prices from every event
+  const allPrices = events
+    ?.flatMap((event: Event) =>
+      event.ticketCategories?.map((t: TicketCategory) => t.price)
+    )
+    .filter((price: number) => typeof price === "number" && price >= 0);
 
-// Gather all ticket prices from every event
-const allPrices = events
-  ?.flatMap((event: Event) =>
-    event.ticketCategories?.map((t: TicketCategory) => t.price)
-  )
-  .filter((price: number) => typeof price === "number" && price >= 0);
+  let priceRanges: { label: string; value: string }[] = [];
 
-let priceRanges: { label: string; value: string }[] = [];
+  if (allPrices?.length) {
+    const minPrice = Math.min(...allPrices);
+    const maxPrice = Math.max(...allPrices);
 
-if (allPrices?.length) {
-  const minPrice = Math.min(...allPrices);
-  const maxPrice = Math.max(...allPrices);
+    if (minPrice < 5000)
+      priceRanges.push({ label: "Under ₦5,000", value: "0-5000" });
 
-  if (minPrice < 5000)
-    priceRanges.push({ label: "Under ₦5,000", value: "0-5000" });
+    if (maxPrice > 5000)
+      priceRanges.push({ label: "₦5,000 - ₦10,000", value: "5000-10000" });
 
-  if (maxPrice > 5000)
-    priceRanges.push({ label: "₦5,000 - ₦10,000", value: "5000-10000" });
+    if (maxPrice > 10000)
+      priceRanges.push({ label: "₦10,000 - ₦50,000", value: "10000-50000" });
 
-  if (maxPrice > 10000)
-    priceRanges.push({ label: "₦10,000 - ₦50,000", value: "10000-50000" });
-
-  if (maxPrice > 20000)
-    priceRanges.push({ label: "Over ₦50,000", value: "50000" });
-}
-
+    if (maxPrice > 20000)
+      priceRanges.push({ label: "Over ₦50,000", value: "50000" });
+  }
 
   const categories = [
     "Music",
@@ -109,24 +137,23 @@ if (allPrices?.length) {
 
     let matchesPrice = true;
     if (priceRange && event.ticketCategories?.length) {
-  matchesPrice = event.ticketCategories.some((t: TicketCategory) => {
-    const price = t.price;
+      matchesPrice = event.ticketCategories.some((t: TicketCategory) => {
+        const price = t.price;
 
-    switch (priceRange) {
-      case "0-5000":
-        return price >= 0 && price <= 5000;
-      case "5000-10000":
-        return price >= 5000 && price <= 10000;
-      case "10000-50000":
-        return price >= 10000 && price <= 50000;
-      case "50000":
-        return price >= 50000;
-      default:
-        return true;
+        switch (priceRange) {
+          case "0-5000":
+            return price >= 0 && price <= 5000;
+          case "5000-10000":
+            return price >= 5000 && price <= 10000;
+          case "10000-50000":
+            return price >= 10000 && price <= 50000;
+          case "50000":
+            return price >= 50000;
+          default:
+            return true;
+        }
+      });
     }
-  });
-}
-
 
     return matchesSearch && matchesLocation && matchesCategory && matchesPrice;
   });
