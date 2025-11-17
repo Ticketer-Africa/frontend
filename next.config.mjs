@@ -17,12 +17,6 @@ const nextConfig = {
         destination: "/explore",
         permanent: true,
       },
-      {
-        source: "/:path*",
-        has: [{ type: "host", value: "www.ticketer.africa" }],
-        destination: "https://ticketer.africa/:path*",
-        permanent: true,
-      },
     ];
   },
 };

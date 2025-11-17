@@ -19,36 +19,6 @@ import { formatPrice, formatDate, formatTime } from "@/lib/helpers";
 import { useAllEvents } from "@/services/events/events.queries";
 import { Event, TicketCategory } from "@/types/events.type";
 
-export const metadata = {
-  title: "Explore Events - Ticketer Africa",
-  description:
-    "Browse events happening across Africa. Concerts, festivals, conferences and more — all in one place.",
-  alternates: {
-    canonical: "https://ticketer.africa/explore",
-  },
-  openGraph: {
-    title: "Explore Events - Ticketer Africa",
-    description: "Discover upcoming events near you and across Africa.",
-    url: "https://ticketer.africa/explore",
-    siteName: "Ticketer Africa",
-    type: "website",
-    images: [
-      {
-        url: "https://ticketer.africa/logo.png",
-        width: 1200,
-        height: 630,
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Explore Events - Ticketer Africa",
-    description:
-      "Discover and book tickets for events happening across Africa.",
-    images: ["https://ticketer.africa/logo.png"],
-  },
-};
-
 export default function EventsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
