@@ -8,5 +8,6 @@ Disallow: /wallet
 Disallow: /my-tickets
 Disallow: /verify-otp
 Disallow: /verify-ticket
+Disallow: /login
 
 Sitemap: https://ticketer.africa/sitemap.xml
