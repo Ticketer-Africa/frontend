@@ -53,7 +53,7 @@ export default function ResalePage() {
     setSelectedTicket(ticket);
     setIsBuyModalOpen(true);
   };
-
+  console.log(resaleTickets);
   const handleConfirmBuy = async (ticketId: string) => {
     try {
       const response = await buyResaleTicket({ ticketIds: [ticketId] });
@@ -166,17 +166,18 @@ export default function ResalePage() {
                   />
 
                   {/* Price Badge */}
-                  <div className="bg-white rounded-full px-3 py-1 shadow text-center">
-                    <div className="text-sm font-semibold text-[#1E88E5]">
-                      {formatPrice(resalePrice)}
-                    </div>
-                    {isDiscounted && (
-                      <div className="text-xs text-gray-500 line-through">
-                        {formatPrice(originalPrice)}
+                  <div className="absolute top-3 right-3">
+                    <div className="bg-white rounded-full px-3 py-1 shadow text-center">
+                      <div className="text-sm font-semibold text-[#1E88E5]">
+                        {formatPrice(resalePrice)}
                       </div>
-                    )}
+                      {isDiscounted && (
+                        <div className="text-xs text-gray-500 line-through">
+                          {formatPrice(originalPrice)}
+                        </div>
+                      )}
+                    </div>
                   </div>
-
                   {/* Savings Badge */}
                   {isDiscounted && (
                     <div className="absolute top-4 left-4">
