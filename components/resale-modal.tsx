@@ -5,9 +5,28 @@ import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatDate, formatPrice } from "@/lib/helpers";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useBankCodes } from "@/services/banks/bank.queries";
 import { Bank } from "@/types/bank.type";
+
+// Zod schema with your rules
+const resaleSchema = z.object({
+  resalePrice: z
+    .string()
+    .min(1, "Enter resale price")
+    .transform((val) => Number(val))
+    .refine((val) => val >= 1200, {
+      message: "Minimum resale price is ₦1,200",
+    }),
+  bankCode: z.string().min(1, "Please select your bank"),
+  accountNumber: z
+    .string()
+    .regex(/^\d{10}$/, "Account number must be exactly 10 digits"),
+});
+
+type ResaleFormData = z.infer<typeof resaleSchema>;
 
 interface ResaleModalProps {
   isOpen: boolean;
@@ -28,21 +47,34 @@ export function ResaleModal({
   onConfirmResale,
   isPending,
 }: ResaleModalProps) {
-  const [resalePrice, setResalePrice] = useState("");
-  const [bankCode, setBankCode] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
-
   const { data: banks, isLoading, error } = useBankCodes();
 
-  const handleSubmit = () => {
-    if (!resalePrice || !bankCode || !accountNumber) return;
-    if ((selectedTicket?.resaleCount ?? 0) >= 1) {
-      return; // Prevent submission if ticket has been resold once
-    }
-    onConfirmResale({ resalePrice, bankCode, accountNumber });
-    setResalePrice("");
-    setBankCode("");
-    setAccountNumber("");
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+    reset,
+  } = useForm<ResaleFormData>({
+    resolver: zodResolver(resaleSchema),
+  });
+
+  const resalePrice = watch("resalePrice");
+  const youWillReceive = resalePrice
+    ? Math.round(Number(resalePrice) * 0.85)
+    : 0;
+
+  const isAlreadyResold = (selectedTicket?.resaleCount ?? 0) >= 1;
+
+  const onSubmit = (data: ResaleFormData) => {
+    if (isAlreadyResold) return;
+
+    onConfirmResale({
+      resalePrice: data.resalePrice.toString(),
+      bankCode: data.bankCode,
+      accountNumber: data.accountNumber,
+    });
+    reset();
   };
 
   return (
@@ -50,164 +82,169 @@ export function ResaleModal({
       isOpen={isOpen}
       onClose={() => {
         onClose();
-        setResalePrice("");
-        setBankCode("");
-        setAccountNumber("");
+        reset();
       }}
       title="List Ticket for Resale"
       className="max-w-lg rounded-xl"
     >
       {selectedTicket && (
-        <div className="
-        ">
-          <div>
-            <h3 className="font-semibold text-lg text-gray-900">
-              {selectedTicket.event.name}
-            </h3>
-            <p className="text-sm text-gray-600">
-              {selectedTicket.event.location}
-            </p>
-            <p className="text-sm text-gray-600">
-              {formatDate(selectedTicket.event.date)}
-            </p>
-            <p className="text-sm text-gray-600">
-              Ticket #{selectedTicket.code}
-            </p>
-            <p className="text-sm text-gray-600">
-              Category: {selectedTicket.ticketCategory?.name}
-            </p>
-          </div>
-
-          <div className="border rounded-lg p-4 bg-gray-50">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Original Price:</span>
-              <span className="font-semibold text-gray-900">
-                {selectedTicket.ticketCategory?.price &&
-                selectedTicket.ticketCategory.price > 0
-                  ? `${formatPrice(selectedTicket.ticketCategory.price)}`
-                  : "Free"}
-              </span>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label
-              htmlFor="resalePrice"
-              className="text-sm font-medium text-gray-900"
-            >
-              Resale Price (₦) *
-            </label>
-            <Input
-              id="resalePrice"
-              type="number"
-              placeholder="Enter resale price"
-              value={resalePrice}
-              onChange={(e) => setResalePrice(e.target.value)}
-              min="0"
-              step="100"
-              disabled={selectedTicket.resaleCount >= 1}
-            />
-            <p className="text-xs text-gray-500">
-              You'll receive {" "}
-              {formatPrice(
-                Math.round(Number.parseFloat(resalePrice || "0") * 0.85)
-              )}{" "}
-              after 5% service fee
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <label
-              htmlFor="bankCode"
-              className="text-sm font-medium text-gray-900"
-            >
-              Select Bank *
-            </label>
-            <select
-              id="bankCode"
-              value={bankCode}
-              onChange={(e) => setBankCode(e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-700"
-              disabled={isLoading || selectedTicket.resaleCount >= 1}
-            >
-              <option value="">-- Select your bank --</option>
-              {banks?.map((bank: Bank) => (
-                <option key={bank.code} value={bank.code}>
-                  {bank.name}
-                </option>
-              ))}
-            </select>
-            {isLoading && (
-              <p className="text-xs text-gray-500">Loading banks...</p>
-            )}
-            {error && (
-              <p className="text-xs text-red-500">Failed to load banks</p>
-            )}
-            <p className="text-xs text-gray-500">
-              Pick your bank from the list
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <label
-              htmlFor="accountNumber"
-              className="text-sm font-medium text-gray-900"
-            >
-              Account Number *
-            </label>
-            <Input
-              id="accountNumber"
-              placeholder="Enter account number"
-              value={accountNumber}
-              onChange={(e) => setAccountNumber(e.target.value)}
-              disabled={selectedTicket.resaleCount >= 1}
-            />
-            <p className="text-xs text-gray-500">
-              Enter your 10-digit account number
-            </p>
-          </div>
-
-          {selectedTicket.resaleCount >= 1 && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-              <p className="text-sm text-red-800">
-                <strong>Note:</strong> This ticket has already been resold once
-                and cannot be listed again.
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col h-full max-h-[85vh] md:max-h-none"
+        >
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto px-6 pt-4 pb-6 space-y-3">
+            {/* Event Info */}
+            <div className="space-y-1">
+              <h3 className="font-bold text-lg text-gray-900">
+                {selectedTicket.event.name}
+              </h3>
+              <p className="text-sm text-gray-600">
+                {selectedTicket.event.location}
+              </p>
+              <p className="text-sm text-gray-600">
+                {formatDate(selectedTicket.event.date)}
+              </p>
+              <p className="text-sm text-gray-600">
+                Ticket #{selectedTicket.code}
+              </p>
+              <p className="text-sm text-gray-600">
+                Category: {selectedTicket.ticketCategory?.name}
               </p>
             </div>
-          )}
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p className="text-sm text-blue-800">
-              <strong>Note:</strong> Once listed, your ticket will be available
-              for purchase by other users. You can remove the listing anytime
-              before it's sold.
-            </p>
+            {/* Original Price */}
+            <div className="border rounded-xl p-4 bg-gray-50">
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">Original Price:</span>
+                <span className="font-semibold">
+                  {selectedTicket.ticketCategory &&
+                  selectedTicket?.ticketCategory?.price > 0
+                    ? formatPrice(selectedTicket?.ticketCategory.price)
+                    : "Free"}
+                </span>
+              </div>
+            </div>
+
+            {/* Resale Price */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-900">
+                Resale Price (₦) <span className="text-red-600">*</span>
+              </label>
+              <Input
+                {...register("resalePrice")}
+                type="number"
+                placeholder="Minimum ₦1,200"
+                disabled={isAlreadyResold || isPending}
+                className="text-base"
+              />
+              {errors.resalePrice && (
+                <p className="text-xs text-red-600">
+                  {errors.resalePrice.message}
+                </p>
+              )}
+              {Number(resalePrice) >= 1200 && (
+                <p className="text-xs text-gray-600">
+                  You’ll receive{" "}
+                  <span className="font-semibold text-gray-900">
+                    {formatPrice(youWillReceive)}
+                  </span>{" "}
+                  after 15% service fee
+                </p>
+              )}
+            </div>
+
+            {/* Bank Select */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-900">
+                Select Bank <span className="text-red-600">*</span>
+              </label>
+              <select
+                {...register("bankCode")}
+                disabled={isLoading || isAlreadyResold || isPending}
+                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm disabled:bg-gray-100"
+              >
+                <option value="">-- Choose your bank --</option>
+                {banks?.map((bank: Bank) => (
+                  <option key={bank.code} value={bank.code}>
+                    {bank.name}
+                  </option>
+                ))}
+              </select>
+              {errors.bankCode && (
+                <p className="text-xs text-red-600">
+                  {errors.bankCode.message}
+                </p>
+              )}
+              {isLoading && (
+                <p className="text-xs text-gray-500">Loading banks...</p>
+              )}
+              {error && (
+                <p className="text-xs text-red-600">Failed to load banks</p>
+              )}
+            </div>
+
+            {/* Account Number */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-900">
+                Account Number <span className="text-red-600">*</span>
+              </label>
+              <Input
+                {...register("accountNumber")}
+                placeholder="10-digit account number"
+                maxLength={10}
+                disabled={isAlreadyResold || isPending}
+              />
+              {errors.accountNumber && (
+                <p className="text-xs text-red-600">
+                  {errors.accountNumber.message}
+                </p>
+              )}
+            </div>
+
+            {/* Warnings */}
+            {isAlreadyResold && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-sm text-red-800 font-medium">
+                  This ticket has already been resold once and cannot be listed
+                  again.
+                </p>
+              </div>
+            )}
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-sm text-blue-800">
+                <strong>Note:</strong> Once listed, anyone can buy your ticket.
+                You can delist it anytime before it's sold.
+              </p>
+            </div>
           </div>
 
-          <div className="flex space-x-2">
-            <Button
-              variant="outline"
-              className="flex-1 bg-transparent border-gray-300 hover:bg-gray-100"
-              onClick={() => onClose()}
-            >
-              Cancel
-            </Button>
-            <Button
-              className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
-              onClick={handleSubmit}
-              disabled={
-                !resalePrice ||
-                Number.parseFloat(resalePrice) <= 0 ||
-                !bankCode ||
-                !accountNumber ||
-                isPending ||
-                selectedTicket.resaleCount >= 1
-              }
-            >
-              {isPending ? "Listing..." : "List for Sale"}
-            </Button>
+          {/* Fixed Bottom Actions */}
+          <div className="border-t border-gray-200 px-6 py-4 bg-white sticky bottom-0">
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  onClose();
+                  reset();
+                }}
+                disabled={isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1 bg-[#1E88E5] hover:bg-blue-600 text-white font-medium rounded-full shadow-lg"
+                disabled={isPending || isAlreadyResold}
+              >
+                {isPending ? "Listing..." : "List for Sale"}
+              </Button>
+            </div>
           </div>
-        </div>
+        </form>
       )}
     </Modal>
   );
