@@ -34,7 +34,6 @@ interface Transaction {
 
 export default function WalletPage() {
   const { user: currentUser, isLoading } = useAuth();
-  const router = useRouter();
   const {
     data: pinStatus,
     isLoading: loadingPinStatus,
@@ -57,22 +56,6 @@ export default function WalletPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const transactionsPerPage = 10;
-
-  useEffect(() => {
-    if (!currentUser && !isLoading) {
-      router.push(
-        `/login?returnUrl=${encodeURIComponent(window.location.href)}`
-      );
-      return;
-    }
-    if (
-      currentUser &&
-      !["ORGANIZER", "ADMIN", "SUPERADMIN"].includes(currentUser.role)
-    ) {
-      router.push("/explore");
-      return;
-    }
-  }, [currentUser, isLoading, router]);
 
   // Filter transactions based on search term
   const filteredTransactions = useMemo(() => {

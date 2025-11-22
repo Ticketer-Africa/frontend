@@ -22,14 +22,12 @@ export const useRegister = () =>
   useMutation({
     mutationFn: (dto: RegisterDto) => register(dto),
   });
-
 export const useLogin = () =>
   useMutation({
     mutationFn: async (dto: LoginDto) => {
       const data = await login(dto);
-      //  Store user and token on successful login
       localStorage.setItem("ticketer-user", JSON.stringify(data.user));
-      localStorage.setItem("ticketer-token", data.access_token);
+
       return data;
     },
   });

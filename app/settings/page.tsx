@@ -44,7 +44,6 @@ export default function SettingsPage() {
   const updateUserMutation = useUpdateUser();
   const changePasswordMutation = useChangePassword();
   const { isLoading, user: currentUser } = useAuth();
-  const router = useRouter();
 
   const {
     register,
@@ -72,15 +71,6 @@ export default function SettingsPage() {
       confirmPassword: "",
     },
   });
-
-  useEffect(() => {
-    if (!currentUser && !isLoading) {
-      router.push(
-        `/login?returnUrl=${encodeURIComponent(window.location.href)}`
-      );
-      return;
-    }
-  }, [currentUser, router, isLoading]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

@@ -42,7 +42,7 @@ import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
 import { formatPrice } from "@/lib/helpers";
 
 export default function EventDashboard() {
-  const { isLoading: authLoading, user: currentUser } = useAuth();
+  const { user: currentUser } = useAuth();
   const router = useRouter();
   const params = useParams();
   const { id } = params; // Extract id from dynamic route
@@ -52,19 +52,6 @@ export default function EventDashboard() {
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!currentUser && !authLoading) {
-      router.push(
-        `/login?returnUrl=${encodeURIComponent(window.location.href)}`
-      );
-      return;
-    }
-    if (currentUser && !["ORGANIZER"].includes(currentUser.role)) {
-      router.push("/explore");
-      return;
-    }
-  }, [currentUser, authLoading, router]);
 
   if (eventsLoading) {
     return (

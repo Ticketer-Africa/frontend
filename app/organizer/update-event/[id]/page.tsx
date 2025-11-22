@@ -115,7 +115,7 @@ export default function UpdateEventPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { mutateAsync: updateEvent, isPending } = useUpdateEvent();
-  const { isLoading: authLoading, user: currentUser } = useAuth();
+  const { isLoading: authLoading } = useAuth();
   const router = useRouter();
   const params = useParams();
   const eventId = Array.isArray(params.id) ? params.id[0] : params.id;
@@ -187,20 +187,6 @@ export default function UpdateEventPage() {
     }
   }, [event, eventLoading, setValue]);
 
-  // Redirect if not authenticated or not an organizer
-  useEffect(() => {
-    if (!currentUser && !authLoading) {
-      router.push(
-        `/login?returnUrl=${encodeURIComponent(window.location.href)}`
-      );
-      return;
-    }
-    if (currentUser && !["ORGANIZER"].includes(currentUser.role)) {
-      router.push("/explore");
-      return;
-    }
-  }, [currentUser, authLoading, router]);
-
   // Clean up preview URL to prevent memory leaks
   const previewUrl = watch("banner")
     ? URL.createObjectURL(watch("banner"))
@@ -251,7 +237,6 @@ export default function UpdateEventPage() {
     if (validatedData.banner instanceof File) {
       formData.append("file", validatedData.banner);
     }
-
 
     try {
       await updateEvent({ eventId, data: formData });

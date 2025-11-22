@@ -2,7 +2,7 @@
 
 import { Logo } from "@/components/layout/logo";
 import Axios from "@/services/axios";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   createContext,
   useContext,
@@ -12,7 +12,7 @@ import {
 } from "react";
 
 interface User {
-  id: string;
+  sub: string;
   email: string;
   name: string;
   role: "USER" | "ORGANIZER" | "ADMIN" | "SUPERADMIN";
@@ -22,7 +22,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  logout: () => void;
+  logout: () => Promise<void>;
   isLoading: boolean;
 }
 
@@ -32,45 +32,82 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Define public routes that don't require authentication
+  const publicRoutes = [
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/",
+    "/explore",
+    "/resale",
+    "/events",
+    "/terms",
+    "/resale",
+    "/reset-password",
+    "/verify-otp",
+  ];
+
+  const fetchUser = async () => {
+    try {
+      const response = await Axios.get("/auth/me");
+      const userData = response.data.user;
+      setUser(userData);
+      localStorage.setItem("ticketer-user", JSON.stringify(userData));
+    } catch (error: any) {
+      setUser(null);
+      localStorage.removeItem("ticketer-user");
+
+      // Only redirect to login if:
+      // 1. We're NOT on a public route
+      // 2. AND the error is 401/403 (unauthorized)
+      const isPublicRoute = publicRoutes.some((route) =>
+        pathname.startsWith(route)
+      );
+
+      const isUnauthenticated =
+        error.response?.status === 401 ||
+        error.response?.status === 403 ||
+        error.message?.includes("401");
+
+      if (!isPublicRoute && isUnauthenticated) {
+        router.push("/login");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const storedUser = localStorage.getItem("ticketer-user");
-        if (storedUser) {
-          try {
-            setUser(JSON.parse(storedUser));
-          } catch (error) {
-            console.error("Failed to parse stored user:", error);
-            localStorage.removeItem("ticketer-user");
-          }
-        }
+    // Don't fetch user if we're on a public route AND there's no stored user hint
+    const isPublicRoute = publicRoutes.some((route) =>
+      pathname.startsWith(route)
+    );
 
-        const response = await Axios.get("/users/me", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("ticketer-token")}`,
-          },
-        });
-        const fetchedUser = response.data.user;
-        setUser(fetchedUser);
-        localStorage.setItem("ticketer-user", JSON.stringify(fetchedUser));
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
-        setUser(null);
-        localStorage.removeItem("ticketer-user");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    const storedUser = localStorage.getItem("ticketer-user");
 
+    // If we're on a public route AND no stored user → skip fetch entirely
+    if (isPublicRoute && !storedUser) {
+      setUser(null);
+      setIsLoading(false);
+      return;
+    }
+
+    // Otherwise: either protected route OR public but has stored session → try to fetch
     fetchUser();
-  }, []);
+  }, [pathname]); // Add pathname as dependency
 
-  const logout = () => {
-    setUser(null);
-    router.push("/login");
-    localStorage.removeItem("ticketer-user");
-    localStorage.removeItem("ticketer-token");
+  const logout = async () => {
+    try {
+      await Axios.post("/auth/logout");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setUser(null);
+      localStorage.removeItem("ticketer-user");
+      router.push("/login");
+    }
   };
 
   if (isLoading) {
@@ -78,7 +115,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center space-y-4">
           <div className="relative">
-            {/* Logo with glowing effect */}
             <Logo
               size="lg"
               withText={true}

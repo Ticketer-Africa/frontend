@@ -84,8 +84,6 @@ export default function CreateEventPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { mutateAsync: createEvent, isPending } = useCreateEvent();
-  const { isLoading, user: currentUser } = useAuth();
-  const router = useRouter();
   const categories = [
     "Music",
     "Concert",
@@ -123,19 +121,6 @@ export default function CreateEventPage() {
       banner: undefined,
     },
   });
-
-  useEffect(() => {
-    if (!currentUser && !isLoading) {
-      router.push(
-        `/login?returnUrl=${encodeURIComponent(window.location.href)}`
-      );
-      return;
-    }
-    if (currentUser && !["ORGANIZER"].includes(currentUser.role)) {
-      router.push("/explore");
-      return;
-    }
-  }, [currentUser, router, isLoading]);
 
   const previewUrl = watch("banner")
     ? URL.createObjectURL(watch("banner"))
@@ -177,7 +162,6 @@ export default function CreateEventPage() {
     if (validatedData.banner) {
       formData.append("file", validatedData.banner);
     }
-
 
     try {
       await createEvent(formData);
@@ -236,27 +220,6 @@ export default function CreateEventPage() {
     setCurrentStep(1);
     setIsSubmitted(false);
   };
-
-  if (isLoading) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
-        className="fixed inset-0 bg-gray-50 bg-opacity-90 flex items-center justify-center z-50"
-      >
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#1E88E5] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Loading Authentication...
-          </h2>
-          <p className="text-gray-600">
-            Please wait while we verify your session
-          </p>
-        </div>
-      </motion.div>
-    );
-  }
 
   if (isSubmitted) {
     return (

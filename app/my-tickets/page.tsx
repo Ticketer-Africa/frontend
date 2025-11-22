@@ -40,21 +40,11 @@ export default function MyTicketsPage() {
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [isResaleModalOpen, setIsResaleModalOpen] = useState(false);
   const [expandedEvent, setExpandedEvent] = useState<string | null>(null);
-  const { data: userTickets } = useMyTickets();
+  const { data: userTickets, isLoading } = useMyTickets();
   const { mutateAsync: listResale, isPending: isResalePending } =
     useListResale();
   const removeMutation = useRemoveResaleTicket();
   const [ticketToRemove, setTicketToRemove] = useState<string | null>(null);
-  const { isLoading, user: currentUser } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!currentUser && !isLoading) {
-      router.push(
-        `/login?returnUrl=${encodeURIComponent(window.location.href)}`
-      );
-    }
-  }, [currentUser, isLoading, router]);
 
   // Group tickets by event ID
   const groupedTickets = userTickets?.reduce(
