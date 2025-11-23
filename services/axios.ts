@@ -20,7 +20,7 @@ Axios.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Global 401 handling for redirecting
+// Global 401 handling for redirection
 Axios.interceptors.response.use(
   (response) => response,
   (error) => {
