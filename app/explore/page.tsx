@@ -290,6 +290,7 @@ export default function EventsPage() {
                         alt={event.name}
                         width={400}
                         height={250}
+                        priority
                         className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
                       />
                       {/* Category badge */}

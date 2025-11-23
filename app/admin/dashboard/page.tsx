@@ -87,17 +87,11 @@ export default function AdminDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-      if (!currentUser && !authLoading) {
-        router.push(
-          `/login?returnUrl=${encodeURIComponent(window.location.href)}`
-        );
-        return;
-      }
-      if (currentUser && !["ADMIN", "SUPERADMIN"].includes(currentUser.role)) {
-        router.push("/explore");
-        return;
-      }
-    }, [currentUser, authLoading, router]);
+    if (currentUser && !["ADMIN", "SUPERADMIN"].includes(currentUser.role)) {
+      router.push("/explore");
+      return;
+    }
+  }, [currentUser, authLoading, router]);
 
   const isLoading = loadingTransaction || loadingStats;
 
@@ -122,7 +116,6 @@ export default function AdminDashboard() {
       };
     }
   );
-
 
   const recentEvents: RecentEvent[] = (events ?? []).map((event: any) => {
     const ticketsSold =
@@ -737,4 +730,3 @@ function ActivityCard({ title, items, type, icon }: any) {
     </div>
   );
 }
-

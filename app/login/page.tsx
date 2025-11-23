@@ -43,7 +43,7 @@ export default function LoginPage() {
       { ...data, email: data.email.toLowerCase() },
       {
         onSuccess: () => {
-          const returnUrl = searchParams.get("returnUrl");
+          const returnUrl = searchParams.get("redirect");
 
           // Only redirect if returnUrl exists and is not the login page
           if (returnUrl && !returnUrl.includes("/login")) {

@@ -39,19 +39,6 @@ export default function Head() {
         content="Discover and book tickets for amazing events across Africa."
       />
       <meta name="twitter:image" content="https://ticketer.africa/logo.png" />
-
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            name: "Ticketer Africa",
-            url: "https://ticketer.africa",
-            logo: "https://ticketer.africa/logo.png",
-          }),
-        }}
-      />
     </>
   );
 }

@@ -15,9 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/helpers";
-import { Header } from "@/components/layout/header";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import {
@@ -44,7 +42,7 @@ import {
 import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
 
 export default function OrganizerDashboard() {
-  const { isLoading: authLoading, user: currentUser } = useAuth();
+  const { user: currentUser } = useAuth();
   const router = useRouter();
   const { data: organizerEventList, isLoading: eventsLoading } =
     useOrganizerEvents();
@@ -52,19 +50,6 @@ export default function OrganizerDashboard() {
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!currentUser && !authLoading) {
-      router.push(
-        `/login?returnUrl=${encodeURIComponent(window.location.href)}`
-      );
-      return;
-    }
-    if (currentUser && !["ORGANIZER"].includes(currentUser.role)) {
-      router.push("/explore");
-      return;
-    }
-  }, [currentUser, authLoading, router]);
 
   if (eventsLoading) {
     return (

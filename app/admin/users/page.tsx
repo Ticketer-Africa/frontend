@@ -36,12 +36,6 @@ export default function AdminUsersPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!currentUser && !authLoading) {
-      router.push(
-        `/login?returnUrl=${encodeURIComponent(window.location.href)}`
-      );
-      return;
-    }
     if (currentUser && !["ADMIN", "SUPERADMIN"].includes(currentUser.role)) {
       router.push("/explore");
       return;
