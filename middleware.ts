@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
 
-  // Skip login page itself or static files
+  // Skip login page and Next.js internals
   if (path.startsWith("/login") || path.startsWith("/_next")) {
     return NextResponse.next();
   }
@@ -12,20 +12,20 @@ export async function middleware(req: NextRequest) {
   try {
     const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-    const cookieHeader = req.headers.get("cookie") || "";
+    // Grab the ticketer_sid cookie from the incoming request
+    const cookies = req.cookies.get("ticketer_sid")?.value;
 
     console.log("==========================================");
     console.log("🔍 MIDDLEWARE DEBUGGING");
     console.log("Path:", path);
     console.log("API Base:", apiBase);
-    console.log("Cookie Header:", cookieHeader);
-    console.log("Has ticketer_sid?", cookieHeader.includes("ticketer_sid"));
+    console.log("Has ticketer_sid?", !!cookies);
 
+    // Forward ticketer_sid explicitly to backend
     const res = await fetch(`${apiBase}/auth/me`, {
       method: "GET",
-      credentials: "include",
       headers: {
-        Cookie: req.headers.get("cookie") || "",
+        Cookie: cookies ? `ticketer_sid=${cookies}` : "",
       },
     });
 
@@ -33,25 +33,25 @@ export async function middleware(req: NextRequest) {
     console.log("Response OK:", res.ok);
     console.log("Response Status Text:", res.statusText);
 
-    // Try to read the response body for more info
-    const responseText = await res.text();
-    console.log("Response Body:", responseText);
-
-    // Check the exact condition
-    console.log("Status === 200?", res.status === 200);
-    console.log("Status type:", typeof res.status);
-
-    if (res.status === 200) {
-      console.log("✅ User authenticated - allowing access");
+    // Parse JSON if 200
+    if (res.status === 200 || res.status === 304) {
+      let userData;
+      if (res.status === 200) {
+        userData = await res.json();
+      } else {
+        // Optionally handle 304 using cached data if needed
+        userData = {}; // minimal object just to allow access
+      }
+      console.log("✅ User authenticated - allowing access", userData);
       return NextResponse.next();
     }
 
     console.log("❌ User not authenticated - redirecting to login");
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("redirect", path);
-
     return NextResponse.redirect(loginUrl);
   } catch (err) {
+    console.error("Middleware error:", err);
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("redirect", path);
     return NextResponse.redirect(loginUrl);
