@@ -94,7 +94,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Otherwise: either protected route OR public but has stored session → try to fetch
     fetchUser();
   }, [pathname]); // Add pathname as dependency
 
