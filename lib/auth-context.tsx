@@ -47,13 +47,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     "/resale",
     "/reset-password",
     "/verify-otp",
-    "/admin",
-    "/ticket",
-    "/wallet",
-    "/my-tickets",
-    "/settings",
-    "/verify-ticket",
-    "/organizer",
   ];
 
   const fetchUser = async () => {
