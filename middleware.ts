@@ -28,7 +28,7 @@ export async function middleware(req: NextRequest) {
     // Not logged in → redirect to login with original path
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("redirect", path); // <-- add the path
-    return NextResponse.redirect(loginUrl);
+    // return NextResponse.redirect(loginUrl);
   } catch (err) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("redirect", path);
