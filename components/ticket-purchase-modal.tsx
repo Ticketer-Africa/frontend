@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus, Minus, Lock } from "lucide-react";
+import { X, Plus, Minus, Lock, Info } from "lucide-react";
 import { formatDate, formatPrice, formatTime } from "@/lib/helpers";
 import { useAuth } from "@/lib/auth-context";
 import { useBuyTicket } from "@/services/tickets/tickets.queries";
@@ -14,8 +14,12 @@ import { TicketCategory } from "@/app/events/[id]/page";
 import {
   BuyTicketPayload,
   TicketResale,
-  TicketCategoryItem,
 } from "@/types/tickets.type";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+// Constants matching Backend Logic
+const GATEWAY_FEE_BPS = 150; // 1.5%
+const DEFAULT_PLATFORM_FEE_BPS = 350; // 3.5% (Matches backend default)
 
 interface Event {
   id: string;
@@ -23,6 +27,7 @@ interface Event {
   price: number;
   date: Date;
   location?: string;
+  primaryFee?: number; // Updated to match type
 }
 
 interface TicketPurchaseModalProps {
@@ -52,29 +57,62 @@ export function TicketPurchaseModal({
   );
   const { mutateAsync: buyTicket, isPending: isBuying } = useBuyTicket();
 
-  const calculateSubtotal = () => {
+  // --- REWORKED CALCULATION LOGIC ---
+  const calculateCosts = () => {
+    // 1. Calculate Base Price (Tickets only)
+    let baseAmount = 0;
+    
     if (resaleTicket) {
-      return (
-        (resaleTicket.resalePrice || 0) * (quantities[resaleTicket.id] || 1)
-      );
-    }
-    return (
-      ticketCategories?.reduce((sum, category) => {
+      baseAmount = (resaleTicket.resalePrice || 0) * (quantities[resaleTicket.id] || 1);
+    } else {
+      baseAmount = ticketCategories?.reduce((sum, category) => {
         const quantity = quantities[category.id] || 0;
         return sum + category.price * quantity;
-      }, 0) || 0
-    );
+      }, 0) || 0;
+    }
+
+    // 2. Determine Fee Rates
+    const platformBps = event.primaryFee ?? DEFAULT_PLATFORM_FEE_BPS;
+    const totalFeeBps = platformBps + GATEWAY_FEE_BPS;
+
+    // 3. Calculate Total Fee (Combined)
+    // We calculate this FIRST to match the backend formula: 
+    // Math.floor((baseAmount * (primaryFeeBps + 150)) / 10000)
+    const totalFees = baseAmount > 0 
+      ? Math.floor((baseAmount * totalFeeBps) / 10000) 
+      : 0;
+
+    // 4. Split for Display
+    // We calculate Gateway fee separately, then give the rest to Platform.
+    // This ensures (Platform + Gateway) ALWAYS equals TotalFees, preventing rounding errors.
+    const gatewayFee = baseAmount > 0
+      ? Math.floor((baseAmount * GATEWAY_FEE_BPS) / 10000)
+      : 0;
+    
+    const platformFee = totalFees - gatewayFee;
+
+    // 5. Final Total
+    const totalAmount = baseAmount + totalFees;
+
+    return {
+      baseAmount,
+      platformFee,
+      gatewayFee,
+      totalAmount
+    };
   };
 
-  const subtotal = calculateSubtotal();
-  const total = subtotal; // Add tax/fees if needed
+  const { baseAmount, platformFee, gatewayFee, totalAmount } = calculateCosts();
 
   const handleQuantityChange = (categoryId: string, delta: number) => {
     setQuantities((prev) => {
       const newQuantity = Math.max(
-        1,
-        Math.min(8, (prev[categoryId] || 1) + delta)
+        0, 
+        Math.min(8, (prev[categoryId] || 0) + delta)
       );
+      
+      if (resaleTicket && newQuantity < 1) return prev; 
+      
       return { ...prev, [categoryId]: newQuantity };
     });
   };
@@ -102,10 +140,9 @@ export function TicketPurchaseModal({
           eventId: event.id,
           ticketCategories: ticketCategories?.map((category) => ({
             ticketCategoryId: category.id,
-            quantity: quantities[category.id] || 1,
-          })),
+            quantity: quantities[category.id] || 0,
+          })).filter(q => q.quantity > 0),
         };
-
 
     try {
       const data = await buyTicket(payload);
@@ -129,7 +166,6 @@ export function TicketPurchaseModal({
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -138,7 +174,6 @@ export function TicketPurchaseModal({
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
           />
 
-          {/* Modal */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -213,9 +248,6 @@ export function TicketPurchaseModal({
                           <Plus className="w-4 h-4" />
                         </Button>
                       </div>
-                      <p className="text-xs text-gray-500 text-center mt-2">
-                        Maximum 8 tickets per order
-                      </p>
                     </div>
                   ) : (
                     ticketCategories?.map((category) => (
@@ -261,55 +293,55 @@ export function TicketPurchaseModal({
                   )}
 
                   {/* Price Breakdown */}
-                  <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-                    {resaleTicket ? (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">
-                          {quantities[resaleTicket.id] || 1} ×{" "}
-                          {formatPrice(resaleTicket.resalePrice || 0)}
-                        </span>
-                        <span className="text-gray-900">
-                          {formatPrice(subtotal)}
-                        </span>
-                      </div>
-                    ) : (
-                      ticketCategories?.map(
-                        (category) =>
-                          quantities[category.id] > 0 && (
-                            <div
-                              key={category.id}
-                              className="flex justify-between text-sm"
-                            >
-                              <span className="text-gray-600">
-                                {quantities[category.id]} × {category.name} (
-                                {formatPrice(category.price)})
-                              </span>
-                              <span className="text-gray-900">
-                                {formatPrice(
-                                  category.price * quantities[category.id]
-                                )}
-                              </span>
+                  {baseAmount > 0 && (
+                    <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+                        {/* 1. Ticket Costs */}
+                        <div className="flex justify-between text-sm text-gray-600">
+                            <span>Subtotal (Tickets)</span>
+                            <span>{formatPrice(baseAmount)}</span>
+                        </div>
+
+                        {/* 2. Platform Fees */}
+                        {platformFee > 0 && (
+                            <div className="flex justify-between text-sm text-gray-600">
+                                <span className="flex items-center gap-1">
+                                    Service Fee
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <Info className="w-3 h-3 text-gray-400" />
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Platform service fee</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </span>
+                                <span>{formatPrice(platformFee)}</span>
                             </div>
-                          )
-                      )
-                    )}
-                    <div className="border-t border-gray-200 pt-2 flex justify-between font-semibold">
-                      <span className="text-gray-900">Total</span>
-                      <span className="text-gray-900">
-                        {formatPrice(total)}
-                      </span>
+                        )}
+
+                        {/* 3. Gateway Fees */}
+                        {gatewayFee > 0 && (
+                            <div className="flex justify-between text-sm text-gray-600">
+                                <span>Processing Fee</span>
+                                <span>{formatPrice(gatewayFee)}</span>
+                            </div>
+                        )}
+
+                        {/* 4. Total */}
+                        <div className="border-t border-gray-200 pt-2 flex justify-between font-semibold">
+                            <span className="text-gray-900">Total</span>
+                            <span className="text-gray-900">
+                                {formatPrice(totalAmount)}
+                            </span>
+                        </div>
                     </div>
-                  </div>
+                  )}
 
                   <Button
                     onClick={handleContinue}
-                    disabled={
-                      resaleTicket
-                        ? false
-                        : !ticketCategories?.some(
-                            (cat) => quantities[cat.id] > 0
-                          )
-                    }
+                    disabled={baseAmount <= 0}
                     className="w-full h-12 bg-[#1E88E5] hover:bg-blue-500 text-white font-semibold rounded-xl"
                   >
                     Continue to Checkout
@@ -350,10 +382,6 @@ export function TicketPurchaseModal({
                       Create Account
                     </Button>
                   </div>
-
-                  <p className="text-xs text-gray-500">
-                    Your ticket selection will be saved
-                  </p>
                 </motion.div>
               )}
 
@@ -379,11 +407,19 @@ export function TicketPurchaseModal({
                             )} tickets`}
                       </Badge>
                     </div>
-                    <div className="text-sm text-gray-600 mb-3">
-                      {formatDate(event.date)} • {event.location}
+                    <div className="text-sm text-gray-600 mb-3 space-y-1">
+                      <div className="flex justify-between">
+                        <span>Tickets</span>
+                        <span>{formatPrice(baseAmount)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Fees</span>
+                        <span>{formatPrice(platformFee + gatewayFee)}</span>
+                      </div>
                     </div>
-                    <div className="text-lg font-bold text-gray-900">
-                      Total: {formatPrice(total)}
+                    <div className="text-lg font-bold text-gray-900 border-t pt-2 flex justify-between">
+                      <span>Total</span>
+                      <span>{formatPrice(totalAmount)}</span>
                     </div>
                   </div>
 
@@ -420,15 +456,6 @@ export function TicketPurchaseModal({
                       Your tickets have been sent to your email and are
                       available in your account.
                     </p>
-                  </div>
-
-                  <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                    <div className="text-sm font-medium text-green-800 mb-1">
-                      Order Confirmation
-                    </div>
-                    <div className="text-xs text-green-600">
-                      #{Math.random().toString(36).substr(2, 9).toUpperCase()}
-                    </div>
                   </div>
 
                   <div className="space-y-3">
