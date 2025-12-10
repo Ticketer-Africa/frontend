@@ -40,6 +40,7 @@ export interface Event {
   organizerd: string;
   tickets: ResaleTicket[]; 
   ticketCategories? :  TicketCategory[]
+  primaryFee?: number; // Changed to match Backend API response
 }
 
 export interface CreateEventDTO {
