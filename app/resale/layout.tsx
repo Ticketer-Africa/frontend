@@ -16,9 +16,10 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://ticketer.africa/logo.png",
+        url: "https://ticketer.africa/og_image.png",
         width: 1200,
         height: 630,
+        alt: "Resale Marketplace - Ticketer Africa",
       },
     ],
   },
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
     title: "Resale Marketplace - Ticketer Africa",
     description:
       "Buy and sell event tickets in a safe and verified marketplace.",
-    images: ["https://ticketer.africa/logo.png"],
+    images: ["https://ticketer.africa/og_image.png"],
   },
 };
 

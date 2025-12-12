@@ -25,7 +25,10 @@ export default function Head() {
         property="og:description"
         content="Discover and book tickets for amazing events across Africa."
       />
-      <meta property="og:image" content="https://ticketer.africa/logo.png" />
+      <meta
+        property="og:image"
+        content="https://ticketer.africa/og_image.png"
+      />
       <meta property="og:url" content="https://ticketer.africa" />
       <meta property="og:type" content="website" />
 
@@ -38,7 +41,10 @@ export default function Head() {
         name="twitter:description"
         content="Discover and book tickets for amazing events across Africa."
       />
-      <meta name="twitter:image" content="https://ticketer.africa/logo.png" />
+      <meta
+        name="twitter:image"
+        content="https://ticketer.africa/og_image.png"
+      />
     </>
   );
 }

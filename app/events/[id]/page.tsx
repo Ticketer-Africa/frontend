@@ -28,6 +28,10 @@ import { TicketResale } from "@/types/tickets.type";
 import { toast } from "sonner";
 import { BuyResaleModal } from "@/components/buy-resale-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  EventStructuredData,
+  BreadcrumbStructuredData,
+} from "@/components/structured-data";
 
 export interface TicketCategory {
   id: string;
@@ -156,6 +160,19 @@ export default function EventPage({ params }: { params: { id: string } }) {
 
   return (
     <div>
+      {/* Structured Data for SEO */}
+      <EventStructuredData event={event} />
+      <BreadcrumbStructuredData
+        items={[
+          { name: "Home", url: "https://ticketer.africa" },
+          { name: "Events", url: "https://ticketer.africa/explore" },
+          {
+            name: event.title,
+            url: `https://ticketer.africa/events/${event.slug}`,
+          },
+        ]}
+      />
+
       {/* Back Button */}
       <div className="py-4">
         <Button variant="ghost" asChild>

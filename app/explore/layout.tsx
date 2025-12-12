@@ -15,9 +15,10 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://ticketer.africa/logo.png",
+        url: "https://ticketer.africa/og_image.png",
         width: 1200,
         height: 630,
+        alt: "Explore Events - Ticketer Africa",
       },
     ],
   },
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     title: "Explore Events - Ticketer Africa",
     description:
       "Discover and book tickets for events happening across Africa.",
-    images: ["https://ticketer.africa/logo.png"],
+    images: ["https://ticketer.africa/og_image.png"],
   },
 };
 
