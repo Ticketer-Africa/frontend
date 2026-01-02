@@ -2,7 +2,6 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Sparkles } from "lucide-react";
@@ -117,24 +116,11 @@ export default function VerifyOTPPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-pink-50 to-orange-50 dark:from-blue-950/20 dark:via-pink-950/20 dark:to-orange-950/20 p-4">
       <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          className="absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
-          animate={{ x: [0, 100, 0], y: [0, -100, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.div
-          className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
-          animate={{ x: [0, -100, 0], y: [0, 100, 0] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-        />
+        <div className="my-tickets-bg-circle absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30" />
+        <div className="my-tickets-bg-circle-alt absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30" />
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full max-w-md"
-      >
+      <div className="auth-form-animate w-full max-w-md">
         <Card className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/20">
           <CardHeader className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-4">
@@ -207,7 +193,7 @@ export default function VerifyOTPPage() {
             </form>
           </CardContent>
         </Card>
-      </motion.div>
+      </div>
     </div>
   );
 }

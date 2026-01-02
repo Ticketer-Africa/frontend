@@ -5,11 +5,52 @@ import {
   UpdateEventDTO,
   EventFilterDTO,
   deleteEventDTO,
+  PriceRange,
 } from "@/types/events.type";
 
-// FETCH all events
-export const getAllEvents = async () => {
-  const res = await axios.get("/events");
+// FETCH price range (min and max prices across all events)
+export const getPriceRange = async (): Promise<PriceRange> => {
+  const res = await axios.get("/events/price-range");
+  const data = res.data;
+
+  // Handle both direct response and nested data structures
+  // API might return { minPrice, maxPrice } or { data: { minPrice, maxPrice } }
+  if (
+    data &&
+    typeof data.minPrice === "number" &&
+    typeof data.maxPrice === "number"
+  ) {
+    return data;
+  }
+  if (
+    data?.data &&
+    typeof data.data.minPrice === "number" &&
+    typeof data.data.maxPrice === "number"
+  ) {
+    return data.data;
+  }
+
+  // Return defaults if structure is unexpected
+  console.warn("Unexpected price range response structure:", data);
+  return { minPrice: 0, maxPrice: 100000 };
+};
+
+// FETCH all events with pagination and optional name search
+export const getAllEvents = async (
+  page?: number,
+  name?: string,
+  minPrice?: number,
+  maxPrice?: number
+) => {
+  const params = new URLSearchParams();
+  if (page) params.append("page", page.toString());
+  if (name) params.append("name", name);
+  if (minPrice !== undefined) params.append("minPrice", minPrice.toString());
+  if (maxPrice !== undefined) params.append("maxPrice", maxPrice.toString());
+
+  const res = await axios.get(
+    `/events${params.toString() ? "?" + params.toString() : ""}`
+  );
   return res.data;
 };
 
@@ -33,7 +74,7 @@ export const createEvent = async (formData: FormData) => {
     const errorMessage =
       error.response?.data?.message || "Failed to create event";
     toast.error(errorMessage);
-    console.log(errorMessage)
+    console.log(errorMessage);
     throw new Error(errorMessage);
   }
 };

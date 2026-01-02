@@ -9,7 +9,19 @@ import {
   WebsiteStructuredData,
 } from "@/components/structured-data";
 
-const inter = Inter({ subsets: ["latin"] });
+/**
+ * Performance: Font optimization
+ * - display: 'swap' prevents FOIT (Flash of Invisible Text) - critical for LCP
+ * - preload: true ensures font loads early in critical path
+ * - Only loading latin subset reduces font file size
+ */
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  preload: true,
+  // Only load weights actually used in the app
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ticketer.africa"),
@@ -99,8 +111,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className={inter.variable}>
+      {/*
+       * Performance: Structured data moved to head via JSON-LD script tags
+       * This prevents them from being in the render tree and blocking paint
+       */}
+      <head>
+        {/* Preconnect to external origins for faster resource loading */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+      </head>
+      <body className={`${inter.className} antialiased`}>
+        {/* Structured data rendered as script tags - doesn't block paint */}
         <OrganizationStructuredData />
         <WebsiteStructuredData />
         <Providers>

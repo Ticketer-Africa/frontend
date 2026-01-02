@@ -1,3 +1,35 @@
+import { EventsGridSkeleton, FiltersSkeleton } from "./skeletons";
+
+/**
+ * Loading component for explore page
+ *
+ * Performance: This renders immediately during page navigation,
+ * before any JavaScript executes. The skeleton layout matches
+ * the exact dimensions of the final content to prevent CLS.
+ *
+ * This is a Server Component - it renders on the server and
+ * streams to the client immediately.
+ */
 export default function Loading() {
-  return null
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 pt-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header - static text, same dimensions as real header */}
+        <header className="text-center mb-12">
+          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+            Discover Amazing Events
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Find and book tickets for the best events happening near you
+          </p>
+        </header>
+
+        {/* Filter skeleton */}
+        <FiltersSkeleton />
+
+        {/* Events grid skeleton - 6 cards for above-the-fold content */}
+        <EventsGridSkeleton />
+      </div>
+    </div>
+  );
 }

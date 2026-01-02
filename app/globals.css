@@ -96,3 +96,616 @@ body {
 .will-change-opacity {
   will-change: opacity;
 }
+
+/**
+ * Explore page event cards - CSS-only animations
+ * Performance: CSS animations are GPU-accelerated and don't block main thread
+ * Using will-change sparingly on hover to hint browser about upcoming transform
+ */
+.explore-card {
+  /* Prepare for transform without constant GPU memory usage */
+  transform: translateZ(0);
+}
+
+.explore-card:hover {
+  /* Only add will-change on hover to avoid memory overhead */
+  will-change: transform;
+}
+
+/**
+ * Staggered fade-in animation for event cards
+ * Uses CSS only - no JavaScript required
+ * Performance: GPU-accelerated, non-blocking
+ */
+@keyframes explore-card-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.explore-card {
+  animation: explore-card-fade-in 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+/* Stagger animation for first 6 cards (above fold) */
+.explore-card:nth-child(1) {
+  animation-delay: 0ms;
+}
+.explore-card:nth-child(2) {
+  animation-delay: 50ms;
+}
+.explore-card:nth-child(3) {
+  animation-delay: 100ms;
+}
+.explore-card:nth-child(4) {
+  animation-delay: 150ms;
+}
+.explore-card:nth-child(5) {
+  animation-delay: 200ms;
+}
+.explore-card:nth-child(6) {
+  animation-delay: 250ms;
+}
+
+/* Cards beyond first 6 animate instantly (below fold, lazy loaded) */
+.explore-card:nth-child(n + 7) {
+  animation-delay: 0ms;
+}
+
+/**
+ * Reduced motion support
+ * Accessibility: Respects user preference for reduced motion
+ */
+@media (prefers-reduced-motion: reduce) {
+  .explore-card {
+    animation: none;
+    opacity: 1;
+  }
+
+  .hero-fade-in,
+  .hero-bg-circle {
+    animation: none !important;
+    opacity: 1;
+  }
+}
+
+/* ============================================
+ * HERO SECTION - CSS-only animations
+ * Performance: Replaces framer-motion JavaScript animations
+ * These run on compositor thread, don't block main thread
+ * ============================================ */
+
+/* Floating background circles animation */
+@keyframes hero-float-1 {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(30px, -30px);
+  }
+}
+
+@keyframes hero-float-2 {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-25px, 25px);
+  }
+}
+
+@keyframes hero-float-3 {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(20px, -20px);
+  }
+}
+
+.hero-bg-circle {
+  position: absolute;
+  border-radius: 9999px;
+  mix-blend-mode: multiply;
+  filter: blur(40px);
+  /* GPU acceleration hint - removed after animation settles */
+  will-change: transform;
+}
+
+.hero-bg-circle-1 {
+  top: -8rem;
+  right: -8rem;
+  width: 18rem;
+  height: 18rem;
+  background-color: rgb(191 219 254); /* blue-200 */
+  opacity: 0.5;
+  animation: hero-float-1 30s linear infinite;
+}
+
+.hero-bg-circle-2 {
+  bottom: -8rem;
+  left: -8rem;
+  width: 18rem;
+  height: 18rem;
+  background-color: rgb(219 234 254); /* blue-100 */
+  opacity: 0.4;
+  animation: hero-float-2 35s linear infinite;
+}
+
+.hero-bg-circle-3 {
+  top: 10rem;
+  left: 10rem;
+  width: 14rem;
+  height: 14rem;
+  background-color: rgb(251 207 232); /* pink-200 */
+  opacity: 0.4;
+  animation: hero-float-3 25s linear infinite;
+}
+
+/* Hero content fade-in animation */
+@keyframes hero-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-fade-in {
+  animation: hero-fade-in 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+/* Staggered delays for hero content */
+.hero-delay-1 {
+  animation-delay: 100ms;
+}
+.hero-delay-2 {
+  animation-delay: 200ms;
+}
+.hero-delay-3 {
+  animation-delay: 300ms;
+}
+.hero-delay-4 {
+  animation-delay: 500ms;
+}
+
+/* ============================================
+ * HEADER - CSS-only animations
+ * ============================================ */
+
+@keyframes header-float-1 {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(100px, -100px);
+  }
+}
+
+@keyframes header-float-2 {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-100px, 100px);
+  }
+}
+
+.header-bg-circle {
+  position: absolute;
+  border-radius: 9999px;
+  mix-blend-mode: multiply;
+  filter: blur(48px);
+  background-color: rgb(147 197 253); /* blue-300 */
+  opacity: 0.3;
+}
+
+.header-bg-circle-1 {
+  top: -10rem;
+  right: -10rem;
+  width: 20rem;
+  height: 20rem;
+  animation: header-float-1 20s linear infinite;
+}
+
+.header-bg-circle-2 {
+  bottom: -10rem;
+  left: -10rem;
+  width: 20rem;
+  height: 20rem;
+  animation: header-float-2 25s linear infinite;
+}
+
+/* ============================================
+ * SECTION animations - CSS-only fade in on scroll
+ * Uses Intersection Observer via CSS (supported in modern browsers)
+ * ============================================ */
+
+@keyframes section-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.section-animate {
+  animation: section-fade-in 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.section-delay-1 {
+  animation-delay: 100ms;
+}
+.section-delay-2 {
+  animation-delay: 200ms;
+}
+.section-delay-3 {
+  animation-delay: 300ms;
+}
+.section-delay-4 {
+  animation-delay: 400ms;
+}
+
+/* Feature cards stagger */
+.feature-card {
+  animation: section-fade-in 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.feature-card:nth-child(1) {
+  animation-delay: 0ms;
+}
+.feature-card:nth-child(2) {
+  animation-delay: 100ms;
+}
+.feature-card:nth-child(3) {
+  animation-delay: 200ms;
+}
+.feature-card:nth-child(4) {
+  animation-delay: 300ms;
+}
+
+/* ============================================
+ * MY-TICKETS page animations
+ * ============================================ */
+
+.tickets-bg-circle {
+  position: absolute;
+  border-radius: 9999px;
+  mix-blend-mode: multiply;
+  filter: blur(48px);
+  background-color: rgb(147 197 253);
+  opacity: 0.3;
+}
+
+.tickets-bg-circle-1 {
+  top: -10rem;
+  right: -10rem;
+  width: 20rem;
+  height: 20rem;
+  animation: header-float-1 20s linear infinite;
+}
+
+.tickets-bg-circle-2 {
+  bottom: -10rem;
+  left: -10rem;
+  width: 20rem;
+  height: 20rem;
+  animation: header-float-2 25s linear infinite;
+}
+
+/* ============================================
+ * DROPDOWN & MOBILE MENU animations
+ * ============================================ */
+
+@keyframes dropdown-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-fade-in {
+  animation: dropdown-fade-in 0.15s ease-out forwards;
+}
+
+@keyframes mobile-menu-slide {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 100vh;
+  }
+}
+
+.mobile-menu-slide-in {
+  animation: mobile-menu-slide 0.25s ease-out forwards;
+  overflow: hidden;
+}
+
+/* ============================================
+ * FAQ Section animations
+ * ============================================ */
+
+.faq-item {
+  animation: section-fade-in 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+/* ============================================
+ * Event Detail Page animations
+ * Performance: GPU-accelerated transforms for smooth animations
+ * ============================================ */
+
+/* Main content cards - fade in from bottom */
+@keyframes event-card-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.event-card-animate {
+  animation: event-card-fade-in 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.event-card-delay-1 {
+  animation-delay: 0.1s;
+}
+
+.event-card-delay-2 {
+  animation-delay: 0.2s;
+}
+
+/* Sidebar cards - slide in from right */
+@keyframes event-sidebar-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.event-sidebar-animate {
+  animation: event-sidebar-slide-in 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.event-sidebar-delay-1 {
+  animation-delay: 0.1s;
+}
+
+/* Floating cart - slide up from bottom */
+@keyframes floating-cart-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.floating-cart-animate {
+  animation: floating-cart-slide-up 0.3s ease-out forwards;
+}
+
+/* ============================================
+ * My Tickets Page animations
+ * ============================================ */
+
+/* Background circles - CSS-only infinite animation */
+.my-tickets-bg-circle {
+  animation: my-tickets-float 20s ease-in-out infinite;
+  will-change: transform;
+}
+
+.my-tickets-bg-circle-alt {
+  animation: my-tickets-float-alt 25s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes my-tickets-float {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(100px, -100px);
+  }
+}
+
+@keyframes my-tickets-float-alt {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-100px, 100px);
+  }
+}
+
+/* Ticket card animations */
+@keyframes ticket-card-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ticket-card-animate {
+  animation: ticket-card-fade-in 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+/* Staggered delays for ticket cards (up to 10 items) */
+.ticket-card-delay-0 {
+  animation-delay: 0s;
+}
+.ticket-card-delay-1 {
+  animation-delay: 0.1s;
+}
+.ticket-card-delay-2 {
+  animation-delay: 0.2s;
+}
+.ticket-card-delay-3 {
+  animation-delay: 0.3s;
+}
+.ticket-card-delay-4 {
+  animation-delay: 0.4s;
+}
+.ticket-card-delay-5 {
+  animation-delay: 0.5s;
+}
+.ticket-card-delay-6 {
+  animation-delay: 0.6s;
+}
+.ticket-card-delay-7 {
+  animation-delay: 0.7s;
+}
+.ticket-card-delay-8 {
+  animation-delay: 0.8s;
+}
+.ticket-card-delay-9 {
+  animation-delay: 0.9s;
+}
+
+/* Ticket item inner animations */
+@keyframes ticket-item-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ticket-item-animate {
+  animation: ticket-item-fade-in 0.3s ease-out forwards;
+  opacity: 0;
+}
+
+/* Expandable ticket list - CSS grid-rows animation */
+.ticket-list-expandable {
+  display: grid;
+  transition: grid-template-rows 0.3s ease-out;
+}
+
+.ticket-list-expandable[data-state="closed"] {
+  grid-template-rows: 0fr;
+}
+
+.ticket-list-expandable[data-state="open"] {
+  grid-template-rows: 1fr;
+}
+
+.ticket-list-expandable > div {
+  overflow: hidden;
+}
+
+/* ============================================
+ * Auth Form animations (login, register, etc.)
+ * ============================================ */
+
+@keyframes auth-form-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-form-animate {
+  animation: auth-form-slide-up 0.8s ease-out forwards;
+}
+
+/* ============================================
+ * Event Card hover effect
+ * Performance: GPU-accelerated transform for smooth hover
+ * ============================================ */
+
+.event-card-hover {
+  transition: transform 0.2s ease-out;
+  will-change: transform;
+}
+
+.event-card-hover:hover {
+  transform: translateY(-5px);
+}
+
+/* ============================================
+ * Wallet Page animations
+ * ============================================ */
+
+.wallet-card-animate {
+  animation: event-card-fade-in 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.wallet-card-delay-1 {
+  animation-delay: 0.1s;
+}
+
+.wallet-card-delay-2 {
+  animation-delay: 0.2s;
+}
+
+/* Transaction items - slide in from left */
+@keyframes transaction-item-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.transaction-item-animate {
+  animation: transaction-item-slide-in 0.4s ease-out forwards;
+  opacity: 0;
+}

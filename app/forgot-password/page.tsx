@@ -4,7 +4,6 @@ import type React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -54,26 +53,13 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-16">
-      {/* Animated Background Circles */}
+      {/* Animated Background Circles - CSS animations */}
       <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          className="absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
-          animate={{ x: [0, 100, 0], y: [0, -100, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.div
-          className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
-          animate={{ x: [0, -100, 0], y: [0, 100, 0] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-        />
+        <div className="my-tickets-bg-circle absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30" />
+        <div className="my-tickets-bg-circle-alt absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30" />
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="relative z-10 w-full max-w-md"
-      >
+      <div className="auth-form-animate relative z-10 w-full max-w-md">
         <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/20 p-8">
           {/* Header */}
           <div className="text-center mb-8">
@@ -81,12 +67,7 @@ export default function ForgotPasswordPage() {
               href="/"
               className="inline-flex items-center space-x-2 mb-6 group"
             >
-              <motion.div
-                whileHover={{ rotate: 180 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Sparkles className="w-8 h-8 text-[#1E88E5]" />
-              </motion.div>
+              <Sparkles className="w-8 h-8 text-[#1E88E5] hover:rotate-180 transition-transform duration-300" />
               <span className="text-2xl font-bold text-gray-900 group-hover:text-[#1E88E5] transition-colors">
                 Ticketer Africa
               </span>
@@ -135,7 +116,7 @@ export default function ForgotPasswordPage() {
             </Button>
           </form>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

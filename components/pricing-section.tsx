@@ -1,32 +1,29 @@
 "use client";
 
-import { motion } from "framer-motion";
-
+/**
+ * PricingSection - Optimized for performance
+ *
+ * Performance optimizations:
+ * 1. Removed framer-motion - uses CSS animations
+ * 2. No dynamic imports needed - simple static content
+ * 3. CSS-only animations for fade-in effects
+ */
 export function PricingSection() {
   return (
     <section id="pricing" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
       <div className="max-w-4xl mx-auto text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-        >
+        {/* Header with CSS animation */}
+        <div className="section-animate">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
             Simple, Transparent Pricing
           </h2>
           <p className="text-xl text-gray-600 mb-12">
             No subscriptions. No setup fees. You only pay when you sell.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          viewport={{ once: true }}
-          className="space-y-12"
-        >
+        {/* Pricing details with staggered CSS animation */}
+        <div className="section-animate section-delay-1 space-y-12">
           <div>
             <h3 className="text-2xl font-semibold text-gray-900 mb-2">
               Event Ticket Sales
@@ -41,7 +38,10 @@ export function PricingSection() {
             </p>
           </div>
 
-          <div className="border-t border-gray-200 w-24 mx-auto"></div>
+          <div
+            className="border-t border-gray-200 w-24 mx-auto"
+            aria-hidden="true"
+          />
 
           <div>
             <h3 className="text-2xl font-semibold text-gray-900 mb-2">
@@ -60,22 +60,17 @@ export function PricingSection() {
               Fair, simple, and built to keep everyone rewarded.
             </p>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          viewport={{ once: true }}
-          className="mt-16"
-        >
+        {/* CTA with CSS animation */}
+        <div className="section-animate section-delay-2 mt-16">
           <a
             href="organizer/create-event"
             className="inline-block bg-[#1E88E5] hover:bg-blue-700 text-white px-10 py-4 rounded-full font-medium text-lg transition-all duration-300"
           >
             Start Selling Tickets
           </a>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

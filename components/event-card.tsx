@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { Calendar, MapPin, Users, Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,12 +13,19 @@ interface EventCardProps {
   onBuyClick?: (event: Event) => void;
 }
 
+/**
+ * EventCard - Optimized for performance
+ *
+ * Performance optimizations:
+ * 1. Removed framer-motion - CSS hover transform instead
+ * 2. CSS transition for smooth hover effect
+ */
 export function EventCard({ event }: EventCardProps) {
   const availableTickets = event.maxTickets - event.minted;
   const soldOutPercentage = (event.minted / event.maxTickets) * 100;
 
   return (
-    <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
+    <div className="event-card-hover">
       <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
         <div className="relative">
           <img
@@ -99,7 +105,6 @@ export function EventCard({ event }: EventCardProps) {
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }
-

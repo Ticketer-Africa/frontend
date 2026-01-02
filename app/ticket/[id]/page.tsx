@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { ArrowLeft, Share2, Calendar, MapPin, Clock } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -143,11 +142,7 @@ export default function TicketDetailPage({
         </div>
 
         <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <div className="section-animate">
             <Card className="bg-white rounded-xl shadow-lg border border-gray-100">
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -291,7 +286,7 @@ export default function TicketDetailPage({
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         </div>
       </div>
 
