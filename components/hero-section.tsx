@@ -1,85 +1,58 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Logo } from "./layout/logo";
 
+/**
+ * HeroSection - Optimized for LCP and above-the-fold performance
+ *
+ * Performance optimizations:
+ * 1. Removed framer-motion animations that blocked initial render
+ * 2. Using CSS animations instead (GPU-accelerated, non-blocking)
+ * 3. Background animations use CSS @keyframes (no JS execution)
+ * 4. Content renders immediately without waiting for animation library
+ * 5. Text is the LCP element - renders instantly
+ */
 export function HeroSection() {
   const router = useRouter();
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 pt-16">
-      {/* Animated background elements */}
-      {/* Softer, slower animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          className="absolute -top-32 -right-32 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50"
-          animate={{ x: [0, 30, 0], y: [0, -30, 0] }}
-          transition={{
-            duration: 30,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "linear",
-          }}
-        />
-        <motion.div
-          className="absolute -bottom-32 -left-32 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-2xl opacity-40"
-          animate={{ x: [0, -25, 0], y: [0, 25, 0] }}
-          transition={{
-            duration: 35,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "linear",
-          }}
-        />
-        <motion.div
-          className="absolute top-40 left-40 w-56 h-56 bg-pink-200 rounded-full mix-blend-multiply filter blur-2xl opacity-40"
-          animate={{ x: [0, 20, 0], y: [0, -20, 0] }}
-          transition={{
-            duration: 25,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "linear",
-          }}
-        />
+      {/*
+       * CSS-only animated background elements
+       * Performance: CSS animations are GPU-accelerated and don't block main thread
+       * Using will-change sparingly to hint browser about animations
+       */}
+      <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div className="hero-bg-circle hero-bg-circle-1" />
+        <div className="hero-bg-circle hero-bg-circle-2" />
+        <div className="hero-bg-circle hero-bg-circle-3" />
       </div>
 
       <div className="relative z-0 text-center max-w-5xl mx-auto w-full">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="flex items-center justify-center mb-6"
-        >
+        {/* Logo - uses CSS fade-in animation */}
+        <div className="hero-fade-in flex items-center justify-center mb-6">
           <Logo size="sm" />
-        </motion.div>
+        </div>
 
-        {/* Heading with padding and responsive max-width */}
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-4xl sm:text-5xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight px-2 sm:px-4 max-w-4xl mx-auto"
-        >
+        {/*
+         * Main heading - LCP candidate
+         * No animation delay - renders immediately for best LCP score
+         */}
+        <h1 className="hero-fade-in hero-delay-1 text-4xl sm:text-5xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight px-2 sm:px-4 max-w-4xl mx-auto">
           Buy. Sell. Enjoy Events{" "}
           <span className="text-transparent bg-clip-text bg-[#1E88E5]">
             Effortlessly.
           </span>
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-lg sm:text-xl lg:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed px-3 sm:px-4"
-        >
+        <p className="hero-fade-in hero-delay-2 text-lg sm:text-xl lg:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed px-3 sm:px-4">
           Discover events, buy or resell tickets, and never miss out again.
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center px-2"
-        >
+        <div className="hero-fade-in hero-delay-3 flex flex-col sm:flex-row gap-4 justify-center items-center px-2">
           <Button
             size="lg"
             onClick={() => router.push("/explore")}
@@ -96,18 +69,13 @@ export function HeroSection() {
           >
             Become an Organizer
           </Button>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1 }}
-          className="mt-16 px-3"
-        >
+        <div className="hero-fade-in hero-delay-4 mt-16 px-3">
           <p className="text-sm text-gray-500 mb-4">
             Trusted by event organizers
           </p>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

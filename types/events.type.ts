@@ -38,8 +38,8 @@ export interface Event {
   maxTickets: number;
   minted: number;
   organizerd: string;
-  tickets: ResaleTicket[]; 
-  ticketCategories? :  TicketCategory[]
+  tickets: ResaleTicket[];
+  ticketCategories?: TicketCategory[];
   primaryFee?: number; // Changed to match Backend API response
 }
 
@@ -58,8 +58,8 @@ export interface UpdateEventDTO {
   description?: string;
   price?: number;
   location?: string;
-  date?:string
-  category?:string
+  date?: string;
+  category?: string;
 }
 
 export interface EventFilterDTO {
@@ -72,6 +72,25 @@ export interface EventFilterDTO {
   isActive?: boolean;
 }
 
-export interface deleteEventDTO{
-  id: string
+export interface deleteEventDTO {
+  id: string;
+}
+
+export interface PaginationMeta {
+  total: number;
+  lastPage: number;
+  currentPage: number;
+  perPage: number;
+  prev: number | null;
+  next: number | null;
+}
+
+export interface PaginatedEventsResponse {
+  data: Event[];
+  meta: PaginationMeta;
+}
+
+export interface PriceRange {
+  minPrice: number;
+  maxPrice: number;
 }

@@ -1,11 +1,13 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { useState, useCallback, memo } from "react";
-import { debounce } from "lodash";
 
-const faqs = [
+/**
+ * Static FAQ data - hoisted outside component
+ * Performance: Prevents recreation on every render
+ */
+const FAQS = [
   {
     question: "How much does it cost to use this platform?",
     answer:
@@ -46,70 +48,92 @@ const faqs = [
     answer:
       "You can check in attendees by scanning their tickets. Just scan the ticket QR code, duplicates are automatically flagged.",
   },
-];
+] as const;
 
+/**
+ * FAQItem - Memoized accordion item
+ * Performance: Uses CSS for expand/collapse instead of framer-motion
+ */
 interface FAQItemProps {
   faq: { question: string; answer: string };
   index: number;
-  openIndex: number | null;
-  toggleFAQ: (index: number) => void;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
-const FAQItem = memo(({ faq, index, openIndex, toggleFAQ }: FAQItemProps) => (
-  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:border-blue-200 transition-all">
-    <button
-      onClick={() => toggleFAQ(index)}
-      className="w-full flex justify-between items-center p-6 text-left"
+const FAQItem = memo(function FAQItem({
+  faq,
+  index,
+  isOpen,
+  onToggle,
+}: FAQItemProps) {
+  return (
+    <div
+      className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:border-blue-200 transition-all faq-item"
+      style={{ animationDelay: `${index * 50}ms` }}
     >
-      <span className="text-lg font-medium text-gray-900">{faq.question}</span>
-      <ChevronDown
-        className={`w-5 h-5 text-[#1E88E5] transition-transform duration-300 ${
-          openIndex === index ? "rotate-180" : ""
-        }`}
-      />
-    </button>
-    {openIndex === index && (
-      <motion.div
-        layout
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
-        className="px-6 pb-6 text-gray-600 leading-relaxed will-change-opacity"
+      <button
+        onClick={onToggle}
+        className="w-full flex justify-between items-center p-6 text-left"
+        aria-expanded={isOpen}
       >
-        {faq.answer}
-      </motion.div>
-    )}
-  </div>
-));
+        <span className="text-lg font-medium text-gray-900">
+          {faq.question}
+        </span>
+        <ChevronDown
+          className={`w-5 h-5 text-[#1E88E5] transition-transform duration-300 flex-shrink-0 ml-4 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+          aria-hidden="true"
+        />
+      </button>
+      {/*
+       * CSS-based expand/collapse
+       * Performance: Uses grid-rows trick for smooth height animation without JS
+       */}
+      <div
+        className={`grid transition-all duration-300 ease-in-out ${
+          isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        }`}
+        aria-hidden={!isOpen}
+      >
+        <div className="overflow-hidden">
+          <div className="px-6 pb-6 text-gray-600 leading-relaxed">
+            {faq.answer}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
 
-FAQItem.displayName = "FAQItem";
-
+/**
+ * FAQSection - Optimized for performance
+ *
+ * Performance optimizations:
+ * 1. Removed framer-motion - uses CSS animations
+ * 2. Removed lodash debounce - not needed for simple toggle
+ * 3. CSS grid-rows animation for expand/collapse (no layout thrashing)
+ * 4. Memoized FAQItem component
+ * 5. Static data hoisted outside component
+ */
 export function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [visibleFAQs, setVisibleFAQs] = useState(4); // Show 4 FAQs initially
+  const [visibleFAQs, setVisibleFAQs] = useState(4);
 
-  const toggleFAQ = useCallback(
-    debounce((index: number) => {
-      setOpenIndex((prev) => (prev === index ? null : index));
-    }, 200),
-    []
-  );
+  const toggleFAQ = useCallback((index: number) => {
+    setOpenIndex((prev) => (prev === index ? null : index));
+  }, []);
 
-  const loadMore = () => {
+  const loadMore = useCallback(() => {
     setVisibleFAQs((prev) => prev + 4);
-  };
+  }, []);
 
   return (
     <section id="faq" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
       <div className="max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
+        {/* Section header with CSS animation */}
+        <div className="section-animate text-center mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
             Frequently Asked Questions
           </h2>
@@ -117,21 +141,22 @@ export function FAQSection() {
             Everything you need to know about using our platform for events and
             ticket resale.
           </p>
-        </motion.div>
+        </div>
 
+        {/* FAQ items with staggered CSS animations */}
         <div className="space-y-4">
-          {faqs.slice(0, visibleFAQs).map((faq, index) => (
+          {FAQS.slice(0, visibleFAQs).map((faq, index) => (
             <FAQItem
               key={faq.question}
               faq={faq}
               index={index}
-              openIndex={openIndex}
-              toggleFAQ={toggleFAQ}
+              isOpen={openIndex === index}
+              onToggle={() => toggleFAQ(index)}
             />
           ))}
         </div>
 
-        {visibleFAQs < faqs.length && (
+        {visibleFAQs < FAQS.length && (
           <div className="text-center mt-8">
             <button
               onClick={loadMore}

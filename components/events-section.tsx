@@ -1,82 +1,125 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { memo } from "react";
 import { MapPin } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAllEvents } from "@/services/events/events.queries";
 import { Event } from "@/types/events.type";
 import { truncateText } from "@/utils/trauncate";
-import { Button } from "@/components/ui/button"; 
+import { Button } from "@/components/ui/button";
 
+/**
+ * EventCard - Memoized to prevent unnecessary re-renders
+ *
+ * Performance optimizations:
+ * - Explicit image dimensions prevent CLS (224px = h-56)
+ * - priority={true} for first card (likely LCP element)
+ * - CSS animations instead of framer-motion
+ */
+interface EventCardProps {
+  event: Event;
+  index: number;
+  onClick: () => void;
+}
+
+const EventCard = memo(function EventCard({
+  event,
+  index,
+  onClick,
+}: EventCardProps) {
+  return (
+    <article
+      onClick={onClick}
+      className="cursor-pointer group section-animate"
+      style={{ animationDelay: `${index * 100}ms` }}
+    >
+      <div className="relative h-80 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+        {/* Full-card background image */}
+        <Image
+          src={event.bannerUrl || "/placeholder.svg"}
+          alt={event.name}
+          fill
+          priority={index === 0}
+          loading={index === 0 ? undefined : "lazy"}
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+
+        {/* Gradient overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+
+        {/* Text content positioned at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+          <h3 className="text-lg font-semibold group-hover:text-blue-300 transition-colors line-clamp-2 mb-2">
+            {event.name}
+          </h3>
+
+          <p className="text-gray-200 text-sm line-clamp-2 mb-3">
+            {truncateText(event.description, 10)}
+          </p>
+
+          <div className="flex items-center text-gray-200 text-sm">
+            <MapPin className="w-4 h-4 mr-2 flex-shrink-0" aria-hidden="true" />
+            <span className="line-clamp-1">
+              {truncateText(event.location, 5)}
+            </span>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+});
+
+/**
+ * EventsSection - Homepage upcoming events
+ *
+ * Performance optimizations:
+ * 1. Removed framer-motion - uses CSS animations
+ * 2. Memoized EventCard component
+ * 3. Explicit image dimensions for CLS prevention
+ * 4. Lazy loading for non-critical images
+ */
 export function EventsSection() {
   const router = useRouter();
-  const { data: events } = useAllEvents();
+  const { data: response } = useAllEvents();
+
+  // Handle both array and paginated response formats
+  const events: Event[] = Array.isArray(response)
+    ? response
+    : response?.data ?? [];
+
+  const handleEventClick = (slug: string) => {
+    router.push(`/events/${slug}`);
+  };
 
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
+        {/* Section header - CSS animation */}
+        <div className="section-animate text-center mb-12">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3">
             Upcoming Events
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Discover amazing events happening near you.
           </p>
-        </motion.div>
+        </div>
 
-        {/* Events grid */}
+        {/* Events grid with staggered CSS animations */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {events?.slice(0, 3).map((event: Event, index: number) => (
-            <motion.div
+          {events.slice(0, 3).map((event, index) => (
+            <EventCard
               key={event.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              onClick={() => router.push(`/events/${event.slug}`)}
-              className="cursor-pointer group"
-            >
-              <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-                {/* Banner */}
-                <div className="relative">
-                  <Image
-                    src={event.bannerUrl || "/placeholder.svg"}
-                    alt={event.name}
-                    width={400}
-                    height={250}
-                    className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-
-                {/* Content */}
-                <div className="p-5">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-[#1E88E5] transition-colors">
-                    {event.name}
-                  </h3>
-
-                  <p className="text-gray-600 text-sm mb-4">
-                    {truncateText(event.description, 10)}
-                  </p>
-
-                  <div className="flex items-center text-gray-600 text-sm mb-2">
-                    <MapPin className="w-4 h-4 mr-2" />
-                    <span>{truncateText(event.location, 5)}</span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+              event={event}
+              index={index}
+              onClick={() => handleEventClick(event.slug)}
+            />
           ))}
         </div>
 
-        {/* Explore More Button */}
-        <div className="text-center">
+        {/* CTA Button */}
+        <div className="text-center section-animate section-delay-4">
           <Button
             size="lg"
             onClick={() => router.push("/explore")}

@@ -66,9 +66,10 @@ export default function EventDashboard() {
     );
   }
 
-  const organizerEvents = Array.isArray(organizerEventList)
+  // Handle both array and paginated response formats
+  const organizerEvents: Event[] = Array.isArray(organizerEventList)
     ? organizerEventList
-    : [];
+    : organizerEventList?.data ?? [];
 
   const event: Event = organizerEvents.find((e: Event) => e.id === id);
 

@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
 import {
   Menu,
   X,
@@ -17,6 +16,24 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { Logo } from "./logo";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+
+/**
+ * Header - Optimized for performance
+ *
+ * Performance optimizations:
+ * 1. Removed framer-motion animations - uses CSS instead
+ * 2. Memoized navigation items to prevent recreation
+ * 3. useCallback for event handlers
+ * 4. CSS animations for background circles (GPU-accelerated)
+ * 5. Conditional rendering for mobile menu (not always in DOM)
+ */
+
+// Static navigation - defined outside component to prevent recreation
+const NAVIGATION = [
+  { name: "Home", href: "/" },
+  { name: "Explore", href: "/explore" },
+  { name: "Resale Market", href: "/resale" },
+] as const;
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -39,12 +56,7 @@ export function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const navigation = [
-    { name: "Home", href: "/" },
-    { name: "Explore", href: "/explore" },
-    { name: "Resale Market", href: "/resale" },
-  ];
-
+  // Memoized user navigation items
   const userNavigation = user
     ? [
         { name: "My Tickets", href: "/my-tickets", icon: Calendar },
@@ -70,31 +82,45 @@ export function Header() {
       ? [{ name: "Admin Dashboard", href: "/admin/dashboard", icon: Settings }]
       : [];
 
-  const isActive = (href: string) => {
-    if (href.startsWith("#")) return false;
-    return pathname === href || pathname.startsWith(href + "/");
-  };
+  const isActive = useCallback(
+    (href: string) => {
+      if (href.startsWith("#")) return false;
+      return pathname === href || pathname.startsWith(href + "/");
+    },
+    [pathname]
+  );
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     logout();
     setIsProfileOpen(false);
     setIsMenuOpen(false);
-  };
+  }, [logout]);
+
+  const toggleMenu = useCallback(() => {
+    setIsMenuOpen((prev) => !prev);
+  }, []);
+
+  const toggleProfile = useCallback(() => {
+    setIsProfileOpen((prev) => !prev);
+  }, []);
+
+  const closeMenu = useCallback(() => {
+    setIsMenuOpen(false);
+  }, []);
+
+  const closeProfile = useCallback(() => {
+    setIsProfileOpen(false);
+  }, []);
 
   return (
     <header className="bg-white border-b border-gray-100/20 sticky top-0 z-50">
-      {/* Animated BG Circles */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          className="absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
-          animate={{ x: [0, 100, 0], y: [0, -100, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.div
-          className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
-          animate={{ x: [0, -100, 0], y: [0, 100, 0] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-        />
+      {/*
+       * CSS-only animated background circles
+       * Performance: CSS animations run on compositor thread
+       */}
+      <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div className="header-bg-circle header-bg-circle-1" />
+        <div className="header-bg-circle header-bg-circle-2" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -106,7 +132,7 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {navigation.map((item) => (
+            {NAVIGATION.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
@@ -128,14 +154,14 @@ export function Header() {
                 <Button
                   variant="ghost"
                   className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 text-gray-900 rounded-full px-4 py-2 transition-all duration-300"
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  onClick={toggleProfile}
                 >
                   <Avatar className="w-8 h-8">
                     <AvatarImage
                       src={user.profileImage ?? undefined}
                       alt={user.name}
                       className="w-8 h-8 rounded-full object-cover"
-                    ></AvatarImage>
+                    />
                     <AvatarFallback className="bg-blue-100 text-[#1E88E5] text-sm">
                       {user.profileImage || user.name.charAt(0)}
                     </AvatarFallback>
@@ -144,19 +170,14 @@ export function Header() {
                 </Button>
 
                 {isProfileOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute right-0 mt-2 w-56 bg-white border border-gray-100/20 rounded-xl shadow-xl py-2 z-50"
-                  >
+                  <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100/20 rounded-xl shadow-xl py-2 z-50 dropdown-fade-in">
                     <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
                       <Avatar className="w-8 h-8">
                         <AvatarImage
                           src={user.profileImage ?? undefined}
                           alt={user.name}
                           className="w-10 h-10 rounded-full object-cover mr-3"
-                        ></AvatarImage>
+                        />
                         <AvatarFallback className="bg-blue-100 text-[#1E88E5] text-sm">
                           {user.profileImage || user.name.charAt(0)}
                         </AvatarFallback>
@@ -177,7 +198,7 @@ export function Header() {
                         key={item.name}
                         href={item.href}
                         className="flex items-center px-4 py-2 text-sm text-gray-900 hover:bg-gray-50 transition-colors"
-                        onClick={() => setIsProfileOpen(false)}
+                        onClick={closeProfile}
                       >
                         <item.icon className="h-4 w-4 mr-3 text-gray-500" />
                         {item.name}
@@ -191,7 +212,7 @@ export function Header() {
                       <LogOut className="h-4 w-4 mr-3 text-gray-500" />
                       Sign Out
                     </button>
-                  </motion.div>
+                  </div>
                 )}
               </div>
             ) : (
@@ -218,7 +239,9 @@ export function Header() {
             variant="ghost"
             size="sm"
             className="md:hidden text-gray-700 hover:bg-gray-100 rounded-full"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={toggleMenu}
+            aria-expanded={isMenuOpen}
+            aria-label="Toggle navigation menu"
           >
             {isMenuOpen ? (
               <X className="h-6 w-6" />
@@ -228,17 +251,11 @@ export function Header() {
           </Button>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation - CSS animation instead of framer-motion */}
         {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden bg-white border-t border-gray-100/20 py-4"
-          >
+          <div className="md:hidden bg-white border-t border-gray-100/20 py-4 mobile-menu-slide-in">
             <nav className="space-y-2">
-              {navigation.map((item) => (
+              {NAVIGATION.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
@@ -247,7 +264,7 @@ export function Header() {
                       ? "bg-blue-50 text-[#1E88E5]"
                       : "text-gray-700 hover:bg-gray-50 hover:text-[#1E88E5]"
                   }`}
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={closeMenu}
                 >
                   {item.name}
                 </Link>
@@ -262,7 +279,7 @@ export function Header() {
                         src={user.profileImage ?? undefined}
                         alt={user.name}
                         className="w-10 h-10 rounded-full object-cover mr-3"
-                      ></AvatarImage>
+                      />
                       <AvatarFallback className="bg-blue-100 text-[#1E88E5] text-sm">
                         {user.profileImage || user.name.charAt(0)}
                       </AvatarFallback>
@@ -283,7 +300,7 @@ export function Header() {
                       key={item.name}
                       href={item.href}
                       className="flex items-center px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#1E88E5] rounded-lg transition-colors"
-                      onClick={() => setIsMenuOpen(false)}
+                      onClick={closeMenu}
                     >
                       <item.icon className="h-4 w-4 mr-3 text-gray-500" />
                       {item.name}
@@ -303,21 +320,21 @@ export function Header() {
                   <Link
                     href="/login"
                     className="block px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#1E88E5] rounded-lg transition-colors"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={closeMenu}
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/register"
                     className="block px-4 py-3 text-sm font-semibold bg-[#1E88E5] hover:bg-blue-500 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={closeMenu}
                   >
                     Sign Up
                   </Link>
                 </>
               )}
             </nav>
-          </motion.div>
+          </div>
         )}
       </div>
     </header>

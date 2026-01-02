@@ -61,9 +61,10 @@ export default function OrganizerDashboard() {
       </div>
     );
   }
-  const organizerEvents = Array.isArray(organizerEventList)
+  // Handle both array and paginated response formats
+  const organizerEvents: Event[] = Array.isArray(organizerEventList)
     ? organizerEventList
-    : [];
+    : organizerEventList?.data ?? [];
 
   // Safe calculations
   const totalEvents = organizerEvents?.length || 0;
