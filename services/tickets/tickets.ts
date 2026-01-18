@@ -1,4 +1,5 @@
 import axios from "../axios";
+import { buildEndpoint } from "@/services/api-config";
 import {
   BuyTicketPayload,
   ListResalePayload,
@@ -9,14 +10,20 @@ import {
 } from "@/types/tickets.type";
 import { toast } from "sonner";
 
+const API_VERSION = "v1";
+
 // BUY a new ticket (primary)
 export const buyTicket = async (
   data: BuyTicketPayload
 ): Promise<TicketResponse> => {
   try {
-    const res = await axios.post(`/tickets/buy`, data, {
-      headers: { "x-client-page": window.location.href },
-    });
+    const res = await axios.post(
+      buildEndpoint(API_VERSION, "tickets/buy"),
+      data,
+      {
+        headers: { "x-client-page": window.location.href },
+      }
+    );
     toast.success(res.data.message || "Ticket purchased successfully");
     return res.data;
   } catch (error: any) {
@@ -32,7 +39,10 @@ export const buyResaleTicket = async (data: {
   ticketIds: string[];
 }): Promise<TicketResponse> => {
   try {
-    const res = await axios.post("/tickets/resale/buy", data);
+    const res = await axios.post(
+      buildEndpoint(API_VERSION, "tickets/resale/buy"),
+      data
+    );
     toast.success(res.data.message || "Resale ticket purchased successfully");
     return res.data;
   } catch (error: any) {
@@ -48,7 +58,10 @@ export const listTicketForResale = async (
   data: ListResalePayload
 ): Promise<TicketResale> => {
   try {
-    const res = await axios.post("/tickets/resale/list", data);
+    const res = await axios.post(
+      buildEndpoint(API_VERSION, "tickets/resale/list"),
+      data
+    );
     toast.success(res.data.message || "Ticket listed for resale successfully");
     return res.data;
   } catch (error: any) {
@@ -60,7 +73,7 @@ export const listTicketForResale = async (
 };
 // FETCH my tickets
 export const getMyTickets = async (): Promise<Ticket[]> => {
-  const res = await axios.get("/tickets/my");
+  const res = await axios.get(buildEndpoint(API_VERSION, "tickets/my"));
   return res.data;
 };
 
@@ -68,7 +81,7 @@ export const getMyTickets = async (): Promise<Ticket[]> => {
 export const getResaleListings = async (
   eventId?: string
 ): Promise<TicketResale[]> => {
-  const res = await axios.get("/tickets/resell", {
+  const res = await axios.get(buildEndpoint(API_VERSION, "tickets/resell"), {
     params: eventId ? { eventId } : undefined,
   });
   return res.data;
@@ -88,10 +101,15 @@ export const verifyTicket = async (data: {
   markedUsed: boolean;
   resalePrice: any;
   event: Event | undefined;
-  message: string | undefined; isValid: boolean; ticket?: Ticket 
+  message: string | undefined;
+  isValid: boolean;
+  ticket?: Ticket;
 }> => {
   try {
-    const res = await axios.post("/tickets/verify", data);
+    const res = await axios.post(
+      buildEndpoint(API_VERSION, "tickets/verify"),
+      data
+    );
     toast.success(res.data.message || "Ticket verified successfully");
     return res.data;
   } catch (error: any) {
@@ -103,21 +121,30 @@ export const verifyTicket = async (data: {
 };
 // FETCH my resale listings
 export const getMyListings = async (): Promise<TicketResale[]> => {
-  const res = await axios.get("/tickets/my/resales");
+  const res = await axios.get(buildEndpoint(API_VERSION, "tickets/my/resales"));
   return res.data;
 };
 
 // FETCH tickets bought from resale
 export const getBoughtFromResale = async (): Promise<Ticket[]> => {
-  const res = await axios.get("/tickets/bought-from-resale");
+  const res = await axios.get(
+    buildEndpoint(API_VERSION, "tickets/bought-from-resale")
+  );
   return res.data;
 };
 
 // REMOVE ticket from resale
-export const removeResaleTicket = async (ticketId: string): Promise<TicketResale> => {
+export const removeResaleTicket = async (
+  ticketId: string
+): Promise<TicketResale> => {
   try {
-    const res = await axios.post("/tickets/resale/remove", { ticketId });
-    toast.success(res.data.message || "Ticket removed from resale successfully");
+    const res = await axios.post(
+      buildEndpoint(API_VERSION, "tickets/resale/remove"),
+      { ticketId }
+    );
+    toast.success(
+      res.data.message || "Ticket removed from resale successfully"
+    );
     return res.data;
   } catch (error: any) {
     const errorMessage =
@@ -126,4 +153,3 @@ export const removeResaleTicket = async (ticketId: string): Promise<TicketResale
     throw new Error(errorMessage);
   }
 };
-

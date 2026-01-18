@@ -88,7 +88,7 @@ function FilterSectionComponent({
         {/* Search input */}
         <div className="relative mb-4">
           <Search
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#1E88E5]"
             aria-hidden="true"
           />
           <Input
@@ -96,7 +96,7 @@ function FilterSectionComponent({
             placeholder="Search events, locations..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-12 h-12 bg-gray-50 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="pl-12 h-12 outline-none focus:outline-none border-[#1E88E5] rounded-full focus:ring-2 focus-visible:ring-[#1E88E5] focus:ring-[#1E88E5] focus:border-[#1E88E5]"
             aria-label="Search events"
           />
         </div>

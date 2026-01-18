@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { useAllEvents, usePriceRange } from "@/services/events/events.queries";
 import { Event } from "@/types/events.type";
 
@@ -61,9 +62,14 @@ export default function EventsPage() {
   // LOCAL STATE
   // ─────────────────────────────────────────────────────────────────────────────
 
+  const searchParams = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Track if we've initialized from URL to show skeleton during search
+  const hasInitializedFromUrl = useRef(false);
+  const [showInitialSkeleton, setShowInitialSkeleton] = useState(false);
 
   // Price bounds - will be updated from API or computed from events
   const [priceBounds, setPriceBounds] = useState<{ min: number; max: number }>({
@@ -98,6 +104,19 @@ export default function EventsPage() {
   // ─────────────────────────────────────────────────────────────────────────────
   // EFFECTS
   // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Initialize search query from URL parameters
+   * If coming from home page with search, show skeleton until results load
+   */
+  useEffect(() => {
+    const urlSearch = searchParams.get("search");
+    if (urlSearch && !hasInitializedFromUrl.current) {
+      hasInitializedFromUrl.current = true;
+      setSearchQuery(urlSearch);
+      setShowInitialSkeleton(true); // Show skeleton while searching
+    }
+  }, [searchParams]);
 
   /**
    * Debounce search to prevent excessive API calls
@@ -155,7 +174,7 @@ export default function EventsPage() {
       : undefined,
     priceSliderRange && priceSliderRange[1] < priceBounds.max
       ? priceSliderRange[1]
-      : undefined
+      : undefined,
   );
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -178,6 +197,15 @@ export default function EventsPage() {
 
     return { events, meta };
   }, [response]);
+
+  /**
+   * Hide skeleton once search results are available
+   */
+  useEffect(() => {
+    if (showInitialSkeleton && response) {
+      setShowInitialSkeleton(false);
+    }
+  }, [response, showInitialSkeleton]);
 
   /**
    * Compute price bounds from events when API price-range endpoint fails
@@ -226,7 +254,7 @@ export default function EventsPage() {
    */
   const filteredEvents = useMemo(
     () => filterEvents(events, selectedLocation, selectedCategory),
-    [events, selectedLocation, selectedCategory]
+    [events, selectedLocation, selectedCategory],
   );
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -299,7 +327,8 @@ export default function EventsPage() {
    * - Using cached data prevents skeleton flash on navigation
    */
   // const showFiltersSkeleton = !hasPriceRangeData && priceRangeFetching;
-  const showEventsSkeleton = eventsLoading && !response;
+  const showEventsSkeleton =
+    (eventsLoading && !response) || showInitialSkeleton;
 
   // Show subtle loading indicator when refetching in background
   const isRefetching = isFetching && !!response;

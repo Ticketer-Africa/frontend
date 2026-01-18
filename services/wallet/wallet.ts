@@ -7,10 +7,15 @@ import {
   PinStatusResponse,
   SetWalletPinResponse,
 } from "@/types/wallet.type";
+import { buildEndpoint } from "../api-config";
+
+const API_VERSION = "v1";
 
 // FETCH wallet balance
 export const checkWalletBalance = async (): Promise<WalletBalanceResponse> => {
-  const res = await axiosInstance.get("/wallet/balance");
+  const res = await axiosInstance.get(
+    buildEndpoint(API_VERSION, "wallet/balance")
+  );
   return res.data;
 };
 
@@ -19,7 +24,10 @@ export const withdrawFromWallet = async (
   data: WithdrawPayload
 ): Promise<any> => {
   try {
-    const res = await axiosInstance.post("/wallet/withdraw", data);
+    const res = await axiosInstance.post(
+      buildEndpoint(API_VERSION, "wallet/withdraw"),
+      data
+    );
     toast.success(
       res.data.message || "Withdrawal request submitted successfully"
     );
@@ -34,7 +42,9 @@ export const withdrawFromWallet = async (
 
 // FETCH wallet transactions
 export const getWalletTransactions = async (): Promise<Transaction[]> => {
-  const res = await axiosInstance.get("/wallet/transactions");
+  const res = await axiosInstance.get(
+    buildEndpoint(API_VERSION, "wallet/transactions")
+  );
   return res.data;
 };
 
@@ -44,12 +54,13 @@ export const setWalletPin = async (
   oldPin?: string
 ): Promise<SetWalletPinResponse> => {
   try {
-    const res = await axiosInstance.patch("/wallet/pin", {
-      newPin: pin,
-      ...(oldPin && { oldPin }),
-    });
-
-
+    const res = await axiosInstance.patch(
+      buildEndpoint(API_VERSION, "wallet/pin"),
+      {
+        newPin: pin,
+        ...(oldPin && { oldPin }),
+      }
+    );
 
     return res.data;
   } catch (error: any) {
@@ -63,7 +74,9 @@ export const setWalletPin = async (
 // CHECK if wallet PIN is set
 export const checkWalletPinStatus = async (): Promise<PinStatusResponse> => {
   try {
-    const res = await axiosInstance.get("/wallet/pin-status");
+    const res = await axiosInstance.get(
+      buildEndpoint(API_VERSION, "wallet/pin-status")
+    );
     return res.data;
   } catch (error: any) {
     const errorMessage =

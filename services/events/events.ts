@@ -1,4 +1,5 @@
 import axios from "@/services/axios";
+import { buildEndpoint } from "@/services/api-config";
 import { toast } from "sonner";
 import {
   CreateEventDTO,
@@ -8,9 +9,11 @@ import {
   PriceRange,
 } from "@/types/events.type";
 
+const API_VERSION = "v1";
+
 // FETCH price range (min and max prices across all events)
 export const getPriceRange = async (): Promise<PriceRange> => {
-  const res = await axios.get("/events/price-range");
+  const res = await axios.get(buildEndpoint(API_VERSION, "events/price-range"));
   const data = res.data;
 
   // Handle both direct response and nested data structures
@@ -49,25 +52,32 @@ export const getAllEvents = async (
   if (maxPrice !== undefined) params.append("maxPrice", maxPrice.toString());
 
   const res = await axios.get(
-    `/events${params.toString() ? "?" + params.toString() : ""}`
+    buildEndpoint(
+      API_VERSION,
+      `events${params.toString() ? "?" + params.toString() : ""}`
+    )
   );
   return res.data;
 };
 
-// FETCH filtered events
-export const getFilteredEvents = async (filters: EventFilterDTO) => {
-  const res = await axios.post("/events/filter", filters);
-  return res.data;
-};
+// // FETCH filtered events
+// export const getFilteredEvents = async (filters: EventFilterDTO) => {
+//   const res = await axios.post("/events/filter", filters);
+//   return res.data;
+// };
 
 // CREATE an event
 export const createEvent = async (formData: FormData) => {
   try {
-    const res = await axios.post("/events/create", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    const res = await axios.post(
+      buildEndpoint(API_VERSION, "events/create"),
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
     toast.success(res.data.message || "Event created successfully");
     return res.data;
   } catch (error: any) {
@@ -82,7 +92,9 @@ export const createEvent = async (formData: FormData) => {
 //Delete an event
 export const deleteEvent = async (eventId: string) => {
   try {
-    const res = await axios.delete(`/events/${eventId}`);
+    const res = await axios.delete(
+      buildEndpoint(API_VERSION, `events/${eventId}`)
+    );
     console.log("everything is fineee");
     toast.success(res.data.message) || "Event deleted successfully";
     return res.data;
@@ -97,11 +109,15 @@ export const deleteEvent = async (eventId: string) => {
 // UPDATE an event
 export const updateEvent = async (eventId: string, formData: FormData) => {
   try {
-    const res = await axios.patch(`/events/${eventId}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data", // Explicitly set to match createEvent
-      },
-    });
+    const res = await axios.patch(
+      buildEndpoint(API_VERSION, `events/${eventId}`),
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data", // Explicitly set to match createEvent
+        },
+      }
+    );
     toast.success(res.data.message || "Event updated successfully");
     return res.data;
   } catch (error: any) {
@@ -116,7 +132,9 @@ export const updateEvent = async (eventId: string, formData: FormData) => {
 // TOGGLE event status
 export const toggleEventStatus = async (eventId: string) => {
   try {
-    const res = await axios.patch(`/events/${eventId}/toggle-status`);
+    const res = await axios.patch(
+      buildEndpoint(API_VERSION, `events/${eventId}/toggle-status`)
+    );
     toast.success(res.data.message || "Event status toggled successfully");
     return res.data;
   } catch (error: any) {
@@ -129,30 +147,34 @@ export const toggleEventStatus = async (eventId: string) => {
 
 // FETCH event by ID
 export const getEventById = async (eventId: string) => {
-  const res = await axios.get(`/events/${eventId}`);
+  const res = await axios.get(buildEndpoint(API_VERSION, `events/${eventId}`));
   return res.data;
 };
 
 // FETCH event by SLUG
 export const getEventBySlug = async (slug: string) => {
-  const res = await axios.get(`/events/slug/${slug}`);
+  const res = await axios.get(
+    buildEndpoint(API_VERSION, `events/slug/${slug}`)
+  );
   return res.data;
 };
 
 // FETCH user events
 export const getUserEvents = async () => {
-  const res = await axios.get("/events/user/my");
+  const res = await axios.get(buildEndpoint(API_VERSION, "events/user/my"));
   return res.data;
 };
 
 // FETCH organizer events
 export const getOrganizerEvents = async () => {
-  const res = await axios.get("/events/organizer/my");
+  const res = await axios.get(
+    buildEndpoint(API_VERSION, "events/organizer/my")
+  );
   return res.data;
 };
 
 // FETCH upcoming events
 export const getUpcomingEvents = async () => {
-  const res = await axios.get("/events/upcoming");
+  const res = await axios.get(buildEndpoint(API_VERSION, "events/upcoming"));
   return res.data;
 };

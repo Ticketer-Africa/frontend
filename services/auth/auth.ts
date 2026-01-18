@@ -11,11 +11,16 @@ import {
   BasicResponse,
   ChangePasswordDto,
 } from "@/types/auth.type";
+import { buildEndpoint } from "../api-config";
 
+const API_VERSION = "v1";
 // REGISTER user
 export const register = async (dto: RegisterDto): Promise<BasicResponse> => {
   try {
-    const res = await axios.post("/auth/register", dto);
+    const res = await axios.post(
+      buildEndpoint(API_VERSION, "auth/register"),
+      dto
+    );
     toast.success(res.data.message || "Registration successful");
     return res.data;
   } catch (error: any) {
@@ -28,7 +33,7 @@ export const register = async (dto: RegisterDto): Promise<BasicResponse> => {
 // LOGIN user
 export const login = async (dto: LoginDto): Promise<AuthResponse> => {
   try {
-    const res = await axios.post("/auth/login", dto);
+    const res = await axios.post(buildEndpoint(API_VERSION, "auth/login"), dto);
     toast.success(res.data.message || "Login successful");
     return res.data;
   } catch (error: any) {
@@ -41,7 +46,10 @@ export const login = async (dto: LoginDto): Promise<AuthResponse> => {
 // VERIFY OTP
 export const verifyOtp = async (dto: VerifyOtpDto): Promise<BasicResponse> => {
   try {
-    const res = await axios.post("/auth/verify-otp", dto);
+    const res = await axios.post(
+      buildEndpoint(API_VERSION, "auth/verify-otp"),
+      dto
+    );
     toast.success(res.data.message || "OTP verified successfully");
     return res.data;
   } catch (error: any) {
@@ -55,7 +63,10 @@ export const verifyOtp = async (dto: VerifyOtpDto): Promise<BasicResponse> => {
 // RESEND OTP
 export const resendOtp = async (dto: ResendOtpDto): Promise<BasicResponse> => {
   try {
-    const res = await axios.post("/auth/resend-otp", dto);
+    const res = await axios.post(
+      buildEndpoint(API_VERSION, "auth/resend-otp"),
+      dto
+    );
     toast.success(res.data.message || "OTP resent successfully");
     return res.data;
   } catch (error: any) {
@@ -71,7 +82,10 @@ export const forgotPassword = async (
   dto: ForgotPasswordDto
 ): Promise<BasicResponse> => {
   try {
-    const res = await axios.post("/auth/forgot-password", dto);
+    const res = await axios.post(
+      buildEndpoint(API_VERSION, "auth/forgot-password"),
+      dto
+    );
     toast.success(res.data.message || "Password reset link sent successfully");
     return res.data;
   } catch (error: any) {
@@ -87,7 +101,10 @@ export const resetPassword = async (
   dto: ResetPasswordDto
 ): Promise<BasicResponse> => {
   try {
-    const res = await axios.post("/auth/reset-password", dto);
+    const res = await axios.post(
+      buildEndpoint(API_VERSION, "auth/reset-password"),
+      dto
+    );
     toast.success(res.data.message || "Password reset successfully");
     return res.data;
   } catch (error: any) {
@@ -103,7 +120,10 @@ export const changePassword = async (
   dto: ChangePasswordDto
 ): Promise<BasicResponse> => {
   try {
-    const res = await axios.post("/auth/change-password", dto);
+    const res = await axios.post(
+      buildEndpoint(API_VERSION, "auth/change-password"),
+      dto
+    );
     toast.success(res.data.message || "Password changed successfully");
     return res.data;
   } catch (error: any) {

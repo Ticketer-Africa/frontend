@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Logo } from "./layout/logo";
+import { HeroSearchBar } from "./hero-search-bar";
 
 /**
  * HeroSection - Optimized for LCP and above-the-fold performance
@@ -19,7 +20,7 @@ export function HeroSection() {
   const router = useRouter();
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 pt-16">
+    <section className="relative flex mt-12 items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 pt-16">
       {/*
        * CSS-only animated background elements
        * Performance: CSS animations are GPU-accelerated and don't block main thread
@@ -51,30 +52,27 @@ export function HeroSection() {
         <p className="hero-fade-in hero-delay-2 text-lg sm:text-xl lg:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed px-3 sm:px-4">
           Discover events, buy or resell tickets, and never miss out again.
         </p>
-
         <div className="hero-fade-in hero-delay-3 flex flex-col sm:flex-row gap-4 justify-center items-center px-2">
-          <Button
+          {/* <Button
             size="lg"
             onClick={() => router.push("/explore")}
             className="bg-[#1E88E5] hover:bg-blue-500 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto"
           >
             Explore Events
             <ArrowRight className="ml-2 w-5 h-5" />
-          </Button>
+          </Button> */}
           <Button
             variant="outline"
             size="lg"
             onClick={() => router.push("/register")}
-            className="border-2 border-[#1E88E5] text-[#1E88E5] hover:bg-[#1E88E5] hover:text-white px-8 py-4 text-lg font-semibold rounded-full transition-all duration-300 bg-transparent w-full sm:w-auto"
+            className="bg-[#1E88E5] hover:bg-blue-500 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl hoveR:text-white transition-all duration-300 w-full sm:w-auto"
           >
             Become an Organizer
           </Button>
         </div>
 
-        <div className="hero-fade-in hero-delay-4 mt-16 px-3">
-          <p className="text-sm text-gray-500 mb-4">
-            Trusted by event organizers
-          </p>
+        <div className="hero-fade-in hero-delay-3 px-2 sm:px-4 md:mt-16">
+          <HeroSearchBar />
         </div>
       </div>
     </section>
