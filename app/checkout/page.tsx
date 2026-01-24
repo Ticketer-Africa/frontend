@@ -97,7 +97,7 @@ export default function CheckoutPage() {
       parsed.tickets.forEach((ticket) => {
         recipientsByCategory[ticket.ticketCategoryId] = Array(ticket.quantity)
           .fill(null)
-          .map(() => ({ name: "", email: "" }));
+          .map(() => ({ recipientName: "", recipientEmail: "" }));
       });
       setRecipients(recipientsByCategory);
     }
@@ -117,15 +117,15 @@ export default function CheckoutPage() {
         recipientList.forEach((recipient, index) => {
           const fieldKey = `${categoryId}-${index}`;
 
-          if (!recipient.name.trim()) {
+          if (!recipient.recipientName.trim()) {
             errors[fieldKey] = "Name is required";
             isValid = false;
           }
 
-          if (!recipient.email.trim()) {
+          if (!recipient.recipientEmail.trim()) {
             errors[fieldKey] = "Email is required";
             isValid = false;
-          } else if (!validateEmail(recipient.email)) {
+          } else if (!validateEmail(recipient.recipientEmail)) {
             errors[fieldKey] = "Invalid email format";
             isValid = false;
           }
@@ -141,7 +141,7 @@ export default function CheckoutPage() {
     (
       categoryId: string,
       index: number,
-      field: "name" | "email",
+      field: "recipientName" | "recipientEmail",
       value: string,
     ) => {
       setRecipients((prev) => {
@@ -150,7 +150,10 @@ export default function CheckoutPage() {
           updated[categoryId] = [];
         }
         if (!updated[categoryId][index]) {
-          updated[categoryId][index] = { name: "", email: "" };
+          updated[categoryId][index] = {
+            recipientName: "",
+            recipientEmail: "",
+          };
         }
         updated[categoryId][index][field] = value;
 
@@ -436,12 +439,12 @@ export default function CheckoutPage() {
                                       <Input
                                         id={`name-${fieldKey}`}
                                         placeholder="Full name"
-                                        value={recipient.name}
+                                        value={recipient.recipientName}
                                         onChange={(e) =>
                                           handleRecipientChange(
                                             ticket.ticketCategoryId,
                                             index,
-                                            "name",
+                                            "recipientName",
                                             e.target.value,
                                           )
                                         }
@@ -461,12 +464,12 @@ export default function CheckoutPage() {
                                         id={`email-${fieldKey}`}
                                         type="email"
                                         placeholder="Email address"
-                                        value={recipient.email}
+                                        value={recipient.recipientEmail}
                                         onChange={(e) =>
                                           handleRecipientChange(
                                             ticket.ticketCategoryId,
                                             index,
-                                            "email",
+                                            "recipientEmail",
                                             e.target.value,
                                           )
                                         }
@@ -639,9 +642,7 @@ export default function CheckoutPage() {
                           {discountState.appliedDiscount.discountAmount && (
                             <p className="text-xs text-green-600 font-semibold mt-1">
                               You save: ₦
-                              {(
-                                discountState.appliedDiscount.discountAmount
-                              ).toLocaleString()}
+                              {discountState.appliedDiscount.discountAmount.toLocaleString()}
                             </p>
                           )}
                         </div>

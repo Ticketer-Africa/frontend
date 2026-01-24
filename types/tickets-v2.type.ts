@@ -4,8 +4,8 @@
  */
 
 export interface RecipientV2 {
-  name: string;
-  email: string;
+  recipientName: string;
+  recipientEmail: string;
 }
 
 export interface TicketPurchaseItemV2 {
