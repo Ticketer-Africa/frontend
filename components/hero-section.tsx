@@ -65,13 +65,13 @@ export function HeroSection() {
             variant="outline"
             size="lg"
             onClick={() => router.push("/register")}
-            className="bg-[#1E88E5] hover:bg-blue-500 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl hoveR:text-white transition-all duration-300 w-full sm:w-auto"
+            className="bg-[#1E88E5] hover:bg-blue-500 max-w-lg text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl hoveR:text-white transition-all duration-300 w-full sm:w-auto"
           >
             Become an Organizer
           </Button>
         </div>
 
-        <div className="hero-fade-in hero-delay-3 px-2 sm:px-4 md:mt-16">
+        <div className="hero-fade-in hero-delay-3 px-2 sm:px-4 mt-4 md:mt-16">
           <HeroSearchBar />
         </div>
       </div>

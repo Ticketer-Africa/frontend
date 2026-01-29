@@ -1,6 +1,6 @@
 /**
- * Event Page V2 - Redesigned
- * Displays event details and ticket categories with improved layout and animations
+ * Event Page V3 - Modern Clean Design (2025 Standards)
+ * Mobile-first • Clean typography • Better buttons • Floating mobile CTA • Subtle shadows & borders
  */
 
 "use client";
@@ -10,58 +10,57 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useEventBySlugV2 } from "@/services/events/events-v2.queries";
 import { EventV2, TicketCategoryV2 } from "@/types/events-v2.type";
-import { EventHeaderV2 } from "./_components/event-header";
-import { TicketCategoryCardV2 } from "./_components/ticket-category-card";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EventHeaderV2 } from "./_components/event-header"; // updated version below
+import { TicketCategoryCardV2 } from "./_components/ticket-category-card"; // improved version below
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, Users, Shield, ArrowLeft } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AlertCircle, ArrowLeft, ShoppingBag, Ticket } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
-interface EventPageProps {
-  params: { slug: string };
-}
-
-export default function EventPage({ params }: EventPageProps) {
+export default function EventPage({ params }: { params: { slug: string } }) {
   const router = useRouter();
   const { user } = useAuth();
   const { data: event, isLoading, error } = useEventBySlugV2(params.slug);
 
-  const [selectedCategories, setSelectedCategories] = useState<
-    TicketCategoryV2[]
-  >([]);
-  const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
 
-  const handleSelectCategory = (category: TicketCategoryV2) => {
-    setSelectedCategories((prev) =>
-      prev.some((cat) => cat.id === category.id)
-        ? prev.filter((cat) => cat.id !== category.id)
-        : [...prev, category],
-    );
-
-    if (!quantities[category.id]) {
-      setQuantities((prev) => ({
-        ...prev,
-        [category.id]: 1,
-      }));
-    }
+  const toggleCategory = (category: TicketCategoryV2) => {
+    const id = category.id;
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+        if (!quantities[id]) {
+          setQuantities((q) => ({ ...q, [id]: 1 }));
+        }
+      }
+      return next;
+    });
   };
 
-  const handleQuantityChange = (categoryId: string, newQuantity: number) => {
-    const category = event?.ticketCategories.find((c) => c.id === categoryId);
+  const updateQuantity = (
+    id: string,
+    value: number | ((prev: number) => number),
+  ) => {
+    const category = event?.ticketCategories.find((c) => c.id === id);
     if (!category) return;
 
-    const maxAvailable = category.maxTickets - category.minted;
-    const limitedQuantity = Math.max(1, Math.min(newQuantity, maxAvailable));
-
-    setQuantities((prev) => ({
-      ...prev,
-      [categoryId]: limitedQuantity,
-    }));
+    const max = category.maxTickets - category.minted;
+    setQuantities((prev) => {
+      const current = prev[id] ?? 1;
+      const next = typeof value === "function" ? value(current) : value;
+      return {
+        ...prev,
+        [id]: Math.max(1, Math.min(max, next)),
+      };
+    });
   };
 
-  const handleProceedToCheckout = () => {
+  const handleCheckout = () => {
     if (!user) {
       router.push(
         `/login?returnUrl=${encodeURIComponent(window.location.href)}`,
@@ -69,322 +68,292 @@ export default function EventPage({ params }: EventPageProps) {
       return;
     }
 
-    if (selectedCategories.length === 0) {
-      toast.error("Please select at least one ticket category.");
+    if (selected.size === 0) {
+      toast.error("Please select at least one ticket type");
       return;
     }
 
-    // Prepare checkout data
-    const checkoutData = selectedCategories.map((cat) => ({
-      ticketCategoryId: cat.id,
-      quantity: quantities[cat.id] || 1,
-      ticketCategoryName: cat.name,
-      price: cat.price,
-    }));
+    const checkoutItems = Array.from(selected).map((id) => {
+      const cat = event!.ticketCategories.find((c) => c.id === id)!;
+      return {
+        ticketCategoryId: id,
+        quantity: quantities[id] ?? 1,
+        ticketCategoryName: cat.name,
+        price: cat.price,
+      };
+    });
 
-    // Store in session for checkout page
     sessionStorage.setItem(
       "checkoutData",
       JSON.stringify({
         eventId: event!.id,
         eventName: event!.name,
-        tickets: checkoutData,
+        tickets: checkoutItems,
       }),
     );
 
     router.push("/checkout");
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <Skeleton className="h-96 rounded-lg mb-8" />
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-6">
-              <Skeleton className="h-40" />
-              <Skeleton className="h-40" />
-            </div>
-            <Skeleton className="h-64" />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <LoadingSkeleton />;
+  if (error || !event) return <NotFound router={router} />;
 
-  if (!event || error) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3 text-destructive mb-4">
-              <AlertCircle className="w-5 h-5" />
-              <span className="font-semibold">Event Not Found</span>
-            </div>
-            <p className="text-muted-foreground text-sm">
-              We couldn't find the event you're looking for. It may have been
-              removed or the link might be incorrect.
-            </p>
-            <Button
-              onClick={() => router.push("/explore")}
-              className="w-full mt-4"
-            >
-              Browse Events
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  const totalQuantity = Object.values(quantities).reduce((a, b) => a + b, 0);
-  const totalPrice = selectedCategories.reduce((sum, cat) => {
-    const qty = quantities[cat.id] || 0;
-    return sum + cat.displayPrice * qty;
+  const totalTickets = Array.from(selected).reduce(
+    (sum, id) => sum + (quantities[id] ?? 1),
+    0,
+  );
+  const totalAmount = Array.from(selected).reduce((sum, id) => {
+    const cat = event.ticketCategories.find((c) => c.id === id)!;
+    return sum + cat.displayPrice * (quantities[id] ?? 1);
   }, 0);
 
+  const hasSelection = totalTickets > 0;
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Back Button */}
-      <div className="container mx-auto px-4 pt-4">
-        <Button variant="ghost" onClick={() => router.back()} className="mb-4">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
+    <>
+      {/* Mobile sticky bottom bar */}
+      <div
+        className={cn(
+          "fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-xl transition-all duration-300 md:hidden",
+          hasSelection ? "translate-y-0 shadow-2xl" : "translate-y-full",
+        )}
+      >
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-sm font-medium truncate">
+              {totalTickets} ticket{totalTickets !== 1 ? "s" : ""}
+            </p>
+            <p className="text-xl font-bold tracking-tight">
+              ₦{totalAmount.toLocaleString()}
+            </p>
+          </div>
+          <Button
+            size="lg"
+            className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-600/20"
+            onClick={handleCheckout}
+            disabled={!hasSelection}
+          >
+            <ShoppingBag className="mr-2 h-5 w-5" />
+            Checkout
+          </Button>
+        </div>
       </div>
 
-      {/* Event Header */}
-      <EventHeaderV2 event={event} />
+      <div className="min-h-screen bg-gradient-to-b from-background to-background/80 pb-32 md:pb-0">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Back button */}
+          <div className="pt-5 pb-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1.5 text-muted-foreground hover:text-foreground -ml-3"
+              onClick={() => router.back()}
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+          </div>
 
-      {/* Event Details Section */}
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* Description */}
-              <div className="event-card-animate">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>About This Event</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600 leading-relaxed">
-                      {event.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
+          {/* Hero */}
+          <EventHeaderV2 event={event} />
 
-              {/* Organizer Info */}
-              <div className="event-card-animate event-card-delay-1">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Organizer</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center space-x-4">
-                      <Avatar>
-                        <AvatarImage
-                          src={event.organizer.profileImage ?? undefined}
-                          alt={event.organizer.name}
-                          className="w-12 h-12 rounded-full object-cover"
-                        />
-                        <AvatarFallback className="bg-blue-100 text-[#1E88E5] text-sm">
-                          {event.organizer.name.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <h3 className="font-semibold">
-                            {event.organizer.name}
-                          </h3>
-                          {/* {event.organizer.isVerified && (
-                            <Shield className="h-4 w-4 text-green-500" />
-                          )} */}
-                        </div>
-                        <p className="text-sm text-gray-600">Event Organizer</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Ticket Categories */}
-              <div className="event-sidebar-animate">
-                <Card className="sticky top-4 space-y-4 p-4">
-                  <CardHeader>
-                    <CardTitle>Get Tickets</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {event.ticketCategories?.length > 0 ? (
-                      event.ticketCategories.map((category) => (
-                        <div key={category.id} className="space-y-4">
-                          <TicketCategoryCardV2
-                            category={category}
-                            onSelectCategory={handleSelectCategory}
-                            isSelected={selectedCategories.some(
-                              (c) => c.id === category.id,
-                            )}
-                            feeMode={event.feeMode}
-                            primaryFeeBps={event.primaryFeeBps}
-                          />
-
-                          {/* Quantity Selector */}
-                          {selectedCategories.some(
-                            (c) => c.id === category.id,
-                          ) && (
-                            <div className="p-4 bg-secondary rounded-lg border border-border">
-                              <label className="block text-sm font-medium text-foreground mb-2">
-                                Quantity
-                              </label>
-                              <div className="flex items-center gap-3">
-                                <button
-                                  onClick={() =>
-                                    handleQuantityChange(
-                                      category.id,
-                                      (quantities[category.id] || 1) - 1,
-                                    )
-                                  }
-                                  className="w-10 h-10 flex items-center justify-center border border-border rounded-md hover:bg-accent"
-                                >
-                                  −
-                                </button>
-                                <input
-                                  type="number"
-                                  min="1"
-                                  max={category.maxTickets - category.minted}
-                                  value={quantities[category.id] || 1}
-                                  onChange={(e) =>
-                                    handleQuantityChange(
-                                      category.id,
-                                      parseInt(e.target.value) || 1,
-                                    )
-                                  }
-                                  className="w-16 text-center border border-border rounded-md px-2 py-1"
-                                />
-                                <button
-                                  onClick={() =>
-                                    handleQuantityChange(
-                                      category.id,
-                                      (quantities[category.id] || 1) + 1,
-                                    )
-                                  }
-                                  className="w-10 h-10 flex items-center justify-center border border-border rounded-md hover:bg-accent"
-                                >
-                                  +
-                                </button>
-                              </div>
-                              <p className="text-xs text-muted-foreground mt-2">
-                                Max available:{" "}
-                                {category.maxTickets - category.minted}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-gray-600">
-                        No tickets available for this event.
+          <main className="py-10 lg:py-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-10">
+              {/* Main content */}
+              <div className="lg:col-span-8 space-y-12 lg:space-y-16">
+                <section>
+                  <h2 className="text-2xl font-bold tracking-tight mb-5">
+                    About the Event
+                  </h2>
+                  <div className="prose prose-neutral dark:prose-invert max-w-none leading-relaxed">
+                    {event.description.split("\n").map((p, i) => (
+                      <p key={i} className="mb-4 last:mb-0">
+                        {p}
                       </p>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
+                    ))}
+                  </div>
+                </section>
 
-              {/* Order Summary */}
-              {selectedCategories.length > 0 && (
-                <div className="event-sidebar-animate event-sidebar-delay-1">
-                  <Card className="sticky top-4">
-                    <CardHeader>
-                      <CardTitle>Order Summary</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {selectedCategories.map((cat) => (
-                        <div
-                          key={cat.id}
-                          className="flex justify-between text-sm pb-2 border-b border-border"
-                        >
-                          <span className="text-muted-foreground">
-                            {cat.name} × {quantities[cat.id] || 1}
-                          </span>
-                          <span className="font-medium">
-                            ₦
-                            {(
-                              cat.displayPrice * (quantities[cat.id] || 1)
-                            ).toLocaleString()}
-                          </span>
-                        </div>
-                      ))}
-
-                      <div className="pt-4 space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-muted-foreground">
-                            Subtotal
-                          </span>
-                          <span>₦{totalPrice.toLocaleString()}</span>
-                        </div>
-                        {event.feeMode === "ATTENDEE" && (
-                          <div className="flex justify-between text-sm text-yellow-700 bg-yellow-50/50 p-2 rounded">
-                            <span>Includes fees</span>
-                            <span>
-                              ₦
-                              {Math.floor(
-                                (totalPrice * (event.primaryFeeBps + 150)) /
-                                  10000 -
-                                  totalPrice,
-                              ).toLocaleString()}
-                            </span>
+                <section>
+                  <h2 className="text-2xl font-bold tracking-tight mb-5">
+                    Organizer
+                  </h2>
+                  <div className="flex items-center gap-4 p-6 rounded-2xl border bg-card/50 backdrop-blur-sm">
+                    <div className="shrink-0">
+                      <div className="h-14 w-14 rounded-full overflow-hidden border-2 border-background shadow-sm">
+                        {event.organizer.profileImage ? (
+                          <img
+                            src={event.organizer.profileImage}
+                            alt={event.organizer.name}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="h-full w-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-xl">
+                            {event.organizer.name.charAt(0).toUpperCase()}
                           </div>
                         )}
-                        <div className="flex justify-between font-bold text-lg pt-2 border-t border-border">
-                          <span>Total</span>
-                          <span>₦{totalPrice.toLocaleString()}</span>
-                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-lg">
+                        {event.organizer.name}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Event Organizer
+                      </p>
+                    </div>
+                  </div>
+                </section>
+
+                <section className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <StatCard
+                    label="Attendees"
+                    value={
+                      event.ticketCategories?.reduce(
+                        (a, b) => a + b.minted,
+                        0,
+                      ) ?? 0
+                    }
+                    icon={<Ticket className="h-5 w-5" />}
+                  />
+                  {/* Add more stats if you have data */}
+                </section>
+              </div>
+
+              {/* Tickets column */}
+              <div className="lg:col-span-4 lg:sticky lg:top-6 h-fit space-y-6">
+                <div className="rounded-2xl border bg-card shadow-sm overflow-hidden">
+                  <div className="px-6 py-5 border-b bg-muted/30">
+                    <h2 className="text-xl font-bold tracking-tight">
+                      Tickets
+                    </h2>
+                  </div>
+
+                  <div className="p-5 space-y-4">
+                    {event.ticketCategories?.length ? (
+                      event.ticketCategories.map((cat) => (
+                        <TicketCategoryCardV2
+                          key={cat.id}
+                          category={cat}
+                          isSelected={selected.has(cat.id)}
+                          quantity={quantities[cat.id] ?? 0}
+                          onToggle={() => toggleCategory(cat)}
+                          onQuantityChange={(delta: number) =>
+                            updateQuantity(cat.id, (q) => q + delta)
+                          }
+                          feeMode={event.feeMode}
+                          primaryFeeBps={event.primaryFeeBps}
+                        />
+                      ))
+                    ) : (
+                      <div className="py-10 text-center text-muted-foreground">
+                        No tickets available yet
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Desktop order summary */}
+                  {hasSelection && (
+                    <div className="p-6 border-t bg-muted/20">
+                      <h3 className="font-semibold mb-4">Order Summary</h3>
+
+                      <div className="space-y-3 mb-6 text-sm">
+                        {Array.from(selected).map((id) => {
+                          const cat = event.ticketCategories.find(
+                            (c) => c.id === id,
+                          )!;
+                          const qty = quantities[id] ?? 1;
+                          return (
+                            <div key={id} className="flex justify-between">
+                              <span className="text-muted-foreground">
+                                {cat.name} × {qty}
+                              </span>
+                              <span className="font-medium">
+                                ₦{(cat.displayPrice * qty).toLocaleString()}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      <div className="flex justify-between items-center py-4 border-t font-bold text-lg">
+                        <span>Total</span>
+                        <span>₦{totalAmount.toLocaleString()}</span>
                       </div>
 
                       <Button
-                        onClick={handleProceedToCheckout}
                         size="lg"
-                        className="w-full"
+                        className="w-full mt-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-600/20 text-white"
+                        onClick={handleCheckout}
                       >
-                        Proceed to Checkout ({totalQuantity}{" "}
-                        {totalQuantity === 1 ? "ticket" : "tickets"})
+                        Proceed to Checkout
                       </Button>
-                    </CardContent>
-                  </Card>
-                </div>
-              )}
-
-              {/* Event Stats */}
-              <div className="event-sidebar-animate event-sidebar-delay-1">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Event Stats</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Users className="h-4 w-4 text-gray-600" />
-                        <span className="text-sm">Attendees</span>
-                      </div>
-                      <span className="font-medium">
-                        {event.ticketCategories?.reduce(
-                          (total, cat) => total + cat.minted,
-                          0,
-                        ) || 0}
-                      </span>
                     </div>
-                  </CardContent>
-                </Card>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          </main>
         </div>
-      </section>
+      </div>
+    </>
+  );
+}
+
+// ────────────────────────────────────────────────
+// Helper Components
+// ────────────────────────────────────────────────
+
+function StatCard({
+  label,
+  value,
+  icon,
+}: {
+  label: string;
+  value: number | string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border bg-card/50 p-5 text-center">
+      <div className="text-muted-foreground mb-1.5 text-sm font-medium">
+        {label}
+      </div>
+      <div className="text-2xl font-bold">{value.toLocaleString()}</div>
+    </div>
+  );
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <Skeleton className="h-72 w-full rounded-2xl mb-10" />
+        <div className="grid lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-8 space-y-10">
+            <Skeleton className="h-10 w-3/4" />
+            <Skeleton className="h-48 w-full" />
+            <Skeleton className="h-48 w-full" />
+          </div>
+          <Skeleton className="lg:col-span-4 h-[600px] rounded-2xl" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NotFound({ router }: { router: any }) {
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="max-w-md text-center">
+        <AlertCircle className="mx-auto h-16 w-16 text-muted-foreground/50" />
+        <h2 className="mt-6 text-2xl font-bold">Event not found</h2>
+        <p className="mt-3 text-muted-foreground">
+          The event you're looking for doesn't exist or has been removed.
+        </p>
+        <Button className="mt-8 w-full" onClick={() => router.push("/explore")}>
+          Discover Events
+        </Button>
+      </div>
     </div>
   );
 }

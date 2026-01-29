@@ -20,7 +20,7 @@ export const EVENT_CATEGORIES = [
 
 // Uppercase categories for validation and backend
 export const UPPERCASE_CATEGORIES = EVENT_CATEGORIES.map((cat) =>
-  cat.toUpperCase()
+  cat.toUpperCase(),
 ) as unknown as [string, ...string[]];
 
 // Base ticket category schema (with id for React state)
@@ -29,6 +29,10 @@ const ticketCategorySchema = z.object({
   name: z.string().min(3, "Category name is required"),
   price: z.coerce.number().min(0, "Price must be non-negative"),
   maxTickets: z.coerce.number().min(1, "At least 1 ticket is required"),
+  maxAdmissions: z.coerce
+    .number()
+    .min(1, "At least 1 admission per ticket is required")
+    .default(1),
 });
 
 // Schema for backend submission (without id)
@@ -36,6 +40,10 @@ const ticketCategorySubmissionSchema = z.object({
   name: z.string().min(3, "Category name is required"),
   price: z.coerce.number().min(0, "Price must be non-negative"),
   maxTickets: z.coerce.number().min(1, "At least 1 ticket is required"),
+  maxAdmissions: z.coerce
+    .number()
+    .min(1, "At least 1 admission per ticket is required")
+    .default(1),
 });
 
 // File validation schema
@@ -43,11 +51,11 @@ const bannerSchema = z
   .any()
   .refine(
     (file) => !file || file.size <= 10 * 1024 * 1024,
-    "File size must be ≤10MB"
+    "File size must be ≤10MB",
   )
   .refine(
     (file) => !file || ["image/png", "image/jpeg"].includes(file.type),
-    "File must be PNG or JPG"
+    "File must be PNG or JPG",
   )
   .optional();
 
@@ -59,6 +67,7 @@ export const eventFormSchema = z.object({
   location: z.string().min(3, "Location is required"),
   date: z.string().min(1, "Date is required"),
   time: z.string().min(1, "Time is required"),
+  feeMode: z.enum(["ORGANIZER", "ATTENDEE"]).default("ORGANIZER"),
   ticketCategories: z
     .array(ticketCategorySchema)
     .min(1, "At least one ticket category is required"),
@@ -78,6 +87,8 @@ export const updateEventFormSchema = z.object({
     .min(1, "Date is required")
     .refine((val) => new Date(val) >= new Date(), "Date cannot be in the past"),
   time: z.string().min(1, "Time is required"),
+  feeMode: z.enum(["ORGANIZER", "ATTENDEE"]).default("ORGANIZER"),
+  visibility: z.enum(["PUBLIC", "PRIVATE"]).default("PUBLIC"),
   ticketCategories: z
     .array(ticketCategorySchema)
     .min(1, "At least one ticket category is required"),
@@ -92,6 +103,8 @@ export const eventSubmissionSchema = z.object({
   location: z.string().min(3, "Location is required"),
   date: z.string().min(1, "Date is required"),
   time: z.string().min(1, "Time is required"),
+  feeMode: z.enum(["ORGANIZER", "ATTENDEE"]).default("ORGANIZER"),
+  visibility: z.enum(["PUBLIC", "PRIVATE"]).default("PUBLIC"),
   ticketCategories: z
     .array(ticketCategorySubmissionSchema)
     .min(1, "At least one ticket category is required"),
@@ -108,6 +121,7 @@ export interface TicketCategory {
   name: string;
   price: number;
   maxTickets: number;
+  maxAdmissions?: number;
 }
 
 // Default values for a new event
@@ -118,6 +132,9 @@ export const DEFAULT_FORM_VALUES: EventFormData = {
   location: "",
   date: "",
   time: "",
-  ticketCategories: [{ id: "1", name: "Regular", price: 0, maxTickets: 1 }],
+  feeMode: "ORGANIZER",
+  ticketCategories: [
+    { id: "1", name: "Regular", price: 0, maxTickets: 1, maxAdmissions: 1 },
+  ],
   banner: undefined,
 };

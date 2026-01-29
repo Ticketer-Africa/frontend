@@ -69,7 +69,7 @@ export default function CreateEventPage() {
     watch("time") &&
     ticketCategories.length > 0 &&
     ticketCategories.every(
-      (cat) => cat.name && cat.price >= 0 && cat.maxTickets >= 1
+      (cat) => cat.name && cat.price >= 0 && cat.maxTickets >= 1,
     );
 
   const onSubmit = async (data: EventFormData) => {
@@ -91,9 +91,10 @@ export default function CreateEventPage() {
     formData.append("category", validatedData.category);
     formData.append("location", validatedData.location);
     formData.append("date", isoDate);
+    formData.append("feeMode", validatedData.feeMode);
     formData.append(
       "ticketCategories",
-      JSON.stringify(validatedData.ticketCategories)
+      JSON.stringify(validatedData.ticketCategories),
     );
     if (validatedData.banner instanceof File) {
       formData.append("file", validatedData.banner);
@@ -116,7 +117,7 @@ export default function CreateEventPage() {
     const newId = (ticketCategories.length + 1).toString();
     setValue("ticketCategories", [
       ...ticketCategories,
-      { id: newId, name: "", price: 0, maxTickets: 1 },
+      { id: newId, name: "", price: 0, maxTickets: 1, maxAdmissions: 1 },
     ]);
   };
 
@@ -124,7 +125,7 @@ export default function CreateEventPage() {
     if (ticketCategories.length === 1) return;
     setValue(
       "ticketCategories",
-      ticketCategories.filter((cat) => cat.id !== id)
+      ticketCategories.filter((cat) => cat.id !== id),
     );
   };
 
@@ -230,6 +231,7 @@ export default function CreateEventPage() {
                 {currentStep === 3 && (
                   <EventFormStep3
                     watch={watch}
+                    setValue={setValue}
                     ticketCategories={ticketCategories}
                     previewUrl={previewUrl}
                   />

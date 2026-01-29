@@ -88,7 +88,7 @@ export function EventFormStep2({
             key={category.id}
             className="border border-gray-200 rounded-lg p-4 space-y-4 ticket-category-animate"
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="space-y-2">
                 <Label htmlFor={`ticketCategories.${index}.name`}>
                   Category Name
@@ -139,6 +139,27 @@ export function EventFormStep2({
                 {errors.ticketCategories?.[index]?.maxTickets && (
                   <p className="text-sm text-red-600">
                     {errors.ticketCategories[index]?.maxTickets?.message}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor={`ticketCategories.${index}.maxAdmissions`}>
+                  Admissions per Ticket
+                </Label>
+                <Input
+                  id={`ticketCategories.${index}.maxAdmissions`}
+                  type="number"
+                  placeholder="1"
+                  {...register(`ticketCategories.${index}.maxAdmissions`)}
+                  min="1"
+                  disabled={isDisabled}
+                />
+                <p className="text-xs text-gray-500">
+                  How many people can enter with 1 ticket?
+                </p>
+                {errors.ticketCategories?.[index]?.maxAdmissions && (
+                  <p className="text-sm text-red-600">
+                    {errors.ticketCategories[index]?.maxAdmissions?.message}
                   </p>
                 )}
               </div>

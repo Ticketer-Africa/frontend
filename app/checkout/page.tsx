@@ -243,18 +243,18 @@ export default function CheckoutPage() {
         }),
       };
 
-      await buyTickets(payload);
+      const response = await buyTickets(payload);
 
       // Clear session data
       sessionStorage.removeItem("checkoutData");
 
-      // Show success message
-      setPurchaseSuccess(true);
-
-      // Redirect after 3 seconds
-      setTimeout(() => {
-        router.push("/my-tickets");
-      }, 3000);
+      // Redirect to payment URL if available
+      if (response.checkoutUrl) {
+        window.location.href = response.checkoutUrl;
+      } else {
+        // Fallback if no checkout URL
+        setPurchaseSuccess(true);
+      }
     } catch (error: any) {
       console.error("Purchase failed:", error);
       toast.error(error.message || "Purchase failed. Please try again.");
@@ -294,10 +294,10 @@ export default function CheckoutPage() {
               <CheckCircle className="w-12 h-12 text-green-500" />
             </div>
             <h2 className="text-2xl font-bold text-center text-foreground mb-2">
-              Purchase Successful!
+              Processing Purchase!
             </h2>
             <p className="text-center text-gray-600 mb-4">
-              Your tickets have been confirmed. Redirecting to your tickets...
+              Your tickets are being processed ...
             </p>
             <p className="text-xs text-gray-600 text-center">
               Redirecting in 3 seconds...
@@ -397,8 +397,10 @@ export default function CheckoutPage() {
                     >
                       <Card>
                         <CardHeader>
-                          <CardTitle className="text-base">
-                            Ticket Category{" "}
+                          <CardTitle className="text-base font-normal">
+                            <span className="font-semibold text-foreground">
+                              {ticket.ticketCategoryName}
+                            </span>
                           </CardTitle>
                           <CardDescription>
                             {ticket.quantity} ticket

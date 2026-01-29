@@ -54,11 +54,14 @@ export function EventFormStep1({
         <Label htmlFor="description">Description *</Label>
         <Textarea
           id="description"
-          placeholder="Describe your event..."
-          className="min-h-[100px]"
+          placeholder="Describe your event... You can use line breaks, bullet points, etc."
+          className="min-h-[120px] whitespace-pre-wrap"
           {...register("description")}
           disabled={isDisabled}
         />
+        <p className="text-xs text-gray-500">
+          Formatting (lists, line breaks) will be preserved
+        </p>
         {errors.description && (
           <p className="text-sm text-red-600">{errors.description.message}</p>
         )}
