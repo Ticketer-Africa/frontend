@@ -53,16 +53,16 @@ export const useAllEvents = (
 /**
  * Filtered events hook with caching
  */
-export const useFilteredEvents = (filters: EventFilterDTO) => {
-  return useQuery({
-    queryKey: ["events", "filtered", filters],
-    queryFn: () => eventsAPI.getFilteredEvents(filters),
-    staleTime: 5 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-  });
-};
+// export const useFilteredEvents = (filters: EventFilterDTO) => {
+//   return useQuery({
+//     queryKey: ["events", "filtered", filters],
+//     queryFn: () => eventsAPI.getFilteredEvents(filters),
+//     staleTime: 5 * 60 * 1000,
+//     gcTime: 30 * 60 * 1000,
+//     refetchOnMount: false,
+//     refetchOnWindowFocus: false,
+//   });
+// };
 
 /**
  * Single event by ID with caching

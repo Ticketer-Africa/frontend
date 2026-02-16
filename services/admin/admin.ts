@@ -1,10 +1,13 @@
 import axios from "@/services/axios";
 import { throwDeprecation } from "process";
 import { toast } from "sonner";
+import { buildEndpoint } from "../api-config";
+
+const API_VERSION = "v1";
 
 export const getAdminStats = async () => {
   try {
-    const res = await axios.get("/admin/stats"); // baseURL already includes /v1
+    const res = await axios.get(buildEndpoint(API_VERSION, "admin/stats")); // baseURL already includes /v1
     return res.data;
   } catch (error: any) {
     // Axios errors have a response object
@@ -21,7 +24,7 @@ export const getAdminStats = async () => {
 };
 export const getAdminEvents = async () => {
   try {
-    const res = await axios.get("/admin/events");
+    const res = await axios.get(buildEndpoint(API_VERSION, "admin/events"));
     return res.data;
   } catch (error: any) {
     if (error.response) {
@@ -38,7 +41,7 @@ export const getAdminEvents = async () => {
 
 export const getAdminUsers = async () => {
   try {
-    const res = await axios.get("/admin/users");
+    const res = await axios.get(buildEndpoint(API_VERSION, "admin/users"));
     return res.data;
   } catch (error: any) {
     if (error.response) {
@@ -54,13 +57,17 @@ export const getAdminUsers = async () => {
 };
 
 export const adminToggleEvent = async (eventId: string) => {
-  const res = await axios.patch(`/admin/events/${eventId}/toggle`);
+  const res = await axios.patch(
+    buildEndpoint(API_VERSION, `admin/events/${eventId}/toggle`)
+  );
   return res.data;
 };
 
 export const getAdminTransactions = async () => {
   try {
-    const res = await axios.get("/admin/transactions");
+    const res = await axios.get(
+      buildEndpoint(API_VERSION, "admin/transactions")
+    );
     return res.data;
   } catch (error: any) {
     if (error.response) {
@@ -76,23 +83,27 @@ export const getAdminTransactions = async () => {
 };
 
 export const getAdminOrganizers = async () => {
-  const res = await axios.get("/admin/organizers");
+  const res = await axios.get(buildEndpoint(API_VERSION, "admin/organizers"));
   return res.data;
 };
 
 export const getAdminUserDetails = async (userId: string) => {
-  const res = await axios.get(`/admin/users/${userId}`);
+  const res = await axios.get(
+    buildEndpoint(API_VERSION, `admin/users/${userId}`)
+  );
   return res.data;
 };
 
 export const getAdminRevenue = async () => {
-  const res = await axios.get(`/admin/revenue`);
+  const res = await axios.get(buildEndpoint(API_VERSION, "admin/revenue"));
   return res.data;
 };
 
 export const getAdminDailyRevenue = async () => {
   try {
-    const res = await axios.get(`/admin/revenue/daily`);
+    const res = await axios.get(
+      buildEndpoint(API_VERSION, "admin/revenue/daily")
+    );
     return res.data;
   } catch (error: any) {
     if (error.response) {
@@ -109,7 +120,9 @@ export const getAdminDailyRevenue = async () => {
 
 export const getEventCategories = async () => {
   try {
-    const res = await axios.get(`/admin/events/categories`);
+    const res = await axios.get(
+      buildEndpoint(API_VERSION, "admin/events/categories")
+    );
     return res.data;
   } catch (error: any) {
     if (error.response) {

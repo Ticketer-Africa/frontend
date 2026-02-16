@@ -1,7 +1,9 @@
 "use client";
 
 import { Logo } from "@/components/layout/logo";
+import { buildEndpoint } from "@/services/api-config";
 import Axios from "@/services/axios";
+import build from "next/dist/build";
 import { useRouter, usePathname } from "next/navigation";
 import {
   createContext,
@@ -47,11 +49,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     "/resale",
     "/reset-password",
     "/verify-otp",
+    "/checkout",
   ];
+
+  const API_VERSION = "v1";
 
   const fetchUser = async () => {
     try {
-      const response = await Axios.get("/auth/me");
+      const response = await Axios.get(buildEndpoint(API_VERSION, "auth/me"));
       const userData = response.data.user;
       setUser(userData);
       localStorage.setItem("ticketer-user", JSON.stringify(userData));

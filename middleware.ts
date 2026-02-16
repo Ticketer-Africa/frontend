@@ -22,8 +22,9 @@ export async function middleware(req: NextRequest) {
     console.log("Has ticketer_sid?", !!cookies);
 
     // Forward ticketer_sid explicitly to backend
-    const res = await fetch(`${apiBase}/auth/me`, {
+    const res = await fetch(`${apiBase}/v1/auth/me`, {
       method: "GET",
+      credentials: "include",
       headers: {
         Cookie: cookies ? `ticketer_sid=${cookies}` : "",
       },

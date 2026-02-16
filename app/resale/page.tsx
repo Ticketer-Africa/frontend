@@ -29,7 +29,7 @@ import { Ticket, TicketResale } from "@/types/tickets.type";
 export default function ResalePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTicket, setSelectedTicket] = useState<TicketResale | null>(
-    null
+    null,
   );
   const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
   const { user } = useAuth();
@@ -40,13 +40,13 @@ export default function ResalePage() {
   const filteredTickets = resaleTickets?.filter(
     (ticket) =>
       ticket?.event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ticket?.event.location?.toLowerCase().includes(searchQuery.toLowerCase())
+      ticket?.event.location?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleBuyTicket = (ticket: TicketResale) => {
     if (!user) {
       window.location.href = `/login?returnUrl=${encodeURIComponent(
-        window.location.href
+        window.location.href,
       )}`;
       return;
     }
@@ -111,13 +111,17 @@ export default function ResalePage() {
         >
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#1E88E5]"
+                aria-hidden="true"
+              />{" "}
               <Input
                 type="text"
-                placeholder="Search resale tickets..."
+                placeholder="Search events, locations..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-12 bg-gray-50 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="pl-12 h-12 outline-none focus:outline-none border-[#1E88E5] rounded-full focus:ring-2 focus-visible:ring-[#1E88E5] focus:ring-[#1E88E5] focus:border-[#1E88E5]"
+                aria-label="Search events"
               />
             </div>
 

@@ -5,15 +5,21 @@ import {
   User,
   BecomeOrganizerResponse,
 } from "@/types/user.type";
+import { buildEndpoint } from "../api-config";
 
+const API_VERSION = "v1";
 // UPDATE user
 export const updateUser = async (
   formData: FormData
 ): Promise<{ message: string; user: User }> => {
   try {
-    const res = await axios.put("/users/update", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const res = await axios.put(
+      buildEndpoint(API_VERSION, "users/update"),
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
     toast.success(res.data.message || "User profile updated successfully");
     return res.data;
   } catch (error: any) {
@@ -29,7 +35,10 @@ export const becomeOrganizer = async (
   email: string
 ): Promise<BecomeOrganizerResponse> => {
   try {
-    const res = await axios.patch("/users/become-organizer", { email });
+    const res = await axios.patch(
+      buildEndpoint(API_VERSION, "users/become-organizer"),
+      { email }
+    );
     toast.success(
       res.data.message || "Successfully requested organizer status"
     );
