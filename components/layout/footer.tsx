@@ -33,7 +33,7 @@ const QUICK_LINKS = [
 const SUPPORT_LINKS = [
   { href: "#faq", label: "FAQs" },
   { href: "#pricing", label: "Pricing" },
-  { href: "/terms", label: "Terms of Service" },
+  { href: "/service-agreement", label: "Service Agreement" },
 ] as const;
 
 /**

@@ -46,6 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     "/resale",
     "/events",
     "/terms",
+    "/service-agreement",
     "/resale",
     "/reset-password",
     "/verify-otp",
