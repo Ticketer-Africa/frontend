@@ -63,7 +63,10 @@ export default function CreateEventPage() {
 
   // Step validation
   const canProceedStep1 =
-    watch("name") && watch("description") && watch("category");
+    watch("name") &&
+    watch("description") &&
+    watch("category") &&
+    watch("banner");
   const canProceedStep2 =
     watch("location") &&
     watch("date") &&

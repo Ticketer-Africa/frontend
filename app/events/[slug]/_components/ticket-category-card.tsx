@@ -78,7 +78,7 @@ export function TicketCategoryCardV2({
               variant="ghost"
               className="h-8 w-8"
               onClick={() => onQuantityChange(1)}
-              disabled={quantity >= available}
+              disabled={quantity >= available || quantity >= 10}
             >
               <Plus className="h-4 w-4" />
             </Button>

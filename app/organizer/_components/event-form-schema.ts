@@ -46,8 +46,21 @@ const ticketCategorySubmissionSchema = z.object({
     .default(1),
 });
 
-// File validation schema
+// File validation schema - required for new events
 const bannerSchema = z
+  .any()
+  .refine((file) => file instanceof File, "Event banner is required")
+  .refine(
+    (file) => !file || file.size <= 10 * 1024 * 1024,
+    "File size must be ≤10MB",
+  )
+  .refine(
+    (file) => !file || ["image/png", "image/jpeg"].includes(file.type),
+    "File must be PNG or JPG",
+  );
+
+// File validation schema - optional for updates (existing banner may be kept)
+const bannerSchemaOptional = z
   .any()
   .refine(
     (file) => !file || file.size <= 10 * 1024 * 1024,
@@ -92,7 +105,7 @@ export const updateEventFormSchema = z.object({
   ticketCategories: z
     .array(ticketCategorySchema)
     .min(1, "At least one ticket category is required"),
-  banner: bannerSchema,
+  banner: bannerSchemaOptional,
 });
 
 // Zod Schema for backend submission (excludes id from ticket categories)
@@ -108,7 +121,7 @@ export const eventSubmissionSchema = z.object({
   ticketCategories: z
     .array(ticketCategorySubmissionSchema)
     .min(1, "At least one ticket category is required"),
-  banner: bannerSchema,
+  banner: bannerSchemaOptional,
 });
 
 // Types

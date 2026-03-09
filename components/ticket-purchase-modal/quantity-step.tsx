@@ -72,7 +72,7 @@ export function QuantityStep({
               variant="outline"
               size="sm"
               onClick={() => onQuantityChange(resaleTicket.id, 1)}
-              disabled={(quantities[resaleTicket.id] || 1) >= 8}
+              disabled={(quantities[resaleTicket.id] || 1) >= 10}
               className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
             >
               <Plus className="w-4 h-4" />
@@ -103,7 +103,7 @@ export function QuantityStep({
                 size="sm"
                 onClick={() => onQuantityChange(category.id, 1)}
                 disabled={
-                  (quantities[category.id] || 0) >= 8 ||
+                  (quantities[category.id] || 0) >= 10 ||
                   category.maxTickets - category.minted <=
                     (quantities[category.id] || 0)
                 }
@@ -118,6 +118,15 @@ export function QuantityStep({
           </div>
         ))
       )}
+
+      {/* Disclaimer */}
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+        <p className="text-xs text-amber-800">
+          <strong>Note:</strong> Maximum of 10 tickets per purchase. Tickets are
+          non-refundable once purchased. Please verify your selection before
+          proceeding.
+        </p>
+      </div>
 
       {/* Price Breakdown */}
       {baseAmount > 0 && (

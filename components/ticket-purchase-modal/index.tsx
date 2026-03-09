@@ -35,12 +35,28 @@ export function TicketPurchaseModal({
 
   const handleQuantityChange = (categoryId: string, delta: number) => {
     setQuantities((prev) => {
-      const newQuantity = Math.max(
+      const currentTotal = Object.values(prev).reduce(
+        (sum, qty) => sum + qty,
         0,
-        Math.min(8, (prev[categoryId] || 0) + delta),
       );
-      if (resaleTicket && newQuantity < 1) return prev;
-      return { ...prev, [categoryId]: newQuantity };
+      const currentQty = prev[categoryId] || 0;
+      const newQty = currentQty + delta;
+
+      // Can't go below 0 (or 1 for resale)
+      if (newQty < 0) return prev;
+      if (resaleTicket && newQty < 1) return prev;
+
+      // Can't exceed 10 per category or 10 total
+      if (newQty > 10) {
+        toast.error("Maximum 10 tickets per category");
+        return prev;
+      }
+      if (currentTotal - currentQty + newQty > 10) {
+        toast.error("Maximum 10 tickets per purchase");
+        return prev;
+      }
+
+      return { ...prev, [categoryId]: newQty };
     });
   };
 

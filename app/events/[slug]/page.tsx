@@ -49,10 +49,21 @@ export default function EventPage({ params }: { params: { slug: string } }) {
     const category = event?.ticketCategories.find((c) => c.id === id);
     if (!category) return;
 
-    const max = category.maxTickets - category.minted;
+    const max = Math.min(category.maxTickets - category.minted, 10); // Max 10 per category
     setQuantities((prev) => {
       const current = prev[id] ?? 1;
       const next = typeof value === "function" ? value(current) : value;
+
+      // Check total across all categories
+      const otherTotal = Object.entries(prev)
+        .filter(([key]) => key !== id)
+        .reduce((sum, [, qty]) => sum + qty, 0);
+
+      if (otherTotal + next > 10) {
+        toast.error("Maximum 10 tickets per purchase");
+        return prev;
+      }
+
       return {
         ...prev,
         [id]: Math.max(1, Math.min(max, next)),
@@ -279,6 +290,14 @@ export default function EventPage({ params }: { params: { slug: string } }) {
                       <div className="flex justify-between items-center py-4 border-t font-bold text-lg">
                         <span>Total</span>
                         <span>₦{totalAmount.toLocaleString()}</span>
+                      </div>
+
+                      {/* Disclaimer */}
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-4">
+                        <p className="text-xs text-amber-800">
+                          <strong>Note:</strong> Maximum of 10 tickets per
+                          purchase. Tickets are non-refundable once purchased.
+                        </p>
                       </div>
 
                       <Button
