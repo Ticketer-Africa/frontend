@@ -30,14 +30,14 @@ export function TicketPurchaseModal({
     resaleTicket,
     ticketCategories,
     quantities,
-    event.primaryFee
+    event.primaryFee,
   );
 
   const handleQuantityChange = (categoryId: string, delta: number) => {
     setQuantities((prev) => {
       const newQuantity = Math.max(
         0,
-        Math.min(8, (prev[categoryId] || 0) + delta)
+        Math.min(8, (prev[categoryId] || 0) + delta),
       );
       if (resaleTicket && newQuantity < 1) return prev;
       return { ...prev, [categoryId]: newQuantity };
@@ -75,7 +75,11 @@ export function TicketPurchaseModal({
     try {
       const data = await buyTicket(payload);
       if (data?.checkoutUrl) {
+        // Paid ticket - redirect to payment
         window.location.href = data.checkoutUrl;
+      } else {
+        // Free ticket - show success step
+        setStep("success");
       }
     } catch (err: any) {
       console.error("Purchase failed:", err);

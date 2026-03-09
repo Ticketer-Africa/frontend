@@ -73,6 +73,16 @@ export default function CheckoutPage() {
   }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
+
+  // Redirect to my-tickets after successful free ticket purchase
+  useEffect(() => {
+    if (purchaseSuccess) {
+      const timer = setTimeout(() => {
+        router.push("/my-tickets");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [purchaseSuccess, router]);
   const [discountCode, setDiscountCode] = useState("");
 
   // Load checkout data from session
@@ -294,14 +304,17 @@ export default function CheckoutPage() {
               <CheckCircle className="w-12 h-12 text-green-500" />
             </div>
             <h2 className="text-2xl font-bold text-center text-foreground mb-2">
-              Processing Purchase!
+              Tickets Claimed!
             </h2>
             <p className="text-center text-gray-600 mb-4">
-              Your tickets are being processed ...
+              Your free tickets have been added to your account.
             </p>
-            <p className="text-xs text-gray-600 text-center">
-              Redirecting in 3 seconds...
-            </p>
+            <Button
+              onClick={() => router.push("/my-tickets")}
+              className="w-full bg-[#1E88E5] hover:bg-blue-600"
+            >
+              View My Tickets
+            </Button>
           </CardContent>
         </Card>
       </div>

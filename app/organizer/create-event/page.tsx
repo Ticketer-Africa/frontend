@@ -29,6 +29,7 @@ import { LoadingScreen } from "../_components/status-screens";
 export default function CreateEventPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
   const { mutateAsync: createEvent, isPending } = useCreateEvent();
   const { isLoading: authLoading } = useAuth();
   const router = useRouter();
@@ -135,12 +136,18 @@ export default function CreateEventPage() {
       (currentStep === 1 ? canProceedStep1 : canProceedStep2)
     ) {
       setCurrentStep(currentStep + 1);
+      // Reset confirmation when moving to step 3
+      if (currentStep === 2) {
+        setIsConfirmed(false);
+      }
     }
   };
 
   const handlePrevious = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      // Reset confirmation when leaving step 3
+      setIsConfirmed(false);
     }
   };
 
@@ -148,6 +155,18 @@ export default function CreateEventPage() {
     reset(DEFAULT_FORM_VALUES);
     setCurrentStep(1);
     setIsSubmitted(false);
+    setIsConfirmed(false);
+  };
+
+  // Prevent Enter key from accidentally submitting the form
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (
+      e.key === "Enter" &&
+      (e.target as HTMLElement).tagName !== "TEXTAREA" &&
+      (e.target as HTMLElement).tagName !== "BUTTON"
+    ) {
+      e.preventDefault();
+    }
   };
 
   if (authLoading) {
@@ -202,7 +221,11 @@ export default function CreateEventPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <form onSubmit={handleSubmit(onSubmit)} id="event-form">
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                onKeyDown={handleKeyDown}
+                id="event-form"
+              >
                 {currentStep === 1 && (
                   <EventFormStep1
                     register={register}
@@ -234,6 +257,8 @@ export default function CreateEventPage() {
                     setValue={setValue}
                     ticketCategories={ticketCategories}
                     previewUrl={previewUrl}
+                    isConfirmed={isConfirmed}
+                    onConfirmChange={setIsConfirmed}
                   />
                 )}
 
@@ -248,6 +273,8 @@ export default function CreateEventPage() {
                   onPrevious={handlePrevious}
                   onNext={handleNext}
                   formId="event-form"
+                  requiresConfirmation={currentStep === 3}
+                  isConfirmed={isConfirmed}
                 />
               </form>
             </CardContent>

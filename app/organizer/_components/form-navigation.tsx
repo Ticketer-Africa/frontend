@@ -13,6 +13,8 @@ interface FormNavigationProps {
   onPrevious: () => void;
   onNext: () => void;
   formId?: string;
+  requiresConfirmation?: boolean;
+  isConfirmed?: boolean;
 }
 
 /**
@@ -28,7 +30,11 @@ export function FormNavigation({
   onPrevious,
   onNext,
   formId = "event-form",
+  requiresConfirmation = false,
+  isConfirmed = true,
 }: FormNavigationProps) {
+  // Disable submit if confirmation is required but not provided
+  const canSubmit = !requiresConfirmation || isConfirmed;
   return (
     <div className="flex justify-between pt-6 border-t">
       <Button
@@ -57,7 +63,7 @@ export function FormNavigation({
           type="submit"
           form={formId}
           className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !canSubmit}
         >
           {isSubmitting ? submittingLabel : submitLabel}
         </Button>

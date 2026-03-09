@@ -10,6 +10,8 @@ interface Step3Props {
   setValue: UseFormSetValue<EventFormData>;
   ticketCategories: TicketCategory[];
   previewUrl: string | null;
+  isConfirmed?: boolean;
+  onConfirmChange?: (confirmed: boolean) => void;
 }
 
 /**
@@ -20,6 +22,8 @@ export function EventFormStep3({
   setValue,
   ticketCategories,
   previewUrl,
+  isConfirmed = false,
+  onConfirmChange,
 }: Step3Props) {
   const category = watch("category");
   const feeMode = watch("feeMode");
@@ -219,6 +223,23 @@ export function EventFormStep3({
               </>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Confirmation Checkbox */}
+      {onConfirmChange && (
+        <div className="w-full pt-4 border-t">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={isConfirmed}
+              onChange={(e) => onConfirmChange(e.target.checked)}
+              className="mt-1 h-4 w-4 rounded border-gray-300 text-[#1E88E5] focus:ring-[#1E88E5]"
+            />
+            <span className="text-sm text-gray-700">
+              I have reviewed all event details and confirm they are correct.
+            </span>
+          </label>
         </div>
       )}
     </div>

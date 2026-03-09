@@ -86,25 +86,48 @@ export function EventFormStep2({
         {ticketCategories.map((category, index) => (
           <div
             key={category.id}
-            className="border border-gray-200 rounded-lg p-4 space-y-4 ticket-category-animate"
+            className="border border-gray-200 rounded-lg p-4 space-y-4 ticket-category-animate bg-gray-50/50"
           >
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor={`ticketCategories.${index}.name`}>
-                  Category Name
-                </Label>
-                <Input
-                  id={`ticketCategories.${index}.name`}
-                  placeholder="e.g., VIP, General Admission"
-                  {...register(`ticketCategories.${index}.name`)}
+            {/* Category Header */}
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-gray-700">
+                Category {index + 1}
+              </span>
+              {index > 0 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onRemoveCategory(category.id)}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 px-2"
                   disabled={isDisabled}
-                />
-                {errors.ticketCategories?.[index]?.name && (
-                  <p className="text-sm text-red-600">
-                    {errors.ticketCategories[index]?.name?.message}
-                  </p>
-                )}
-              </div>
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Remove
+                </Button>
+              )}
+            </div>
+
+            {/* Row 1: Name (full width) */}
+            <div className="space-y-2">
+              <Label htmlFor={`ticketCategories.${index}.name`}>
+                Category Name
+              </Label>
+              <Input
+                id={`ticketCategories.${index}.name`}
+                placeholder="e.g., VIP, General Admission, Early Bird"
+                {...register(`ticketCategories.${index}.name`)}
+                disabled={isDisabled}
+              />
+              {errors.ticketCategories?.[index]?.name && (
+                <p className="text-sm text-red-600">
+                  {errors.ticketCategories[index]?.name?.message}
+                </p>
+              )}
+            </div>
+
+            {/* Row 2: Price, Total Tickets, Admissions */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor={`ticketCategories.${index}.price`}>
                   Price (₦)
@@ -131,7 +154,7 @@ export function EventFormStep2({
                 <Input
                   id={`ticketCategories.${index}.maxTickets`}
                   type="number"
-                  placeholder="Number of tickets"
+                  placeholder="Available quantity"
                   {...register(`ticketCategories.${index}.maxTickets`)}
                   min={existingTicketCategories?.[index]?.soldTickets || 1}
                   disabled={isDisabled}
@@ -144,7 +167,7 @@ export function EventFormStep2({
               </div>
               <div className="space-y-2">
                 <Label htmlFor={`ticketCategories.${index}.maxAdmissions`}>
-                  Admissions per Ticket
+                  Admissions / Ticket
                 </Label>
                 <Input
                   id={`ticketCategories.${index}.maxAdmissions`}
@@ -154,9 +177,6 @@ export function EventFormStep2({
                   min="1"
                   disabled={isDisabled}
                 />
-                <p className="text-xs text-gray-500">
-                  How many people can enter with 1 ticket?
-                </p>
                 {errors.ticketCategories?.[index]?.maxAdmissions && (
                   <p className="text-sm text-red-600">
                     {errors.ticketCategories[index]?.maxAdmissions?.message}
@@ -164,19 +184,9 @@ export function EventFormStep2({
                 )}
               </div>
             </div>
-            {index > 0 && (
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                onClick={() => onRemoveCategory(category.id)}
-                className="bg-red-600 hover:bg-red-700"
-                disabled={isDisabled}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Remove
-              </Button>
-            )}
+            <p className="text-xs text-gray-500">
+              Admissions per ticket: How many people can enter with 1 ticket?
+            </p>
           </div>
         ))}
         {errors.ticketCategories && (
@@ -187,11 +197,11 @@ export function EventFormStep2({
         <Button
           type="button"
           variant="outline"
-          className="bg-transparent"
+          className="bg-transparent w-full sm:w-auto"
           onClick={onAddCategory}
           disabled={isDisabled}
         >
-          Add Category
+          + Add Another Category
         </Button>
       </div>
     </>
