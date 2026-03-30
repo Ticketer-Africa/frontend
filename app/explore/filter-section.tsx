@@ -13,6 +13,8 @@ interface FilterSectionProps {
   // Search
   searchQuery: string;
   onSearchChange: (value: string) => void;
+  onSearchSubmit: () => void;
+  canSubmitSearch: boolean;
 
   // Filter visibility
   showFilters: boolean;
@@ -55,6 +57,8 @@ interface FilterSectionProps {
 function FilterSectionComponent({
   searchQuery,
   onSearchChange,
+  onSearchSubmit,
+  canSubmitSearch,
   showFilters,
   onToggleFilters,
   tempLocation,
@@ -73,6 +77,14 @@ function FilterSectionComponent({
   onClearFilters,
   resultsCount,
 }: FilterSectionProps) {
+  const handleSearchSubmit = useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      onSearchSubmit();
+    },
+    [onSearchSubmit],
+  );
+
   // Calculate active filter count for badge
   const activeFilterCount = [
     selectedLocation,
@@ -86,20 +98,35 @@ function FilterSectionComponent({
     <div className="mb-8">
       <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
         {/* Search input */}
-        <div className="relative mb-4">
-          <Search
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#1E88E5]"
-            aria-hidden="true"
-          />
-          <Input
-            type="text"
-            placeholder="Search events, locations..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-12 h-12 outline-none focus:outline-none border-[#1E88E5] rounded-full focus:ring-2 focus-visible:ring-[#1E88E5] focus:ring-[#1E88E5] focus:border-[#1E88E5]"
-            aria-label="Search events"
-          />
-        </div>
+        <form onSubmit={handleSearchSubmit} className="mb-4 flex gap-2">
+          <div className="relative flex-1">
+            <Search
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#1E88E5]"
+              aria-hidden="true"
+            />
+            <Input
+              type="text"
+              placeholder="Search events, locations..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-12 h-12 outline-none focus:outline-none border-[#1E88E5] rounded-full focus:ring-2 focus-visible:ring-[#1E88E5] focus:ring-[#1E88E5] focus:border-[#1E88E5]"
+              aria-label="Search events"
+            />
+          </div>
+          <Button
+            type="submit"
+            variant="primary"
+            className="h-12 px-5"
+            disabled={!canSubmitSearch}
+          >
+            Search
+          </Button>
+        </form>
+        {!canSubmitSearch && (
+          <p className="mt-1 text-xs text-muted-foreground">
+            Enter at least 3 letters to search.
+          </p>
+        )}
 
         {/* Filter toggle and results count */}
         <div className="flex items-center justify-between">

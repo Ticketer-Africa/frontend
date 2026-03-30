@@ -46,7 +46,11 @@ export const useAllEvents = (
     gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
     refetchOnMount: false, // Use cached data on remount
     refetchOnWindowFocus: false, // Don't refetch on tab focus
-    placeholderData: (previousData) => previousData, // Show previous data while fetching
+    retry: (failureCount, error: any) => {
+      const status = error?.response?.status;
+      if (status >= 400 && status < 500) return false;
+      return failureCount < 2;
+    },
   });
 };
 

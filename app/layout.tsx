@@ -1,6 +1,5 @@
 import type React from "react";
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "../lib/provider";
 import { Header } from "@/components/layout/header";
@@ -8,20 +7,6 @@ import {
   OrganizationStructuredData,
   WebsiteStructuredData,
 } from "@/components/structured-data";
-
-/**
- * Performance: Font optimization
- * - display: 'swap' prevents FOIT (Flash of Invisible Text) - critical for LCP
- * - preload: true ensures font loads early in critical path
- * - Only loading latin subset reduces font file size
- */
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  preload: true,
-  // Only load weights actually used in the app
-  variable: "--font-inter",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ticketer.africa"),
@@ -111,7 +96,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en">
       {/*
        * Performance: Structured data moved to head via JSON-LD script tags
        * This prevents them from being in the render tree and blocking paint
@@ -124,8 +109,13 @@ export default function RootLayout({
           href="https://fonts.gstatic.com"
           crossOrigin="anonymous"
         />
+        <link rel="preconnect" href="https://api.fontshare.com" />
+        <link
+          rel="stylesheet"
+          href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@400,500,600,700&display=swap"
+        />
       </head>
-      <body className={`${inter.className} antialiased`}>
+      <body className="antialiased">
         {/* Structured data rendered as script tags - doesn't block paint */}
         <OrganizationStructuredData />
         <WebsiteStructuredData />

@@ -6,6 +6,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useEventBySlugV2 } from "@/services/events/events-v2.queries";
@@ -140,7 +141,8 @@ export default function EventPage({ params }: { params: { slug: string } }) {
           </div>
           <Button
             size="lg"
-            className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-600/20"
+            variant="primary"
+            className="flex-1"
             onClick={handleCheckout}
             disabled={!hasSelection}
           >
@@ -150,7 +152,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
         </div>
       </div>
 
-      <div className="min-h-screen bg-gradient-to-b from-background to-background/80 pb-32 md:pb-0">
+      <div className="min-h-screen bg-background pb-32 md:pb-0">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back button */}
           <div className="pt-5 pb-3">
@@ -165,13 +167,12 @@ export default function EventPage({ params }: { params: { slug: string } }) {
             </Button>
           </div>
 
-          {/* Hero */}
-          <EventHeaderV2 event={event} />
-
-          <main className="py-10 lg:py-12">
+          <main className="py-6 lg:py-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 xl:gap-10">
               {/* Main content */}
-              <div className="lg:col-span-8 space-y-12 lg:space-y-16">
+              <div className="lg:col-span-6 space-y-8 lg:space-y-12">
+                <EventHeaderV2 event={event} />
+
                 <section>
                   <h2 className="text-2xl font-bold tracking-tight mb-5">
                     About the Event
@@ -189,7 +190,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
                   <h2 className="text-2xl font-bold tracking-tight mb-5">
                     Organizer
                   </h2>
-                  <div className="flex items-center gap-4 p-6 rounded-2xl border bg-card/50 backdrop-blur-sm">
+                  <div className="flex items-center gap-4 p-6 rounded-2xl border bg-card">
                     <div className="shrink-0">
                       <div className="h-14 w-14 rounded-full overflow-hidden border-2 border-background shadow-sm">
                         {event.organizer.profileImage ? (
@@ -231,9 +232,27 @@ export default function EventPage({ params }: { params: { slug: string } }) {
                 </section>
               </div>
 
-              {/* Tickets column */}
-              <div className="lg:col-span-4 lg:sticky lg:top-6 h-fit space-y-6">
-                <div className="rounded-2xl border bg-card shadow-sm overflow-hidden">
+              {/* Poster + tickets column */}
+              <div className="lg:col-span-6 lg:-mt-16 lg:sticky lg:top-6 h-fit space-y-6">
+                <div className="rounded-2xl border bg-card overflow-hidden">
+                  <div className="relative aspect-[3/4] bg-muted">
+                    {event.bannerUrl ? (
+                      <Image
+                        src={event.bannerUrl}
+                        alt={event.name}
+                        fill
+                        className="object-cover"
+                        priority
+                      />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center text-muted-foreground text-sm">
+                        Event poster
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border bg-card overflow-hidden">
                   <div className="px-6 py-5 border-b bg-muted/30">
                     <h2 className="text-xl font-bold tracking-tight">
                       Tickets
@@ -293,8 +312,8 @@ export default function EventPage({ params }: { params: { slug: string } }) {
                       </div>
 
                       {/* Disclaimer */}
-                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-4">
-                        <p className="text-xs text-amber-800">
+                      <div className="bg-muted/40 border border-border rounded-lg p-3 mt-4">
+                        <p className="text-xs text-muted-foreground">
                           <strong>Note:</strong> Maximum of 10 tickets per
                           purchase. Tickets are non-refundable once purchased.
                         </p>
@@ -302,7 +321,8 @@ export default function EventPage({ params }: { params: { slug: string } }) {
 
                       <Button
                         size="lg"
-                        className="w-full mt-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-600/20 text-white"
+                        variant="primary"
+                        className="w-full mt-5"
                         onClick={handleCheckout}
                       >
                         Proceed to Checkout
