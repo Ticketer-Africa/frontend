@@ -12,6 +12,8 @@ import {
   Edit,
   ArrowLeft,
   Loader2,
+  Copy,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +25,7 @@ import {
 } from "@/services/events/events.queries";
 import { useEffect, useState } from "react";
 import { Event } from "@/types/events.type";
+import { useToast } from "@/hooks/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,9 +52,11 @@ export default function EventDashboard() {
   const { data: organizerEventList, isLoading: eventsLoading } =
     useOrganizerEvents();
   const { mutate: deleteEvent } = useDeleteEvent();
+  const { toast } = useToast();
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
+  const [copiedToClipboard, setCopiedToClipboard] = useState(false);
 
   if (eventsLoading) {
     return (
@@ -105,6 +110,26 @@ export default function EventDashboard() {
   const cancelDelete = () => {
     setIsDeleteDialogOpen(false);
     setDeleteEventId(null);
+  };
+
+  const handleCopyEventUrl = async () => {
+    const eventUrl = `${window.location.origin}/event/${event.slug}`;
+    try {
+      await navigator.clipboard.writeText(eventUrl);
+      setCopiedToClipboard(true);
+      toast({
+        title: "Copied!",
+        description: "Event URL copied to clipboard",
+      });
+      setTimeout(() => setCopiedToClipboard(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy URL:", error);
+      toast({
+        title: "Error",
+        description: "Failed to copy URL to clipboard",
+        variant: "destructive",
+      });
+    }
   };
 
   const totalTickets: number =
@@ -328,6 +353,38 @@ export default function EventDashboard() {
                       View Attendees
                     </Link>
                   </Button>
+                </div>
+
+                {/* Event URL Section */}
+                <div className="mt-6 pt-6 border-t">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-muted-foreground mb-2">
+                        Event URL
+                      </p>
+                      <p className="text-sm sm:text-base break-all bg-muted p-3 rounded-lg font-mono">
+                        {`${typeof window !== 'undefined' ? window.location.origin : ''}/event/${event.slug}`}
+                      </p>
+                    </div>
+                    <Button
+                      onClick={handleCopyEventUrl}
+                      variant="default"
+                      size="sm"
+                      className="bg-[#1E88E5] hover:bg-blue-600 text-white rounded-lg flex items-center gap-2 w-full sm:w-auto"
+                    >
+                      {copiedToClipboard ? (
+                        <>
+                          <Check className="h-4 w-4" />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-4 w-4" />
+                          Copy URL
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
