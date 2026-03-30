@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,9 +25,21 @@ type LoginSchema = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
   const searchParams = useSearchParams();
   const loginMutation = useLogin();
+  const redirect =
+    searchParams.get("redirect") ?? searchParams.get("returnUrl");
+  const intent = searchParams.get("intent");
+  const registerParams = new URLSearchParams();
+  if (intent === "organizer") {
+    registerParams.set("intent", "organizer");
+  }
+  if (redirect) {
+    registerParams.set("redirect", redirect);
+  }
+  const registerHref = registerParams.toString()
+    ? `/register?${registerParams.toString()}`
+    : "/register";
 
   const {
     register,
@@ -42,7 +54,8 @@ export default function LoginPage() {
       { ...data, email: data.email.toLowerCase() },
       {
         onSuccess: () => {
-          const returnUrl = searchParams.get("redirect");
+          const returnUrl =
+            searchParams.get("redirect") ?? searchParams.get("returnUrl");
 
           // Only redirect if returnUrl exists and is not the login page
           if (returnUrl && !returnUrl.includes("/login")) {
@@ -169,7 +182,7 @@ export default function LoginPage() {
           <p className="mt-6 text-center text-sm text-gray-600">
             Don't have an account?{" "}
             <Link
-              href="/register"
+              href={registerHref}
               className="text-[#1E88E5] hover:text-blue-700 font-medium"
             >
               Sign up

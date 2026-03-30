@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,9 +38,24 @@ type RegisterForm = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState<1 | 2>(1);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const intent = searchParams.get("intent");
+  const redirect =
+    searchParams.get("redirect") ?? searchParams.get("returnUrl");
+  const initialRole = intent === "organizer" ? "ORGANIZER" : "USER";
+  const loginParams = new URLSearchParams();
+  if (intent === "organizer") {
+    loginParams.set("intent", "organizer");
+  }
+  if (redirect) {
+    loginParams.set("redirect", redirect);
+  }
+  const loginHref = loginParams.toString()
+    ? `/login?${loginParams.toString()}`
+    : "/login";
 
   const {
     register,
@@ -57,7 +72,7 @@ export default function RegisterPage() {
       email: "",
       password: "",
       confirmPassword: "",
-      role: "USER",
+      role: initialRole,
       agreementAccepted: false,
     },
   });
@@ -91,7 +106,19 @@ export default function RegisterPage() {
         JSON.stringify({ email: data.email, context: "register" })
       );
 
-      router.push("/verify-otp");
+      const verifyOtpParams = new URLSearchParams();
+      if (intent === "organizer") {
+        verifyOtpParams.set("intent", "organizer");
+      }
+      if (redirect) {
+        verifyOtpParams.set("redirect", redirect);
+      }
+
+      router.push(
+        verifyOtpParams.toString()
+          ? `/verify-otp?${verifyOtpParams.toString()}`
+          : "/verify-otp"
+      );
     } catch (err: any) {
       const msg =
         err?.response?.data?.message ?? "Something went wrong, try again";
@@ -339,7 +366,7 @@ export default function RegisterPage() {
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
                 Already have an account?{" "}
-                <Link href="/login" className="text-primary hover:underline">
+                <Link href={loginHref} className="text-primary hover:underline">
                   Sign in
                 </Link>
               </p>

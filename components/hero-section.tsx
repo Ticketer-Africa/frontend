@@ -64,7 +64,7 @@ export function HeroSection() {
           <Button
             variant="outline"
             size="lg"
-            onClick={() => router.push("/register")}
+            onClick={() => router.push("/register?intent=organizer")}
             className="bg-[#1E88E5] hover:bg-blue-500 max-w-lg text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl hoveR:text-white transition-all duration-300 w-full sm:w-auto"
           >
             Become an Organizer
