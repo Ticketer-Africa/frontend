@@ -17,7 +17,6 @@ import { extractLocations, filterEvents } from "./utils";
 import {
   DEFAULT_MIN_PRICE,
   DEFAULT_MAX_PRICE,
-  SEARCH_DEBOUNCE_MS,
 } from "./constants";
 
 /**
@@ -65,7 +64,7 @@ export default function EventsPage() {
   const searchParams = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [appliedSearch, setAppliedSearch] = useState("");
 
   // Track if we've initialized from URL to show skeleton during search
   const hasInitializedFromUrl = useRef(false);
@@ -114,22 +113,10 @@ export default function EventsPage() {
     if (urlSearch && !hasInitializedFromUrl.current) {
       hasInitializedFromUrl.current = true;
       setSearchQuery(urlSearch);
+      setAppliedSearch(urlSearch);
       setShowInitialSkeleton(true); // Show skeleton while searching
     }
   }, [searchParams]);
-
-  /**
-   * Debounce search to prevent excessive API calls
-   * Performance: Reduces network requests and re-renders
-   */
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-      setCurrentPage(1);
-    }, SEARCH_DEBOUNCE_MS);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
 
   /**
    * Sync price bounds from API data when it arrives successfully
@@ -168,7 +155,7 @@ export default function EventsPage() {
     isFetching,
   } = useAllEvents(
     currentPage,
-    debouncedSearch || undefined,
+    appliedSearch || undefined,
     priceSliderRange && priceSliderRange[0] > priceBounds.min
       ? priceSliderRange[0]
       : undefined,
@@ -262,9 +249,46 @@ export default function EventsPage() {
   // All handlers wrapped in useCallback to prevent child re-renders
   // ─────────────────────────────────────────────────────────────────────────────
 
-  const handleSearchChange = useCallback((value: string) => {
-    setSearchQuery(value);
-  }, []);
+  const applySearch = useCallback(
+    (rawValue: string) => {
+      const query = rawValue.trim().replace(/\s+/g, " ").toLowerCase();
+
+      // Allow empty query to reset results.
+      if (query.length === 0) {
+        if (appliedSearch !== "") {
+          setAppliedSearch("");
+          setCurrentPage(1);
+        }
+        return;
+      }
+
+      // Minimum 3 characters before triggering API search.
+      if (query.length < 3) {
+        if (appliedSearch !== "") {
+          setAppliedSearch("");
+          setCurrentPage(1);
+        }
+        return;
+      }
+
+      if (query === appliedSearch) return;
+      setAppliedSearch(query);
+      setCurrentPage(1);
+    },
+    [appliedSearch],
+  );
+
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      setSearchQuery(value);
+      applySearch(value);
+    },
+    [applySearch],
+  );
+
+  const handleSearchSubmit = useCallback(() => {
+    applySearch(searchQuery);
+  }, [applySearch, searchQuery]);
 
   const handleToggleFilters = useCallback(() => {
     setShowFilters((prev) => !prev);
@@ -303,7 +327,7 @@ export default function EventsPage() {
 
   const handleClearAllFilters = useCallback(() => {
     setSearchQuery("");
-    setDebouncedSearch("");
+    setAppliedSearch("");
     handleClearFilters();
   }, [handleClearFilters]);
 
@@ -356,6 +380,10 @@ export default function EventsPage() {
         <FilterSection
           searchQuery={searchQuery}
           onSearchChange={handleSearchChange}
+          onSearchSubmit={handleSearchSubmit}
+          canSubmitSearch={
+            searchQuery.trim().length === 0 || searchQuery.trim().length >= 3
+          }
           showFilters={showFilters}
           onToggleFilters={handleToggleFilters}
           tempLocation={tempLocation}
