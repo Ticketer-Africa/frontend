@@ -3,8 +3,8 @@
 import type React from "react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -18,7 +18,6 @@ import { toast } from "sonner";
 import { useVerifyOtp, useResendOtp } from "@/services/auth/auth.queries";
 import { ResendOtpDto } from "@/types/auth.type";
 import { z } from "zod";
-import { useAuth } from "@/lib/auth-context";
 
 const otpSchema = z.object({
   email: z.string().email(),
@@ -27,12 +26,26 @@ const otpSchema = z.object({
 
 export default function VerifyOTPPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [otp, setOtp] = useState("");
-  const { user } = useAuth();
   const [secondsLeft, setSecondsLeft] = useState(60);
   const { mutate: verifyOtp, isPending } = useVerifyOtp();
   const { mutate: resendOtp, isPending: isResending } = useResendOtp();
   const [otpPayload, setOtpPayload] = useState<ResendOtpDto | null>(null);
+  const redirect =
+    searchParams.get("redirect") ?? searchParams.get("returnUrl");
+  const intent = searchParams.get("intent");
+
+  const loginParams = new URLSearchParams();
+  if (intent === "organizer") {
+    loginParams.set("intent", "organizer");
+  }
+  if (redirect) {
+    loginParams.set("redirect", redirect);
+  }
+  const loginHref = loginParams.toString()
+    ? `/login?${loginParams.toString()}`
+    : "/login";
 
   useEffect(() => {
     const stored = localStorage.getItem("otpPayload");
@@ -50,9 +63,21 @@ export default function VerifyOTPPage() {
       }
     } else {
       toast.error("No OTP session found. Please register again.");
-      router.push("/register");
+      const registerParams = new URLSearchParams();
+      if (intent === "organizer") {
+        registerParams.set("intent", "organizer");
+      }
+      if (redirect) {
+        registerParams.set("redirect", redirect);
+      }
+
+      router.push(
+        registerParams.toString()
+          ? `/register?${registerParams.toString()}`
+          : "/register"
+      );
     }
-  }, [router]);
+  }, [router, intent, redirect]);
 
   useEffect(() => {
     if (secondsLeft <= 0) return;
@@ -89,7 +114,7 @@ export default function VerifyOTPPage() {
           localStorage.setItem("resetOtp", otp);
           router.push("/reset-password");
         } else {
-          router.push("/login");
+          router.push(loginHref);
         }
       },
       onError: (err: any) => {
@@ -185,7 +210,7 @@ export default function VerifyOTPPage() {
               </div>
 
               <Button variant="ghost" className="w-full" asChild>
-                <Link href="/login">
+                <Link href={loginHref}>
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Login
                 </Link>

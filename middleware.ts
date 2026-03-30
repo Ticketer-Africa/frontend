@@ -3,6 +3,8 @@ import type { NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
+  const routeWithQuery = `${req.nextUrl.pathname}${req.nextUrl.search}`;
+  const isOrganizerPath = path.startsWith("/organizer");
 
   // Skip login page and Next.js internals
   if (path.startsWith("/login") || path.startsWith("/_next")) {
@@ -43,18 +45,30 @@ export async function middleware(req: NextRequest) {
         // Optionally handle 304 using cached data if needed
         userData = {}; // minimal object just to allow access
       }
+
+      const userRole = res.status === 200 ? userData?.user?.role : undefined;
+      if (isOrganizerPath && res.status === 200 && userRole !== "ORGANIZER") {
+        return NextResponse.redirect(new URL("/explore", req.url));
+      }
+
       console.log("✅ User authenticated - allowing access", userData);
       return NextResponse.next();
     }
 
     console.log("❌ User not authenticated - redirecting to login");
     const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("redirect", path);
+    loginUrl.searchParams.set("redirect", routeWithQuery);
+    if (isOrganizerPath) {
+      loginUrl.searchParams.set("intent", "organizer");
+    }
     return NextResponse.redirect(loginUrl);
   } catch (err) {
     console.error("Middleware error:", err);
     const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("redirect", path);
+    loginUrl.searchParams.set("redirect", routeWithQuery);
+    if (isOrganizerPath) {
+      loginUrl.searchParams.set("intent", "organizer");
+    }
     return NextResponse.redirect(loginUrl);
   }
 }

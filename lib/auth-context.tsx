@@ -78,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         error.message?.includes("401");
 
       if (!isPublicRoute && isUnauthenticated) {
-        router.push("/login");
+        router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
       }
     } finally {
       setIsLoading(false);
