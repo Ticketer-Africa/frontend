@@ -35,8 +35,8 @@ export function TicketCategoryCardV2({
       className={cn(
         "rounded-xl border p-5 transition-all duration-200",
         isSelected
-          ? "border-blue-500/70 bg-blue-50/50 dark:bg-blue-950/30 ring-1 ring-blue-500/40"
-          : "border-border hover:border-blue-400/50 hover:shadow-sm",
+          ? "border-[#1E88E5]/60 bg-[#1E88E5]/10 ring-1 ring-[#1E88E5]/30"
+          : "border-border hover:border-[#1E88E5]/40",
         outOfStock && "opacity-50 pointer-events-none",
       )}
     >
@@ -88,14 +88,9 @@ export function TicketCategoryCardV2({
         )}
 
         <Button
-          variant={isSelected ? "default" : "outline"}
+          variant={isSelected ? "primary" : "outline"}
           size="sm"
-          className={cn(
-            "min-w-[100px]",
-            isSelected
-              ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-sm"
-              : "",
-          )}
+          className={cn("min-w-[100px]")}
           onClick={onToggle}
           disabled={outOfStock}
         >

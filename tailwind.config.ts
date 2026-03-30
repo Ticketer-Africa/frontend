@@ -12,6 +12,17 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["Syne", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["Clash Grotesk", "Syne", "ui-sans-serif", "sans-serif"],
+      },
+      fontSize: {
+        caption: ["10px", { lineHeight: "1.4" }],
+      },
+      spacing: {
+        navbar: "60px",
+        sidebar: "16rem",
+      },
       willChange: {
         opacity: "opacity",
       },
@@ -68,9 +79,9 @@ const config: Config = {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "1rem",
+        md: "0.75rem",
+        sm: "0.5rem",
       },
       keyframes: {
         "accordion-down": {

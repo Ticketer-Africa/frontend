@@ -31,16 +31,16 @@ export const ActivityCard = memo(function ActivityCard({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
-      <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-6 border-b border-slate-200">
+    <div className="overflow-hidden rounded-2xl border border-border bg-background">
+      <div className="border-b border-border p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {icon}
-            <h3 className="font-semibold text-slate-900">{title}</h3>
+            <h3 className="text-xl font-semibold text-foreground">{title}</h3>
           </div>
           <button
             onClick={handleViewAll}
-            className="text-sm text-[#1E88E5] hover:text-blue-800 font-medium transition-colors flex items-center gap-1"
+            className="flex items-center gap-1 text-sm font-medium text-[#1E88E5] transition-colors hover:text-[#1976D2]"
           >
             View All
             <ArrowUpRight className="h-3 w-3" />
@@ -73,22 +73,22 @@ const TransactionItem = memo(function TransactionItem({
   item: RecentTransaction;
 }) {
   return (
-    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+    <div className="activity-row justify-between">
       <div className="flex-1">
-        <p className="font-semibold text-slate-900">
+        <p className="font-semibold text-foreground">
           ₦{item.amount.toLocaleString()}
         </p>
-        <p className="text-xs text-slate-600 mt-1">
+        <p className="mt-1 text-xs text-muted-foreground">
           {item.name} • {item.event}
         </p>
       </div>
       <span
-        className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${
+        className={`rounded-lg px-3 py-1 text-xs font-semibold capitalize ${
           item.status === "SUCCESS"
-            ? "bg-green-100 text-green-800"
+            ? "bg-[#10B981]/10 text-[#10B981]"
             : item.status === "PENDING"
-            ? "bg-yellow-100 text-yellow-800"
-            : "bg-red-100 text-red-800"
+            ? "bg-[#F59E0B]/10 text-[#F59E0B]"
+            : "bg-[#EC4899]/10 text-[#EC4899]"
         }`}
       >
         {item.status}
@@ -102,14 +102,14 @@ const EventItem = memo(function EventItem({ item }: { item: RecentEvent }) {
     item.totalTickets > 0 ? (item.ticketsSold / item.totalTickets) * 100 : 0;
 
   return (
-    <div className="p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+    <div className="activity-row block">
       <div className="flex items-center justify-between mb-2">
-        <p className="font-semibold text-slate-900 text-sm">{item.name}</p>
+        <p className="text-sm font-semibold text-foreground">{item.name}</p>
         <span
-          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+          className={`rounded-lg px-2 py-1 text-xs font-semibold ${
             item.status === "Active"
-              ? "bg-green-100 text-green-800"
-              : "bg-gray-100 text-gray-800"
+              ? "bg-[#10B981]/10 text-[#10B981]"
+              : "bg-[#F3F4F6] text-[#666666]"
           }`}
         >
           {item.status}
@@ -117,21 +117,21 @@ const EventItem = memo(function EventItem({ item }: { item: RecentEvent }) {
       </div>
       <div className="space-y-2">
         <div className="flex items-center justify-between text-xs">
-          <span className="text-slate-600">
+          <span className="text-muted-foreground">
             {item.ticketsSold} / {item.totalTickets} tickets sold
           </span>
-          <span className="font-semibold text-slate-900">
+          <span className="font-semibold text-foreground">
             {percentage.toFixed(0)}%
           </span>
         </div>
-        <div className="w-full bg-slate-200 rounded-full h-2">
+        <div className="h-2 w-full rounded-full bg-[#F3F4F6]">
           <div
             className={`h-2 rounded-full transition-all ${
               percentage > 80
-                ? "bg-green-500"
+                ? "bg-[#10B981]"
                 : percentage > 50
-                ? "bg-blue-500"
-                : "bg-yellow-500"
+                ? "bg-[#1E88E5]"
+                : "bg-[#F59E0B]"
             }`}
             style={{ width: `${percentage}%` }}
           />
@@ -143,25 +143,25 @@ const EventItem = memo(function EventItem({ item }: { item: RecentEvent }) {
 
 const UserItem = memo(function UserItem({ item }: { item: RecentUser }) {
   return (
-    <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
-      <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-sm">
-        <span className="text-xs font-bold text-white">{item.avatar}</span>
+    <div className="activity-row">
+      <div className="activity-row-icon bg-[#F9F9F9]">
+        <span className="text-xs font-bold text-[#1E88E5]">{item.avatar}</span>
       </div>
       <div className="flex-1">
-        <p className="font-semibold text-slate-900 text-sm">{item.name}</p>
+        <p className="text-sm font-semibold text-foreground">{item.name}</p>
         <div className="flex items-center gap-2 mt-1">
           <span
-            className={`px-2 py-1 rounded text-xs font-medium ${
+            className={`rounded-lg px-2 py-1 text-xs font-medium ${
               item.role === "ORGANIZER"
-                ? "bg-purple-100 text-purple-800"
+                ? "bg-[#6366F1]/10 text-[#6366F1]"
                 : item.role === "USER"
-                ? "text-green-800 bg-green-100"
-                : "bg-blue-100 text-blue-800"
+                ? "bg-[#10B981]/10 text-[#10B981]"
+                : "bg-[#1E88E5]/10 text-[#1E88E5]"
             }`}
           >
             {item.role}
           </span>
-          <span className="text-xs text-slate-500">{item.joinedDate}</span>
+          <span className="text-xs text-muted-foreground">{item.joinedDate}</span>
         </div>
       </div>
     </div>

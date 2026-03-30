@@ -1,10 +1,8 @@
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
 
 @layer utilities {
   .text-balance {
@@ -38,7 +36,7 @@ body {
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --radius: 1rem;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -89,8 +87,80 @@ body {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans text-base leading-relaxed;
+    font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
   }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family:
+      "Clash Grotesk", "Syne", ui-sans-serif, system-ui, sans-serif;
+    @apply tracking-tight leading-tight;
+  }
+
+  h1 {
+    @apply text-4xl font-semibold;
+  }
+
+  h2 {
+    @apply text-3xl font-semibold;
+  }
+
+  h3 {
+    @apply text-2xl font-semibold;
+  }
+
+  h4 {
+    @apply text-xl font-semibold;
+  }
+
+  h5 {
+    @apply text-lg font-semibold;
+  }
+
+  h6 {
+    @apply text-base font-semibold;
+  }
+
+  small,
+  .caption {
+    font-size: 10px;
+    line-height: 1.4;
+  }
+}
+
+@layer components {
+  .empty-state,
+  [data-empty-state="true"] {
+    @apply border border-dashed border-border rounded-lg;
+  }
+
+  .stat-value {
+    font-family:
+      "Clash Grotesk", "Syne", ui-sans-serif, system-ui, sans-serif;
+    @apply text-3xl leading-none;
+  }
+
+  .activity-row {
+    @apply flex items-center gap-2 w-full p-4 rounded-lg border border-border;
+  }
+
+  .activity-row-icon {
+    @apply h-[42px] w-[42px] rounded-lg flex items-center justify-center border border-border;
+  }
+}
+
+.shadow,
+.shadow-sm,
+.shadow-md,
+.shadow-lg,
+.shadow-xl,
+.shadow-2xl {
+  box-shadow: 0 1px 3px rgba(51, 51, 51, 0.08) !important;
 }
 
 .will-change-opacity {
