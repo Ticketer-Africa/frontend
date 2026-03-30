@@ -74,7 +74,7 @@ export default function EventDashboard() {
   // Handle both array and paginated response formats
   const organizerEvents: Event[] = Array.isArray(organizerEventList)
     ? organizerEventList
-    : organizerEventList?.data ?? [];
+    : (organizerEventList?.data ?? []);
 
   const event: Event = organizerEvents.find((e: Event) => e.id === id);
 
@@ -135,7 +135,7 @@ export default function EventDashboard() {
   const totalTickets: number =
     event?.ticketCategories?.reduce(
       (sum, cat) => sum + (cat.maxTickets || 0),
-      0
+      0,
     ) ?? 0;
 
   const ticketsSold: number =
@@ -145,7 +145,7 @@ export default function EventDashboard() {
   const totalRevenue: number =
     event?.ticketCategories?.reduce(
       (sum, cat) => sum + (cat.minted || 0) * (cat.price || 0),
-      0
+      0,
     ) ?? 0;
   const percentageSold =
     totalTickets > 0 ? Math.round((ticketsSold / totalTickets) * 100) : 0;
@@ -363,7 +363,7 @@ export default function EventDashboard() {
                         Event URL
                       </p>
                       <p className="text-sm sm:text-base break-all bg-muted p-3 rounded-lg font-mono">
-                        {`${typeof window !== 'undefined' ? window.location.origin : ''}/event/${event.slug}`}
+                        {`${typeof window !== "undefined" ? window.location.origin : ""}/event/${event.slug}`}
                       </p>
                     </div>
                     <Button
