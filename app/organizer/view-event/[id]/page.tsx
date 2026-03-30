@@ -357,29 +357,25 @@ export default function EventDashboard() {
 
                 {/* Event URL Section */}
                 <div className="mt-6 pt-6 border-t">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-muted-foreground mb-2">
-                        Event URL
-                      </p>
-                      <p className="text-sm sm:text-base break-all bg-muted p-3 rounded-lg font-mono">
-                        {`${typeof window !== "undefined" ? window.location.origin : ""}/event/${event.slug}`}
-                      </p>
-                    </div>
+                  <p className="text-sm font-medium mb-3">Event URL</p>
+                  <div className="flex flex-col gap-3">
+                    <p className="text-sm break-all bg-muted px-3 py-2 rounded-md font-mono">
+                      {`${typeof window !== "undefined" ? window.location.origin : ""}/events/${event.slug}`}
+                    </p>
                     <Button
                       onClick={handleCopyEventUrl}
                       variant="default"
                       size="sm"
-                      className="bg-[#1E88E5] hover:bg-blue-600 text-white rounded-lg flex items-center gap-2 w-full sm:w-auto"
+                      className="w-full sm:w-auto"
                     >
                       {copiedToClipboard ? (
                         <>
-                          <Check className="h-4 w-4" />
+                          <Check className="h-4 w-4 mr-2" />
                           Copied!
                         </>
                       ) : (
                         <>
-                          <Copy className="h-4 w-4" />
+                          <Copy className="h-4 w-4 mr-2" />
                           Copy URL
                         </>
                       )}
