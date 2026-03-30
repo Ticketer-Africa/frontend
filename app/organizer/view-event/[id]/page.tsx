@@ -113,7 +113,7 @@ export default function EventDashboard() {
   };
 
   const handleCopyEventUrl = async () => {
-    const eventUrl = `${window.location.origin}/event/${event.slug}`;
+    const eventUrl = `${window.location.origin}/events/${event.slug}`;
     try {
       await navigator.clipboard.writeText(eventUrl);
       setCopiedToClipboard(true);
