@@ -65,7 +65,7 @@ export function PricingSection() {
         {/* CTA with CSS animation */}
         <div className="section-animate section-delay-2 mt-16">
           <a
-            href="organizer/create-event"
+            href="/register?intent=organizer"
             className="inline-block bg-[#1E88E5] hover:bg-blue-700 text-white px-10 py-4 rounded-full font-medium text-lg transition-all duration-300"
           >
             Start Selling Tickets
