@@ -12,6 +12,8 @@ import {
   Edit,
   ArrowLeft,
   Loader2,
+  Copy,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +25,7 @@ import {
 } from "@/services/events/events.queries";
 import { useEffect, useState } from "react";
 import { Event } from "@/types/events.type";
+import { useToast } from "@/hooks/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,9 +52,11 @@ export default function EventDashboard() {
   const { data: organizerEventList, isLoading: eventsLoading } =
     useOrganizerEvents();
   const { mutate: deleteEvent } = useDeleteEvent();
+  const { toast } = useToast();
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
+  const [copiedToClipboard, setCopiedToClipboard] = useState(false);
 
   if (eventsLoading) {
     return (
@@ -69,7 +74,7 @@ export default function EventDashboard() {
   // Handle both array and paginated response formats
   const organizerEvents: Event[] = Array.isArray(organizerEventList)
     ? organizerEventList
-    : organizerEventList?.data ?? [];
+    : (organizerEventList?.data ?? []);
 
   const event: Event = organizerEvents.find((e: Event) => e.id === id);
 
@@ -107,10 +112,30 @@ export default function EventDashboard() {
     setDeleteEventId(null);
   };
 
+  const handleCopyEventUrl = async () => {
+    const eventUrl = `${window.location.origin}/events/${event.slug}`;
+    try {
+      await navigator.clipboard.writeText(eventUrl);
+      setCopiedToClipboard(true);
+      toast({
+        title: "Copied!",
+        description: "Event URL copied to clipboard",
+      });
+      setTimeout(() => setCopiedToClipboard(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy URL:", error);
+      toast({
+        title: "Error",
+        description: "Failed to copy URL to clipboard",
+        variant: "destructive",
+      });
+    }
+  };
+
   const totalTickets: number =
     event?.ticketCategories?.reduce(
       (sum, cat) => sum + (cat.maxTickets || 0),
-      0
+      0,
     ) ?? 0;
 
   const ticketsSold: number =
@@ -120,7 +145,7 @@ export default function EventDashboard() {
   const totalRevenue: number =
     event?.ticketCategories?.reduce(
       (sum, cat) => sum + (cat.minted || 0) * (cat.price || 0),
-      0
+      0,
     ) ?? 0;
   const percentageSold =
     totalTickets > 0 ? Math.round((ticketsSold / totalTickets) * 100) : 0;
@@ -328,6 +353,34 @@ export default function EventDashboard() {
                       View Attendees
                     </Link>
                   </Button>
+                </div>
+
+                {/* Event URL Section */}
+                <div className="mt-6 pt-6 border-t">
+                  <p className="text-sm font-medium mb-3">Event URL</p>
+                  <div className="flex flex-col gap-3">
+                    <p className="text-sm break-all bg-muted px-3 py-2 rounded-md font-mono">
+                      {`${typeof window !== "undefined" ? window.location.origin : ""}/events/${event.slug}`}
+                    </p>
+                    <Button
+                      onClick={handleCopyEventUrl}
+                      variant="default"
+                      size="sm"
+                      className="w-full sm:w-auto"
+                    >
+                      {copiedToClipboard ? (
+                        <>
+                          <Check className="h-4 w-4 mr-2" />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-4 w-4 mr-2" />
+                          Copy URL
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
