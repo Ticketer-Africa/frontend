@@ -109,10 +109,11 @@ export default function EventManagementTabs({
 
   const handleAddInvitee = () => {
     if (!inviteForm.email || !inviteForm.name) return;
+    const { email } = inviteForm;
     addInvitee(inviteForm, {
       onSuccess: () => {
         setInviteForm({ email: "", name: "" });
-        toast({ title: "Invite sent", description: `Invite sent to ${inviteForm.email}.` });
+        toast({ title: "Invite sent", description: `Invite sent to ${email}.` });
       },
       onError: () => {
         toast({ title: "Error", description: "Failed to send invite.", variant: "destructive" });
@@ -482,7 +483,7 @@ export default function EventManagementTabs({
                 ) : shareableLink?.token ? (
                   <div className="space-y-3">
                     <p className="text-sm break-all bg-muted px-3 py-2 rounded-md font-mono">
-                      {`${typeof window !== "undefined" ? window.location.origin : ""}/invite/shareable?s=${shareableLink.token}&eventSlug=${eventSlug}`}
+                      {`${window.location.origin}/invite/shareable?s=${shareableLink.token}&eventSlug=${eventSlug}`}
                     </p>
                     <div className="flex gap-2">
                       <Button
