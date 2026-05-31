@@ -29,8 +29,12 @@ export const useAddInvitee = (eventId: string) => {
 };
 
 export const useResendInvite = (eventId: string) => {
+  const queryClient = useQueryClient();
   return useMutation<void, Error, string>({
     mutationFn: (inviteId) => invitesAPI.resendInvite(eventId, inviteId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["invites", eventId] });
+    },
   });
 };
 

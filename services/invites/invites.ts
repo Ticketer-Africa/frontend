@@ -60,6 +60,7 @@ export const removeInvitee = async (
   eventId: string,
   inviteId: string,
 ): Promise<void> => {
+  // Backend uses PATCH (not DELETE) for soft-removal via the /remove sub-path
   const endpoint = buildEndpoint("v2", `${BASE(eventId)}/${inviteId}/remove`);
   await axios.patch(endpoint);
 };
@@ -79,8 +80,16 @@ export const getShareableLink = async (
     const endpoint = buildEndpoint("v2", `${BASE(eventId)}/shareable`);
     const res = await axios.get<ShareableLink>(endpoint);
     return res.data;
-  } catch {
-    return null;
+  } catch (err: unknown) {
+    if (
+      typeof err === "object" &&
+      err !== null &&
+      "response" in err &&
+      (err as { response: { status: number } }).response?.status === 404
+    ) {
+      return null;
+    }
+    throw err;
   }
 };
 
