@@ -130,8 +130,8 @@ export default function RegisterPage() {
         <Card className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/20">
           <CardHeader className="text-center flex justify-center items-center flex-col space-y-2 p-8">
             <Logo withText={false} size="sm" />
-            <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
-            <p className="text-muted-foreground">Join Ticketer Africa today</p>
+            <CardTitle className="text-2xl font-bold">Organizer Sign Up</CardTitle>
+            <p className="text-muted-foreground">Create your organizer account to start hosting events</p>
           </CardHeader>
 
           <CardContent className="space-y-6">
@@ -317,7 +317,7 @@ export default function RegisterPage() {
                       className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                       disabled={isPending}
                     >
-                      {isPending ? "Creating..." : "Create Account"}
+                      {isPending ? "Creating account..." : "Create Organizer Account"}
                     </Button>
                   </div>
                 </>
@@ -334,7 +334,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="text-xs text-muted-foreground text-center">
-              By creating an account, you agree to our{" "}
+              By creating an organizer account, you agree to our{" "}
               <Link
                 href="/service-agreement"
                 className="text-primary hover:underline"

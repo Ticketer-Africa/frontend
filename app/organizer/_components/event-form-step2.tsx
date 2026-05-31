@@ -1,8 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Trash2, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Trash2, Plus, CalendarIcon } from "lucide-react";
+import { format, parseISO } from "date-fns";
+import { cn } from "@/lib/utils";
 import {
   UseFormRegister,
   FieldErrors,
@@ -34,6 +40,10 @@ export function EventFormStep2({
   onRemoveCategory,
   existingTicketCategories,
 }: Step2Props) {
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const dateValue = watch("date");
+  const selectedDate = dateValue ? parseISO(dateValue) : undefined;
+
   return (
     <div className="space-y-6">
       {/* Date & Location */}
@@ -54,14 +64,34 @@ export function EventFormStep2({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label htmlFor="date" className="text-sm font-medium">Date <span className="text-red-500">*</span></Label>
-            <Input
-              id="date"
-              type="date"
-              className="h-11 rounded-xl"
-              {...register("date")}
-              disabled={isDisabled}
-            />
+            <Label className="text-sm font-medium">Date <span className="text-red-500">*</span></Label>
+            <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  disabled={isDisabled}
+                  className={cn(
+                    "h-11 w-full rounded-xl justify-start text-left font-normal",
+                    !selectedDate && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={(day) => {
+                    setValue("date", day ? format(day, "yyyy-MM-dd") : "");
+                    setCalendarOpen(false);
+                  }}
+                  disabled={(day) => day < new Date(new Date().setHours(0, 0, 0, 0))}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
             {errors.date && <p className="text-xs text-red-500">{errors.date.message}</p>}
           </div>
           <div className="space-y-1.5">
