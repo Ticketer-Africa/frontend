@@ -15,6 +15,19 @@ export const useEventBySlugV2 = (slug: string) => {
   });
 };
 
+export const useEventByIdV2 = (id: string) => {
+  return useQuery<EventV2, Error>({
+    queryKey: ["eventV2", id],
+    queryFn: () => eventsV2API.getEventByIdV2(id),
+    enabled: !!id,
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+};
+
 export const useCreateEventV2 = () => {
   const queryClient = useQueryClient();
   return useMutation<EventV2, Error, FormData>({

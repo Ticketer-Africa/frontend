@@ -10,6 +10,12 @@ export const getEventBySlugV2 = async (slug: string): Promise<EventV2> => {
   return res.data;
 };
 
+export const getEventByIdV2 = async (id: string): Promise<EventV2> => {
+  const endpoint = buildEndpoint(API_VERSION, `events/${id}`);
+  const res = await axios.get(endpoint);
+  return res.data;
+};
+
 export const createEventV2 = async (formData: FormData): Promise<EventV2> => {
   const endpoint = buildEndpoint(API_VERSION, "events/create");
   const res = await axios.post<EventV2>(endpoint, formData, {
