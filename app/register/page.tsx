@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Eye, EyeOff, User, BarChart3 } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -24,7 +24,6 @@ const registerSchema = z
     email: z.string().email("Invalid email"),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string().min(8, "Confirm your password"),
-    role: z.enum(["USER", "ORGANIZER"]),
     agreementAccepted: z.boolean().refine((value) => value, {
       message: "You must accept the Service Agreement to continue",
     }),
@@ -45,7 +44,6 @@ export default function RegisterPage() {
   const intent = searchParams.get("intent");
   const redirect =
     searchParams.get("redirect") ?? searchParams.get("returnUrl");
-  const initialRole = intent === "organizer" ? "ORGANIZER" : "USER";
   const loginParams = new URLSearchParams();
   if (intent === "organizer") {
     loginParams.set("intent", "organizer");
@@ -61,9 +59,7 @@ export default function RegisterPage() {
     register,
     control,
     handleSubmit,
-    setValue,
     trigger,
-    watch,
     formState: { errors },
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
@@ -72,7 +68,6 @@ export default function RegisterPage() {
       email: "",
       password: "",
       confirmPassword: "",
-      role: initialRole,
       agreementAccepted: false,
     },
   });
@@ -81,7 +76,7 @@ export default function RegisterPage() {
   const becomeOrganizerMutation = useBecomeOrganizer();
 
   const goToNextStep = async () => {
-    const isStepOneValid = await trigger(["name", "email", "role"]);
+    const isStepOneValid = await trigger(["name", "email"]);
     if (isStepOneValid) {
       setStep(2);
     }
@@ -96,10 +91,7 @@ export default function RegisterPage() {
       };
 
       await registerUser(payload);
-
-      if (data.role === "ORGANIZER") {
-        await becomeOrganizerMutation.mutateAsync(data.email);
-      }
+      await becomeOrganizerMutation.mutateAsync(data.email);
 
       localStorage.setItem(
         "otpPayload",
@@ -169,37 +161,6 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               {step === 1 && (
                 <>
-                  {/* Role Selection */}
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium">Account Type</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button
-                        type="button"
-                        className={`flex items-center space-x-2 rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300 ${
-                          watch("role") === "USER"
-                            ? "bg-[#1E88E5] hover:bg-blue-500 text-white"
-                            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                        }`}
-                        onClick={() => setValue("role", "USER")}
-                      >
-                        <User className="h-4 w-4" />
-                        <span>Event Goer</span>
-                      </Button>
-                      <Button
-                        type="button"
-                        className={`flex items-center space-x-2 rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300 ${
-                          watch("role") === "ORGANIZER"
-                            ? "bg-[#1E88E5] hover:bg-blue-500 text-white"
-                            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                        }`}
-                        onClick={() => setValue("role", "ORGANIZER")}
-                      >
-                        <BarChart3 className="h-4 w-4" />
-                        <span>Organizer</span>
-                      </Button>
-                    </div>
-                  </div>
-
                   <div className="space-y-2">
                     <label htmlFor="name" className="text-sm font-medium">
                       Full Name
