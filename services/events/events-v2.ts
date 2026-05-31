@@ -16,6 +16,32 @@ export const getEventByIdV2 = async (id: string): Promise<EventV2> => {
   return res.data;
 };
 
+export const getAllEventsV2 = async (
+  page?: number,
+  name?: string,
+  minPrice?: number,
+  maxPrice?: number,
+) => {
+  const params = new URLSearchParams();
+  if (page) params.append("page", page.toString());
+  if (name) params.append("name", name);
+  if (minPrice !== undefined) params.append("minPrice", minPrice.toString());
+  if (maxPrice !== undefined) params.append("maxPrice", maxPrice.toString());
+
+  const endpoint = buildEndpoint(
+    API_VERSION,
+    `events${params.toString() ? "?" + params.toString() : ""}`,
+  );
+  const res = await axios.get(endpoint);
+  return res.data;
+};
+
+export const getOrganizerEventsV2 = async () => {
+  const endpoint = buildEndpoint(API_VERSION, "events/organizer/my");
+  const res = await axios.get(endpoint);
+  return res.data;
+};
+
 export const createEventV2 = async (formData: FormData): Promise<EventV2> => {
   const endpoint = buildEndpoint(API_VERSION, "events/create");
   const res = await axios.post<EventV2>(endpoint, formData, {
