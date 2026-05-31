@@ -73,13 +73,6 @@ export default function EventPage({ params }: { params: { slug: string } }) {
   };
 
   const handleCheckout = () => {
-    if (!user) {
-      router.push(
-        `/login?returnUrl=${encodeURIComponent(window.location.href)}`,
-      );
-      return;
-    }
-
     if (selected.size === 0) {
       toast.error("Please select at least one ticket type");
       return;

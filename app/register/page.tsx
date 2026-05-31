@@ -130,7 +130,7 @@ export default function RegisterPage() {
         <Card className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/20">
           <CardHeader className="text-center flex justify-center items-center flex-col space-y-2 p-8">
             <Logo withText={false} size="sm" />
-            <CardTitle className="text-2xl font-bold">Organizer Sign Up</CardTitle>
+            <CardTitle className="text-2xl font-bold">Sign Up</CardTitle>
             <p className="text-muted-foreground">Create your organizer account to start hosting events</p>
           </CardHeader>
 
