@@ -19,12 +19,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter, useParams } from "next/navigation";
-import {
-  useDeleteEvent,
-  useOrganizerEvents,
-} from "@/services/events/events.queries";
-import { useEffect, useState } from "react";
-import { Event } from "@/types/events.type";
+import { useDeleteEvent } from "@/services/events/events.queries";
+import { useEventByIdV2 } from "@/services/events/events-v2.queries";
+import { EventV2 } from "@/types/events-v2.type";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import {
   DropdownMenu,
@@ -49,8 +47,7 @@ export default function EventDashboard() {
   const router = useRouter();
   const params = useParams();
   const { id } = params; // Extract id from dynamic route
-  const { data: organizerEventList, isLoading: eventsLoading } =
-    useOrganizerEvents();
+  const { data: event, isLoading: eventsLoading } = useEventByIdV2(id as string);
   const { mutate: deleteEvent } = useDeleteEvent();
   const { toast } = useToast();
 
@@ -70,13 +67,6 @@ export default function EventDashboard() {
       </div>
     );
   }
-
-  // Handle both array and paginated response formats
-  const organizerEvents: Event[] = Array.isArray(organizerEventList)
-    ? organizerEventList
-    : (organizerEventList?.data ?? []);
-
-  const event: Event = organizerEvents.find((e: Event) => e.id === id);
 
   if (!event) {
     return (
