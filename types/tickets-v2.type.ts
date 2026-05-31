@@ -14,10 +14,18 @@ export interface TicketPurchaseItemV2 {
   recipients?: RecipientV2[];
 }
 
+export interface CustomFieldResponse {
+  customFieldId: string;
+  value: string;
+}
+
 export interface BuyTicketsV2Payload {
   eventId: string;
   ticketCategories: TicketPurchaseItemV2[];
   discountCode?: string;
+  inviteToken?: string;
+  occurrenceId?: string;
+  customFieldResponses?: CustomFieldResponse[];
 }
 
 export interface BuyTicketsV2Response {
