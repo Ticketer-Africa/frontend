@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { useToast } from "@/hooks/use-toast";
 import {
   useListDiscounts,
@@ -601,17 +602,13 @@ export default function EventManagementTabs({
                 <Label htmlFor="msg-schedule">
                   Schedule For (optional)
                 </Label>
-                <Input
-                  id="msg-schedule"
-                  type="datetime-local"
+                <DateTimePicker
                   value={messageForm.scheduledFor}
-                  onChange={(e) =>
-                    setMessageForm((f) => ({
-                      ...f,
-                      scheduledFor: e.target.value,
-                    }))
+                  onChange={(val) =>
+                    setMessageForm((f) => ({ ...f, scheduledFor: val }))
                   }
                   disabled={sendingMessage}
+                  placeholder="Schedule for later (optional)"
                 />
               </div>
               <Button
