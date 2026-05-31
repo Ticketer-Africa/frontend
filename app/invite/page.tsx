@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, CheckCircle, Loader } from "lucide-react";
@@ -30,20 +30,7 @@ export default function InviteAcceptancePage() {
   const email = searchParams.get("email");
   const inviteToken = searchParams.get("i");
 
-  useEffect(() => {
-    if (inviteToken) {
-      resolvePersonalInvite(inviteToken);
-      return;
-    }
-    if (!inviteId || !email) {
-      setStatus("invalid");
-      setMessage("Invalid invitation link. Missing required parameters.");
-      return;
-    }
-    acceptInvite(inviteId, decodeURIComponent(email));
-  }, [inviteToken, inviteId, email]);
-
-  const resolvePersonalInvite = async (token: string) => {
+  const resolvePersonalInvite = useCallback(async (token: string) => {
     try {
       setStatus("loading");
       const response = await fetch(
@@ -54,16 +41,21 @@ export default function InviteAcceptancePage() {
         throw new Error(err.message || "Failed to resolve invite");
       }
       const data = await response.json();
-      sessionStorage.setItem(
-        "inviteSession",
-        JSON.stringify({
-          inviteToken: token,
-          guestName: data.invitee?.name ?? "",
-          guestEmail: data.invitee?.email ?? "",
-        }),
-      );
+      try {
+        sessionStorage.setItem(
+          "inviteSession",
+          JSON.stringify({
+            inviteToken: token,
+            guestName: data.invitee?.name ?? "",
+            guestEmail: data.invitee?.email ?? "",
+          }),
+        );
+      } catch {
+        // sessionStorage unavailable — proceed without storing
+      }
       const slug = data.event?.slug;
       if (slug) {
+        // Hard redirect so event page loads fresh with server-side data
         window.location.href = `/events/${slug}`;
       } else {
         setStatus("error");
@@ -75,7 +67,20 @@ export default function InviteAcceptancePage() {
         error instanceof Error ? error.message : "Failed to resolve invite.",
       );
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (inviteToken) {
+      resolvePersonalInvite(inviteToken);
+      return;
+    }
+    if (!inviteId || !email) {
+      setStatus("invalid");
+      setMessage("Invalid invitation link. Missing required parameters.");
+      return;
+    }
+    acceptInvite(inviteId, decodeURIComponent(email));
+  }, [inviteToken, inviteId, email, resolvePersonalInvite]);
 
   const acceptInvite = async (id: string, inviteeEmail: string) => {
     try {
