@@ -13,8 +13,8 @@ interface ProgressBarProps {
  */
 export function ProgressBar({
   currentStep,
-  totalSteps = 3,
-  labels = ["Event Details", "Date & Pricing", "Review & Submit"],
+  totalSteps = 4,
+  labels = ["Event Details", "Date & Tickets", "Review & Fees", "Advanced"],
 }: ProgressBarProps) {
   return (
     <div className="mb-8 max-w-2xl mx-auto">
@@ -32,7 +32,7 @@ export function ProgressBar({
             </div>
             {step < totalSteps && (
               <div
-                className={`w-16 h-1 mx-2 transition-colors ${
+                className={`w-8 sm:w-12 h-1 mx-1 sm:mx-2 transition-colors ${
                   step < currentStep ? "bg-[#1E88E5]" : "bg-gray-200"
                 }`}
               />

@@ -22,7 +22,7 @@ interface FormNavigationProps {
  */
 export function FormNavigation({
   currentStep,
-  totalSteps = 3,
+  totalSteps = 4,
   canProceed,
   isSubmitting,
   submitLabel = "Create Event",
