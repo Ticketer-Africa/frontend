@@ -3,11 +3,78 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UseFormWatch, UseFormSetValue, UseFormRegister, FieldErrors } from "react-hook-form";
-import { Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronUp, CalendarIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format, parseISO } from "date-fns";
+import { cn } from "@/lib/utils";
 import { EventFormData, OccurrenceFormData, CustomFieldFormData } from "./event-form-schema";
+
+// Combined date + time picker that stores as "yyyy-MM-ddTHH:mm" string
+function DateTimePicker({
+  value,
+  onChange,
+  disabled,
+  placeholder = "Pick a date",
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  disabled?: boolean;
+  placeholder?: string;
+}) {
+  const [open, setOpen] = useState(false);
+
+  const datePart = value ? value.split("T")[0] : "";
+  const timePart = value ? (value.split("T")[1] ?? "") : "";
+  const selectedDate = datePart ? parseISO(datePart) : undefined;
+
+  const update = (newDate: string, newTime: string) => {
+    if (newDate) onChange(`${newDate}T${newTime || "00:00"}`);
+    else onChange("");
+  };
+
+  return (
+    <div className="flex gap-2">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            disabled={disabled}
+            className={cn(
+              "h-10 flex-1 rounded-xl justify-start text-left text-sm font-normal",
+              !selectedDate && "text-muted-foreground"
+            )}
+          >
+            <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+            {selectedDate ? format(selectedDate, "dd MMM yyyy") : placeholder}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={(day) => {
+              update(day ? format(day, "yyyy-MM-dd") : "", timePart);
+              setOpen(false);
+            }}
+            initialFocus
+          />
+        </PopoverContent>
+      </Popover>
+      <Input
+        type="time"
+        value={timePart}
+        onChange={(e) => update(datePart, e.target.value)}
+        disabled={disabled || !datePart}
+        className="h-10 w-28 rounded-xl text-sm appearance-none border-0 shadow-none ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+      />
+    </div>
+  );
+}
 
 interface Step4Props {
   watch: UseFormWatch<EventFormData>;
@@ -142,11 +209,11 @@ export function EventFormStep4({ watch, setValue, register, errors, isDisabled }
           </div>
           <div className="space-y-1.5">
             <Label className="text-sm font-medium">Release Link to Attendees At (optional)</Label>
-            <Input
-              type="datetime-local"
-              className="h-11 rounded-xl"
-              {...register("virtualLinkReleaseAt")}
+            <DateTimePicker
+              value={watch("virtualLinkReleaseAt") ?? ""}
+              onChange={(val) => setValue("virtualLinkReleaseAt", val)}
               disabled={isDisabled}
+              placeholder="Pick a date & time"
             />
             <p className="text-xs text-gray-400">Leave blank to release immediately after purchase</p>
           </div>
@@ -178,22 +245,20 @@ export function EventFormStep4({ watch, setValue, register, errors, isDisabled }
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label className="text-xs font-medium">Start Date & Time <span className="text-red-500">*</span></Label>
-                  <Input
-                    type="datetime-local"
-                    className="h-10 rounded-xl text-sm"
+                  <DateTimePicker
                     value={occ.startsAt}
-                    onChange={(e) => updateOccurrence(occ.id, "startsAt", e.target.value)}
+                    onChange={(val) => updateOccurrence(occ.id, "startsAt", val)}
                     disabled={isDisabled}
+                    placeholder="Start date"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-xs font-medium">End Date & Time (optional)</Label>
-                  <Input
-                    type="datetime-local"
-                    className="h-10 rounded-xl text-sm"
+                  <DateTimePicker
                     value={occ.endsAt ?? ""}
-                    onChange={(e) => updateOccurrence(occ.id, "endsAt", e.target.value)}
+                    onChange={(val) => updateOccurrence(occ.id, "endsAt", val)}
                     disabled={isDisabled}
+                    placeholder="End date"
                   />
                 </div>
               </div>
