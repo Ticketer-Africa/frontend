@@ -7,12 +7,12 @@ import { Calendar, MapPin, Ticket } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatPrice, formatDate, formatTime } from "@/lib/helpers";
-import { Event } from "@/types/events.type";
+import { EventV2 } from "@/types/events-v2.type";
 import { getTicketStats } from "./utils";
 import { EVENT_IMAGE_WIDTH, EVENT_IMAGE_HEIGHT } from "./constants";
 
 interface ExploreEventCardProps {
-  event: Event;
+  event: EventV2;
   /**
    * Priority loading - only true for first 3 cards (above the fold)
    * Performance: Ensures LCP image loads with high priority
@@ -39,7 +39,7 @@ function ExploreEventCardComponent({
 
   // Calculate price display once
   const lowestPrice = ticketCategories.length
-    ? Math.min(...ticketCategories.map((t) => t.price))
+    ? Math.min(...ticketCategories.map((t) => t.displayPrice))
     : 0;
   const priceDisplay =
     lowestPrice > 0 ? `From ${formatPrice(lowestPrice)}` : "Free";
@@ -166,7 +166,7 @@ function ExploreEventCardComponent({
                   >
                     <span className="line-clamp-1">
                       {ticket.name} (
-                      {ticket.price === 0 ? "Free" : formatPrice(ticket.price)})
+                      {ticket.displayPrice === 0 ? "Free" : formatPrice(ticket.displayPrice)})
                     </span>
                     <span
                       className={

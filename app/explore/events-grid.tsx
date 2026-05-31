@@ -1,11 +1,11 @@
 "use client";
 
 import { memo } from "react";
-import { Event } from "@/types/events.type";
+import { EventV2 } from "@/types/events-v2.type";
 import { ExploreEventCard } from "./explore-event-card";
 
 interface EventsGridProps {
-  events: Event[];
+  events: EventV2[];
 }
 
 /**
