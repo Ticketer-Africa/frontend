@@ -119,31 +119,30 @@ export default function CheckoutPage() {
       try {
         const inv = JSON.parse(inviteRaw);
         setInviteSession(inv);
-        // Pre-fill first recipient from personal invite
-        if (inv.guestName || inv.guestEmail) {
-          const firstCategoryId = parsed.tickets[0]?.ticketCategoryId;
-          if (firstCategoryId) {
-            setRecipients((prev) => ({
-              ...prev,
-              [firstCategoryId]: [
-                {
-                  recipientName: inv.guestName ?? "",
-                  recipientEmail: inv.guestEmail ?? "",
-                },
-              ],
-            }));
-          }
-        }
       } catch {}
     }
 
     // Initialize recipients if multiple recipients is toggled
     if (useMultipleRecipients) {
       const recipientsByCategory: RecipientForm = {};
-      parsed.tickets.forEach((ticket) => {
+      // Parse invite pre-fill if available
+      let invitePreFill: { recipientName: string; recipientEmail: string } | null = null;
+      if (inviteRaw) {
+        try {
+          const inv = JSON.parse(inviteRaw);
+          if (inv.guestName || inv.guestEmail) {
+            invitePreFill = { recipientName: inv.guestName ?? "", recipientEmail: inv.guestEmail ?? "" };
+          }
+        } catch {}
+      }
+      parsed.tickets.forEach((ticket, idx) => {
         recipientsByCategory[ticket.ticketCategoryId] = Array(ticket.quantity)
           .fill(null)
-          .map(() => ({ recipientName: "", recipientEmail: "" }));
+          .map((_, i) =>
+            idx === 0 && i === 0 && invitePreFill
+              ? invitePreFill
+              : { recipientName: "", recipientEmail: "" }
+          );
       });
       setRecipients(recipientsByCategory);
     }
@@ -188,14 +187,18 @@ export default function CheckoutPage() {
     const errors: { [key: string]: string } = {};
     let isValid = true;
     for (const field of checkoutData.customFields) {
-      if (field.required && !customFieldValues[field.id]?.trim()) {
+      const value = customFieldValues[field.id]?.trim() ?? "";
+      if (field.required && !value) {
         errors[`cf-${field.id}`] = `${field.label} is required`;
+        isValid = false;
+      } else if (field.fieldType === "EMAIL" && value && !validateEmail(value)) {
+        errors[`cf-${field.id}`] = `${field.label} must be a valid email address`;
         isValid = false;
       }
     }
     setValidationErrors((prev) => ({ ...prev, ...errors }));
     return isValid;
-  }, [checkoutData, customFieldValues]);
+  }, [checkoutData, customFieldValues, validateEmail]);
 
   const handleRecipientChange = useCallback(
     (
