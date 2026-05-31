@@ -10,7 +10,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useEventBySlugV2 } from "@/services/events/events-v2.queries";
-import { EventV2, TicketCategoryV2 } from "@/types/events-v2.type";
+import { EventV2, EventOccurrence, TicketCategoryV2 } from "@/types/events-v2.type";
 import { EventHeaderV2 } from "./_components/event-header"; // updated version below
 import { TicketCategoryCardV2 } from "./_components/ticket-category-card"; // improved version below
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [selectedOccurrenceId, setSelectedOccurrenceId] = useState<string | null>(null);
 
   const toggleCategory = (category: TicketCategoryV2) => {
     const id = category.id;
@@ -78,6 +79,12 @@ export default function EventPage({ params }: { params: { slug: string } }) {
       return;
     }
 
+    const isRecurring = event!.isRecurring && (event!.occurrences?.length ?? 0) > 0;
+    if (isRecurring && !selectedOccurrenceId) {
+      toast.error("Please select a date to continue");
+      return;
+    }
+
     const checkoutItems = Array.from(selected).map((id) => {
       const cat = event!.ticketCategories.find((c) => c.id === id)!;
       return {
@@ -94,6 +101,8 @@ export default function EventPage({ params }: { params: { slug: string } }) {
         eventId: event!.id,
         eventName: event!.name,
         tickets: checkoutItems,
+        occurrenceId: selectedOccurrenceId ?? undefined,
+        customFields: event!.customFields ?? [],
       }),
     );
 
@@ -253,26 +262,43 @@ export default function EventPage({ params }: { params: { slug: string } }) {
                   </div>
 
                   <div className="p-5 space-y-4">
-                    {event.ticketCategories?.length ? (
-                      event.ticketCategories.map((cat) => (
-                        <TicketCategoryCardV2
-                          key={cat.id}
-                          category={cat}
-                          isSelected={selected.has(cat.id)}
-                          quantity={quantities[cat.id] ?? 0}
-                          onToggle={() => toggleCategory(cat)}
-                          onQuantityChange={(delta: number) =>
-                            updateQuantity(cat.id, (q) => q + delta)
-                          }
-                          feeMode={event.feeMode}
-                          primaryFeeBps={event.primaryFeeBps}
-                        />
-                      ))
-                    ) : (
-                      <div className="py-10 text-center text-muted-foreground">
-                        No tickets available yet
-                      </div>
+                    {event.isRecurring && (event.occurrences?.length ?? 0) > 0 && (
+                      <OccurrenceSelector
+                        occurrences={event.occurrences!}
+                        selectedId={selectedOccurrenceId}
+                        onSelect={setSelectedOccurrenceId}
+                      />
                     )}
+
+                    <div
+                      className={cn(
+                        "space-y-4 transition-all duration-200",
+                        event.isRecurring && !selectedOccurrenceId
+                          ? "opacity-40 blur-[1px] pointer-events-none"
+                          : "",
+                      )}
+                    >
+                      {event.ticketCategories?.length ? (
+                        event.ticketCategories.map((cat) => (
+                          <TicketCategoryCardV2
+                            key={cat.id}
+                            category={cat}
+                            isSelected={selected.has(cat.id)}
+                            quantity={quantities[cat.id] ?? 0}
+                            onToggle={() => toggleCategory(cat)}
+                            onQuantityChange={(delta: number) =>
+                              updateQuantity(cat.id, (q) => q + delta)
+                            }
+                            feeMode={event.feeMode}
+                            primaryFeeBps={event.primaryFeeBps}
+                          />
+                        ))
+                      ) : (
+                        <div className="py-10 text-center text-muted-foreground">
+                          No tickets available yet
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Desktop order summary */}
@@ -351,6 +377,51 @@ function StatCard({
         {label}
       </div>
       <div className="text-2xl font-bold">{value.toLocaleString()}</div>
+    </div>
+  );
+}
+
+function OccurrenceSelector({
+  occurrences,
+  selectedId,
+  onSelect,
+}: {
+  occurrences: EventOccurrence[];
+  selectedId: string | null;
+  onSelect: (id: string) => void;
+}) {
+  const active = occurrences.filter((o) => o.isActive);
+  if (!active.length) return null;
+
+  return (
+    <div className="rounded-xl border bg-amber-50 border-amber-200 p-4">
+      <p className="text-xs font-semibold text-amber-800 uppercase tracking-wide mb-3">
+        Pick a date to unlock tickets
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {active.map((o) => {
+          const date = new Date(o.startsAt);
+          const label = date.toLocaleDateString("en-NG", { month: "short", day: "numeric" });
+          const sublabel = date.toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" });
+          const isSelected = o.id === selectedId;
+          return (
+            <button
+              key={o.id}
+              onClick={() => onSelect(o.id)}
+              className={cn(
+                "flex flex-col items-center px-3 py-1.5 rounded-full text-sm font-semibold border transition-colors",
+                isSelected
+                  ? "border-2 border-[#1E88E5] bg-blue-50 text-[#1E88E5]"
+                  : "border border-border bg-background text-foreground hover:border-[#1E88E5]",
+              )}
+              title={`${sublabel}${o.locationOverride ? " · " + o.locationOverride : ""}`}
+            >
+              {label}
+              <span className="text-[10px] font-normal opacity-70">{sublabel}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
