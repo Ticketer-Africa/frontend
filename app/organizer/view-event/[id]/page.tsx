@@ -41,6 +41,7 @@ import {
 } from "@radix-ui/react-dialog";
 import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
 import { formatPrice } from "@/lib/helpers";
+import EventManagementTabs from "./EventManagementTabs";
 
 export default function EventDashboard() {
   const { user: currentUser } = useAuth();
@@ -393,6 +394,19 @@ export default function EventDashboard() {
                 </p>
               </CardContent>
             </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+            className="mt-8"
+          >
+            <EventManagementTabs
+              eventId={event.id}
+              accessType={event.accessType}
+              eventSlug={event.slug}
+            />
           </motion.div>
         </motion.div>
       </div>
