@@ -49,3 +49,35 @@ export const useUpdateEventV2 = () => {
     },
   });
 };
+
+export const useAllEventsV2 = (
+  page?: number,
+  name?: string,
+  minPrice?: number,
+  maxPrice?: number,
+) => {
+  return useQuery({
+    queryKey: ["eventsV2", page, name, minPrice, maxPrice],
+    queryFn: () => eventsV2API.getAllEventsV2(page, name, minPrice, maxPrice),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    retry: (failureCount, error: any) => {
+      const status = error?.response?.status;
+      if (status >= 400 && status < 500) return false;
+      return failureCount < 2;
+    },
+  });
+};
+
+export const useOrganizerEventsV2 = () => {
+  return useQuery({
+    queryKey: ["eventsV2", "organizer"],
+    queryFn: eventsV2API.getOrganizerEventsV2,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+};
