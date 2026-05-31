@@ -87,11 +87,6 @@ export default function CheckoutPage() {
 
   // Load checkout data from session
   useEffect(() => {
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-
     const data = sessionStorage.getItem("checkoutData");
     if (!data) {
       router.push("/explore");
@@ -111,7 +106,7 @@ export default function CheckoutPage() {
       });
       setRecipients(recipientsByCategory);
     }
-  }, [user, router, useMultipleRecipients]);
+  }, [router, useMultipleRecipients]);
 
   const validateEmail = useCallback((email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
