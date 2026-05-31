@@ -43,9 +43,7 @@ export default function ShareableInvitePage() {
     );
   }
 
-  const handleRequestAccess = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+  const requestAccess = async () => {
     if (!email.trim()) {
       setError("Please enter your email address.");
       return;
@@ -64,6 +62,12 @@ export default function ShareableInvitePage() {
     }
   };
 
+  const handleRequestAccess = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    requestAccess();
+  };
+
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -78,7 +82,11 @@ export default function ShareableInvitePage() {
         email: email.trim(),
         otp: otp.trim(),
       });
-      const { accessToken, eventSlug: returnedSlug } = res.data;
+      const { accessToken, eventSlug: returnedSlug } = res.data ?? {};
+      if (!accessToken) {
+        setError("Server error: missing access token. Please try again.");
+        return;
+      }
       router.push(`/events/${returnedSlug ?? eventSlug}?accessToken=${accessToken}`);
     } catch (err: any) {
       setError(err.response?.data?.message ?? "Invalid or expired code. Please try again.");
@@ -159,7 +167,7 @@ export default function ShareableInvitePage() {
                 <button
                   type="button"
                   className="text-[#1E88E5] hover:underline"
-                  onClick={() => { setOtp(""); setError(""); handleRequestAccess({ preventDefault: () => {} } as any); }}
+                  onClick={() => { setOtp(""); setError(""); requestAccess(); }}
                 >
                   Resend code
                 </button>
