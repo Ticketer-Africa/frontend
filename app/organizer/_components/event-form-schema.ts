@@ -161,7 +161,7 @@ export const DEFAULT_FORM_VALUES: Partial<EventFormData> = {
   category: "",
   location: "",
   date: "",
-  time: "",
+  time: "20:00",
   feeMode: "ORGANIZER",
   accessType: "PUBLIC",
   isVirtual: false,
