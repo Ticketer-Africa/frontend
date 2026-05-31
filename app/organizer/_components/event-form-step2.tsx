@@ -70,7 +70,7 @@ export function EventFormStep2({
             <Input
               id="time"
               type="time"
-              className="h-11 rounded-xl appearance-none border-0 shadow-none ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+              className="h-11 rounded-xl appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
               {...register("time")}
               disabled={isDisabled}
             />

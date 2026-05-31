@@ -51,7 +51,7 @@ export function DateTimePicker({
             {selectedDate ? format(selectedDate, "dd MMM yyyy") : placeholder}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="w-fit p-0" align="start">
           <Calendar
             mode="single"
             selected={selectedDate}
@@ -69,7 +69,7 @@ export function DateTimePicker({
         value={timePart}
         onChange={(e) => update(datePart, e.target.value)}
         disabled={disabled || !datePart}
-        className="h-10 w-28 rounded-xl text-sm appearance-none border-0 shadow-none ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+        className="h-10 w-28 rounded-xl text-sm appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
       />
     </div>
   );
