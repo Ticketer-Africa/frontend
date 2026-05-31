@@ -69,6 +69,7 @@ export default function EventManagementTabs({
 
   const handleCreateDiscount = () => {
     if (!discountForm.code || !discountForm.value) return;
+    const { code } = discountForm;
     createDiscount(
       {
         code: discountForm.code,
@@ -81,7 +82,7 @@ export default function EventManagementTabs({
       {
         onSuccess: () => {
           setDiscountForm({ code: "", type: "PERCENT", value: "", usageLimit: "" });
-          toast({ title: "Discount created", description: `Code "${discountForm.code}" added.` });
+          toast({ title: "Discount created", description: `Code "${code}" added.` });
         },
         onError: () => {
           toast({ title: "Error", description: "Failed to create discount code.", variant: "destructive" });
@@ -144,7 +145,9 @@ export default function EventManagementTabs({
       {
         subject: messageForm.subject,
         body: messageForm.body,
-        scheduledFor: messageForm.scheduledFor || undefined,
+        scheduledFor: messageForm.scheduledFor
+          ? new Date(messageForm.scheduledFor).toISOString()
+          : undefined,
       },
       {
         onSuccess: () => {
@@ -483,7 +486,7 @@ export default function EventManagementTabs({
                 ) : shareableLink?.token ? (
                   <div className="space-y-3">
                     <p className="text-sm break-all bg-muted px-3 py-2 rounded-md font-mono">
-                      {`${window.location.origin}/invite/shareable?s=${shareableLink.token}&eventSlug=${eventSlug}`}
+                      {`${typeof window !== "undefined" ? window.location.origin : ""}/invite/shareable?s=${shareableLink.token}&eventSlug=${eventSlug}`}
                     </p>
                     <div className="flex gap-2">
                       <Button

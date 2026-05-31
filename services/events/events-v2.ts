@@ -12,7 +12,7 @@ export const getEventBySlugV2 = async (slug: string): Promise<EventV2> => {
 
 export const getEventByIdV2 = async (id: string): Promise<EventV2> => {
   const endpoint = buildEndpoint(API_VERSION, `events/${id}`);
-  const res = await axios.get(endpoint);
+  const res = await axios.get<EventV2>(endpoint);
   return res.data;
 };
 
