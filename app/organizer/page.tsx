@@ -18,12 +18,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/helpers";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
-import {
-  useDeleteEvent,
-  useOrganizerEvents,
-} from "@/services/events/events.queries";
+import { useDeleteEvent } from "@/services/events/events.queries";
+import { useOrganizerEventsV2 } from "@/services/events/events-v2.queries";
 import { useEffect, useState } from "react";
-import { Event } from "@/types/events.type";
+import { EventV2 } from "@/types/events-v2.type";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,7 +43,7 @@ export default function OrganizerDashboard() {
   const { user: currentUser } = useAuth();
   const router = useRouter();
   const { data: organizerEventList, isLoading: eventsLoading } =
-    useOrganizerEvents();
+    useOrganizerEventsV2();
   const { mutate: deleteEvent } = useDeleteEvent();
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -62,14 +60,14 @@ export default function OrganizerDashboard() {
     );
   }
   // Handle both array and paginated response formats
-  const organizerEvents: Event[] = Array.isArray(organizerEventList)
+  const organizerEvents: EventV2[] = Array.isArray(organizerEventList)
     ? organizerEventList
     : organizerEventList?.data ?? [];
 
   // Safe calculations
   const totalEvents = organizerEvents?.length || 0;
   const totalTicketsSold =
-    organizerEvents?.reduce((eventsum, event: Event) => {
+    organizerEvents?.reduce((eventsum, event: EventV2) => {
       const eventMinted =
         event.ticketCategories?.reduce(
           (catSum, cat) => catSum + (cat.minted || 0),
@@ -78,7 +76,7 @@ export default function OrganizerDashboard() {
       return eventsum + eventMinted;
     }, 0) || 0;
   const totalRevenue =
-    organizerEvents?.reduce((sum, event: Event) => {
+    organizerEvents?.reduce((sum, event: EventV2) => {
       const eventRevenue =
         event.ticketCategories?.reduce((catSum, cat) => {
           return catSum + (cat.minted || 0) * (cat.price || 0);
@@ -223,7 +221,7 @@ export default function OrganizerDashboard() {
               <CardContent>
                 {organizerEvents?.length > 0 ? (
                   <div className="space-y-4">
-                    {organizerEvents?.map((event: Event, index: number) => (
+                    {organizerEvents?.map((event: EventV2, index: number) => (
                       <motion.div
                         key={event.id}
                         initial={{ opacity: 0, x: -20 }}
