@@ -115,9 +115,10 @@ export default function CheckoutPage() {
 
     // Load invite session if present
     const inviteRaw = sessionStorage.getItem("inviteSession");
+    let inv: { guestName?: string; guestEmail?: string } | null = null;
     if (inviteRaw) {
       try {
-        const inv = JSON.parse(inviteRaw);
+        inv = JSON.parse(inviteRaw);
         setInviteSession(inv);
       } catch {}
     }
@@ -125,15 +126,10 @@ export default function CheckoutPage() {
     // Initialize recipients if multiple recipients is toggled
     if (useMultipleRecipients) {
       const recipientsByCategory: RecipientForm = {};
-      // Parse invite pre-fill if available
+      // Use already-parsed invite for pre-fill if available
       let invitePreFill: { recipientName: string; recipientEmail: string } | null = null;
-      if (inviteRaw) {
-        try {
-          const inv = JSON.parse(inviteRaw);
-          if (inv.guestName || inv.guestEmail) {
-            invitePreFill = { recipientName: inv.guestName ?? "", recipientEmail: inv.guestEmail ?? "" };
-          }
-        } catch {}
+      if (inv && (inv.guestName || inv.guestEmail)) {
+        invitePreFill = { recipientName: inv.guestName ?? "", recipientEmail: inv.guestEmail ?? "" };
       }
       parsed.tickets.forEach((ticket, idx) => {
         recipientsByCategory[ticket.ticketCategoryId] = Array(ticket.quantity)

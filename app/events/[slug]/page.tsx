@@ -79,7 +79,10 @@ export default function EventPage({ params }: { params: { slug: string } }) {
       return;
     }
 
-    const isRecurring = event!.isRecurring && (event!.occurrences?.length ?? 0) > 0;
+    const activeOccurrences = event!.isRecurring
+      ? (event!.occurrences ?? []).filter((o) => o.isActive)
+      : [];
+    const isRecurring = activeOccurrences.length > 0;
     if (isRecurring && !selectedOccurrenceId) {
       toast.error("Please select a date to continue");
       return;
@@ -262,7 +265,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
                   </div>
 
                   <div className="p-5 space-y-4">
-                    {event.isRecurring && (event.occurrences?.length ?? 0) > 0 && (
+                    {event.isRecurring && (event.occurrences ?? []).some((o) => o.isActive) && (
                       <OccurrenceSelector
                         occurrences={event.occurrences!}
                         selectedId={selectedOccurrenceId}
@@ -273,7 +276,9 @@ export default function EventPage({ params }: { params: { slug: string } }) {
                     <div
                       className={cn(
                         "space-y-4 transition-all duration-200",
-                        event.isRecurring && !selectedOccurrenceId
+                        event.isRecurring &&
+                        (event.occurrences ?? []).some((o) => o.isActive) &&
+                        !selectedOccurrenceId
                           ? "opacity-40 blur-[1px] pointer-events-none"
                           : "",
                       )}

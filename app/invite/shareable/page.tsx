@@ -87,7 +87,7 @@ export default function ShareableInvitePage() {
         setError("Server error: missing access token. Please try again.");
         return;
       }
-      router.push(`/events/${returnedSlug ?? eventSlug}?accessToken=${accessToken}`);
+      router.push(`/events/${returnedSlug ?? eventSlug}?accessToken=${encodeURIComponent(accessToken)}`);
     } catch (err: any) {
       setError(err.response?.data?.message ?? "Invalid or expired code. Please try again.");
     } finally {

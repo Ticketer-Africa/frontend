@@ -69,20 +69,7 @@ export default function InviteAcceptancePage() {
     }
   }, []);
 
-  useEffect(() => {
-    if (inviteToken) {
-      resolvePersonalInvite(inviteToken);
-      return;
-    }
-    if (!inviteId || !email) {
-      setStatus("invalid");
-      setMessage("Invalid invitation link. Missing required parameters.");
-      return;
-    }
-    acceptInvite(inviteId, decodeURIComponent(email));
-  }, [inviteToken, inviteId, email, resolvePersonalInvite]);
-
-  const acceptInvite = async (id: string, inviteeEmail: string) => {
+  const acceptInvite = useCallback(async (id: string, inviteeEmail: string) => {
     try {
       setStatus("loading");
 
@@ -124,7 +111,20 @@ export default function InviteAcceptancePage() {
           : "Failed to accept invite. Please try again.",
       );
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    if (inviteToken) {
+      resolvePersonalInvite(inviteToken);
+      return;
+    }
+    if (!inviteId || !email) {
+      setStatus("invalid");
+      setMessage("Invalid invitation link. Missing required parameters.");
+      return;
+    }
+    acceptInvite(inviteId, decodeURIComponent(email));
+  }, [inviteToken, inviteId, email, resolvePersonalInvite, acceptInvite]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 px-4">
