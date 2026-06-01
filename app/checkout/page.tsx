@@ -1,8 +1,3 @@
-/**
- * Checkout Page - Redesigned
- * Full-page checkout with recipient toggle and validation
- */
-
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -15,7 +10,6 @@ import { DiscountDetailsResponse } from "@/services/discounts/discounts";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -23,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -34,12 +29,18 @@ import { EventCustomField } from "@/types/events-v2.type";
 import { toast } from "sonner";
 import {
   AlertCircle,
-  Loader,
+  Loader2,
   ArrowLeft,
   Users,
-  CheckCircle,
+  CheckCircle2,
   Ticket,
   ShoppingCart,
+  Tag,
+  X,
+  ChevronRight,
+  User,
+  Mail,
+  Sparkles,
 } from "lucide-react";
 
 interface CheckoutData {
@@ -56,7 +57,7 @@ interface CheckoutData {
 }
 
 interface RecipientForm {
-  [key: string]: RecipientV2[];
+  [categoryId: string]: RecipientV2[];
 }
 
 interface DiscountState {
@@ -67,823 +68,681 @@ interface DiscountState {
 export default function CheckoutPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { mutateAsync: buyTickets, isPending: isProcessing } =
-    useBuyTicketsV2();
-  const { mutateAsync: applyDiscount, isPending: isValidatingDiscount } =
-    useApplyDiscountCode();
+  const { mutateAsync: buyTickets, isPending: isProcessing } = useBuyTicketsV2();
+  const { mutateAsync: applyDiscount, isPending: isValidatingDiscount } = useApplyDiscountCode();
 
   const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null);
+  const [dataChecked, setDataChecked] = useState(false);
   const [useMultipleRecipients, setUseMultipleRecipients] = useState(false);
-  const [discountState, setDiscountState] = useState<DiscountState>({
-    appliedDiscount: null,
-    isValidating: false,
-  });
+  const [discountState, setDiscountState] = useState<DiscountState>({ appliedDiscount: null, isValidating: false });
   const [recipients, setRecipients] = useState<RecipientForm>({});
-  const [validationErrors, setValidationErrors] = useState<{
-    [key: string]: string;
-  }>({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
   const [customFieldValues, setCustomFieldValues] = useState<Record<string, string>>({});
+  const [discountCode, setDiscountCode] = useState("");
+  const [buyerEmail, setBuyerEmail] = useState("");
+  const [buyerName, setBuyerName] = useState("");
   const [inviteSession, setInviteSession] = useState<{
     inviteToken?: string;
     guestName?: string;
     guestEmail?: string;
   } | null>(null);
 
-  // Redirect to my-tickets after successful free ticket purchase
   useEffect(() => {
     if (purchaseSuccess) {
-      const timer = setTimeout(() => {
-        router.push("/my-tickets");
-      }, 2000);
+      const timer = setTimeout(() => router.push("/explore"), 2500);
       return () => clearTimeout(timer);
     }
   }, [purchaseSuccess, router]);
-  const [discountCode, setDiscountCode] = useState("");
 
-  // Load checkout data from session
   useEffect(() => {
     const data = sessionStorage.getItem("checkoutData");
-    if (!data) {
-      router.push("/explore");
-      return;
-    }
+    setDataChecked(true);
+    if (!data) return;
 
     const parsed = JSON.parse(data) as CheckoutData;
     setCheckoutData(parsed);
 
-    // Load invite session if present
     const inviteRaw = sessionStorage.getItem("inviteSession");
-    let inv: { guestName?: string; guestEmail?: string } | null = null;
+    let inv: { guestName?: string; guestEmail?: string; inviteToken?: string } | null = null;
     if (inviteRaw) {
       try {
         inv = JSON.parse(inviteRaw);
         setInviteSession(inv);
+        if (inv?.guestEmail) setBuyerEmail(inv.guestEmail);
+        if (inv?.guestName) setBuyerName(inv.guestName);
       } catch {}
     }
-
-    // Initialize recipients if multiple recipients is toggled
-    if (useMultipleRecipients) {
-      const recipientsByCategory: RecipientForm = {};
-      // Use already-parsed invite for pre-fill if available
-      let invitePreFill: { recipientName: string; recipientEmail: string } | null = null;
-      if (inv && (inv.guestName || inv.guestEmail)) {
-        invitePreFill = { recipientName: inv.guestName ?? "", recipientEmail: inv.guestEmail ?? "" };
-      }
-      parsed.tickets.forEach((ticket, idx) => {
-        recipientsByCategory[ticket.ticketCategoryId] = Array(ticket.quantity)
-          .fill(null)
-          .map((_, i) =>
-            idx === 0 && i === 0 && invitePreFill
-              ? invitePreFill
-              : { recipientName: "", recipientEmail: "" }
-          );
-      });
-      setRecipients(recipientsByCategory);
-    }
-  }, [router, useMultipleRecipients]);
-
-  const validateEmail = useCallback((email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
   }, []);
 
-  const validateRecipients = useCallback((): boolean => {
-    const errors: { [key: string]: string } = {};
-    let isValid = true;
+  useEffect(() => {
+    if (!checkoutData || !useMultipleRecipients) return;
+    const recipientsByCategory: RecipientForm = {};
+    checkoutData.tickets.forEach((ticket, idx) => {
+      recipientsByCategory[ticket.ticketCategoryId] = Array(ticket.quantity)
+        .fill(null)
+        .map((_, i) =>
+          idx === 0 && i === 0 && inviteSession?.guestName
+            ? { recipientName: inviteSession.guestName ?? "", recipientEmail: inviteSession.guestEmail ?? "" }
+            : { recipientName: "", recipientEmail: "" }
+        );
+    });
+    setRecipients(recipientsByCategory);
+  }, [useMultipleRecipients, checkoutData, inviteSession]);
+
+  const validateEmail = useCallback((email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), []);
+
+  const clearError = useCallback((key: string) => {
+    setValidationErrors((prev) => {
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  }, []);
+
+  const handleRecipientChange = useCallback(
+    (categoryId: string, index: number, field: "recipientName" | "recipientEmail", value: string) => {
+      setRecipients((prev) => {
+        const updated = { ...prev };
+        if (!updated[categoryId]) updated[categoryId] = [];
+        if (!updated[categoryId][index]) updated[categoryId][index] = { recipientName: "", recipientEmail: "" };
+        updated[categoryId][index] = { ...updated[categoryId][index], [field]: value };
+        return updated;
+      });
+      clearError(`${categoryId}-${index}`);
+    },
+    [clearError]
+  );
+
+  const validate = useCallback((): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (!user && !buyerEmail.trim()) {
+      errors["buyerEmail"] = "Email is required to complete your purchase";
+    } else if (!user && buyerEmail.trim() && !validateEmail(buyerEmail)) {
+      errors["buyerEmail"] = "Please enter a valid email address";
+    }
 
     if (useMultipleRecipients) {
-      Object.entries(recipients).forEach(([categoryId, recipientList]) => {
-        recipientList.forEach((recipient, index) => {
-          const fieldKey = `${categoryId}-${index}`;
-
-          if (!recipient.recipientName.trim()) {
-            errors[fieldKey] = "Name is required";
-            isValid = false;
-          }
-
-          if (!recipient.recipientEmail.trim()) {
-            errors[fieldKey] = "Email is required";
-            isValid = false;
-          } else if (!validateEmail(recipient.recipientEmail)) {
-            errors[fieldKey] = "Invalid email format";
-            isValid = false;
-          }
+      Object.entries(recipients).forEach(([categoryId, list]) => {
+        list.forEach((r, i) => {
+          const key = `${categoryId}-${i}`;
+          if (!r.recipientName.trim()) errors[key] = "Name is required";
+          else if (!r.recipientEmail.trim()) errors[key] = "Email is required";
+          else if (!validateEmail(r.recipientEmail)) errors[key] = "Invalid email address";
         });
       });
+    }
+
+    if (checkoutData?.customFields) {
+      for (const field of checkoutData.customFields) {
+        const val = customFieldValues[field.id]?.trim() ?? "";
+        if (field.required && !val) errors[`cf-${field.id}`] = `${field.label} is required`;
+        else if (field.fieldType === "EMAIL" && val && !validateEmail(val))
+          errors[`cf-${field.id}`] = `${field.label} must be a valid email`;
+      }
     }
 
     setValidationErrors(errors);
-    return isValid;
-  }, [useMultipleRecipients, recipients, validateEmail]);
-
-  const validateCustomFields = useCallback((): boolean => {
-    if (!checkoutData?.customFields?.length) return true;
-    const errors: { [key: string]: string } = {};
-    let isValid = true;
-    for (const field of checkoutData.customFields) {
-      const value = customFieldValues[field.id]?.trim() ?? "";
-      if (field.required && !value) {
-        errors[`cf-${field.id}`] = `${field.label} is required`;
-        isValid = false;
-      } else if (field.fieldType === "EMAIL" && value && !validateEmail(value)) {
-        errors[`cf-${field.id}`] = `${field.label} must be a valid email address`;
-        isValid = false;
-      }
-    }
-    setValidationErrors((prev) => ({ ...prev, ...errors }));
-    return isValid;
-  }, [checkoutData, customFieldValues, validateEmail]);
-
-  const handleRecipientChange = useCallback(
-    (
-      categoryId: string,
-      index: number,
-      field: "recipientName" | "recipientEmail",
-      value: string,
-    ) => {
-      setRecipients((prev) => {
-        const updated = { ...prev };
-        if (!updated[categoryId]) {
-          updated[categoryId] = [];
-        }
-        if (!updated[categoryId][index]) {
-          updated[categoryId][index] = {
-            recipientName: "",
-            recipientEmail: "",
-          };
-        }
-        updated[categoryId][index][field] = value;
-
-        // Clear validation error on change
-        const fieldKey = `${categoryId}-${index}`;
-        setValidationErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors[fieldKey];
-          return newErrors;
-        });
-
-        return updated;
-      });
-    },
-    [],
-  );
+    return Object.keys(errors).length === 0;
+  }, [user, buyerEmail, validateEmail, useMultipleRecipients, recipients, checkoutData, customFieldValues]);
 
   const handleApplyDiscount = useCallback(async () => {
-    if (!discountCode.trim()) {
-      toast.error("Please enter a discount code");
-      return;
-    }
-
-    if (!checkoutData) {
-      toast.error("Checkout data is missing");
-      return;
-    }
+    if (!discountCode.trim()) { toast.error("Please enter a discount code"); return; }
+    if (!checkoutData) return;
 
     try {
-      setDiscountState((prev) => ({ ...prev, isValidating: true }));
-
-      // Calculate total amount from tickets
-      const totalAmount = checkoutData.tickets.reduce((sum, ticket) => {
-        return sum + ticket.price * ticket.quantity;
-      }, 0);
-
+      const totalAmount = checkoutData.tickets.reduce((s, t) => s + t.price * t.quantity, 0);
       const discount = await applyDiscount({
         code: discountCode,
         eventId: checkoutData.eventId,
         amount: totalAmount > 0 ? totalAmount : undefined,
       });
-
-      setDiscountState({
-        appliedDiscount: discount,
-        isValidating: false,
-      });
-
-      toast.success(
-        `Discount applied! You save ${discount.discountAmount ? `₦${(discount.discountAmount / 100).toLocaleString()}` : `${discount.value}${discount.type === "PERCENT" ? "%" : " cents"}`}`,
-      );
+      setDiscountState({ appliedDiscount: discount, isValidating: false });
+      toast.success(`Discount applied!`);
     } catch (error) {
-      setDiscountState((prev) => ({ ...prev, isValidating: false }));
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Failed to apply discount code",
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to apply discount code");
     }
   }, [discountCode, checkoutData, applyDiscount]);
 
   const handlePurchase = useCallback(async () => {
-    if (!checkoutData) {
-      toast.error("Checkout data is missing");
-      return;
-    }
-
-    if (!validateCustomFields()) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
-    if (!validateRecipients()) {
-      toast.error("Please fill in all required fields correctly");
+    if (!checkoutData) return;
+    if (!validate()) {
+      toast.error("Please fix the errors below before continuing");
       return;
     }
 
     setIsSubmitting(true);
-
     try {
       const payload: BuyTicketsV2Payload = {
         eventId: checkoutData.eventId,
-        ticketCategories: checkoutData.tickets.map((ticket) => ({
-          ticketCategoryId: ticket.ticketCategoryId,
-          quantity: ticket.quantity,
-          ...(useMultipleRecipients &&
-            recipients[ticket.ticketCategoryId] && {
-              recipients: recipients[ticket.ticketCategoryId],
-            }),
+        ticketCategories: checkoutData.tickets.map((t) => ({
+          ticketCategoryId: t.ticketCategoryId,
+          quantity: t.quantity,
+          ...(useMultipleRecipients && recipients[t.ticketCategoryId] && {
+            recipients: recipients[t.ticketCategoryId],
+          }),
         })),
-        ...(discountState.appliedDiscount && {
-          discountCode: discountState.appliedDiscount.code,
-        }),
+        ...(!user && buyerEmail.trim() && { buyerEmail: buyerEmail.trim().toLowerCase() }),
+        ...(!user && buyerName.trim() && { buyerName: buyerName.trim() }),
+        ...(discountState.appliedDiscount && { discountCode: discountState.appliedDiscount.code }),
         ...(checkoutData.occurrenceId && { occurrenceId: checkoutData.occurrenceId }),
         ...(inviteSession?.inviteToken && { inviteToken: inviteSession.inviteToken }),
         ...(checkoutData.customFields?.length && {
           customFieldResponses: checkoutData.customFields.map((f) => ({
-            customFieldId: f.id,
+            fieldId: f.id,
             value: customFieldValues[f.id] ?? "",
           })),
         }),
       };
 
       const response = await buyTickets(payload);
-
-      // Clear session data
       sessionStorage.removeItem("checkoutData");
       sessionStorage.removeItem("inviteSession");
 
-      // Redirect to payment URL if available
       if (response.checkoutUrl) {
         window.location.href = response.checkoutUrl;
       } else {
-        // Fallback if no checkout URL
         setPurchaseSuccess(true);
       }
     } catch (error: any) {
-      console.error("Purchase failed:", error);
       toast.error(error.message || "Purchase failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   }, [
-    checkoutData,
-    validateRecipients,
-    validateCustomFields,
-    useMultipleRecipients,
-    recipients,
-    buyTickets,
-    router,
-    inviteSession,
-    customFieldValues,
-    discountState,
+    checkoutData, validate, useMultipleRecipients, recipients, user,
+    buyerEmail, buyerName, discountState, inviteSession, customFieldValues, buyTickets,
   ]);
 
+  // ── Loading state ──────────────────────────────────────────────
+  if (!dataChecked) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-10 h-10 animate-spin text-[#1E88E5]" />
+          <p className="text-muted-foreground text-sm">Loading checkout…</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Empty cart state ───────────────────────────────────────────
   if (!checkoutData) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardContent className="pt-6">
-            <Loader className="w-8 h-8 animate-spin mx-auto text-[#1E88E5]" />
-            <p className="text-center text-gray-600 mt-4">
-              Loading checkout...
-            </p>
-          </CardContent>
-        </Card>
+        <div className="w-full max-w-md text-center">
+          <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-6">
+            <ShoppingCart className="w-10 h-10 text-[#1E88E5]" />
+          </div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">No event selected for checkout</h1>
+          <p className="text-muted-foreground mb-8">
+            Browse our events and select tickets to get started.
+          </p>
+          <Button variant="primary" size="lg" className="w-full" onClick={() => router.push("/explore")}>
+            Explore Events
+            <ChevronRight className="w-4 h-4 ml-1" />
+          </Button>
+        </div>
       </div>
     );
   }
 
+  // ── Success state ──────────────────────────────────────────────
   if (purchaseSuccess) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardContent className="pt-6">
-            <div className="flex justify-center mb-4">
-              <CheckCircle className="w-12 h-12 text-green-500" />
-            </div>
-            <h2 className="text-2xl font-bold text-center text-foreground mb-2">
-              Tickets Claimed!
-            </h2>
-            <p className="text-center text-gray-600 mb-4">
-              Your free tickets have been added to your account.
-            </p>
-            <Button
-              onClick={() => router.push("/my-tickets")}
-              className="w-full bg-[#1E88E5] hover:bg-blue-600"
-            >
-              View My Tickets
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="w-full max-w-md text-center">
+          <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-6">
+            <CheckCircle2 className="w-10 h-10 text-green-500" />
+          </div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Tickets Claimed!</h1>
+          <p className="text-muted-foreground mb-8">
+            Your free tickets have been added to your account. Redirecting you now…
+          </p>
+          <Button variant="primary" size="lg" className="w-full" onClick={() => router.push("/explore")}>
+            Explore More Events
+          </Button>
+        </div>
       </div>
     );
   }
 
-  const totalQuantity = checkoutData.tickets.reduce(
-    (sum, t) => sum + t.quantity,
-    0,
-  );
+  // ── Computed values ────────────────────────────────────────────
+  const totalQuantity = checkoutData.tickets.reduce((s, t) => s + t.quantity, 0);
+  const subtotal = checkoutData.tickets.reduce((s, t) => s + t.price * t.quantity, 0);
+  const discountAmount = discountState.appliedDiscount?.discountAmount ?? 0;
+  const total = Math.max(0, subtotal - discountAmount);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Back Button */}
-      <div className="container mx-auto px-4 pt-4">
-        <Button variant="ghost" onClick={() => router.back()} className="mb-4">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/40 via-background to-background">
+      {/* Top bar */}
+      <div className="border-b border-border bg-background/80 backdrop-blur sticky top-[60px] z-40">
+        <div className="container mx-auto px-4 h-14 flex items-center gap-4">
+          <Button variant="ghost" size="sm" onClick={() => router.back()} className="gap-2 -ml-2">
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+          <div className="h-4 w-px bg-border" />
+          <div className="flex items-center gap-2 min-w-0">
+            <ShoppingCart className="h-4 w-4 text-[#1E88E5] shrink-0" />
+            <span className="text-sm font-medium text-foreground truncate">{checkoutData.eventName}</span>
+          </div>
+          <div className="ml-auto">
+            <Badge variant="secondary" className="text-xs">
+              {totalQuantity} ticket{totalQuantity !== 1 ? "s" : ""}
+            </Badge>
+          </div>
+        </div>
       </div>
 
-      {/* Main Content */}
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          {/* Page Header */}
-          <div className="mb-8 event-card-animate">
-            <div className="flex items-center space-x-3 mb-2">
-              <ShoppingCart className="h-8 w-8 text-[#1E88E5]" />
-              <h1 className="text-3xl font-bold text-foreground">Checkout</h1>
+      <div className="container mx-auto px-4 py-8 lg:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
+
+          {/* ── LEFT: Main form ─────────────────────────────── */}
+          <div className="space-y-6">
+
+            {/* Section heading */}
+            <div>
+              <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Complete your order</h1>
+              <p className="text-muted-foreground mt-1 text-sm">Fill in the details below to confirm your tickets</p>
             </div>
-            <p className="text-gray-600">{checkoutData.eventName}</p>
-          </div>
 
-          <div
-            className={`grid ${totalQuantity > 1 ? "grid-cols-1 lg:grid-cols-3" : "grid-cols-1"} gap-8`}
-          >
-            {/* Main Content */}
-            <div
-              className={`${totalQuantity > 1 ? "lg:col-span-2" : ""} space-y-8`}
-            >
-              {/* Recipients Toggle */}
-              {totalQuantity > 1 && (
-                <div className="event-card-animate">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Ticket Recipients</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="mb-4">
-                        Send tickets to recipient(s) or keep them for yourself
-                      </CardDescription>
-
-                      <label className="flex items-center gap-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={useMultipleRecipients}
-                          onChange={(e) =>
-                            setUseMultipleRecipients(e.target.checked)
-                          }
-                          className="w-4 h-4 text-[#1E88E5] rounded"
-                        />
-                        <span className="text-foreground">
-                          Send tickets to multiple recipients
-                        </span>
-                      </label>
-
-                      {useMultipleRecipients && (
-                        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                          <div className="flex gap-2">
-                            <Users className="w-5 h-5 text-[#1E88E5] flex-shrink-0 mt-0.5" />
-                            <p className="text-sm text-[#1E88E5]">
-                              Enter the name and email for each ticket recipient
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
+            {/* ── 1. Your Details ─────────────────────────── */}
+            <Card className="overflow-hidden">
+              <CardHeader className="border-b border-border bg-secondary/30 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-[#1E88E5] text-white flex items-center justify-center text-sm font-semibold shrink-0">
+                    1
+                  </div>
+                  <CardTitle className="text-base">Your Details</CardTitle>
                 </div>
-              )}
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                {user ? (
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-blue-50 border border-blue-100">
+                    <div className="w-9 h-9 rounded-full bg-[#1E88E5] text-white flex items-center justify-center text-sm font-semibold shrink-0">
+                      {user.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                    </div>
+                    <CheckCircle2 className="w-4 h-4 text-[#1E88E5] ml-auto shrink-0" />
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="buyer-name" className="text-sm font-medium flex items-center gap-1.5">
+                          <User className="w-3.5 h-3.5 text-muted-foreground" />
+                          Your Name
+                          <span className="text-muted-foreground text-xs font-normal">(optional)</span>
+                        </Label>
+                        <Input
+                          id="buyer-name"
+                          placeholder="Full name"
+                          value={buyerName}
+                          onChange={(e) => setBuyerName(e.target.value)}
+                          className="rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="buyer-email" className="text-sm font-medium flex items-center gap-1.5">
+                          <Mail className="w-3.5 h-3.5 text-muted-foreground" />
+                          Email Address
+                          <span className="text-destructive ml-0.5">*</span>
+                        </Label>
+                        <Input
+                          id="buyer-email"
+                          type="email"
+                          placeholder="you@example.com"
+                          value={buyerEmail}
+                          onChange={(e) => { setBuyerEmail(e.target.value); clearError("buyerEmail"); }}
+                          className={`rounded-xl ${validationErrors["buyerEmail"] ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                        />
+                        {validationErrors["buyerEmail"] && (
+                          <p className="text-xs text-destructive flex items-center gap-1">
+                            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                            {validationErrors["buyerEmail"]}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Your tickets and confirmation will be sent to this email address.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
-              {/* Recipients Forms */}
-              {useMultipleRecipients && (
-                <div className="space-y-6">
-                  {checkoutData.tickets.map((ticket, ticketIndex) => (
-                    <div
-                      key={ticket.ticketCategoryId}
-                      className={`event-card-animate ${
-                        ticketIndex === 0
-                          ? "event-card-delay-1"
-                          : "event-card-delay-2"
-                      }`}
-                    >
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-base font-normal">
-                            <span className="font-semibold text-foreground">
-                              {ticket.ticketCategoryName}
-                            </span>
-                          </CardTitle>
-                          <CardDescription>
-                            {ticket.quantity} ticket
-                            {ticket.quantity > 1 ? "s" : ""}
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          {Array(ticket.quantity)
-                            .fill(null)
-                            .map((_, index) => {
-                              const fieldKey = `${ticket.ticketCategoryId}-${index}`;
-                              const error = validationErrors[fieldKey];
-                              const recipient = recipients[
-                                ticket.ticketCategoryId
-                              ]?.[index] || {
-                                name: "",
-                                email: "",
-                              };
+            {/* ── 2. Ticket Recipients (only for multi-ticket orders) ── */}
+            {totalQuantity > 1 && (
+              <Card className="overflow-hidden">
+                <CardHeader className="border-b border-border bg-secondary/30 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-[#1E88E5] text-white flex items-center justify-center text-sm font-semibold shrink-0">
+                      2
+                    </div>
+                    <CardTitle className="text-base">Ticket Recipients</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <label className="flex items-start gap-3 cursor-pointer group">
+                    <div className="relative mt-0.5">
+                      <input
+                        type="checkbox"
+                        checked={useMultipleRecipients}
+                        onChange={(e) => setUseMultipleRecipients(e.target.checked)}
+                        className="sr-only"
+                      />
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${useMultipleRecipients ? "bg-[#1E88E5] border-[#1E88E5]" : "border-input group-hover:border-[#1E88E5]"}`}>
+                        {useMultipleRecipients && (
+                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Send tickets to different recipients</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Assign each ticket to a specific person's name and email
+                      </p>
+                    </div>
+                  </label>
 
+                  {useMultipleRecipients && (
+                    <div className="mt-6 space-y-6">
+                      <div className="flex items-start gap-2 p-3 rounded-xl bg-blue-50 border border-blue-100">
+                        <Users className="w-4 h-4 text-[#1E88E5] mt-0.5 shrink-0" />
+                        <p className="text-xs text-[#1E88E5]">
+                          Each ticket will be sent to the recipient's email address after purchase.
+                        </p>
+                      </div>
+
+                      {checkoutData.tickets.map((ticket) => (
+                        <div key={ticket.ticketCategoryId}>
+                          <div className="flex items-center gap-2 mb-3">
+                            <Ticket className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-sm font-semibold text-foreground">{ticket.ticketCategoryName}</span>
+                            <Badge variant="secondary" className="text-xs ml-auto">
+                              {ticket.quantity} ticket{ticket.quantity !== 1 ? "s" : ""}
+                            </Badge>
+                          </div>
+                          <div className="space-y-3">
+                            {Array(ticket.quantity).fill(null).map((_, i) => {
+                              const key = `${ticket.ticketCategoryId}-${i}`;
+                              const hasError = !!validationErrors[key];
+                              const recipient = recipients[ticket.ticketCategoryId]?.[i] ?? { recipientName: "", recipientEmail: "" };
                               return (
-                                <div
-                                  key={index}
-                                  className={`p-4 border rounded-lg ${
-                                    error
-                                      ? "border-destructive bg-destructive/10"
-                                      : "bg-secondary"
-                                  }`}
-                                >
-                                  <p className="text-sm font-medium text-foreground mb-3">
-                                    Ticket {index + 1}
+                                <div key={i} className={`p-4 rounded-xl border ${hasError ? "border-destructive bg-destructive/5" : "border-border bg-secondary/30"}`}>
+                                  <p className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wide">
+                                    Ticket {i + 1}
                                   </p>
-
-                                  <div className="space-y-3">
-                                    <div>
-                                      <Label htmlFor={`name-${fieldKey}`}>
-                                        Recipient Name
-                                      </Label>
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div className="space-y-1">
+                                      <Label className="text-xs">Full Name</Label>
                                       <Input
-                                        id={`name-${fieldKey}`}
-                                        placeholder="Full name"
+                                        placeholder="Recipient name"
                                         value={recipient.recipientName}
-                                        onChange={(e) =>
-                                          handleRecipientChange(
-                                            ticket.ticketCategoryId,
-                                            index,
-                                            "recipientName",
-                                            e.target.value,
-                                          )
-                                        }
-                                        className={
-                                          error
-                                            ? "border-destructive focus:border-destructive"
-                                            : ""
-                                        }
+                                        onChange={(e) => handleRecipientChange(ticket.ticketCategoryId, i, "recipientName", e.target.value)}
+                                        className={`rounded-lg text-sm ${hasError ? "border-destructive" : ""}`}
                                       />
                                     </div>
-
-                                    <div>
-                                      <Label htmlFor={`email-${fieldKey}`}>
-                                        Email Address
-                                      </Label>
+                                    <div className="space-y-1">
+                                      <Label className="text-xs">Email Address</Label>
                                       <Input
-                                        id={`email-${fieldKey}`}
                                         type="email"
-                                        placeholder="Email address"
+                                        placeholder="Recipient email"
                                         value={recipient.recipientEmail}
-                                        onChange={(e) =>
-                                          handleRecipientChange(
-                                            ticket.ticketCategoryId,
-                                            index,
-                                            "recipientEmail",
-                                            e.target.value,
-                                          )
-                                        }
-                                        className={
-                                          error
-                                            ? "border-destructive focus:border-destructive"
-                                            : ""
-                                        }
+                                        onChange={(e) => handleRecipientChange(ticket.ticketCategoryId, i, "recipientEmail", e.target.value)}
+                                        className={`rounded-lg text-sm ${hasError ? "border-destructive" : ""}`}
                                       />
                                     </div>
-
-                                    {error && (
-                                      <div className="flex gap-2 text-destructive text-sm">
-                                        <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                        <span>{error}</span>
-                                      </div>
-                                    )}
                                   </div>
+                                  {hasError && (
+                                    <p className="mt-2 text-xs text-destructive flex items-center gap-1">
+                                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                                      {validationErrors[key]}
+                                    </p>
+                                  )}
                                 </div>
                               );
                             })}
-                        </CardContent>
-                      </Card>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {/* Custom Fields */}
-              {checkoutData.customFields && checkoutData.customFields.length > 0 && (
-                <div className="event-card-animate">
-                  <CustomFieldsCard
-                    fields={checkoutData.customFields}
-                    values={customFieldValues}
-                    errors={validationErrors}
-                    onChange={(id, value) => {
-                      setCustomFieldValues((prev) => ({ ...prev, [id]: value }));
-                      setValidationErrors((prev) => {
-                        const next = { ...prev };
-                        delete next[`cf-${id}`];
-                        return next;
-                      });
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Order Summary */}
-              <div className="event-sidebar-animate">
-                <Card className="sticky top-4">
-                  <CardHeader>
-                    <CardTitle>Order Summary</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <h3 className="font-semibold text-foreground mb-3">
-                        {checkoutData.eventName}
-                      </h3>
-
-                      {checkoutData.tickets.map((ticket, idx) => {
-                        const subtotal = ticket.price * ticket.quantity;
-                        return (
-                          <div
-                            key={idx}
-                            className="space-y-1 py-2 border-b border-border"
-                          >
-                            <div className="flex justify-between text-sm">
-                              <span className="text-gray-600">
-                                {ticket.ticketCategoryName}
-                              </span>
-                              <span className="font-medium">
-                                ₦{ticket.price.toLocaleString()}
-                              </span>
-                            </div>
-                            <div className="flex justify-between text-xs text-gray-500">
-                              <span>Qty: {ticket.quantity}</span>
-                              <span>₦{subtotal.toLocaleString()}</span>
-                            </div>
                           </div>
-                        );
-                      })}
-
-                      <div className="flex justify-between text-base font-bold pt-4 mt-4 border-t border-border">
-                        <span>Subtotal</span>
-                        <span>
-                          ₦
-                          {checkoutData.tickets
-                            .reduce(
-                              (sum, ticket) =>
-                                sum + ticket.price * ticket.quantity,
-                              0,
-                            )
-                            .toLocaleString()}
-                        </span>
-                      </div>
-
-                      {discountState.appliedDiscount &&
-                        discountState.appliedDiscount.discountAmount && (
-                          <div className="flex justify-between text-sm pt-2 text-green-600">
-                            <span>Discount</span>
-                            <span>
-                              -₦
-                              {discountState.appliedDiscount.discountAmount.toLocaleString()}
-                            </span>
-                          </div>
-                        )}
-
-                      <div className="flex justify-between text-lg font-bold pt-2 border-t border-border mt-2">
-                        <span>Total</span>
-                        <span>
-                          ₦
-                          {(
-                            checkoutData.tickets.reduce(
-                              (sum, ticket) =>
-                                sum + ticket.price * ticket.quantity,
-                              0,
-                            ) -
-                            (discountState.appliedDiscount?.discountAmount || 0)
-                          ).toLocaleString()}
-                        </span>
-                      </div>
+                        </div>
+                      ))}
                     </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
-                    {/* Discount Code */}
-                    <div>
-                      <Label
-                        htmlFor="discount-code"
-                        className="text-sm font-medium text-foreground mb-2"
-                      >
-                        Discount Code (Optional)
-                      </Label>
-                      <div className="flex gap-2 mt-2">
-                        <Input
-                          id="discount-code"
-                          type="text"
-                          placeholder="Enter discount code"
-                          value={discountCode}
-                          onChange={(e) =>
-                            setDiscountCode(e.target.value.toUpperCase())
-                          }
-                          disabled={!!discountState.appliedDiscount}
-                          className="flex-1 bg-gray-50 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#1E88E5] focus:border-transparent disabled:opacity-50"
-                        />
-                        {!discountState.appliedDiscount && (
-                          <Button
-                            variant="outline"
-                            onClick={handleApplyDiscount}
-                            disabled={isValidatingDiscount}
-                            className="px-4 border-gray-200 hover:bg-gray-50 rounded-lg hover:border-[#1E88E5] transition-colors"
-                          >
-                            {isValidatingDiscount ? (
-                              <Loader className="w-4 h-4 animate-spin" />
-                            ) : (
-                              "Apply"
-                            )}
-                          </Button>
-                        )}
-                        {discountState.appliedDiscount && (
-                          <Button
-                            variant="outline"
-                            onClick={() => {
-                              setDiscountState({
-                                appliedDiscount: null,
-                                isValidating: false,
-                              });
-                              setDiscountCode("");
-                            }}
-                            className="px-4 border-gray-200 hover:bg-gray-50 rounded-lg transition-colors text-red-500"
-                          >
-                            Remove
-                          </Button>
-                        )}
-                      </div>
-
-                      {/* Applied Discount Info */}
-                      {discountState.appliedDiscount && (
-                        <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                          <p className="text-sm font-medium text-green-700">
-                            ✓ {discountState.appliedDiscount.code} applied
-                          </p>
-                          <p className="text-xs text-green-600 mt-1">
-                            {discountState.appliedDiscount.type === "PERCENT"
-                              ? `${discountState.appliedDiscount.value}% discount`
-                              : `₦${(discountState.appliedDiscount.value / 100).toLocaleString()} off`}
-                          </p>
-                          {discountState.appliedDiscount.discountAmount && (
-                            <p className="text-xs text-green-600 font-semibold mt-1">
-                              You save: ₦
-                              {discountState.appliedDiscount.discountAmount.toLocaleString()}
+            {/* ── 3. Custom Fields ─────────────────────────── */}
+            {checkoutData.customFields && checkoutData.customFields.length > 0 && (
+              <Card className="overflow-hidden">
+                <CardHeader className="border-b border-border bg-secondary/30 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-[#1E88E5] text-white flex items-center justify-center text-sm font-semibold shrink-0">
+                      {totalQuantity > 1 ? 3 : 2}
+                    </div>
+                    <CardTitle className="text-base">Additional Information</CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6 space-y-5">
+                  {[...checkoutData.customFields]
+                    .sort((a, b) => a.position - b.position)
+                    .map((field) => {
+                      const errKey = `cf-${field.id}`;
+                      const hasError = !!validationErrors[errKey];
+                      return (
+                        <div key={field.id} className="space-y-1.5">
+                          <Label htmlFor={`cf-${field.id}`} className="text-sm font-medium">
+                            {field.label}
+                            {field.required && <span className="text-destructive ml-1">*</span>}
+                          </Label>
+                          {field.fieldType === "TEXTAREA" ? (
+                            <Textarea
+                              id={`cf-${field.id}`}
+                              value={customFieldValues[field.id] ?? ""}
+                              onChange={(e) => {
+                                setCustomFieldValues((p) => ({ ...p, [field.id]: e.target.value }));
+                                clearError(errKey);
+                              }}
+                              className={`rounded-xl ${hasError ? "border-destructive" : ""}`}
+                              rows={3}
+                            />
+                          ) : field.fieldType === "SELECT" ? (
+                            <Select
+                              value={customFieldValues[field.id] ?? ""}
+                              onValueChange={(v) => { setCustomFieldValues((p) => ({ ...p, [field.id]: v })); clearError(errKey); }}
+                            >
+                              <SelectTrigger className={`rounded-xl ${hasError ? "border-destructive" : ""}`}>
+                                <SelectValue placeholder="Select an option…" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {(field.options ?? []).map((opt) => (
+                                  <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <Input
+                              id={`cf-${field.id}`}
+                              type={field.fieldType === "EMAIL" ? "email" : field.fieldType === "NUMBER" ? "number" : "text"}
+                              value={customFieldValues[field.id] ?? ""}
+                              onChange={(e) => { setCustomFieldValues((p) => ({ ...p, [field.id]: e.target.value })); clearError(errKey); }}
+                              className={`rounded-xl ${hasError ? "border-destructive" : ""}`}
+                            />
+                          )}
+                          {hasError && (
+                            <p className="text-xs text-destructive flex items-center gap-1">
+                              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                              {validationErrors[errKey]}
                             </p>
                           )}
                         </div>
-                      )}
-                    </div>
+                      );
+                    })}
+                </CardContent>
+              </Card>
+            )}
 
-                    {/* Purchase Button */}
-                    <Button
-                      onClick={handlePurchase}
-                      disabled={isSubmitting || isProcessing}
-                      size="lg"
-                      className="w-full"
-                    >
-                      {isSubmitting || isProcessing ? (
-                        <>
-                          <Loader className="w-4 h-4 mr-2 animate-spin" />
-                          Processing...
-                        </>
-                      ) : (
-                        <>Complete Purchase</>
-                      )}
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
+          </div>
 
-              {/* Purchase Info */}
-              <div className="event-sidebar-animate event-sidebar-delay-1">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>What's Next?</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-start space-x-3">
-                      <Ticket className="h-4 w-4 text-gray-600 mt-0.5" />
-                      <div>
-                        <p className="text-sm font-medium">Instant Access</p>
-                        <p className="text-xs text-gray-600">
-                          Your tickets will be available immediately after
-                          purchase
+          {/* ── RIGHT: Order Summary ─────────────────────────────── */}
+          <div className="space-y-4 lg:sticky lg:top-[112px]">
+
+            {/* Order summary card */}
+            <Card className="overflow-hidden">
+              <CardHeader className="border-b border-border bg-secondary/30 pb-4">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <ShoppingCart className="w-4 h-4 text-[#1E88E5]" />
+                  Order Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-5 space-y-4">
+                {/* Event name */}
+                <div className="pb-3 border-b border-border">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Event</p>
+                  <p className="text-sm font-semibold text-foreground leading-snug">{checkoutData.eventName}</p>
+                </div>
+
+                {/* Ticket line items */}
+                <div className="space-y-2">
+                  {checkoutData.tickets.map((ticket, i) => (
+                    <div key={i} className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-sm text-foreground font-medium truncate">{ticket.ticketCategoryName}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {ticket.quantity} × ₦{ticket.price.toLocaleString()}
                         </p>
                       </div>
+                      <p className="text-sm font-semibold text-foreground shrink-0">
+                        ₦{(ticket.price * ticket.quantity).toLocaleString()}
+                      </p>
                     </div>
-                    <div className="flex items-start space-x-3">
-                      <CheckCircle className="h-4 w-4 text-gray-600 mt-0.5" />
-                      <div>
-                        <p className="text-sm font-medium">
-                          Email Confirmation
-                        </p>
-                        <p className="text-xs text-gray-600">
-                          Confirmation sent to your registered email
+                  ))}
+                </div>
+
+                {/* Totals */}
+                <div className="border-t border-border pt-3 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span className="font-medium">₦{subtotal.toLocaleString()}</span>
+                  </div>
+                  {discountState.appliedDiscount && discountAmount > 0 && (
+                    <div className="flex justify-between text-sm text-green-600">
+                      <span>Discount ({discountState.appliedDiscount.code})</span>
+                      <span>−₦{discountAmount.toLocaleString()}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-base font-bold pt-1 border-t border-border">
+                    <span>Total</span>
+                    <span className="text-[#1E88E5]">₦{total.toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {/* Discount code */}
+                <div className="border-t border-border pt-4">
+                  <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 mb-2">
+                    <Tag className="w-3.5 h-3.5" />
+                    Discount Code
+                  </Label>
+                  {discountState.appliedDiscount ? (
+                    <div className="flex items-center gap-2 p-3 rounded-xl bg-green-50 border border-green-200">
+                      <CheckCircle2 className="w-4 h-4 text-green-600 shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-semibold text-green-700">{discountState.appliedDiscount.code}</p>
+                        <p className="text-xs text-green-600">
+                          {discountState.appliedDiscount.type === "PERCENT"
+                            ? `${discountState.appliedDiscount.value}% off`
+                            : `₦${(discountState.appliedDiscount.value / 100).toLocaleString()} off`}
                         </p>
                       </div>
+                      <button
+                        onClick={() => { setDiscountState({ appliedDiscount: null, isValidating: false }); setDiscountCode(""); }}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Enter code"
+                        value={discountCode}
+                        onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+                        className="rounded-xl text-sm flex-1"
+                        onKeyDown={(e) => e.key === "Enter" && handleApplyDiscount()}
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleApplyDiscount}
+                        disabled={isValidatingDiscount || !discountCode.trim()}
+                        className="shrink-0 px-4"
+                      >
+                        {isValidatingDiscount ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Apply"}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {/* CTA */}
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className="w-full mt-2"
+                  onClick={handlePurchase}
+                  disabled={isSubmitting || isProcessing}
+                >
+                  {isSubmitting || isProcessing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Processing…
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Complete Purchase
+                    </>
+                  )}
+                </Button>
+
+                <p className="text-center text-xs text-muted-foreground">
+                  By completing your purchase you agree to our terms of service.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* What's next */}
+            <Card>
+              <CardContent className="p-5 space-y-3">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">What happens next?</p>
+                {[
+                  { icon: Ticket, title: "Instant ticket delivery", desc: "Tickets sent to your email immediately" },
+                  { icon: CheckCircle2, title: "QR code included", desc: "Scan at the venue for entry" },
+                ].map(({ icon: Icon, title, desc }) => (
+                  <div key={title} className="flex items-start gap-3">
+                    <div className="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+                      <Icon className="w-3.5 h-3.5 text-[#1E88E5]" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-foreground">{title}</p>
+                      <p className="text-xs text-muted-foreground">{desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
           </div>
         </div>
-      </section>
+      </div>
     </div>
-  );
-}
-
-function CustomFieldsCard({
-  fields,
-  values,
-  errors,
-  onChange,
-}: {
-  fields: EventCustomField[];
-  values: Record<string, string>;
-  errors: Record<string, string>;
-  onChange: (id: string, value: string) => void;
-}) {
-  const sorted = [...fields].sort((a, b) => a.position - b.position);
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Additional Info</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {sorted.map((field) => {
-          const errorKey = `cf-${field.id}`;
-          const hasError = !!errors[errorKey];
-          return (
-            <div key={field.id}>
-              <Label htmlFor={`cf-${field.id}`}>
-                {field.label}
-                {field.required && <span className="text-destructive ml-1">*</span>}
-              </Label>
-              {field.fieldType === "TEXTAREA" ? (
-                <Textarea
-                  id={`cf-${field.id}`}
-                  value={values[field.id] ?? ""}
-                  onChange={(e) => onChange(field.id, e.target.value)}
-                  className={`mt-1 ${hasError ? "border-destructive" : ""}`}
-                />
-              ) : field.fieldType === "SELECT" ? (
-                <Select
-                  value={values[field.id] ?? ""}
-                  onValueChange={(v) => onChange(field.id, v)}
-                >
-                  <SelectTrigger className={`mt-1 ${hasError ? "border-destructive" : ""}`}>
-                    <SelectValue placeholder="Select…" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(field.options ?? []).map((opt) => (
-                      <SelectItem key={opt} value={opt}>
-                        {opt}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Input
-                  id={`cf-${field.id}`}
-                  type={
-                    field.fieldType === "EMAIL"
-                      ? "email"
-                      : field.fieldType === "NUMBER"
-                      ? "number"
-                      : "text"
-                  }
-                  value={values[field.id] ?? ""}
-                  onChange={(e) => onChange(field.id, e.target.value)}
-                  className={`mt-1 ${hasError ? "border-destructive" : ""}`}
-                />
-              )}
-              {hasError && (
-                <p className="mt-1 text-sm text-destructive flex items-center gap-1">
-                  <AlertCircle className="h-3.5 w-3.5" />
-                  {errors[errorKey]}
-                </p>
-              )}
-            </div>
-          );
-        })}
-      </CardContent>
-    </Card>
   );
 }

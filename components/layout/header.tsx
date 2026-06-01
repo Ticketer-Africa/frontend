@@ -18,7 +18,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 const NAVIGATION = [
   { name: "Home", href: "/" },
   { name: "Explore", href: "/explore" },
-  { name: "Resale Market", href: "/resale" },
 ] as const;
 
 export function Header() {
@@ -43,7 +42,6 @@ export function Header() {
 
   const userNavigation = user
     ? [
-        { name: "My Tickets", href: "/my-tickets", icon: Calendar },
         { name: "Settings", href: "/settings", icon: Settings },
       ]
     : [];
