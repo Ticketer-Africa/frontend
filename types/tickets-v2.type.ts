@@ -15,16 +15,19 @@ export interface TicketPurchaseItemV2 {
 }
 
 export interface CustomFieldResponse {
-  customFieldId: string;
-  value: string;
+  fieldId: string;
+  value?: string | number | boolean | string[];
 }
 
 export interface BuyTicketsV2Payload {
   eventId: string;
   ticketCategories: TicketPurchaseItemV2[];
+  buyerEmail?: string;
+  buyerName?: string;
   discountCode?: string;
   inviteToken?: string;
   occurrenceId?: string;
+  shareableAccessToken?: string;
   customFieldResponses?: CustomFieldResponse[];
 }
 

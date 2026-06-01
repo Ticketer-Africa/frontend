@@ -43,14 +43,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     "/forgot-password",
     "/",
     "/explore",
-    "/resale",
     "/events",
     "/terms",
     "/service-agreement",
-    "/resale",
     "/reset-password",
     "/verify-otp",
     "/checkout",
+    "/my-tickets",
+    "/resale",
   ];
 
   const API_VERSION = "v1";
