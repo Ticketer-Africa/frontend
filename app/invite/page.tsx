@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, CheckCircle, Loader } from "lucide-react";
@@ -28,23 +28,48 @@ export default function InviteAcceptancePage() {
 
   const inviteId = searchParams.get("inviteId");
   const email = searchParams.get("email");
+  const inviteToken = searchParams.get("i");
 
-  useEffect(() => {
-    // Validate query parameters
-    if (!inviteId || !email) {
-      setStatus("invalid");
-      setMessage("Invalid invitation link. Missing required parameters.");
-      return;
+  const resolvePersonalInvite = useCallback(async (token: string) => {
+    try {
+      setStatus("loading");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "https://api.ticketer.africa"}/api/v2/events/invite/resolve?i=${encodeURIComponent(token)}`,
+      );
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || "Failed to resolve invite");
+      }
+      const data = await response.json();
+      try {
+        sessionStorage.setItem(
+          "inviteSession",
+          JSON.stringify({
+            inviteToken: token,
+            guestName: data.invitee?.name ?? "",
+            guestEmail: data.invitee?.email ?? "",
+          }),
+        );
+      } catch {
+        // sessionStorage unavailable — proceed without storing
+      }
+      const slug = data.event?.slug;
+      if (slug) {
+        // Hard redirect so event page loads fresh with server-side data
+        window.location.href = `/events/${slug}`;
+      } else {
+        setStatus("error");
+        setMessage("Could not determine event from this invite link.");
+      }
+    } catch (error) {
+      setStatus("error");
+      setMessage(
+        error instanceof Error ? error.message : "Failed to resolve invite.",
+      );
     }
+  }, []);
 
-    // Decode email if it's URL encoded
-    const decodedEmail = decodeURIComponent(email);
-
-    // Automatically accept the invite
-    acceptInvite(inviteId, decodedEmail);
-  }, [inviteId, email]);
-
-  const acceptInvite = async (id: string, inviteeEmail: string) => {
+  const acceptInvite = useCallback(async (id: string, inviteeEmail: string) => {
     try {
       setStatus("loading");
 
@@ -86,7 +111,20 @@ export default function InviteAcceptancePage() {
           : "Failed to accept invite. Please try again.",
       );
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    if (inviteToken) {
+      resolvePersonalInvite(inviteToken);
+      return;
+    }
+    if (!inviteId || !email) {
+      setStatus("invalid");
+      setMessage("Invalid invitation link. Missing required parameters.");
+      return;
+    }
+    acceptInvite(inviteId, decodeURIComponent(email));
+  }, [inviteToken, inviteId, email, resolvePersonalInvite, acceptInvite]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 px-4">

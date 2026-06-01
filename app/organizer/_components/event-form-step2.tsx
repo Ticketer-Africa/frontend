@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { DatePicker } from "@/components/ui/date-time-picker";
+import { Trash2, Plus } from "lucide-react";
 import {
   UseFormRegister,
   FieldErrors,
@@ -21,13 +22,9 @@ interface Step2Props {
   isDisabled: boolean;
   onAddCategory: () => void;
   onRemoveCategory: (id: string) => void;
-  /** For update form: existing sold tickets per category */
   existingTicketCategories?: Array<{ soldTickets?: number }>;
 }
 
-/**
- * Step 2: Date, Location & Pricing
- */
 export function EventFormStep2({
   register,
   errors,
@@ -40,170 +37,150 @@ export function EventFormStep2({
   existingTicketCategories,
 }: Step2Props) {
   return (
-    <>
-      <div className="space-y-2">
-        <Label htmlFor="location">Location *</Label>
-        <Input
-          id="location"
-          placeholder="Enter event location"
-          {...register("location")}
-          disabled={isDisabled}
-        />
-        {errors.location && (
-          <p className="text-sm text-red-600">{errors.location.message}</p>
-        )}
-      </div>
+    <div className="space-y-6">
+      {/* Date & Location */}
+      <div className="bg-gray-50/70 rounded-2xl p-5 space-y-4">
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">When & Where</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="date">Date *</Label>
+        <div className="space-y-1.5">
+          <Label htmlFor="location" className="text-sm font-medium">Location <span className="text-red-500">*</span></Label>
           <Input
-            id="date"
-            type="date"
-            {...register("date")}
+            id="location"
+            placeholder="e.g. Muri Okunola Park, Lagos"
+            className="h-11 rounded-xl"
+            {...register("location")}
             disabled={isDisabled}
           />
-          {errors.date && (
-            <p className="text-sm text-red-600">{errors.date.message}</p>
-          )}
+          {errors.location && <p className="text-xs text-red-500">{errors.location.message}</p>}
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="time">Time *</Label>
-          <Input
-            id="time"
-            type="time"
-            {...register("time")}
-            disabled={isDisabled}
-          />
-          {errors.time && (
-            <p className="text-sm text-red-600">{errors.time.message}</p>
-          )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Date <span className="text-red-500">*</span></Label>
+            <DatePicker
+              value={watch("date")}
+              onChange={(val) => setValue("date", val)}
+              disabled={isDisabled}
+              disablePast
+            />
+            {errors.date && <p className="text-xs text-red-500">{errors.date.message}</p>}
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="time" className="text-sm font-medium">Time <span className="text-red-500">*</span></Label>
+            <Input
+              id="time"
+              type="time"
+              className="h-11 rounded-xl appearance-none bg-background [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+              {...register("time")}
+              disabled={isDisabled}
+            />
+            {errors.time && <p className="text-xs text-red-500">{errors.time.message}</p>}
+          </div>
         </div>
       </div>
 
-      <div className="space-y-4">
-        <Label>Ticket Categories *</Label>
+      {/* Ticket Categories */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Ticket Categories <span className="text-red-500">*</span></p>
+        </div>
+
         {ticketCategories.map((category, index) => (
           <div
             key={category.id}
-            className="border border-gray-200 rounded-lg p-4 space-y-4 ticket-category-animate bg-gray-50/50"
+            className="bg-gray-50/70 rounded-2xl p-5 space-y-4 border border-gray-100"
           >
-            {/* Category Header */}
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700">
-                Category {index + 1}
-              </span>
+              <span className="text-sm font-semibold text-gray-700">Category {index + 1}</span>
               {index > 0 && (
-                <Button
+                <button
                   type="button"
-                  variant="ghost"
-                  size="sm"
                   onClick={() => onRemoveCategory(category.id)}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 px-2"
                   disabled={isDisabled}
+                  className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 transition-colors"
                 >
-                  <Trash2 className="h-4 w-4 mr-1" />
+                  <Trash2 className="h-3.5 w-3.5" />
                   Remove
-                </Button>
+                </button>
               )}
             </div>
 
-            {/* Row 1: Name (full width) */}
-            <div className="space-y-2">
-              <Label htmlFor={`ticketCategories.${index}.name`}>
-                Category Name
-              </Label>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">Category Name</Label>
               <Input
-                id={`ticketCategories.${index}.name`}
-                placeholder="e.g., VIP, General Admission, Early Bird"
+                placeholder="e.g. VIP, General Admission, Early Bird"
+                className="h-11 rounded-xl"
                 {...register(`ticketCategories.${index}.name`)}
                 disabled={isDisabled}
               />
               {errors.ticketCategories?.[index]?.name && (
-                <p className="text-sm text-red-600">
-                  {errors.ticketCategories[index]?.name?.message}
-                </p>
+                <p className="text-xs text-red-500">{errors.ticketCategories[index]?.name?.message}</p>
               )}
             </div>
 
-            {/* Row 2: Price, Total Tickets, Admissions */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor={`ticketCategories.${index}.price`}>
-                  Price (₦)
-                </Label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-sm font-medium">Price (₦)</Label>
                 <Input
-                  id={`ticketCategories.${index}.price`}
                   type="number"
                   placeholder="0 for free"
-                  {...register(`ticketCategories.${index}.price`)}
+                  className="h-11 rounded-xl"
                   min="0"
                   step="100"
+                  {...register(`ticketCategories.${index}.price`)}
                   disabled={isDisabled}
                 />
                 {errors.ticketCategories?.[index]?.price && (
-                  <p className="text-sm text-red-600">
-                    {errors.ticketCategories[index]?.price?.message}
-                  </p>
+                  <p className="text-xs text-red-500">{errors.ticketCategories[index]?.price?.message}</p>
                 )}
               </div>
-              <div className="space-y-2">
-                <Label htmlFor={`ticketCategories.${index}.maxTickets`}>
-                  Total Tickets
-                </Label>
+              <div className="space-y-1.5">
+                <Label className="text-sm font-medium">Total Tickets</Label>
                 <Input
-                  id={`ticketCategories.${index}.maxTickets`}
                   type="number"
-                  placeholder="Available quantity"
-                  {...register(`ticketCategories.${index}.maxTickets`)}
+                  placeholder="Available qty"
+                  className="h-11 rounded-xl"
                   min={existingTicketCategories?.[index]?.soldTickets || 1}
+                  {...register(`ticketCategories.${index}.maxTickets`)}
                   disabled={isDisabled}
                 />
                 {errors.ticketCategories?.[index]?.maxTickets && (
-                  <p className="text-sm text-red-600">
-                    {errors.ticketCategories[index]?.maxTickets?.message}
-                  </p>
+                  <p className="text-xs text-red-500">{errors.ticketCategories[index]?.maxTickets?.message}</p>
                 )}
               </div>
-              <div className="space-y-2">
-                <Label htmlFor={`ticketCategories.${index}.maxAdmissions`}>
-                  Admissions / Ticket
-                </Label>
+              <div className="space-y-1.5">
+                <Label className="text-sm font-medium">Admissions / Ticket</Label>
                 <Input
-                  id={`ticketCategories.${index}.maxAdmissions`}
                   type="number"
                   placeholder="1"
-                  {...register(`ticketCategories.${index}.maxAdmissions`)}
+                  className="h-11 rounded-xl"
                   min="1"
+                  {...register(`ticketCategories.${index}.maxAdmissions`)}
                   disabled={isDisabled}
                 />
                 {errors.ticketCategories?.[index]?.maxAdmissions && (
-                  <p className="text-sm text-red-600">
-                    {errors.ticketCategories[index]?.maxAdmissions?.message}
-                  </p>
+                  <p className="text-xs text-red-500">{errors.ticketCategories[index]?.maxAdmissions?.message}</p>
                 )}
               </div>
             </div>
-            <p className="text-xs text-gray-500">
-              Admissions per ticket: How many people can enter with 1 ticket?
-            </p>
+            <p className="text-xs text-gray-400">Admissions per ticket: how many people enter with 1 ticket (use &gt;1 for group tickets)</p>
           </div>
         ))}
-        {errors.ticketCategories && (
-          <p className="text-sm text-red-600">
-            {errors.ticketCategories.message}
-          </p>
+
+        {errors.ticketCategories && typeof errors.ticketCategories.message === "string" && (
+          <p className="text-xs text-red-500">{errors.ticketCategories.message}</p>
         )}
-        <Button
+
+        <button
           type="button"
-          variant="outline"
-          className="bg-transparent w-full sm:w-auto"
           onClick={onAddCategory}
           disabled={isDisabled}
+          className="w-full py-3 rounded-xl border-2 border-dashed border-gray-200 text-sm text-gray-500 hover:border-[#1E88E5] hover:text-[#1E88E5] transition-colors flex items-center justify-center gap-2"
         >
-          + Add Another Category
-        </Button>
+          <Plus className="h-4 w-4" />
+          Add Another Category
+        </button>
       </div>
-    </>
+    </div>
   );
 }

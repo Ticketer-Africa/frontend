@@ -22,6 +22,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { EventCustomField } from "@/types/events-v2.type";
 import { toast } from "sonner";
 import {
   AlertCircle,
@@ -42,6 +51,8 @@ interface CheckoutData {
     quantity: number;
     price: number;
   }>;
+  occurrenceId?: string;
+  customFields?: EventCustomField[];
 }
 
 interface RecipientForm {
@@ -73,6 +84,12 @@ export default function CheckoutPage() {
   }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
+  const [customFieldValues, setCustomFieldValues] = useState<Record<string, string>>({});
+  const [inviteSession, setInviteSession] = useState<{
+    inviteToken?: string;
+    guestName?: string;
+    guestEmail?: string;
+  } | null>(null);
 
   // Redirect to my-tickets after successful free ticket purchase
   useEffect(() => {
@@ -87,11 +104,6 @@ export default function CheckoutPage() {
 
   // Load checkout data from session
   useEffect(() => {
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-
     const data = sessionStorage.getItem("checkoutData");
     if (!data) {
       router.push("/explore");
@@ -101,17 +113,36 @@ export default function CheckoutPage() {
     const parsed = JSON.parse(data) as CheckoutData;
     setCheckoutData(parsed);
 
+    // Load invite session if present
+    const inviteRaw = sessionStorage.getItem("inviteSession");
+    let inv: { guestName?: string; guestEmail?: string } | null = null;
+    if (inviteRaw) {
+      try {
+        inv = JSON.parse(inviteRaw);
+        setInviteSession(inv);
+      } catch {}
+    }
+
     // Initialize recipients if multiple recipients is toggled
     if (useMultipleRecipients) {
       const recipientsByCategory: RecipientForm = {};
-      parsed.tickets.forEach((ticket) => {
+      // Use already-parsed invite for pre-fill if available
+      let invitePreFill: { recipientName: string; recipientEmail: string } | null = null;
+      if (inv && (inv.guestName || inv.guestEmail)) {
+        invitePreFill = { recipientName: inv.guestName ?? "", recipientEmail: inv.guestEmail ?? "" };
+      }
+      parsed.tickets.forEach((ticket, idx) => {
         recipientsByCategory[ticket.ticketCategoryId] = Array(ticket.quantity)
           .fill(null)
-          .map(() => ({ recipientName: "", recipientEmail: "" }));
+          .map((_, i) =>
+            idx === 0 && i === 0 && invitePreFill
+              ? invitePreFill
+              : { recipientName: "", recipientEmail: "" }
+          );
       });
       setRecipients(recipientsByCategory);
     }
-  }, [user, router, useMultipleRecipients]);
+  }, [router, useMultipleRecipients]);
 
   const validateEmail = useCallback((email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -146,6 +177,24 @@ export default function CheckoutPage() {
     setValidationErrors(errors);
     return isValid;
   }, [useMultipleRecipients, recipients, validateEmail]);
+
+  const validateCustomFields = useCallback((): boolean => {
+    if (!checkoutData?.customFields?.length) return true;
+    const errors: { [key: string]: string } = {};
+    let isValid = true;
+    for (const field of checkoutData.customFields) {
+      const value = customFieldValues[field.id]?.trim() ?? "";
+      if (field.required && !value) {
+        errors[`cf-${field.id}`] = `${field.label} is required`;
+        isValid = false;
+      } else if (field.fieldType === "EMAIL" && value && !validateEmail(value)) {
+        errors[`cf-${field.id}`] = `${field.label} must be a valid email address`;
+        isValid = false;
+      }
+    }
+    setValidationErrors((prev) => ({ ...prev, ...errors }));
+    return isValid;
+  }, [checkoutData, customFieldValues, validateEmail]);
 
   const handleRecipientChange = useCallback(
     (
@@ -230,6 +279,11 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (!validateCustomFields()) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
     if (!validateRecipients()) {
       toast.error("Please fill in all required fields correctly");
       return;
@@ -251,12 +305,21 @@ export default function CheckoutPage() {
         ...(discountState.appliedDiscount && {
           discountCode: discountState.appliedDiscount.code,
         }),
+        ...(checkoutData.occurrenceId && { occurrenceId: checkoutData.occurrenceId }),
+        ...(inviteSession?.inviteToken && { inviteToken: inviteSession.inviteToken }),
+        ...(checkoutData.customFields?.length && {
+          customFieldResponses: checkoutData.customFields.map((f) => ({
+            customFieldId: f.id,
+            value: customFieldValues[f.id] ?? "",
+          })),
+        }),
       };
 
       const response = await buyTickets(payload);
 
       // Clear session data
       sessionStorage.removeItem("checkoutData");
+      sessionStorage.removeItem("inviteSession");
 
       // Redirect to payment URL if available
       if (response.checkoutUrl) {
@@ -274,10 +337,14 @@ export default function CheckoutPage() {
   }, [
     checkoutData,
     validateRecipients,
+    validateCustomFields,
     useMultipleRecipients,
     recipients,
     buyTickets,
     router,
+    inviteSession,
+    customFieldValues,
+    discountState,
   ]);
 
   if (!checkoutData) {
@@ -512,6 +579,24 @@ export default function CheckoutPage() {
                   ))}
                 </div>
               )}
+              {/* Custom Fields */}
+              {checkoutData.customFields && checkoutData.customFields.length > 0 && (
+                <div className="event-card-animate">
+                  <CustomFieldsCard
+                    fields={checkoutData.customFields}
+                    values={customFieldValues}
+                    errors={validationErrors}
+                    onChange={(id, value) => {
+                      setCustomFieldValues((prev) => ({ ...prev, [id]: value }));
+                      setValidationErrors((prev) => {
+                        const next = { ...prev };
+                        delete next[`cf-${id}`];
+                        return next;
+                      });
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Sidebar */}
@@ -720,5 +805,85 @@ export default function CheckoutPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+function CustomFieldsCard({
+  fields,
+  values,
+  errors,
+  onChange,
+}: {
+  fields: EventCustomField[];
+  values: Record<string, string>;
+  errors: Record<string, string>;
+  onChange: (id: string, value: string) => void;
+}) {
+  const sorted = [...fields].sort((a, b) => a.position - b.position);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Additional Info</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {sorted.map((field) => {
+          const errorKey = `cf-${field.id}`;
+          const hasError = !!errors[errorKey];
+          return (
+            <div key={field.id}>
+              <Label htmlFor={`cf-${field.id}`}>
+                {field.label}
+                {field.required && <span className="text-destructive ml-1">*</span>}
+              </Label>
+              {field.fieldType === "TEXTAREA" ? (
+                <Textarea
+                  id={`cf-${field.id}`}
+                  value={values[field.id] ?? ""}
+                  onChange={(e) => onChange(field.id, e.target.value)}
+                  className={`mt-1 ${hasError ? "border-destructive" : ""}`}
+                />
+              ) : field.fieldType === "SELECT" ? (
+                <Select
+                  value={values[field.id] ?? ""}
+                  onValueChange={(v) => onChange(field.id, v)}
+                >
+                  <SelectTrigger className={`mt-1 ${hasError ? "border-destructive" : ""}`}>
+                    <SelectValue placeholder="Select…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(field.options ?? []).map((opt) => (
+                      <SelectItem key={opt} value={opt}>
+                        {opt}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  id={`cf-${field.id}`}
+                  type={
+                    field.fieldType === "EMAIL"
+                      ? "email"
+                      : field.fieldType === "NUMBER"
+                      ? "number"
+                      : "text"
+                  }
+                  value={values[field.id] ?? ""}
+                  onChange={(e) => onChange(field.id, e.target.value)}
+                  className={`mt-1 ${hasError ? "border-destructive" : ""}`}
+                />
+              )}
+              {hasError && (
+                <p className="mt-1 text-sm text-destructive flex items-center gap-1">
+                  <AlertCircle className="h-3.5 w-3.5" />
+                  {errors[errorKey]}
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </CardContent>
+    </Card>
   );
 }

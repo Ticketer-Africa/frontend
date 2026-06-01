@@ -20,6 +20,7 @@ import { useAuth } from "@/lib/auth-context";
 import { formatDate, formatPrice } from "@/lib/helpers";
 import { toast } from "sonner";
 import { useEventById } from "@/services/events/events.queries";
+import { QRCameraScanner } from "./QRCameraScanner";
 
 interface TicketCategory {
   name: string;
@@ -57,67 +58,106 @@ export default function VerifyTicketPage() {
   const { user } = useAuth();
   const { mutateAsync: verifyTicket, isPending: isVerifying } =
     useVerifyTicket();
+
   const [verification, setVerification] = useState<TicketVerification | null>(
     null
   );
   const [ticketData, setTicketData] = useState<QRTicketData | null>(null);
   const [error, setError] = useState<string>("");
-
-  useEffect(() => {
-    const verify = async () => {
-      try {
-        setError("");
-        const dataParam = searchParams.get("data");
-        if (!dataParam) {
-          setError("Invalid verification link");
-          toast.error("Invalid verification link");
-          return;
-        }
-
-        const parsedData = parseTicketData(dataParam);
-        if (!parsedData || !parsedData.eventId) {
-          setError("Invalid ticket data");
-          toast.error("Invalid ticket data");
-          return;
-        }
-
-        setTicketData(parsedData);
-
-        const response = await verifyTicket({
-          ticketId: parsedData.ticketId,
-          code: parsedData.code,
-          eventId: parsedData.eventId,
-        });
-
-        setVerification({
-          isValid: response.status === "VALID",
-          ticket: {
-            id: response.ticketId,
-            code: response.code,
-            eventId: response.eventId,
-            ticketCategory: response.ticketCategory,
-            isUsed: response.markedUsed,
-            isListed: !!response.resalePrice,
-            resalePrice: response.resalePrice,
-            event: response.event
-              ? (response.event as unknown as TicketEvent)
-              : undefined,
-          },
-          scannedAt: new Date().toISOString(),
-          message: response.message,
-        });
-      } catch (err: any) {
-        setError(err?.message || "Verification failed. Please try again.");
-        toast.error(err?.message || "Verification failed. Please try again.");
-      }
-    };
-
-    verify();
-  }, [searchParams, verifyTicket]);
+  const [mode, setMode] = useState<"camera" | "url-param">("camera");
+  const [scannerActive, setScannerActive] = useState(false);
 
   const { data: event } = useEventById(ticketData?.eventId || "");
 
+  // ─── shared verify logic ──────────────────────────────────────────────────
+
+  const handleVerify = async (dataParam: string) => {
+    try {
+      setError("");
+      const parsedData = parseTicketData(dataParam);
+      if (!parsedData || !parsedData.eventId) {
+        setError("Invalid ticket data");
+        toast.error("Invalid ticket data");
+        return;
+      }
+
+      setTicketData(parsedData);
+
+      const response = await verifyTicket({
+        ticketId: parsedData.ticketId,
+        code: parsedData.code,
+        eventId: parsedData.eventId,
+      });
+
+      setVerification({
+        isValid: response.status === "VALID",
+        ticket: {
+          id: response.ticketId,
+          code: response.code,
+          eventId: response.eventId,
+          ticketCategory: response.ticketCategory,
+          isUsed: response.markedUsed,
+          isListed: !!response.resalePrice,
+          resalePrice: response.resalePrice,
+          event: response.event
+            ? (response.event as unknown as TicketEvent)
+            : undefined,
+        },
+        scannedAt: new Date().toISOString(),
+        message: response.message,
+      });
+    } catch (err: any) {
+      setError(err?.message || "Verification failed. Please try again.");
+      toast.error(err?.message || "Verification failed. Please try again.");
+    }
+  };
+
+  // ─── camera scan callback ─────────────────────────────────────────────────
+
+  const handleCameraScan = (rawText: string) => {
+    setScannerActive(false);
+    // QR codes encode the full verification URL — extract the ?data= param
+    try {
+      const url = new URL(rawText);
+      const dataParam = url.searchParams.get("data");
+      if (dataParam) {
+        handleVerify(dataParam);
+        return;
+      }
+    } catch {
+      // rawText is not a URL — treat it as the raw data string
+    }
+    handleVerify(rawText);
+  };
+
+  // ─── scan-next reset ──────────────────────────────────────────────────────
+
+  const handleScanNext = () => {
+    setVerification(null);
+    setTicketData(null);
+    setError("");
+    setMode("camera");
+    setScannerActive(true);
+  };
+
+  // ─── URL-param mode on mount ──────────────────────────────────────────────
+
+  useEffect(() => {
+    const dataParam = searchParams.get("data");
+    if (dataParam) {
+      setMode("url-param");
+      setScannerActive(false);
+      handleVerify(dataParam);
+    } else {
+      setMode("camera");
+      setScannerActive(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
   const ticket = verification?.ticket;
+
+  // ─── render: verifying spinner ────────────────────────────────────────────
 
   if (isVerifying) {
     return (
@@ -140,6 +180,39 @@ export default function VerifyTicketPage() {
     );
   }
 
+  // ─── render: camera viewfinder ────────────────────────────────────────────
+
+  if (mode === "camera" && !verification && !error) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="container mx-auto max-w-md py-8 space-y-4">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">
+              Scan Ticket
+            </h1>
+            <p className="text-gray-500 text-sm">
+              Point the camera at a ticket QR code
+            </p>
+          </div>
+          <QRCameraScanner onScan={handleCameraScan} active={scannerActive} />
+          <div className="text-center">
+            <button
+              onClick={() => {
+                setScannerActive(false);
+                setMode("url-param");
+              }}
+              className="text-sm text-[#1E88E5] underline"
+            >
+              Use URL param instead
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── render: error / invalid data ────────────────────────────────────────
+
   if (error || !ticketData) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -158,19 +231,30 @@ export default function VerifyTicketPage() {
             </CardHeader>
             <CardContent className="text-center space-y-4">
               <p className="text-gray-600">{error || "Invalid ticket data"}</p>
-              <Button
-                variant="outline"
-                className="bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900"
-                onClick={() => window.location.reload()}
-              >
-                Try Again
-              </Button>
+              <div className="flex gap-2 justify-center">
+                <Button
+                  variant="outline"
+                  className="bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900"
+                  onClick={handleScanNext}
+                >
+                  Scan Another Ticket
+                </Button>
+                <Button
+                  variant="outline"
+                  className="bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900"
+                  onClick={() => window.location.reload()}
+                >
+                  Retry
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </motion.div>
       </div>
     );
   }
+
+  // ─── render: verification result card ────────────────────────────────────
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -336,32 +420,29 @@ export default function VerifyTicketPage() {
               )}
 
               {/* Action Buttons */}
-              <div className="flex space-x-2 pt-4 border-t">
-                {verification?.isValid && user?.role === "ORGANIZER" ? (
-                  <>
-                    <Button
-                      className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
-                      onClick={() => window.print()}
-                    >
-                      Print Verification
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="flex-1 bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900"
-                      onClick={() => (window.location.href = "/")}
-                    >
-                      Close
-                    </Button>
-                  </>
-                ) : (
+              <div className="flex flex-wrap gap-2 pt-4 border-t">
+                <Button
+                  className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                  onClick={handleScanNext}
+                >
+                  Scan Next Ticket
+                </Button>
+                {verification?.isValid && user?.role === "ORGANIZER" && (
                   <Button
                     variant="outline"
-                    className="w-full bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900"
-                    onClick={() => (window.location.href = "/")}
+                    className="flex-1 bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900"
+                    onClick={() => window.print()}
                   >
-                    Close
+                    Print Verification
                   </Button>
                 )}
+                <Button
+                  variant="outline"
+                  className="flex-1 bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900"
+                  onClick={() => (window.location.href = "/")}
+                >
+                  Close
+                </Button>
               </div>
 
               {/* Security Notice */}

@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import { useAllEvents, usePriceRange } from "@/services/events/events.queries";
-import { Event } from "@/types/events.type";
+import { usePriceRange } from "@/services/events/events.queries";
+import { useAllEventsV2 } from "@/services/events/events-v2.queries";
+import { EventV2 } from "@/types/events-v2.type";
 
 // Local components - code split for better tree shaking
 import { FilterSection } from "./filter-section";
@@ -153,7 +154,7 @@ export default function EventsPage() {
     data: response,
     isLoading: eventsLoading,
     isFetching,
-  } = useAllEvents(
+  } = useAllEventsV2(
     currentPage,
     appliedSearch || undefined,
     priceSliderRange && priceSliderRange[0] > priceBounds.min
@@ -172,7 +173,7 @@ export default function EventsPage() {
    * Parse API response - handle both array and paginated formats
    */
   const { events, meta } = useMemo(() => {
-    let events: Event[] = [];
+    let events: EventV2[] = [];
     let meta = null;
 
     if (Array.isArray(response)) {
@@ -205,16 +206,10 @@ export default function EventsPage() {
       let maxFound = 0;
 
       events.forEach((event) => {
-        // Check event.price
-        if (event.price > 0) {
-          minFound = Math.min(minFound, event.price);
-          maxFound = Math.max(maxFound, event.price);
-        }
-        // Check ticket categories
         event.ticketCategories?.forEach((cat) => {
-          if (cat.price > 0) {
-            minFound = Math.min(minFound, cat.price);
-            maxFound = Math.max(maxFound, cat.price);
+          if (cat.displayPrice > 0) {
+            minFound = Math.min(minFound, cat.displayPrice);
+            maxFound = Math.max(maxFound, cat.displayPrice);
           }
         });
       });

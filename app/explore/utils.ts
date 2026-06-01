@@ -1,10 +1,6 @@
-import { Event } from "@/types/events.type";
+import { EventV2 } from "@/types/events-v2.type";
 
-/**
- * Extract unique locations from events
- * Memoized at call site to prevent recalculation on every render
- */
-export function extractLocations(events: Event[]): string[] {
+export function extractLocations(events: EventV2[]): string[] {
   const locationSet = new Set<string>();
 
   for (const event of events) {
@@ -17,15 +13,11 @@ export function extractLocations(events: Event[]): string[] {
   return Array.from(locationSet);
 }
 
-/**
- * Filter events by location and category
- * Separated from component for cleaner code and potential memoization
- */
 export function filterEvents(
-  events: Event[],
+  events: EventV2[],
   selectedLocation: string,
-  selectedCategory: string
-): Event[] {
+  selectedCategory: string,
+): EventV2[] {
   if (!selectedLocation && !selectedCategory) {
     return events;
   }
@@ -40,11 +32,7 @@ export function filterEvents(
   });
 }
 
-/**
- * Calculate ticket availability stats for an event
- * Extracted to avoid recalculating in render loop
- */
-export function getTicketStats(event: Event) {
+export function getTicketStats(event: EventV2) {
   const ticketCategories = event.ticketCategories || [];
   const maxTickets = ticketCategories.reduce((sum, t) => sum + t.maxTickets, 0);
   const mintedTickets = ticketCategories.reduce((sum, t) => sum + t.minted, 0);
