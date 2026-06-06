@@ -4,15 +4,21 @@ import axios from "@/services/axios";
 export interface Invite {
   id: string;
   eventId: string;
-  email: string;
+  email?: string | null;
+  phone?: string | null;
   name: string;
   status: "PENDING" | "ACCEPTED" | "REVOKED";
   token: string;
+  inviteLink?: string;
 }
 
+export type InviteDeliveryMode = "GENERATE" | "SEND";
+
 export interface AddInviteePayload {
-  email: string;
+  email?: string;
+  phone?: string;
   name: string;
+  mode?: InviteDeliveryMode;
 }
 
 export interface ShareableLink {
@@ -96,4 +102,13 @@ export const getShareableLink = async (
 export const revokeShareableLink = async (eventId: string): Promise<void> => {
   const endpoint = buildEndpoint("v2", `${BASE(eventId)}/shareable`);
   await axios.delete(endpoint);
+};
+
+export const getInviteQrBlob = async (
+  eventId: string,
+  inviteId: string,
+): Promise<Blob> => {
+  const endpoint = buildEndpoint("v2", `${BASE(eventId)}/${inviteId}/qr`);
+  const res = await axios.get(endpoint, { responseType: "blob" });
+  return res.data as Blob;
 };
