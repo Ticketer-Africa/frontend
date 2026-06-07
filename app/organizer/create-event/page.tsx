@@ -68,7 +68,8 @@ export default function CreateEventPage() {
   const canProceedStep3 = true;
   const canProceedStep4 = true;
 
-  const canProceed = [canProceedStep1, canProceedStep2, canProceedStep3, canProceedStep4][currentStep - 1];
+  // Step order: 1 Details · 2 Date & Tickets · 3 Advanced Settings · 4 Review & Submit
+  const canProceed = [canProceedStep1, canProceedStep2, canProceedStep4, canProceedStep3][currentStep - 1];
 
   const onSubmit = async (data: EventFormData) => {
     const fullDate = new Date(`${data.date}T${data.time}`);
@@ -140,7 +141,7 @@ export default function CreateEventPage() {
   const handleNext = () => {
     if (currentStep < TOTAL_STEPS && canProceed) {
       setCurrentStep(currentStep + 1);
-      if (currentStep === 2) setIsConfirmed(false);
+      if (currentStep === 3) setIsConfirmed(false);
     }
   };
 
@@ -171,7 +172,7 @@ export default function CreateEventPage() {
   if (authLoading) return <LoadingScreen message="Loading..." subMessage="Verifying your session" />;
   if (isSubmitted) return <EventSuccessScreen eventName={watch("name")} title="Event Created!" onCreateAnother={handleCreateAnother} />;
 
-  const stepTitles = ["Event Details", "Date & Tickets", "Review & Fees", "Advanced Settings"];
+  const stepTitles = ["Event Details", "Date & Tickets", "Advanced Settings", "Review & Fees"];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
@@ -214,15 +215,15 @@ export default function CreateEventPage() {
                   />
                 )}
                 {currentStep === 3 && (
-                  <EventFormStep3
-                    watch={watch} setValue={setValue} ticketCategories={ticketCategories}
-                    previewUrl={previewUrl} isConfirmed={isConfirmed} onConfirmChange={setIsConfirmed}
-                  />
-                )}
-                {currentStep === 4 && (
                   <EventFormStep4
                     watch={watch} setValue={setValue} register={register}
                     errors={errors} isDisabled={isPending || isSubmitting}
+                  />
+                )}
+                {currentStep === 4 && (
+                  <EventFormStep3
+                    watch={watch} setValue={setValue} ticketCategories={ticketCategories}
+                    previewUrl={previewUrl} isConfirmed={isConfirmed} onConfirmChange={setIsConfirmed}
                   />
                 )}
 
@@ -236,7 +237,7 @@ export default function CreateEventPage() {
                   onPrevious={handlePrevious}
                   onNext={handleNext}
                   formId="event-form"
-                  requiresConfirmation={currentStep === 3}
+                  requiresConfirmation={currentStep === 4}
                   isConfirmed={isConfirmed}
                 />
               </form>
