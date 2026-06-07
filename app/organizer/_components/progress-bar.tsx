@@ -14,7 +14,7 @@ interface ProgressBarProps {
 export function ProgressBar({
   currentStep,
   totalSteps = 4,
-  labels = ["Event Details", "Date & Tickets", "Review & Fees", "Advanced"],
+  labels = ["Event Details", "Date & Tickets", "Advanced", "Review & Fees"],
 }: ProgressBarProps) {
   return (
     <div className="mb-8 max-w-2xl mx-auto">
