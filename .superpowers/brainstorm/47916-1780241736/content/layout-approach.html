@@ -1,0 +1,66 @@
+<h2>How should the 4 management sections be laid out?</h2>
+<p class="subtitle">Discount Codes · Invite Management · Shareable Link · Attendee Messaging</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="A" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup" style="font-size:11px;padding:8px;">
+        <div style="background:#1E88E5;color:white;padding:4px 8px;border-radius:4px;margin-bottom:6px;font-weight:600;">📊 Stats row</div>
+        <div style="border:1px solid #e2e8f0;border-radius:6px;padding:6px;margin-bottom:4px;background:#fff;">Event Details card</div>
+        <div style="border:1px solid #e2e8f0;border-radius:6px;padding:6px;margin-bottom:4px;background:#fff;">🏷️ Discount Codes card</div>
+        <div style="border:1px solid #e2e8f0;border-radius:6px;padding:6px;margin-bottom:4px;background:#fff;">✉️ Invite Management card</div>
+        <div style="border:1px solid #e2e8f0;border-radius:6px;padding:6px;margin-bottom:4px;background:#fff;">🔗 Shareable Link card</div>
+        <div style="border:1px solid #e2e8f0;border-radius:6px;padding:6px;background:#fff;">📣 Attendee Messaging card</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Vertical Stack</h3>
+      <p>Each section is a full-width card stacked below the existing event details. Simple, consistent with the current page style. Scroll to reach each section.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="B" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup" style="font-size:11px;padding:8px;">
+        <div style="background:#1E88E5;color:white;padding:4px 8px;border-radius:4px;margin-bottom:6px;font-weight:600;">📊 Stats row</div>
+        <div style="border:1px solid #e2e8f0;border-radius:6px;padding:6px;margin-bottom:4px;background:#fff;">Event Details card</div>
+        <div style="border:1px solid #e2e8f0;border-radius:6px;background:#fff;overflow:hidden;">
+          <div style="display:flex;border-bottom:1px solid #e2e8f0;">
+            <div style="padding:4px 8px;background:#1E88E5;color:white;font-weight:600;font-size:10px;">Discounts</div>
+            <div style="padding:4px 8px;color:#64748b;font-size:10px;">Invites</div>
+            <div style="padding:4px 8px;color:#64748b;font-size:10px;">Link</div>
+            <div style="padding:4px 8px;color:#64748b;font-size:10px;">Messages</div>
+          </div>
+          <div style="padding:8px;min-height:40px;color:#64748b;font-size:10px;">Active tab content here...</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Tabbed Panel</h3>
+      <p>A single "Event Management" card with 4 tabs. Keeps the page compact. Only one section visible at a time — good if sections are rarely used together.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="C" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="mockup" style="font-size:11px;padding:8px;">
+        <div style="background:#1E88E5;color:white;padding:4px 8px;border-radius:4px;margin-bottom:6px;font-weight:600;">📊 Stats row</div>
+        <div style="border:1px solid #e2e8f0;border-radius:6px;padding:6px;margin-bottom:4px;background:#fff;">Event Details card (full width)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:4px;">
+          <div style="border:1px solid #e2e8f0;border-radius:6px;padding:6px;background:#fff;">🏷️ Discount Codes</div>
+          <div style="border:1px solid #e2e8f0;border-radius:6px;padding:6px;background:#fff;">🔗 Shareable Link</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+          <div style="border:1px solid #e2e8f0;border-radius:6px;padding:6px;background:#fff;">✉️ Invite Mgmt</div>
+          <div style="border:1px solid #e2e8f0;border-radius:6px;padding:6px;background:#fff;">📣 Messaging</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — 2-Column Grid</h3>
+      <p>Management sections arranged in a 2×2 grid on desktop, collapsing to single column on mobile. Lets you see multiple sections at once without scrolling as far.</p>
+    </div>
+  </div>
+
+</div>

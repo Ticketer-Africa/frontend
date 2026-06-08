@@ -1,0 +1,58 @@
+<h2>How should the 4 new sections be organized?</h2>
+<p class="subtitle">The view-event page currently has: Stats cards → Event Details card → Analytics placeholder. Where do the new sections go?</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Tabbed Panel (Recommended)</h3>
+      <p>A single card below Event Details with 4 tabs: <strong>Discount Codes · Invites · Shareable Link · Message Attendees</strong>. One active section at a time. Clean and compact — doesn't balloon the page.</p>
+      <div style="margin-top:10px;background:#f0f7ff;border:1px solid #1E88E5;border-radius:8px;padding:10px;font-size:13px;">
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <span style="background:#1E88E5;color:white;border-radius:6px;padding:3px 10px;font-size:12px;">Discount Codes</span>
+          <span style="background:#f1f5f9;color:#64748b;border-radius:6px;padding:3px 10px;font-size:12px;">Invites</span>
+          <span style="background:#f1f5f9;color:#64748b;border-radius:6px;padding:3px 10px;font-size:12px;">Shareable Link</span>
+          <span style="background:#f1f5f9;color:#64748b;border-radius:6px;padding:3px 10px;font-size:12px;">Message</span>
+        </div>
+        <div style="height:80px;background:white;border-radius:6px;border:1px solid #e2e8f0;display:flex;align-items:center;padding:12px;color:#94a3b8;font-size:12px;">Content for active tab here...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Stacked Cards</h3>
+      <p>Each feature gets its own Card section stacked vertically below Event Details, always visible. Familiar pattern matching the existing page structure — easy to scan but makes the page very long.</p>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-size:12px;color:#334155;font-weight:500;">💸 Discount Codes</div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-size:12px;color:#334155;font-weight:500;">✉️ Personal Invites</div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-size:12px;color:#334155;font-weight:500;">🔗 Shareable Link</div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-size:12px;color:#334155;font-weight:500;">📣 Message Attendees</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Accordion Cards</h3>
+      <p>4 collapsible cards — collapsed by default, expand on click. Middle ground: all sections visible in the TOC but content is hidden until needed. Slightly heavier interaction model.</p>
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px;">
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="color:#334155;font-weight:500;">💸 Discount Codes</span><span style="color:#94a3b8;">▶</span>
+        </div>
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="color:#1E88E5;font-weight:500;">✉️ Personal Invites</span><span style="color:#1E88E5;">▼</span>
+        </div>
+        <div style="background:white;border:1px solid #bfdbfe;border-radius:6px;padding:10px 12px;font-size:12px;color:#94a3b8;margin-top:-4px;">Expanded content here...</div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="color:#334155;font-weight:500;">🔗 Shareable Link</span><span style="color:#94a3b8;">▶</span>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="color:#334155;font-weight:500;">📣 Message Attendees</span><span style="color:#94a3b8;">▶</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

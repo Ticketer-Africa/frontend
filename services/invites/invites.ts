@@ -132,3 +132,18 @@ export const getInviteQrBlob = async (
   const res = await axios.get(endpoint, { responseType: "blob" });
   return res.data as Blob;
 };
+
+// Returns a base64 data URL — preferred for embedding in a card the user
+// downloads via html-to-image, which can't inline blob: URLs on canvas.
+export const getInviteQrDataUrl = async (
+  eventId: string,
+  inviteId: string,
+): Promise<string> => {
+  const blob = await getInviteQrBlob(eventId, inviteId);
+  return await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error ?? new Error("Failed to read QR"));
+    reader.readAsDataURL(blob);
+  });
+};

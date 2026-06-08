@@ -42,7 +42,7 @@ import { useEventByIdV2 } from "@/services/events/events-v2.queries";
 import { useListAttendees } from "@/services/attendees/attendees.queries";
 import type { Attendee, AttendeeStatus } from "@/services/attendees/attendees";
 import { useRegenerateToken } from "@/services/invites/invites.queries";
-import { getInviteQrBlob } from "@/services/invites/invites";
+import { getInviteQrDataUrl } from "@/services/invites/invites";
 import { InviteCard } from "@/components/invite-card";
 
 type FilterType = "ALL" | "INVITE" | "TICKET";
@@ -83,12 +83,6 @@ export default function AttendeesPage() {
   const [downloading, setDownloading] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    return () => {
-      if (qrBlobUrl) URL.revokeObjectURL(qrBlobUrl);
-    };
-  }, [qrBlobUrl]);
-
 
   const openQr = async (a: Attendee) => {
     if (a.type !== "INVITE" || !a.inviteId) return;
@@ -96,8 +90,8 @@ export default function AttendeesPage() {
     setQrBlobUrl(null);
     setQrLoading(true);
     try {
-      const blob = await getInviteQrBlob(eventId, a.inviteId);
-      setQrBlobUrl(URL.createObjectURL(blob));
+      const dataUrl = await getInviteQrDataUrl(eventId, a.inviteId);
+      setQrBlobUrl(dataUrl);
     } catch {
       toast({
         title: "Error",
@@ -110,7 +104,6 @@ export default function AttendeesPage() {
   };
 
   const closeQr = () => {
-    if (qrBlobUrl) URL.revokeObjectURL(qrBlobUrl);
     setQrBlobUrl(null);
     setQrFor(null);
   };

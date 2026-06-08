@@ -1,0 +1,9 @@
+{"type":"server-started","port":52547,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:52547","screen_dir":"/Users/admin/Documents/ticketerafrica/frontend/.superpowers/brainstorm/53395-1780250422/content","state_dir":"/Users/admin/Documents/ticketerafrica/frontend/.superpowers/brainstorm/53395-1780250422/state"}
+{"type":"screen-added","file":"/Users/admin/Documents/ticketerafrica/frontend/.superpowers/brainstorm/53395-1780250422/content/shareable-otp-flow.html"}
+{"source":"user-event","type":"click","text":"You're Invited\n        Lagos Design Week 2025\n        June 12 · Eko Hotel\n      \n      \n        Enter your email to claim your spot:\n        \n        Request Access\n      \n    \n    \n      C — Hero banner + form\n      Blue gradient hero section with event branding, then form below. Most visually prominent — works well if the invite link is someone's first touch with the event.","choice":"C","id":null,"timestamp":1780250519090}
+{"type":"screen-added","file":"/Users/admin/Documents/ticketerafrica/frontend/.superpowers/brainstorm/53395-1780250422/content/otp-input-step.html"}
+{"type":"screen-added","file":"/Users/admin/Documents/ticketerafrica/frontend/.superpowers/brainstorm/53395-1780250422/content/otp-input-step-v2.html"}
+{"type":"screen-added","file":"/Users/admin/Documents/ticketerafrica/frontend/.superpowers/brainstorm/53395-1780250422/content/occurrence-selector.html"}
+{"type":"screen-added","file":"/Users/admin/Documents/ticketerafrica/frontend/.superpowers/brainstorm/53395-1780250422/content/custom-fields-checkout.html"}
+{"type":"screen-added","file":"/Users/admin/Documents/ticketerafrica/frontend/.superpowers/brainstorm/53395-1780250422/content/waiting.html"}
+{"type":"server-stopped","reason":"idle timeout"}

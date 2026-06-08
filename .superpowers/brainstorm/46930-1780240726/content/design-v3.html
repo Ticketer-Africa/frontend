@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subsystem 2 — v3</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f1f5f9; color: #1e293b; padding: 28px; }
+
+  .page-note { font-size: 12px; color: #94a3b8; margin-bottom: 20px; background: #fff; border-radius: 10px; padding: 10px 14px; border: 1px dashed #cbd5e1; }
+
+  .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 16px; }
+  .stat-card { background: white; border-radius: 16px; padding: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+  .stat-label { font-size: 11px; color: #94a3b8; font-weight: 500; margin-bottom: 6px; }
+  .stat-val { font-size: 26px; font-weight: 800; color: #0f172a; }
+  .stat-card.hi { border-left: 4px solid #1E88E5; }
+
+  .card { background: white; border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.05); margin-bottom: 16px; overflow: hidden; }
+  .card-header { padding: 18px 22px; border-bottom: 1px solid #f1f5f9; }
+  .card-title { font-size: 15px; font-weight: 700; }
+  .card-body { padding: 18px 22px; color:#94a3b8; font-size:13px; }
+
+  /* Management panel */
+  .mgmt { background: white; border-radius: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.07); overflow: hidden; }
+
+  /* Tabs — underline style */
+  .tab-bar { display: flex; padding: 0 24px; border-bottom: 1px solid #f1f5f9; gap: 0; }
+  .tab { padding: 16px 18px; font-size: 13px; font-weight: 600; color: #94a3b8; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .15s, border-color .15s; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+  .tab:hover { color: #334155; }
+  .tab.active { color: #1E88E5; border-bottom-color: #1E88E5; }
+
+  .tab-content { display: none; padding: 28px 24px; }
+  .tab-content.active { display: block; }
+
+  .section-intro { font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 22px; }
+
+  /* ── DISCOUNT CODES ── */
+  .create-box { border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 18px 20px; margin-bottom: 24px; }
+  .create-box-label { font-size: 11px; font-weight: 700; color: #1E88E5; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+  .create-box-label::before { content: ''; display: inline-block; width: 3px; height: 13px; background: #1E88E5; border-radius: 2px; }
+
+  .form-grid-4 { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
+  .field label { display: block; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 5px; }
+  .field input, .field select { width: 100%; height: 38px; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 0 12px; font-size: 13px; background: white; color: #0f172a; outline: none; }
+  .field input:focus, .field select:focus { border-color: #1E88E5; }
+  .btn-blue { height: 38px; background: #1E88E5; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; padding: 0 18px; cursor: pointer; white-space: nowrap; }
+
+  .list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .list-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .06em; }
+  .count-chip { font-size: 12px; font-weight: 700; background: #eff6ff; color: #1E88E5; border-radius: 999px; padding: 2px 10px; }
+
+  .code-row { display: flex; align-items: center; gap: 14px; padding: 13px 16px; border-radius: 12px; background: #f8fafc; margin-bottom: 8px; border: 1px solid #f1f5f9; }
+  .code-pill { font-family: monospace; font-size: 14px; font-weight: 800; color: #0f172a; background: white; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 4px 11px; letter-spacing: .06em; }
+  .type-badge { font-size: 11px; font-weight: 700; border-radius: 6px; padding: 3px 9px; }
+  .pct { background: #eff6ff; color: #1E88E5; }
+  .flat { background: #f0fdf4; color: #16a34a; }
+  .code-meta { flex: 1; display: flex; align-items: center; gap: 10px; }
+  .usage-text { font-size: 12px; color: #64748b; }
+  .bar-wrap { width: 72px; height: 4px; background: #e2e8f0; border-radius: 999px; }
+  .bar-fill { height: 4px; background: #1E88E5; border-radius: 999px; }
+  .code-date { font-size: 11px; color: #cbd5e1; }
+
+  /* ── PERSONAL INVITES ── */
+  .add-box { background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 14px; padding: 18px 20px; margin-bottom: 24px; }
+  .add-row { display: flex; gap: 10px; align-items: flex-end; }
+
+  .inv-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f8fafc; }
+  .inv-row:last-child { border-bottom: none; }
+  .av { width: 36px; height: 36px; border-radius: 50%; background: #1E88E5; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: white; flex-shrink: 0; }
+  .av.grey { background: #e2e8f0; color: #94a3b8; }
+  .inv-info { flex: 1; }
+  .inv-name { font-size: 13px; font-weight: 600; }
+  .inv-email { font-size: 11px; color: #94a3b8; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .dot-g { background: #22c55e; }
+  .dot-y { background: #f59e0b; }
+  .status-text { font-size: 11px; font-weight: 600; }
+  .st-g { color: #16a34a; }
+  .st-y { color: #d97706; }
+  .inv-btns { display: flex; gap: 5px; }
+  .ghost-btn { height: 28px; padding: 0 10px; border-radius: 7px; border: 1.5px solid #e2e8f0; background: white; font-size: 11px; font-weight: 600; color: #475569; cursor: pointer; }
+  .ghost-btn:hover { border-color: #1E88E5; color: #1E88E5; }
+  .red-btn { height: 28px; padding: 0 10px; border-radius: 7px; border: 1.5px solid #fecaca; background: #fef2f2; font-size: 11px; font-weight: 600; color: #dc2626; cursor: pointer; }
+
+  /* ── SHAREABLE LINK ── */
+  .share-panel { border: 1.5px solid #e2e8f0; border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+  .share-top { background: #0f172a; padding: 22px 22px 18px; }
+  .share-top-title { font-size: 15px; font-weight: 800; color: white; margin-bottom: 4px; }
+  .share-top-sub { font-size: 12px; color: #64748b; line-height: 1.5; }
+  .share-link-row { background: #1e293b; padding: 12px 22px; display: flex; align-items: center; gap: 10px; }
+  .share-link-text { flex: 1; font-family: monospace; font-size: 12px; color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .share-bottom { padding: 16px 22px; display: flex; gap: 8px; }
+  .sbtn { height: 34px; border-radius: 9px; font-size: 12px; font-weight: 700; padding: 0 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; border: none; }
+  .sbtn-copy { background: #1E88E5; color: white; }
+  .sbtn-regen { background: white; border: 1.5px solid #e2e8f0; color: #334155; }
+  .sbtn-revoke { background: #fef2f2; border: 1.5px solid #fecaca; color: #dc2626; margin-left: auto; }
+
+  .steps-row { display: flex; gap: 0; align-items: flex-start; }
+  .step-item { flex: 1; text-align: center; position: relative; }
+  .step-item:not(:last-child)::after { content: ''; position: absolute; top: 14px; right: 0; width: 50%; height: 1.5px; background: #e2e8f0; }
+  .step-item:not(:first-child)::before { content: ''; position: absolute; top: 14px; left: 0; width: 50%; height: 1.5px; background: #e2e8f0; }
+  .step-num { width: 28px; height: 28px; background: #1E88E5; color: white; border-radius: 50%; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; position: relative; z-index: 1; }
+  .step-label { font-size: 11px; color: #64748b; line-height: 1.4; }
+  .steps-title { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
+
+  /* ── MESSAGE ── */
+  .rcpt-row { display: flex; gap: 10px; margin-bottom: 20px; }
+  .rcpt-opt { flex: 1; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: border-color .15s, background .15s; }
+  .rcpt-opt.on { border-color: #1E88E5; background: #f0f7ff; }
+  .rcpt-opt-icon { font-size: 20px; margin-bottom: 6px; }
+  .rcpt-opt-title { font-size: 13px; font-weight: 700; color: #0f172a; }
+  .rcpt-opt.on .rcpt-opt-title { color: #1E88E5; }
+  .rcpt-opt-sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+  .msg-field { margin-bottom: 14px; }
+  .msg-field label { display: block; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  .msg-field input, .msg-field textarea, .msg-field select { width: 100%; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 10px 13px; font-size: 13px; background: white; color: #0f172a; outline: none; font-family: inherit; }
+  .msg-field input, .msg-field select { height: 40px; }
+  .msg-field textarea { height: 100px; resize: vertical; }
+  .msg-field input:focus, .msg-field textarea:focus { border-color: #1E88E5; }
+  .char-hint { text-align: right; font-size: 11px; color: #cbd5e1; margin-top: 4px; }
+
+  .send-row { display: flex; gap: 10px; align-items: center; }
+  .send-btn { height: 40px; background: #1E88E5; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; padding: 0 22px; cursor: pointer; margin-left: auto; }
+</style>
+</head>
+<body>
+
+<div class="page-note">📐 Structure mockup only — real app uses shadcn/ui, Framer Motion, Tailwind, dark mode. No gradients.</div>
+
+<div class="stats">
+  <div class="stat-card"><div class="stat-label">Total Tickets</div><div class="stat-val">500</div></div>
+  <div class="stat-card"><div class="stat-label">Tickets Sold</div><div class="stat-val">312</div></div>
+  <div class="stat-card"><div class="stat-label">% Sold</div><div class="stat-val">62%</div></div>
+  <div class="stat-card hi"><div class="stat-label">Net Earnings</div><div class="stat-val">₦1.56M</div></div>
+</div>
+
+<div class="card">
+  <div class="card-header"><span class="card-title">Event Details</span></div>
+  <div class="card-body">[ existing content unchanged ]</div>
+</div>
+
+<div class="mgmt">
+  <div class="tab-bar">
+    <div class="tab active" onclick="sw('discounts',this)">🏷️ Discount Codes</div>
+    <div class="tab" onclick="sw('invites',this)">✉️ Personal Invites</div>
+    <div class="tab" onclick="sw('shareable',this)">🔗 Shareable Link</div>
+    <div class="tab" onclick="sw('message',this)">📣 Message Attendees</div>
+  </div>
+
+  <!-- DISCOUNTS -->
+  <div class="tab-content active" id="tab-discounts">
+    <p class="section-intro">Create promo codes attendees enter at checkout. Codes are auto-uppercased and tied to this event only.</p>
+    <div class="create-box">
+      <div class="create-box-label">New Code</div>
+      <div class="form-grid-4">
+        <div class="field"><label>Code</label><input placeholder="SAVE20" style="font-family:monospace;font-weight:700;text-transform:uppercase;"></div>
+        <div class="field"><label>Type</label><select><option>PERCENT</option><option>FLAT (₦)</option></select></div>
+        <div class="field"><label>Value</label><input type="number" placeholder="e.g. 15"></div>
+        <div class="field"><label>Max Uses</label><input type="number" placeholder="Unlimited"></div>
+        <div><button class="btn-blue">Create</button></div>
+      </div>
+    </div>
+    <div class="list-header">
+      <span class="list-label">Active Codes</span>
+      <span class="count-chip">3</span>
+    </div>
+    <div class="code-row">
+      <span class="code-pill">EARLYBIRD</span>
+      <span class="type-badge pct">15%</span>
+      <div class="code-meta">
+        <span class="usage-text">42 / 100 uses</span>
+        <div class="bar-wrap"><div class="bar-fill" style="width:42%"></div></div>
+      </div>
+      <span class="code-date">Jun 1</span>
+    </div>
+    <div class="code-row">
+      <span class="code-pill">VIP50</span>
+      <span class="type-badge flat">₦5,000</span>
+      <div class="code-meta"><span class="usage-text">8 uses · No limit</span></div>
+      <span class="code-date">May 28</span>
+    </div>
+    <div class="code-row">
+      <span class="code-pill">STAFF</span>
+      <span class="type-badge pct">100%</span>
+      <div class="code-meta">
+        <span class="usage-text">3 / 10 uses</span>
+        <div class="bar-wrap"><div class="bar-fill" style="width:30%"></div></div>
+      </div>
+      <span class="code-date">May 20</span>
+    </div>
+  </div>
+
+  <!-- INVITES -->
+  <div class="tab-content" id="tab-invites">
+    <p class="section-intro">Add specific guests by email. Each receives a private one-use link — only they can access it.</p>
+    <div class="add-box">
+      <div class="create-box-label">Add Invitees</div>
+      <div class="add-row">
+        <div class="field" style="flex:1;"><label>Name (optional)</label><input placeholder="Jane Doe"></div>
+        <div class="field" style="flex:2;"><label>Email</label><input placeholder="guest@example.com"></div>
+        <button class="btn-blue">Send Invite</button>
+      </div>
+    </div>
+    <div class="list-header">
+      <span class="list-label">Invitees</span>
+      <span class="count-chip">3 sent</span>
+    </div>
+    <div class="inv-row">
+      <div class="av">J</div>
+      <div class="inv-info"><div class="inv-name">Jane Doe</div><div class="inv-email">jane@example.com</div></div>
+      <div class="status-dot dot-g"></div><span class="status-text st-g">Accepted</span>
+      <div class="inv-btns"><button class="ghost-btn">Resend</button><button class="ghost-btn">New link</button><button class="red-btn">Remove</button></div>
+    </div>
+    <div class="inv-row">
+      <div class="av grey">K</div>
+      <div class="inv-info"><div class="inv-name">Kofi Mensah</div><div class="inv-email">kofi@example.com</div></div>
+      <div class="status-dot dot-y"></div><span class="status-text st-y">Pending</span>
+      <div class="inv-btns"><button class="ghost-btn">Resend</button><button class="ghost-btn">New link</button><button class="red-btn">Remove</button></div>
+    </div>
+    <div class="inv-row">
+      <div class="av grey">A</div>
+      <div class="inv-info"><div class="inv-name">Amara Diallo</div><div class="inv-email">amara@example.com</div></div>
+      <div class="status-dot dot-y"></div><span class="status-text st-y">Pending</span>
+      <div class="inv-btns"><button class="ghost-btn">Resend</button><button class="ghost-btn">New link</button><button class="red-btn">Remove</button></div>
+    </div>
+  </div>
+
+  <!-- SHAREABLE -->
+  <div class="tab-content" id="tab-shareable">
+    <p class="section-intro">One link for broad sharing — WhatsApp, Instagram, anywhere. Recipients verify via OTP before checkout.</p>
+    <div class="share-panel">
+      <div class="share-top">
+        <div class="share-top-title">Your Shareable Link</div>
+        <div class="share-top-sub" style="color:#64748b;margin-top:4px;">Anyone with this link enters their email and verifies via OTP to proceed to checkout.</div>
+      </div>
+      <div class="share-link-row">
+        <span class="share-link-text">https://ticketer.africa/invite?s=eyJhbGciOiJIUzI1NiJ9.Xbc9kR...</span>
+      </div>
+      <div class="share-bottom">
+        <button class="sbtn sbtn-copy">📋 Copy</button>
+        <button class="sbtn sbtn-regen">🔄 Regenerate</button>
+        <button class="sbtn sbtn-revoke">🗑 Revoke</button>
+      </div>
+    </div>
+
+    <div class="steps-title">How guests use this link</div>
+    <div class="steps-row">
+      <div class="step-item"><div class="step-num">1</div><div class="step-label">Open link</div></div>
+      <div class="step-item"><div class="step-num">2</div><div class="step-label">Enter email</div></div>
+      <div class="step-item"><div class="step-num">3</div><div class="step-label">Verify OTP</div></div>
+      <div class="step-item"><div class="step-num">4</div><div class="step-label">Checkout</div></div>
+    </div>
+  </div>
+
+  <!-- MESSAGE -->
+  <div class="tab-content" id="tab-message">
+    <p class="section-intro">Send a direct email to your ticket holders — updates, reminders, last-minute changes.</p>
+
+    <div class="rcpt-row">
+      <div class="rcpt-opt on" onclick="pickRcpt(this,'all')">
+        <div class="rcpt-opt-icon">👥</div>
+        <div class="rcpt-opt-title">All Attendees</div>
+        <div class="rcpt-opt-sub">Everyone with a ticket</div>
+      </div>
+      <div class="rcpt-opt" onclick="pickRcpt(this,'specific')">
+        <div class="rcpt-opt-icon">🎯</div>
+        <div class="rcpt-opt-title">Specific People</div>
+        <div class="rcpt-opt-sub">Pick by email address</div>
+      </div>
+    </div>
+
+    <div id="specific-field" style="display:none;">
+      <div class="msg-field">
+        <label>Email Addresses (one per line)</label>
+        <textarea placeholder="alice@example.com&#10;bob@example.com" style="height:70px;"></textarea>
+      </div>
+    </div>
+
+    <div class="msg-field">
+      <label>Subject</label>
+      <input placeholder="e.g. Quick update about tomorrow night">
+    </div>
+    <div class="msg-field">
+      <label>Message</label>
+      <textarea placeholder="Write your message here...">Hi everyone — doors open at 5 PM sharp. Please arrive early to avoid queues. See you there!</textarea>
+      <div class="char-hint">134 / 5000</div>
+    </div>
+
+    <div class="send-row">
+      <div class="msg-field" style="margin:0;flex:0 0 auto;">
+        <select onchange="toggleSched(this)" style="height:40px;border:1.5px solid #e2e8f0;border-radius:10px;padding:0 12px;font-size:13px;background:white;outline:none;cursor:pointer;">
+          <option value="now">⚡ Send now</option>
+          <option value="later">🕐 Schedule for later</option>
+        </select>
+      </div>
+      <input type="datetime-local" id="sched-dt" style="display:none;height:40px;border:1.5px solid #e2e8f0;border-radius:10px;padding:0 12px;font-size:13px;background:white;outline:none;">
+      <button class="send-btn">Send Message →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function sw(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+function pickRcpt(el, mode) {
+  document.querySelectorAll('.rcpt-opt').forEach(o => o.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('specific-field').style.display = mode === 'specific' ? 'block' : 'none';
+}
+function toggleSched(sel) {
+  document.getElementById('sched-dt').style.display = sel.value === 'later' ? 'inline-block' : 'none';
+}
+</script>
+</body>
+</html>

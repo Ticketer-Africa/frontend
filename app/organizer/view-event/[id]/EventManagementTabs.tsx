@@ -24,7 +24,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { getInviteQrBlob, type Invite } from "@/services/invites/invites";
+import { getInviteQrDataUrl, type Invite } from "@/services/invites/invites";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -203,8 +203,8 @@ export default function EventManagementTabs({
     setQrBlobUrl(null);
     setQrLoading(true);
     try {
-      const blob = await getInviteQrBlob(eventId, inv.id);
-      setQrBlobUrl(URL.createObjectURL(blob));
+      const dataUrl = await getInviteQrDataUrl(eventId, inv.id);
+      setQrBlobUrl(dataUrl);
     } catch {
       toast({
         title: "Error",
@@ -217,7 +217,6 @@ export default function EventManagementTabs({
   };
 
   const closeQr = () => {
-    if (qrBlobUrl) URL.revokeObjectURL(qrBlobUrl);
     setQrBlobUrl(null);
     setQrInvite(null);
   };
@@ -255,11 +254,6 @@ export default function EventManagementTabs({
     setTimeout(() => setCopiedInviteLink(false), 2000);
   };
 
-  useEffect(() => {
-    return () => {
-      if (qrBlobUrl) URL.revokeObjectURL(qrBlobUrl);
-    };
-  }, [qrBlobUrl]);
 
   const handleCopyLink = async (token: string) => {
     const url = `${window.location.origin}/invite/shareable?s=${token}&eventSlug=${eventSlug}`;
