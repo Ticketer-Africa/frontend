@@ -119,6 +119,39 @@ export const getShareableLink = async (
   }
 };
 
+export type VerifyInviteStatus = "VALID" | "ALREADY_USED" | "INACTIVE";
+
+export interface VerifyInviteResponse {
+  status: VerifyInviteStatus;
+  message: string;
+  invite: {
+    id: string;
+    name: string | null;
+    email: string | null;
+    phone: string | null;
+  };
+  event: {
+    id: string;
+    name: string;
+    slug: string;
+    date: string;
+    location: string | null;
+    bannerUrl: string | null;
+    organizerId: string;
+    isActive: boolean;
+  };
+  alreadyUsed: boolean;
+  usedAt: string | null;
+}
+
+export const verifyInvite = async (
+  inviteToken: string,
+): Promise<VerifyInviteResponse> => {
+  const endpoint = buildEndpoint("v2", "events/invite/verify");
+  const res = await axios.post<VerifyInviteResponse>(endpoint, { inviteToken });
+  return res.data;
+};
+
 export const revokeShareableLink = async (eventId: string): Promise<void> => {
   const endpoint = buildEndpoint("v2", `${BASE(eventId)}/shareable`);
   await axios.delete(endpoint);

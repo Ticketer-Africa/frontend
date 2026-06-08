@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { parseTicketData, type QRTicketData } from "@/lib/qr-utils";
 import { useVerifyTicket } from "@/services/tickets/tickets.queries";
+import { verifyInvite, type VerifyInviteResponse } from "@/services/invites/invites";
 import { useAuth } from "@/lib/auth-context";
 import { formatDate, formatPrice } from "@/lib/helpers";
 import { toast } from "sonner";
@@ -63,6 +64,9 @@ export default function VerifyTicketPage() {
     null
   );
   const [ticketData, setTicketData] = useState<QRTicketData | null>(null);
+  const [inviteVerification, setInviteVerification] =
+    useState<VerifyInviteResponse | null>(null);
+  const [inviteVerifying, setInviteVerifying] = useState(false);
   const [error, setError] = useState<string>("");
   const [mode, setMode] = useState<"camera" | "url-param">("camera");
   const [scannerActive, setScannerActive] = useState(false);
@@ -114,11 +118,41 @@ export default function VerifyTicketPage() {
 
   // ─── camera scan callback ─────────────────────────────────────────────────
 
+  const handleVerifyInvite = async (inviteToken: string) => {
+    try {
+      setError("");
+      setInviteVerifying(true);
+      const resp = await verifyInvite(inviteToken);
+      setInviteVerification(resp);
+      if (resp.status === "VALID") {
+        toast.success(resp.message);
+      } else {
+        toast.error(resp.message);
+      }
+    } catch (err: any) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Failed to verify invite.";
+      setError(msg);
+      toast.error(msg);
+    } finally {
+      setInviteVerifying(false);
+    }
+  };
+
   const handleCameraScan = (rawText: string) => {
     setScannerActive(false);
-    // QR codes encode the full verification URL — extract the ?data= param
+    // QR codes encode the full verification URL — extract ?data= (ticket)
+    // or ?i= (invite). If neither parses, fall back to treating the raw
+    // text as a ticket data string.
     try {
       const url = new URL(rawText);
+      const inviteToken = url.searchParams.get("i");
+      if (inviteToken) {
+        handleVerifyInvite(inviteToken);
+        return;
+      }
       const dataParam = url.searchParams.get("data");
       if (dataParam) {
         handleVerify(dataParam);
@@ -135,6 +169,7 @@ export default function VerifyTicketPage() {
   const handleScanNext = () => {
     setVerification(null);
     setTicketData(null);
+    setInviteVerification(null);
     setError("");
     setMode("camera");
     setScannerActive(true);
@@ -143,6 +178,13 @@ export default function VerifyTicketPage() {
   // ─── URL-param mode on mount ──────────────────────────────────────────────
 
   useEffect(() => {
+    const inviteToken = searchParams.get("i");
+    if (inviteToken) {
+      setMode("url-param");
+      setScannerActive(false);
+      handleVerifyInvite(inviteToken);
+      return;
+    }
     const dataParam = searchParams.get("data");
     if (dataParam) {
       setMode("url-param");
@@ -156,6 +198,113 @@ export default function VerifyTicketPage() {
   }, [searchParams]);
 
   const ticket = verification?.ticket;
+
+  // ─── render: invite verification result ───────────────────────────────────
+
+  if (inviteVerifying) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#1E88E5] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Verifying invite...
+          </h2>
+        </div>
+      </div>
+    );
+  }
+
+  if (inviteVerification) {
+    const isOk = inviteVerification.status === "VALID";
+    const isUsed = inviteVerification.status === "ALREADY_USED";
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="container mx-auto max-w-md py-8">
+          <Card
+            className={`bg-white shadow-lg rounded-xl ${
+              isOk
+                ? "border-green-200"
+                : isUsed
+                  ? "border-amber-200"
+                  : "border-red-200"
+            }`}
+          >
+            <CardHeader className="text-center">
+              {isOk ? (
+                <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+              ) : isUsed ? (
+                <AlertCircle className="h-16 w-16 text-amber-500 mx-auto mb-4" />
+              ) : (
+                <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+              )}
+              <CardTitle
+                className={
+                  isOk
+                    ? "text-green-600"
+                    : isUsed
+                      ? "text-amber-600"
+                      : "text-red-600"
+                }
+              >
+                {isOk
+                  ? "Invite checked in ✓"
+                  : isUsed
+                    ? "Already checked in"
+                    : "Invite invalid"}
+              </CardTitle>
+              <p className="text-gray-600 mt-2">{inviteVerification.message}</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-gray-50 rounded-lg p-4 text-sm space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Guest</span>
+                  <span className="text-gray-900 font-medium">
+                    {inviteVerification.invite.name || "—"}
+                  </span>
+                </div>
+                {inviteVerification.invite.email && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Email</span>
+                    <span className="text-gray-900">
+                      {inviteVerification.invite.email}
+                    </span>
+                  </div>
+                )}
+                {inviteVerification.invite.phone && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Phone</span>
+                    <span className="text-gray-900">
+                      {inviteVerification.invite.phone}
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Event</span>
+                  <span className="text-gray-900 font-medium">
+                    {inviteVerification.event.name}
+                  </span>
+                </div>
+                {inviteVerification.usedAt && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Checked in</span>
+                    <span className="text-gray-900">
+                      {new Date(inviteVerification.usedAt).toLocaleString()}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <Button
+                className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white"
+                onClick={handleScanNext}
+              >
+                Scan next
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   // ─── render: verifying spinner ────────────────────────────────────────────
 
