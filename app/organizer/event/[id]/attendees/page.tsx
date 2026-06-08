@@ -1,0 +1,353 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import {
+  ArrowLeft,
+  Copy,
+  Download,
+  Loader2,
+  RefreshCw,
+  Search,
+  QrCode,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { useEventByIdV2 } from "@/services/events/events-v2.queries";
+import { useListAttendees } from "@/services/attendees/attendees.queries";
+import type { Attendee, AttendeeStatus } from "@/services/attendees/attendees";
+import { useRegenerateToken } from "@/services/invites/invites.queries";
+import { getInviteQrBlob } from "@/services/invites/invites";
+
+type FilterType = "ALL" | "INVITE" | "TICKET";
+
+const STATUS_VARIANT: Record<AttendeeStatus, { label: string; className: string }> = {
+  PENDING: { label: "Pending", className: "bg-amber-100 text-amber-800" },
+  CHECKED_IN: { label: "Checked in", className: "bg-green-100 text-green-800" },
+  ACTIVE: { label: "Active", className: "bg-blue-100 text-blue-800" },
+  USED: { label: "Used", className: "bg-gray-200 text-gray-700" },
+};
+
+export default function AttendeesPage() {
+  const params = useParams();
+  const eventId = params.id as string;
+  const { toast } = useToast();
+
+  const [type, setType] = useState<FilterType>("ALL");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search.trim()), 300);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  const { data: event } = useEventByIdV2(eventId);
+  const { data, isLoading, isFetching } = useListAttendees(eventId, {
+    type,
+    q: debouncedSearch || undefined,
+  });
+
+  const { mutate: regenerateToken, isPending: regenerating } =
+    useRegenerateToken(eventId);
+
+  const [qrFor, setQrFor] = useState<Attendee | null>(null);
+  const [qrBlobUrl, setQrBlobUrl] = useState<string | null>(null);
+  const [qrLoading, setQrLoading] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (qrBlobUrl) URL.revokeObjectURL(qrBlobUrl);
+    };
+  }, [qrBlobUrl]);
+
+  const openQr = async (a: Attendee) => {
+    if (a.type !== "INVITE" || !a.inviteId) return;
+    setQrFor(a);
+    setQrBlobUrl(null);
+    setQrLoading(true);
+    try {
+      const blob = await getInviteQrBlob(eventId, a.inviteId);
+      setQrBlobUrl(URL.createObjectURL(blob));
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to load QR code.",
+        variant: "destructive",
+      });
+    } finally {
+      setQrLoading(false);
+    }
+  };
+
+  const closeQr = () => {
+    if (qrBlobUrl) URL.revokeObjectURL(qrBlobUrl);
+    setQrBlobUrl(null);
+    setQrFor(null);
+  };
+
+  const downloadQr = () => {
+    if (!qrBlobUrl || !qrFor) return;
+    const a = document.createElement("a");
+    a.href = qrBlobUrl;
+    a.download = `invite-${(qrFor.name || "guest")
+      .replace(/\s+/g, "-")
+      .toLowerCase()}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
+  const copyLink = async (link: string | null) => {
+    if (!link) return;
+    await navigator.clipboard.writeText(link);
+    toast({ title: "Copied!", description: "Invite link copied." });
+  };
+
+  const handleRegenerate = (a: Attendee) => {
+    if (a.type !== "INVITE" || !a.inviteId) return;
+    regenerateToken(a.inviteId, {
+      onSuccess: () => {
+        toast({
+          title: "Token regenerated",
+          description: `New QR / link issued for ${a.name || a.email || "attendee"}. The old one no longer works.`,
+        });
+      },
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "Failed to regenerate invite token.",
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
+  const rows = data?.attendees ?? [];
+  const counts = data?.counts;
+
+  const summary = useMemo(() => {
+    if (!data) return null;
+    return [
+      { label: "Total", value: data.total },
+      { label: "Invitees", value: counts?.invites ?? 0 },
+      { label: "Ticket-holders", value: counts?.tickets ?? 0 },
+    ];
+  }, [data, counts]);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold">Attendees</h1>
+            <p className="text-sm text-muted-foreground">
+              {event?.name ? `Managing attendees for ${event.name}` : "Manage everyone going to this event"}
+            </p>
+          </div>
+          <Button asChild variant="outline" className="w-full md:w-auto rounded-full">
+            <Link href={`/organizer/view-event/${eventId}`}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to event
+            </Link>
+          </Button>
+        </div>
+
+        {summary && (
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
+            {summary.map((s) => (
+              <Card key={s.label}>
+                <CardContent className="py-4">
+                  <p className="text-xs text-muted-foreground">{s.label}</p>
+                  <p className="text-2xl font-bold">{s.value}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        <Card>
+          <CardHeader className="gap-4">
+            <CardTitle>All attendees</CardTitle>
+            <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+              <Tabs value={type} onValueChange={(v) => setType(v as FilterType)}>
+                <TabsList>
+                  <TabsTrigger value="ALL">All</TabsTrigger>
+                  <TabsTrigger value="INVITE">Invitees</TabsTrigger>
+                  <TabsTrigger value="TICKET">Ticket-holders</TabsTrigger>
+                </TabsList>
+              </Tabs>
+              <div className="relative flex-1 max-w-sm">
+                <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  className="pl-9"
+                  placeholder="Search name, email, phone, ticket code"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+              {isFetching && !isLoading && (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-16">
+                <Loader2 className="h-8 w-8 animate-spin text-[#1E88E5]" />
+              </div>
+            ) : rows.length === 0 ? (
+              <div className="text-center py-16 text-muted-foreground">
+                No attendees yet.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Contact</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Category / Code</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {rows.map((a) => {
+                      const s = STATUS_VARIANT[a.status];
+                      return (
+                        <TableRow key={`${a.type}-${a.id}`}>
+                          <TableCell className="font-medium">
+                            {a.name || <span className="text-muted-foreground italic">No name</span>}
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            <div>{a.email || "—"}</div>
+                            {a.phone && (
+                              <div className="text-muted-foreground">{a.phone}</div>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">
+                              {a.type === "INVITE" ? "Invite" : "Ticket"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <span className={`inline-block px-2 py-1 rounded text-xs ${s.className}`}>
+                              {s.label}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            {a.type === "TICKET" ? (
+                              <>
+                                <div>{a.ticketCategoryName || "—"}</div>
+                                {a.ticketCode && (
+                                  <div className="text-muted-foreground font-mono text-xs">
+                                    {a.ticketCode}
+                                  </div>
+                                )}
+                              </>
+                            ) : (
+                              <span className="text-muted-foreground">—</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {a.type === "INVITE" ? (
+                              <div className="flex justify-end gap-2 flex-wrap">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => openQr(a)}
+                                >
+                                  <QrCode className="h-4 w-4 mr-1" />
+                                  QR
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => copyLink(a.inviteLink)}
+                                  disabled={!a.inviteLink}
+                                >
+                                  <Copy className="h-4 w-4 mr-1" />
+                                  Link
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleRegenerate(a)}
+                                  disabled={regenerating}
+                                >
+                                  <RefreshCw className={`h-4 w-4 mr-1 ${regenerating ? "animate-spin" : ""}`} />
+                                  Regenerate
+                                </Button>
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground text-xs">—</span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <Dialog open={!!qrFor} onOpenChange={(open) => !open && closeQr()}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {qrFor?.name || qrFor?.email || "Invite QR"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center justify-center py-4 min-h-[300px]">
+            {qrLoading ? (
+              <Loader2 className="h-8 w-8 animate-spin text-[#1E88E5]" />
+            ) : qrBlobUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={qrBlobUrl} alt="Invite QR" className="max-w-full rounded-md" />
+            ) : (
+              <p className="text-muted-foreground text-sm">No QR available.</p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={closeQr}>
+              Close
+            </Button>
+            <Button onClick={downloadQr} disabled={!qrBlobUrl}>
+              <Download className="h-4 w-4 mr-2" />
+              Download
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
