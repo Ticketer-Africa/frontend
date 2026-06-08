@@ -217,6 +217,43 @@ export default function VerifyTicketPage() {
   if (inviteVerification) {
     const isOk = inviteVerification.status === "VALID";
     const isUsed = inviteVerification.status === "ALREADY_USED";
+
+    const formatRelativeCheckin = (iso: string) => {
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return iso;
+      const time = d.toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit",
+      });
+      const startOfDay = (dt: Date) =>
+        new Date(dt.getFullYear(), dt.getMonth(), dt.getDate()).getTime();
+      const today = startOfDay(new Date());
+      const that = startOfDay(d);
+      const diffDays = Math.round((today - that) / (1000 * 60 * 60 * 24));
+      if (diffDays === 0) return `Today at ${time}`;
+      if (diffDays === 1) return `Yesterday at ${time}`;
+      if (diffDays === -1) return `Tomorrow at ${time}`;
+      const datePart = d.toLocaleDateString([], {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+      return `${datePart} at ${time}`;
+    };
+
+    const checkInLabel = inviteVerification.usedAt
+      ? formatRelativeCheckin(inviteVerification.usedAt)
+      : null;
+    const headlineSubtitle = isOk
+      ? checkInLabel
+        ? `Checked in ${checkInLabel}`
+        : "Checked in"
+      : isUsed
+        ? checkInLabel
+          ? `Already checked in ${checkInLabel}`
+          : "This invite was already checked in."
+        : inviteVerification.message;
     return (
       <div className="min-h-screen bg-gray-50 p-4">
         <div className="container mx-auto max-w-md py-8">
@@ -252,7 +289,7 @@ export default function VerifyTicketPage() {
                     ? "Already checked in"
                     : "Invite invalid"}
               </CardTitle>
-              <p className="text-gray-600 mt-2">{inviteVerification.message}</p>
+              <p className="text-gray-600 mt-2">{headlineSubtitle}</p>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="bg-gray-50 rounded-lg p-4 text-sm space-y-2">
@@ -284,12 +321,10 @@ export default function VerifyTicketPage() {
                     {inviteVerification.event.name}
                   </span>
                 </div>
-                {inviteVerification.usedAt && (
+                {checkInLabel && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Checked in</span>
-                    <span className="text-gray-900">
-                      {new Date(inviteVerification.usedAt).toLocaleString()}
-                    </span>
+                    <span className="text-gray-900">{checkInLabel}</span>
                   </div>
                 )}
               </div>
