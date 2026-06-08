@@ -33,12 +33,32 @@ export const listInvites = async (eventId: string): Promise<Invite[]> => {
   return res.data;
 };
 
+export interface AddInvitesResponse {
+  eventId: string;
+  mode?: InviteDeliveryMode;
+  addedCount: number;
+  skippedCount: number;
+  added: Array<{
+    id: string;
+    email: string | null;
+    phone: string | null;
+    name: string | null;
+    inviteLink?: string;
+    inviteToken?: string;
+    createdAt?: string;
+  }>;
+}
+
 export const addInvitee = async (
   eventId: string,
   payload: AddInviteePayload,
-): Promise<Invite> => {
+): Promise<AddInvitesResponse> => {
   const endpoint = buildEndpoint("v2", BASE(eventId));
-  const res = await axios.post<Invite>(endpoint, payload);
+  const { mode, ...invitee } = payload;
+  const res = await axios.post<AddInvitesResponse>(endpoint, {
+    invitees: [invitee],
+    ...(mode ? { mode } : {}),
+  });
   return res.data;
 };
 
