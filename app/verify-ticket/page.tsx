@@ -217,6 +217,9 @@ export default function VerifyTicketPage() {
   if (inviteVerification) {
     const isOk = inviteVerification.status === "VALID";
     const isUsed = inviteVerification.status === "ALREADY_USED";
+    const isPending =
+      inviteVerification.status === "NOT_STARTED" ||
+      inviteVerification.status === "EVENT_PASSED";
 
     const formatRelativeCheckin = (iso: string) => {
       const d = new Date(iso);
@@ -245,6 +248,17 @@ export default function VerifyTicketPage() {
     const checkInLabel = inviteVerification.usedAt
       ? formatRelativeCheckin(inviteVerification.usedAt)
       : null;
+    const formatEventDay = (iso: string) => {
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return iso;
+      return d.toLocaleDateString([], {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+    };
+
     const headlineSubtitle = isOk
       ? checkInLabel
         ? `Checked in ${checkInLabel}`
@@ -253,7 +267,15 @@ export default function VerifyTicketPage() {
         ? checkInLabel
           ? `Already checked in ${checkInLabel}`
           : "This invite was already checked in."
-        : inviteVerification.message;
+        : inviteVerification.status === "NOT_STARTED"
+          ? `Check-in isn't open yet — the event is on ${formatEventDay(
+              inviteVerification.event.date,
+            )}.`
+          : inviteVerification.status === "EVENT_PASSED"
+            ? `Check-in is closed — the event ended on ${formatEventDay(
+                inviteVerification.event.date,
+              )}.`
+            : inviteVerification.message;
     return (
       <div className="min-h-screen bg-gray-50 p-4">
         <div className="container mx-auto max-w-md py-8">
@@ -261,7 +283,7 @@ export default function VerifyTicketPage() {
             className={`bg-white shadow-lg rounded-xl ${
               isOk
                 ? "border-green-200"
-                : isUsed
+                : isUsed || isPending
                   ? "border-amber-200"
                   : "border-red-200"
             }`}
@@ -269,7 +291,7 @@ export default function VerifyTicketPage() {
             <CardHeader className="text-center">
               {isOk ? (
                 <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-              ) : isUsed ? (
+              ) : isUsed || isPending ? (
                 <AlertCircle className="h-16 w-16 text-amber-500 mx-auto mb-4" />
               ) : (
                 <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
@@ -278,7 +300,7 @@ export default function VerifyTicketPage() {
                 className={
                   isOk
                     ? "text-green-600"
-                    : isUsed
+                    : isUsed || isPending
                       ? "text-amber-600"
                       : "text-red-600"
                 }
@@ -287,7 +309,11 @@ export default function VerifyTicketPage() {
                   ? "Invite checked in ✓"
                   : isUsed
                     ? "Already checked in"
-                    : "Invite invalid"}
+                    : inviteVerification.status === "NOT_STARTED"
+                      ? "Not the event day yet"
+                      : inviteVerification.status === "EVENT_PASSED"
+                        ? "Event has ended"
+                        : "Invite invalid"}
               </CardTitle>
               <p className="text-gray-600 mt-2">{headlineSubtitle}</p>
             </CardHeader>

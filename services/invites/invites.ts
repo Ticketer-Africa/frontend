@@ -119,7 +119,12 @@ export const getShareableLink = async (
   }
 };
 
-export type VerifyInviteStatus = "VALID" | "ALREADY_USED" | "INACTIVE";
+export type VerifyInviteStatus =
+  | "VALID"
+  | "ALREADY_USED"
+  | "INACTIVE"
+  | "NOT_STARTED"
+  | "EVENT_PASSED";
 
 export interface VerifyInviteResponse {
   status: VerifyInviteStatus;
