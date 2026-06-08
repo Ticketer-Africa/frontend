@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toPng } from "html-to-image";
+import { InviteCard } from "@/components/invite-card";
 import {
   Loader2,
   Copy,
@@ -11,7 +13,18 @@ import {
   Link,
   Tag,
   Mail,
+  QrCode,
+  Download,
+  Phone,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { getInviteQrDataUrl, type Invite } from "@/services/invites/invites";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -47,12 +60,18 @@ interface EventManagementTabsProps {
   eventId: string;
   accessType: "PUBLIC" | "INVITE_ONLY";
   eventSlug: string;
+  eventName?: string;
+  eventDate?: string | Date | null;
+  eventLocation?: string | null;
 }
 
 export default function EventManagementTabs({
   eventId,
   accessType,
   eventSlug,
+  eventName,
+  eventDate,
+  eventLocation,
 }: EventManagementTabsProps) {
   const { toast } = useToast();
 
@@ -106,22 +125,135 @@ export default function EventManagementTabs({
     useGenerateShareableLink(eventId);
   const { mutate: revokeLink, isPending: revokingLink } =
     useRevokeShareableLink(eventId);
-  const [inviteForm, setInviteForm] = useState({ email: "", name: "" });
+  const [inviteForm, setInviteForm] = useState<{
+    name: string;
+    contactMethod: "email" | "phone";
+    email: string;
+    phone: string;
+  }>({ name: "", contactMethod: "email", email: "", phone: "" });
   const [copiedLink, setCopiedLink] = useState(false);
+  const [qrInvite, setQrInvite] = useState<Invite | null>(null);
+  const [qrBlobUrl, setQrBlobUrl] = useState<string | null>(null);
+  const [qrDownloading, setQrDownloading] = useState(false);
+  const qrCardRef = useRef<HTMLDivElement>(null);
+  const [qrLoading, setQrLoading] = useState(false);
+  const [copiedInviteLink, setCopiedInviteLink] = useState(false);
 
-  const handleAddInvitee = () => {
-    if (!inviteForm.email || !inviteForm.name) return;
-    const { email } = inviteForm;
-    addInvitee(inviteForm, {
-      onSuccess: () => {
-        setInviteForm({ email: "", name: "" });
-        toast({ title: "Invite sent", description: `Invite sent to ${email}.` });
+  const inviteContactReady =
+    inviteForm.contactMethod === "email"
+      ? !!inviteForm.email
+      : !!inviteForm.phone;
+
+  const submitInvite = (mode: "GENERATE" | "SEND") => {
+    if (!inviteForm.name || !inviteContactReady) return;
+    const payload = {
+      name: inviteForm.name,
+      mode,
+      ...(inviteForm.contactMethod === "email"
+        ? { email: inviteForm.email }
+        : { phone: inviteForm.phone }),
+    };
+    const label =
+      inviteForm.contactMethod === "email"
+        ? inviteForm.email
+        : inviteForm.phone;
+    addInvitee(payload, {
+      onSuccess: (resp: any) => {
+        setInviteForm({
+          name: "",
+          contactMethod: inviteForm.contactMethod,
+          email: "",
+          phone: "",
+        });
+        if (mode === "SEND") {
+          toast({ title: "Invite sent", description: `Invite sent to ${label}.` });
+        } else {
+          toast({
+            title: "Invite created",
+            description: `Open the QR for ${label}.`,
+          });
+          // Auto-open QR modal for the freshly added invite (last item in `added`)
+          const added = resp?.added?.[0];
+          if (added?.id) {
+            openQrFor({
+              id: added.id,
+              eventId,
+              name: added.name ?? inviteForm.name,
+              email: added.email,
+              phone: added.phone,
+              status: "PENDING",
+              token: added.inviteToken ?? "",
+              inviteLink: added.inviteLink,
+            });
+          }
+        }
       },
       onError: () => {
-        toast({ title: "Error", description: "Failed to send invite.", variant: "destructive" });
+        toast({
+          title: "Error",
+          description: "Failed to add invite.",
+          variant: "destructive",
+        });
       },
     });
   };
+
+  const openQrFor = async (inv: Invite) => {
+    setQrInvite(inv);
+    setQrBlobUrl(null);
+    setQrLoading(true);
+    try {
+      const dataUrl = await getInviteQrDataUrl(eventId, inv.id);
+      setQrBlobUrl(dataUrl);
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to load QR code.",
+        variant: "destructive",
+      });
+    } finally {
+      setQrLoading(false);
+    }
+  };
+
+  const closeQr = () => {
+    setQrBlobUrl(null);
+    setQrInvite(null);
+  };
+
+  const downloadQr = async () => {
+    if (!qrCardRef.current || !qrInvite) return;
+    setQrDownloading(true);
+    try {
+      const dataUrl = await toPng(qrCardRef.current, {
+        pixelRatio: 2,
+        cacheBust: true,
+      });
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = `invite-${(qrInvite.name || "guest").replace(/\s+/g, "-").toLowerCase()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to download invite card.",
+        variant: "destructive",
+      });
+    } finally {
+      setQrDownloading(false);
+    }
+  };
+
+  const copyInviteLink = async (link?: string) => {
+    if (!link) return;
+    await navigator.clipboard.writeText(link);
+    setCopiedInviteLink(true);
+    toast({ title: "Copied!", description: "Invite link copied." });
+    setTimeout(() => setCopiedInviteLink(false), 2000);
+  };
+
 
   const handleCopyLink = async (token: string) => {
     const url = `${window.location.origin}/invite/shareable?s=${token}&eventSlug=${eventSlug}`;
@@ -316,45 +448,142 @@ export default function EventManagementTabs({
               {/* Individual invites */}
               <div className="space-y-4">
                 <h3 className="font-semibold text-base">Individual Invites</h3>
-                <div className="flex flex-col sm:flex-row gap-3 p-4 border rounded-lg bg-muted/30">
-                  <div className="flex-1 space-y-1">
-                    <Label htmlFor="inv-name">Name</Label>
-                    <Input
-                      id="inv-name"
-                      placeholder="Jane Doe"
-                      value={inviteForm.name}
-                      onChange={(e) =>
-                        setInviteForm((f) => ({ ...f, name: e.target.value }))
-                      }
-                      disabled={addingInvitee}
-                    />
+                <p className="text-xs text-muted-foreground">
+                  Add a guest by name and either email or phone. Choose{" "}
+                  <strong>Generate Invite</strong> to get a QR card you can share
+                  via WhatsApp, or <strong>Send Invite</strong> to email it.
+                </p>
+                <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label htmlFor="inv-name">Name</Label>
+                      <Input
+                        id="inv-name"
+                        placeholder="Jane Doe"
+                        value={inviteForm.name}
+                        onChange={(e) =>
+                          setInviteForm((f) => ({ ...f, name: e.target.value }))
+                        }
+                        disabled={addingInvitee}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label>Contact method</Label>
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant={
+                            inviteForm.contactMethod === "email"
+                              ? "default"
+                              : "outline"
+                          }
+                          size="sm"
+                          onClick={() =>
+                            setInviteForm((f) => ({
+                              ...f,
+                              contactMethod: "email",
+                            }))
+                          }
+                          className="flex-1"
+                        >
+                          <Mail className="h-3 w-3 mr-1" /> Email
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={
+                            inviteForm.contactMethod === "phone"
+                              ? "default"
+                              : "outline"
+                          }
+                          size="sm"
+                          onClick={() =>
+                            setInviteForm((f) => ({
+                              ...f,
+                              contactMethod: "phone",
+                            }))
+                          }
+                          className="flex-1"
+                        >
+                          <Phone className="h-3 w-3 mr-1" /> Phone
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex-1 space-y-1">
-                    <Label htmlFor="inv-email">Email</Label>
-                    <Input
-                      id="inv-email"
-                      type="email"
-                      placeholder="jane@example.com"
-                      value={inviteForm.email}
-                      onChange={(e) =>
-                        setInviteForm((f) => ({ ...f, email: e.target.value }))
-                      }
-                      disabled={addingInvitee}
-                    />
-                  </div>
-                  <div className="flex items-end">
+
+                  {inviteForm.contactMethod === "email" ? (
+                    <div className="space-y-1">
+                      <Label htmlFor="inv-email">Email</Label>
+                      <Input
+                        id="inv-email"
+                        type="email"
+                        placeholder="jane@example.com"
+                        value={inviteForm.email}
+                        onChange={(e) =>
+                          setInviteForm((f) => ({
+                            ...f,
+                            email: e.target.value,
+                          }))
+                        }
+                        disabled={addingInvitee}
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      <Label htmlFor="inv-phone">Phone</Label>
+                      <Input
+                        id="inv-phone"
+                        type="tel"
+                        placeholder="+2348012345678"
+                        value={inviteForm.phone}
+                        onChange={(e) =>
+                          setInviteForm((f) => ({
+                            ...f,
+                            phone: e.target.value,
+                          }))
+                        }
+                        disabled={addingInvitee}
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex flex-col sm:flex-row gap-2 pt-1">
                     <Button
-                      onClick={handleAddInvitee}
+                      type="button"
+                      variant="outline"
+                      onClick={() => submitInvite("GENERATE")}
                       disabled={
-                        addingInvitee ||
-                        !inviteForm.email ||
-                        !inviteForm.name
+                        addingInvitee || !inviteForm.name || !inviteContactReady
                       }
-                      className="bg-[#1E88E5] hover:bg-blue-500 text-white w-full sm:w-auto"
+                      className="flex-1"
                     >
                       {addingInvitee ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      ) : null}
+                      ) : (
+                        <QrCode className="h-4 w-4 mr-2" />
+                      )}
+                      Generate Invite
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() => submitInvite("SEND")}
+                      disabled={
+                        addingInvitee ||
+                        !inviteForm.name ||
+                        !inviteContactReady ||
+                        inviteForm.contactMethod !== "email"
+                      }
+                      className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white"
+                      title={
+                        inviteForm.contactMethod === "phone"
+                          ? "Phone invites must be generated — there's no email to send to."
+                          : undefined
+                      }
+                    >
+                      {addingInvitee ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Send className="h-4 w-4 mr-2" />
+                      )}
                       Send Invite
                     </Button>
                   </div>
@@ -370,7 +599,7 @@ export default function EventManagementTabs({
                       <thead>
                         <tr className="border-b text-muted-foreground">
                           <th className="text-left py-2 pr-4 font-medium">Name</th>
-                          <th className="text-left py-2 pr-4 font-medium">Email</th>
+                          <th className="text-left py-2 pr-4 font-medium">Contact</th>
                           <th className="text-left py-2 pr-4 font-medium">Status</th>
                           <th className="text-left py-2 font-medium">Actions</th>
                         </tr>
@@ -379,7 +608,13 @@ export default function EventManagementTabs({
                         {invites.map((inv) => (
                           <tr key={inv.id} className="border-b last:border-0">
                             <td className="py-2 pr-4">{inv.name}</td>
-                            <td className="py-2 pr-4">{inv.email}</td>
+                            <td className="py-2 pr-4">
+                              {inv.email || inv.phone || (
+                                <span className="text-muted-foreground italic">
+                                  —
+                                </span>
+                              )}
+                            </td>
                             <td className="py-2 pr-4">
                               <span
                                 className={`text-xs font-medium px-2 py-0.5 rounded-full ${
@@ -394,7 +629,15 @@ export default function EventManagementTabs({
                               </span>
                             </td>
                             <td className="py-2">
-                              <div className="flex gap-2">
+                              <div className="flex gap-2 flex-wrap">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => openQrFor(inv)}
+                                >
+                                  <QrCode className="h-3 w-3 mr-1" />
+                                  QR
+                                </Button>
                                 <Button
                                   variant="outline"
                                   size="sm"
@@ -413,7 +656,12 @@ export default function EventManagementTabs({
                                         }),
                                     })
                                   }
-                                  disabled={resendingInvite}
+                                  disabled={resendingInvite || !inv.email}
+                                  title={
+                                    !inv.email
+                                      ? "No email on file — share the QR instead"
+                                      : undefined
+                                  }
                                 >
                                   <Send className="h-3 w-3 mr-1" />
                                   Resend
@@ -631,6 +879,73 @@ export default function EventManagementTabs({
           </TabsContent>
         </Tabs>
       </CardContent>
+
+      <Dialog
+        open={!!qrInvite}
+        onOpenChange={(open) => {
+          if (!open) closeQr();
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Invite QR</DialogTitle>
+            <DialogDescription>
+              {qrInvite?.name
+                ? `Share this with ${qrInvite.name}`
+                : "Share this invite"}{" "}
+              — they scan to claim their ticket.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col items-center gap-3">
+            {qrLoading || !qrBlobUrl ? (
+              <div className="h-72 w-full flex items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin text-[#1E88E5]" />
+              </div>
+            ) : (
+              <InviteCard
+                ref={qrCardRef}
+                eventName={eventName}
+                eventDate={eventDate}
+                eventLocation={eventLocation}
+                inviteeName={qrInvite?.name}
+                qrUrl={qrBlobUrl}
+              />
+            )}
+
+            <div className="flex flex-col sm:flex-row gap-2 w-full">
+              <Button
+                onClick={downloadQr}
+                disabled={!qrBlobUrl || qrDownloading}
+                className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white"
+              >
+                {qrDownloading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4 mr-2" />
+                )}
+                Download PNG
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => copyInviteLink(qrInvite?.inviteLink)}
+                disabled={!qrInvite?.inviteLink}
+                className="flex-1"
+              >
+                {copiedInviteLink ? (
+                  <Check className="h-4 w-4 mr-2" />
+                ) : (
+                  <Copy className="h-4 w-4 mr-2" />
+                )}
+                {copiedInviteLink ? "Copied!" : "Copy Invite Link"}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground text-center">
+              Tip: download then share on WhatsApp.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

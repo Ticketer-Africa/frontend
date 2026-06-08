@@ -406,6 +406,9 @@ export default function EventDashboard() {
               eventId={event.id}
               accessType={event.accessType}
               eventSlug={event.slug}
+              eventName={event.name}
+              eventDate={event.date}
+              eventLocation={event.location}
             />
           </motion.div>
         </motion.div>

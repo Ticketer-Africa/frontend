@@ -200,7 +200,7 @@ export default function UpdateEventPage() {
   if (error) return <ErrorScreen message="Failed to load event" />;
   if (isSubmitted) return <EventSuccessScreen eventName={watch("name")} title="Event Updated!" />;
 
-  const stepTitles = ["Event Details", "Date & Tickets", "Review & Fees", "Advanced Settings"];
+  const stepTitles = ["Event Details", "Date & Tickets", "Advanced Settings", "Review & Fees"];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
@@ -244,16 +244,16 @@ export default function UpdateEventPage() {
                   />
                 )}
                 {currentStep === 3 && (
-                  <EventFormStep3
-                    watch={watch as any} setValue={setValue as any}
-                    ticketCategories={ticketCategories} previewUrl={previewUrl}
-                  />
-                )}
-                {currentStep === 4 && (
                   <EventFormStep4
                     watch={watch as any} setValue={setValue as any}
                     register={register as any} errors={errors as any}
                     isDisabled={isPending || isSubmitting}
+                  />
+                )}
+                {currentStep === 4 && (
+                  <EventFormStep3
+                    watch={watch as any} setValue={setValue as any}
+                    ticketCategories={ticketCategories} previewUrl={previewUrl}
                   />
                 )}
 

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subsystem 2 — Creative Design v2</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f4f8; color: #1e293b; padding: 28px; }
+
+  .page-note { font-size: 12px; color: #94a3b8; margin-bottom: 20px; background: #fff; border-radius: 10px; padding: 10px 14px; border: 1px dashed #cbd5e1; }
+
+  /* Stats */
+  .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 16px; }
+  .stat-card { background: white; border-radius: 16px; padding: 16px 18px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .stat-label { font-size: 11px; color: #94a3b8; font-weight: 500; margin-bottom: 6px; }
+  .stat-val { font-size: 24px; font-weight: 800; color: #0f172a; }
+  .stat-card.accent { background: linear-gradient(135deg, #1E88E5, #42a5f5); }
+  .stat-card.accent .stat-label { color: rgba(255,255,255,.7); }
+  .stat-card.accent .stat-val { color: white; }
+
+  /* Event details (collapsed) */
+  .card { background: white; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.06); margin-bottom: 16px; overflow: hidden; }
+  .card-header { padding: 18px 22px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; }
+  .card-title { font-size: 15px; font-weight: 700; }
+  .card-body { padding: 18px 22px; }
+
+  /* Management panel */
+  .mgmt { background: white; border-radius: 20px; box-shadow: 0 2px 12px rgba(0,0,0,.08); overflow: hidden; }
+  .mgmt-header { padding: 0 24px; background: white; border-bottom: 1px solid #f1f5f9; }
+
+  /* Tab bar — sleek pill style */
+  .tab-bar { display: flex; gap: 0; padding: 0; }
+  .tab { padding: 16px 20px; font-size: 13px; font-weight: 600; color: #94a3b8; cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s; white-space: nowrap; display: flex; align-items: center; gap: 7px; }
+  .tab:hover { color: #1E88E5; }
+  .tab.active { color: #1E88E5; border-bottom-color: #1E88E5; }
+  .tab .icon { font-size: 15px; }
+
+  .tab-content { display: none; padding: 26px 24px; }
+  .tab-content.active { display: block; }
+
+  /* ── DISCOUNT CODES ── */
+  .section-intro { font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 20px; }
+
+  .create-form { background: linear-gradient(135deg, #f0f7ff, #e8f4fd); border: 1px solid #bfdbfe; border-radius: 14px; padding: 18px 20px; margin-bottom: 22px; }
+  .create-form-title { font-size: 12px; font-weight: 700; color: #1E88E5; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
+  .form-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
+  .field label { display: block; font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 5px; }
+  .field input, .field select { width: 100%; height: 38px; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0 12px; font-size: 13px; background: white; color: #0f172a; outline: none; transition: border-color .15s; }
+  .field input:focus, .field select:focus { border-color: #1E88E5; box-shadow: 0 0 0 3px rgba(30,136,229,.1); }
+
+  .btn-create { height: 38px; background: #1E88E5; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; padding: 0 18px; cursor: pointer; white-space: nowrap; }
+
+  /* Codes list */
+  .codes-list { display: flex; flex-direction: column; gap: 8px; }
+  .code-item { display: flex; align-items: center; gap: 14px; padding: 13px 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; transition: box-shadow .15s; }
+  .code-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+  .code-pill { font-family: 'Courier New', monospace; font-size: 14px; font-weight: 800; color: #0f172a; background: white; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 4px 10px; letter-spacing: .05em; }
+  .code-badge { font-size: 11px; font-weight: 700; border-radius: 20px; padding: 3px 9px; }
+  .badge-pct { background: #eff6ff; color: #1E88E5; }
+  .badge-flat { background: #f0fdf4; color: #16a34a; }
+  .code-meta { flex: 1; font-size: 12px; color: #64748b; }
+  .code-usage { font-size: 12px; }
+  .usage-bar-wrap { width: 80px; height: 5px; background: #e2e8f0; border-radius: 999px; display: inline-block; vertical-align: middle; margin: 0 6px; }
+  .usage-bar { height: 5px; background: #1E88E5; border-radius: 999px; }
+
+  /* ── PERSONAL INVITES ── */
+  .invite-add-box { border: 1.5px dashed #bfdbfe; border-radius: 14px; padding: 16px 18px; background: #f8fbff; margin-bottom: 20px; }
+  .invite-add-title { font-size: 12px; font-weight: 700; color: #1E88E5; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+  .invite-form-row { display: flex; gap: 10px; align-items: flex-end; }
+
+  .invitees-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .invitees-label { font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .05em; }
+  .invitees-count { font-size: 12px; font-weight: 700; background: #eff6ff; color: #1E88E5; border-radius: 999px; padding: 2px 9px; }
+
+  .invite-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+  .invite-item:last-child { border-bottom: none; }
+  .av { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #1E88E5, #42a5f5); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: white; flex-shrink: 0; }
+  .av.muted { background: linear-gradient(135deg, #94a3b8, #cbd5e1); }
+  .inv-info { flex: 1; }
+  .inv-name { font-size: 13px; font-weight: 600; color: #0f172a; }
+  .inv-email { font-size: 11px; color: #94a3b8; }
+  .inv-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .dot-green { background: #22c55e; }
+  .dot-amber { background: #f59e0b; }
+  .inv-status { font-size: 11px; font-weight: 600; }
+  .st-accepted { color: #16a34a; }
+  .st-pending { color: #d97706; }
+  .inv-actions { display: flex; gap: 6px; }
+  .act-btn { height: 28px; border-radius: 7px; font-size: 11px; font-weight: 600; padding: 0 10px; cursor: pointer; border: 1px solid #e2e8f0; background: white; color: #475569; transition: all .15s; }
+  .act-btn:hover { border-color: #1E88E5; color: #1E88E5; }
+  .act-btn.danger { border-color: #fecaca; background: #fef2f2; color: #dc2626; }
+  .act-btn.danger:hover { background: #fee2e2; }
+
+  /* ── SHAREABLE LINK ── */
+  .share-hero { background: linear-gradient(135deg, #0f172a, #1e3a5f); border-radius: 16px; padding: 24px 22px; color: white; margin-bottom: 20px; position: relative; overflow: hidden; }
+  .share-hero::before { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(30,136,229,.3); border-radius: 50%; }
+  .share-hero::after { content: ''; position: absolute; bottom: -20px; right: 60px; width: 70px; height: 70px; background: rgba(66,165,245,.2); border-radius: 50%; }
+  .share-hero-title { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
+  .share-hero-sub { font-size: 12px; color: rgba(255,255,255,.6); line-height: 1.5; margin-bottom: 18px; max-width: 380px; }
+  .share-link-display { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); border-radius: 10px; padding: 10px 14px; font-family: monospace; font-size: 12px; color: rgba(255,255,255,.85); word-break: break-all; margin-bottom: 14px; }
+  .share-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .sbtn { height: 34px; border-radius: 9px; font-size: 12px; font-weight: 700; padding: 0 14px; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 5px; }
+  .sbtn-copy { background: #1E88E5; color: white; }
+  .sbtn-regen { background: rgba(255,255,255,.15); color: white; border: 1px solid rgba(255,255,255,.25); }
+  .sbtn-revoke { background: rgba(239,68,68,.2); color: #fca5a5; border: 1px solid rgba(239,68,68,.3); }
+
+  .share-no-link { text-align: center; padding: 40px 20px; }
+  .share-no-link .big-icon { font-size: 48px; margin-bottom: 12px; }
+  .share-no-link h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .share-no-link p { font-size: 13px; color: #64748b; margin-bottom: 18px; }
+  .share-gen-btn { background: #1E88E5; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; padding: 11px 24px; cursor: pointer; }
+
+  .how-it-works { background: #f8fafc; border-radius: 12px; padding: 14px 16px; }
+  .how-title { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
+  .steps { display: flex; gap: 0; }
+  .step { flex: 1; text-align: center; position: relative; }
+  .step:not(:last-child)::after { content: '→'; position: absolute; right: -8px; top: 8px; color: #cbd5e1; font-size: 14px; }
+  .step-num { width: 24px; height: 24px; background: #1E88E5; color: white; border-radius: 50%; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 5px; }
+  .step-text { font-size: 11px; color: #64748b; line-height: 1.3; }
+
+  /* ── MESSAGE ATTENDEES ── */
+  .msg-recipients { display: flex; gap: 10px; margin-bottom: 18px; }
+  .rcpt-card { flex: 1; border: 2px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: all .15s; }
+  .rcpt-card.selected { border-color: #1E88E5; background: #eff6ff; }
+  .rcpt-card-icon { font-size: 22px; margin-bottom: 6px; }
+  .rcpt-card-title { font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 2px; }
+  .rcpt-card-sub { font-size: 11px; color: #94a3b8; }
+  .rcpt-card.selected .rcpt-card-title { color: #1E88E5; }
+
+  .msg-field { margin-bottom: 14px; }
+  .msg-field label { display: block; font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
+  .msg-field input, .msg-field textarea, .msg-field select { width: 100%; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 13px; font-size: 13px; background: #f8fafc; color: #0f172a; outline: none; transition: border-color .15s; font-family: inherit; }
+  .msg-field input { height: 40px; }
+  .msg-field textarea { height: 110px; resize: vertical; }
+  .msg-field input:focus, .msg-field textarea:focus { border-color: #1E88E5; background: white; box-shadow: 0 0 0 3px rgba(30,136,229,.08); }
+
+  .send-row { display: flex; gap: 10px; align-items: center; }
+  .send-select { height: 40px; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0 12px; font-size: 13px; background: #f8fafc; color: #0f172a; outline: none; cursor: pointer; }
+  .send-btn { height: 40px; background: linear-gradient(135deg, #1E88E5, #1565c0); color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; padding: 0 22px; cursor: pointer; display: flex; align-items: center; gap: 7px; margin-left: auto; }
+
+  .char-count { text-align: right; font-size: 11px; color: #94a3b8; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<div class="page-note">📐 Design mockup — your real app will have dark mode, Framer Motion animations, and full shadcn/ui styling. This is structure & layout only.</div>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="stat-card"><div class="stat-label">Total Tickets</div><div class="stat-val">500</div></div>
+  <div class="stat-card"><div class="stat-label">Tickets Sold</div><div class="stat-val">312</div></div>
+  <div class="stat-card"><div class="stat-label">% Sold</div><div class="stat-val">62%</div></div>
+  <div class="stat-card accent"><div class="stat-label">Net Earnings</div><div class="stat-val">₦1.56M</div></div>
+</div>
+
+<!-- Event Details card -->
+<div class="card">
+  <div class="card-header"><span class="card-title">Event Details</span></div>
+  <div class="card-body" style="color:#94a3b8;font-size:13px;">[ existing content unchanged ]</div>
+</div>
+
+<!-- ── Management Panel ── -->
+<div class="mgmt">
+  <div class="mgmt-header">
+    <div class="tab-bar">
+      <div class="tab active" onclick="sw('discounts',this)"><span class="icon">🏷️</span> Discount Codes</div>
+      <div class="tab" onclick="sw('invites',this)"><span class="icon">✉️</span> Personal Invites</div>
+      <div class="tab" onclick="sw('shareable',this)"><span class="icon">🔗</span> Shareable Link</div>
+      <div class="tab" onclick="sw('message',this)"><span class="icon">📣</span> Message Attendees</div>
+    </div>
+  </div>
+
+  <!-- DISCOUNT CODES -->
+  <div class="tab-content active" id="tab-discounts">
+    <p class="section-intro">Create promo codes attendees enter at checkout. Codes work for any ticket category on this event.</p>
+
+    <div class="create-form">
+      <div class="create-form-title">+ New Code</div>
+      <div class="form-grid">
+        <div class="field"><label>Code</label><input placeholder="SAVE20" style="text-transform:uppercase;font-family:monospace;font-weight:700;letter-spacing:.05em;"></div>
+        <div class="field"><label>Type</label><select><option>PERCENT</option><option>FLAT (₦)</option></select></div>
+        <div class="field"><label>Value</label><input type="number" placeholder="e.g. 15"></div>
+        <div class="field"><label>Max Uses</label><input type="number" placeholder="Unlimited"></div>
+        <div><button class="btn-create">Create →</button></div>
+      </div>
+    </div>
+
+    <div class="invitees-header">
+      <span class="invitees-label">Active Codes</span>
+      <span class="invitees-count">3 codes</span>
+    </div>
+    <div class="codes-list">
+      <div class="code-item">
+        <span class="code-pill">EARLYBIRD</span>
+        <span class="code-badge badge-pct">15%</span>
+        <span class="code-meta">Used 42 of 100 <span class="usage-bar-wrap"><span class="usage-bar" style="width:42%"></span></span></span>
+        <span style="font-size:11px;color:#94a3b8;">Created Jun 1</span>
+      </div>
+      <div class="code-item">
+        <span class="code-pill">VIP50</span>
+        <span class="code-badge badge-flat">₦5,000</span>
+        <span class="code-meta">Used 8 <span style="color:#94a3b8;">· Unlimited</span></span>
+        <span style="font-size:11px;color:#94a3b8;">Created May 28</span>
+      </div>
+      <div class="code-item">
+        <span class="code-pill">STAFF</span>
+        <span class="code-badge badge-pct">100%</span>
+        <span class="code-meta">Used 3 of 10 <span class="usage-bar-wrap"><span class="usage-bar" style="width:30%"></span></span></span>
+        <span style="font-size:11px;color:#94a3b8;">Created May 20</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERSONAL INVITES -->
+  <div class="tab-content" id="tab-invites">
+    <p class="section-intro">Add specific guests by email. Each gets a private link — only they can use it. Works even for public events.</p>
+
+    <div class="invite-add-box">
+      <div class="invite-add-title">+ Add Invitees</div>
+      <div class="invite-form-row">
+        <div class="field" style="flex:1;"><label>Name (optional)</label><input placeholder="Jane Doe"></div>
+        <div class="field" style="flex:2;"><label>Email Address</label><input placeholder="guest@example.com"></div>
+        <button class="btn-create" style="flex-shrink:0;">Invite →</button>
+      </div>
+    </div>
+
+    <div class="invitees-header">
+      <span class="invitees-label">Invitees</span>
+      <span class="invitees-count">4 sent</span>
+    </div>
+
+    <div class="invite-item">
+      <div class="av">J</div>
+      <div class="inv-info"><div class="inv-name">Jane Doe</div><div class="inv-email">jane@example.com</div></div>
+      <div class="inv-dot dot-green"></div>
+      <span class="inv-status st-accepted">Accepted</span>
+      <div class="inv-actions">
+        <button class="act-btn">↺ Resend</button>
+        <button class="act-btn">⟳ New link</button>
+        <button class="act-btn danger">Remove</button>
+      </div>
+    </div>
+    <div class="invite-item">
+      <div class="av muted">K</div>
+      <div class="inv-info"><div class="inv-name">Kofi Mensah</div><div class="inv-email">kofi@example.com</div></div>
+      <div class="inv-dot dot-amber"></div>
+      <span class="inv-status st-pending">Pending</span>
+      <div class="inv-actions">
+        <button class="act-btn">↺ Resend</button>
+        <button class="act-btn">⟳ New link</button>
+        <button class="act-btn danger">Remove</button>
+      </div>
+    </div>
+    <div class="invite-item">
+      <div class="av muted">A</div>
+      <div class="inv-info"><div class="inv-name">Amara Diallo</div><div class="inv-email">amara@example.com</div></div>
+      <div class="inv-dot dot-amber"></div>
+      <span class="inv-status st-pending">Pending</span>
+      <div class="inv-actions">
+        <button class="act-btn">↺ Resend</button>
+        <button class="act-btn">⟳ New link</button>
+        <button class="act-btn danger">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHAREABLE LINK -->
+  <div class="tab-content" id="tab-shareable">
+    <div class="share-hero">
+      <div class="share-hero-title">🔗 Your Shareable Invite Link</div>
+      <div class="share-hero-sub">Drop this in a WhatsApp group or Instagram story. Anyone who opens it enters their email and verifies via OTP to get a ticket.</div>
+      <div class="share-link-display">https://ticketer.africa/invite?s=eyJhbGciOiJIUzI1NiJ9.Xbc9...</div>
+      <div class="share-btns">
+        <button class="sbtn sbtn-copy">📋 Copy Link</button>
+        <button class="sbtn sbtn-regen">🔄 Regenerate</button>
+        <button class="sbtn sbtn-revoke">🗑 Revoke</button>
+      </div>
+    </div>
+
+    <div class="how-it-works">
+      <div class="how-title">How it works</div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-text">Guest opens your link</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">Enters their email</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text">Verifies with OTP</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-text">Proceeds to checkout</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MESSAGE ATTENDEES -->
+  <div class="tab-content" id="tab-message">
+    <p class="section-intro">Send an email to your ticket holders — event updates, reminders, last-minute changes.</p>
+
+    <div class="msg-recipients">
+      <div class="rcpt-card selected" onclick="selRcpt(this,'all')">
+        <div class="rcpt-card-icon">👥</div>
+        <div class="rcpt-card-title">All Attendees</div>
+        <div class="rcpt-card-sub">Everyone with a ticket</div>
+      </div>
+      <div class="rcpt-card" onclick="selRcpt(this,'specific')">
+        <div class="rcpt-card-icon">🎯</div>
+        <div class="rcpt-card-title">Specific People</div>
+        <div class="rcpt-card-sub">Enter email addresses</div>
+      </div>
+    </div>
+
+    <div id="specific-emails" style="display:none;">
+      <div class="msg-field">
+        <label>Email Addresses</label>
+        <textarea placeholder="alice@example.com&#10;bob@example.com&#10;carol@example.com" style="height:70px;"></textarea>
+      </div>
+    </div>
+
+    <div class="msg-field">
+      <label>Subject</label>
+      <input placeholder="e.g. Doors open at 5 PM — arrive early">
+    </div>
+
+    <div class="msg-field">
+      <label>Message</label>
+      <textarea placeholder="Write your message here...">Hi everyone! Just a quick reminder — doors open at 5 PM sharp. Please arrive early to avoid queues at the entrance. Can't wait to see you all! 🎉</textarea>
+      <div class="char-count">147 / 5000</div>
+    </div>
+
+    <div class="send-row">
+      <select class="send-select" onchange="toggleSchedule(this)">
+        <option value="now">⚡ Send now</option>
+        <option value="later">🕐 Schedule for later</option>
+      </select>
+      <input type="datetime-local" id="sched-dt" style="display:none;height:40px;border:1px solid #e2e8f0;border-radius:10px;padding:0 12px;font-size:13px;background:#f8fafc;outline:none;">
+      <button class="send-btn">Send Message →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function sw(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+function selRcpt(el, mode) {
+  document.querySelectorAll('.rcpt-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('specific-emails').style.display = mode === 'specific' ? 'block' : 'none';
+}
+function toggleSchedule(sel) {
+  document.getElementById('sched-dt').style.display = sel.value === 'later' ? 'inline-block' : 'none';
+}
+</script>
+</body>
+</html>

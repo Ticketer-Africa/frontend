@@ -4,15 +4,21 @@ import axios from "@/services/axios";
 export interface Invite {
   id: string;
   eventId: string;
-  email: string;
+  email?: string | null;
+  phone?: string | null;
   name: string;
   status: "PENDING" | "ACCEPTED" | "REVOKED";
   token: string;
+  inviteLink?: string;
 }
 
+export type InviteDeliveryMode = "GENERATE" | "SEND";
+
 export interface AddInviteePayload {
-  email: string;
+  email?: string;
+  phone?: string;
   name: string;
+  mode?: InviteDeliveryMode;
 }
 
 export interface ShareableLink {
@@ -27,12 +33,32 @@ export const listInvites = async (eventId: string): Promise<Invite[]> => {
   return res.data;
 };
 
+export interface AddInvitesResponse {
+  eventId: string;
+  mode?: InviteDeliveryMode;
+  addedCount: number;
+  skippedCount: number;
+  added: Array<{
+    id: string;
+    email: string | null;
+    phone: string | null;
+    name: string | null;
+    inviteLink?: string;
+    inviteToken?: string;
+    createdAt?: string;
+  }>;
+}
+
 export const addInvitee = async (
   eventId: string,
   payload: AddInviteePayload,
-): Promise<Invite> => {
+): Promise<AddInvitesResponse> => {
   const endpoint = buildEndpoint("v2", BASE(eventId));
-  const res = await axios.post<Invite>(endpoint, payload);
+  const { mode, ...invitee } = payload;
+  const res = await axios.post<AddInvitesResponse>(endpoint, {
+    invitees: [invitee],
+    ...(mode ? { mode } : {}),
+  });
   return res.data;
 };
 
@@ -93,7 +119,69 @@ export const getShareableLink = async (
   }
 };
 
+export type VerifyInviteStatus =
+  | "VALID"
+  | "ALREADY_USED"
+  | "INACTIVE"
+  | "NOT_STARTED"
+  | "EVENT_PASSED";
+
+export interface VerifyInviteResponse {
+  status: VerifyInviteStatus;
+  message: string;
+  invite: {
+    id: string;
+    name: string | null;
+    email: string | null;
+    phone: string | null;
+  };
+  event: {
+    id: string;
+    name: string;
+    slug: string;
+    date: string;
+    location: string | null;
+    bannerUrl: string | null;
+    organizerId: string;
+    isActive: boolean;
+  };
+  alreadyUsed: boolean;
+  usedAt: string | null;
+}
+
+export const verifyInvite = async (
+  inviteToken: string,
+): Promise<VerifyInviteResponse> => {
+  const endpoint = buildEndpoint("v2", "events/invite/verify");
+  const res = await axios.post<VerifyInviteResponse>(endpoint, { inviteToken });
+  return res.data;
+};
+
 export const revokeShareableLink = async (eventId: string): Promise<void> => {
   const endpoint = buildEndpoint("v2", `${BASE(eventId)}/shareable`);
   await axios.delete(endpoint);
+};
+
+export const getInviteQrBlob = async (
+  eventId: string,
+  inviteId: string,
+): Promise<Blob> => {
+  const endpoint = buildEndpoint("v2", `${BASE(eventId)}/${inviteId}/qr`);
+  const res = await axios.get(endpoint, { responseType: "blob" });
+  return res.data as Blob;
+};
+
+// Returns a base64 data URL — preferred for embedding in a card the user
+// downloads via html-to-image, which can't inline blob: URLs on canvas.
+export const getInviteQrDataUrl = async (
+  eventId: string,
+  inviteId: string,
+): Promise<string> => {
+  const blob = await getInviteQrBlob(eventId, inviteId);
+  return await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error ?? new Error("Failed to read QR"));
+    reader.readAsDataURL(blob);
+  });
 };
