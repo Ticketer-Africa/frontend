@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toPng } from "html-to-image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
@@ -42,6 +43,7 @@ import { useListAttendees } from "@/services/attendees/attendees.queries";
 import type { Attendee, AttendeeStatus } from "@/services/attendees/attendees";
 import { useRegenerateToken } from "@/services/invites/invites.queries";
 import { getInviteQrBlob } from "@/services/invites/invites";
+import { InviteCard } from "@/components/invite-card";
 
 type FilterType = "ALL" | "INVITE" | "TICKET";
 
@@ -78,12 +80,15 @@ export default function AttendeesPage() {
   const [qrFor, setQrFor] = useState<Attendee | null>(null);
   const [qrBlobUrl, setQrBlobUrl] = useState<string | null>(null);
   const [qrLoading, setQrLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     return () => {
       if (qrBlobUrl) URL.revokeObjectURL(qrBlobUrl);
     };
   }, [qrBlobUrl]);
+
 
   const openQr = async (a: Attendee) => {
     if (a.type !== "INVITE" || !a.inviteId) return;
@@ -110,16 +115,31 @@ export default function AttendeesPage() {
     setQrFor(null);
   };
 
-  const downloadQr = () => {
-    if (!qrBlobUrl || !qrFor) return;
-    const a = document.createElement("a");
-    a.href = qrBlobUrl;
-    a.download = `invite-${(qrFor.name || "guest")
-      .replace(/\s+/g, "-")
-      .toLowerCase()}.png`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+  const downloadQr = async () => {
+    if (!cardRef.current || !qrFor) return;
+    setDownloading(true);
+    try {
+      const dataUrl = await toPng(cardRef.current, {
+        pixelRatio: 2,
+        cacheBust: true,
+      });
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = `invite-${(qrFor.name || "guest")
+        .replace(/\s+/g, "-")
+        .toLowerCase()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to download invite card.",
+        variant: "destructive",
+      });
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const copyLink = async (link: string | null) => {
@@ -323,16 +343,20 @@ export default function AttendeesPage() {
       <Dialog open={!!qrFor} onOpenChange={(open) => !open && closeQr()}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>
-              {qrFor?.name || qrFor?.email || "Invite QR"}
-            </DialogTitle>
+            <DialogTitle>Invite card</DialogTitle>
           </DialogHeader>
-          <div className="flex items-center justify-center py-4 min-h-[300px]">
+          <div className="flex items-center justify-center py-2 min-h-[360px]">
             {qrLoading ? (
               <Loader2 className="h-8 w-8 animate-spin text-[#1E88E5]" />
-            ) : qrBlobUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={qrBlobUrl} alt="Invite QR" className="max-w-full rounded-md" />
+            ) : qrBlobUrl && qrFor ? (
+              <InviteCard
+                ref={cardRef}
+                eventName={event?.name}
+                eventDate={event?.date}
+                eventLocation={event?.location}
+                inviteeName={qrFor.name}
+                qrUrl={qrBlobUrl}
+              />
             ) : (
               <p className="text-muted-foreground text-sm">No QR available.</p>
             )}
@@ -341,8 +365,12 @@ export default function AttendeesPage() {
             <Button variant="outline" onClick={closeQr}>
               Close
             </Button>
-            <Button onClick={downloadQr} disabled={!qrBlobUrl}>
-              <Download className="h-4 w-4 mr-2" />
+            <Button onClick={downloadQr} disabled={!qrBlobUrl || downloading}>
+              {downloading ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4 mr-2" />
+              )}
               Download
             </Button>
           </DialogFooter>

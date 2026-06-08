@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toPng } from "html-to-image";
+import { InviteCard } from "@/components/invite-card";
 import {
   Loader2,
   Copy,
@@ -58,12 +60,18 @@ interface EventManagementTabsProps {
   eventId: string;
   accessType: "PUBLIC" | "INVITE_ONLY";
   eventSlug: string;
+  eventName?: string;
+  eventDate?: string | Date | null;
+  eventLocation?: string | null;
 }
 
 export default function EventManagementTabs({
   eventId,
   accessType,
   eventSlug,
+  eventName,
+  eventDate,
+  eventLocation,
 }: EventManagementTabsProps) {
   const { toast } = useToast();
 
@@ -126,6 +134,8 @@ export default function EventManagementTabs({
   const [copiedLink, setCopiedLink] = useState(false);
   const [qrInvite, setQrInvite] = useState<Invite | null>(null);
   const [qrBlobUrl, setQrBlobUrl] = useState<string | null>(null);
+  const [qrDownloading, setQrDownloading] = useState(false);
+  const qrCardRef = useRef<HTMLDivElement>(null);
   const [qrLoading, setQrLoading] = useState(false);
   const [copiedInviteLink, setCopiedInviteLink] = useState(false);
 
@@ -212,14 +222,29 @@ export default function EventManagementTabs({
     setQrInvite(null);
   };
 
-  const downloadQr = () => {
-    if (!qrBlobUrl || !qrInvite) return;
-    const a = document.createElement("a");
-    a.href = qrBlobUrl;
-    a.download = `invite-${(qrInvite.name || "guest").replace(/\s+/g, "-").toLowerCase()}.png`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+  const downloadQr = async () => {
+    if (!qrCardRef.current || !qrInvite) return;
+    setQrDownloading(true);
+    try {
+      const dataUrl = await toPng(qrCardRef.current, {
+        pixelRatio: 2,
+        cacheBust: true,
+      });
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = `invite-${(qrInvite.name || "guest").replace(/\s+/g, "-").toLowerCase()}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to download invite card.",
+        variant: "destructive",
+      });
+    } finally {
+      setQrDownloading(false);
+    }
   };
 
   const copyInviteLink = async (link?: string) => {
@@ -884,20 +909,27 @@ export default function EventManagementTabs({
                 <Loader2 className="h-6 w-6 animate-spin text-[#1E88E5]" />
               </div>
             ) : (
-              <img
-                src={qrBlobUrl}
-                alt="Invite QR card"
-                className="w-full rounded-md border"
+              <InviteCard
+                ref={qrCardRef}
+                eventName={eventName}
+                eventDate={eventDate}
+                eventLocation={eventLocation}
+                inviteeName={qrInvite?.name}
+                qrUrl={qrBlobUrl}
               />
             )}
 
             <div className="flex flex-col sm:flex-row gap-2 w-full">
               <Button
                 onClick={downloadQr}
-                disabled={!qrBlobUrl}
+                disabled={!qrBlobUrl || qrDownloading}
                 className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white"
               >
-                <Download className="h-4 w-4 mr-2" />
+                {qrDownloading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4 mr-2" />
+                )}
                 Download PNG
               </Button>
               <Button
