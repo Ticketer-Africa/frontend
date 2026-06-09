@@ -80,7 +80,7 @@ export const InviteCard = forwardRef<HTMLDivElement, InviteCardProps>(
             style={{ marginBottom: 20, lineHeight: 1.4 }}
             className="text-xs text-slate-500"
           >
-            Scan the QR code to claim your ticket
+            Present this at the gate
           </p>
 
           <p
