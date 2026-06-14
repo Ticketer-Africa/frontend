@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -9,6 +9,7 @@ import {
   Copy,
   Download,
   Loader2,
+  Pencil,
   RefreshCw,
   Search,
   QrCode,
@@ -16,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
   Tabs,
@@ -33,6 +35,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -42,6 +45,7 @@ import { useEventByIdV2 } from "@/services/events/events-v2.queries";
 import { useListAttendees } from "@/services/attendees/attendees.queries";
 import type { Attendee, AttendeeStatus } from "@/services/attendees/attendees";
 import { useRegenerateToken } from "@/services/invites/invites.queries";
+import { useUpdateInvite } from "@/services/invites/invites.queries";
 import { getInviteQrDataUrl } from "@/services/invites/invites";
 import { InviteCard } from "@/components/invite-card";
 
@@ -77,12 +81,14 @@ export default function AttendeesPage() {
   const { mutate: regenerateToken, isPending: regenerating } =
     useRegenerateToken(eventId);
 
+  const { mutate: updateInvite, isPending: updating } = useUpdateInvite(eventId);
+
+  // ── QR dialog state ──────────────────────────────────────────────────────────
   const [qrFor, setQrFor] = useState<Attendee | null>(null);
   const [qrBlobUrl, setQrBlobUrl] = useState<string | null>(null);
   const [qrLoading, setQrLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
-
 
   const openQr = async (a: Attendee) => {
     if (a.type !== "INVITE" || !a.inviteId) return;
@@ -160,6 +166,50 @@ export default function AttendeesPage() {
     });
   };
 
+  // ── Edit dialog state ────────────────────────────────────────────────────────
+  const [editFor, setEditFor] = useState<Attendee | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    tableNumber: "",
+  });
+
+  const openEdit = useCallback((a: Attendee) => {
+    setEditFor(a);
+    setEditForm({
+      name: a.name ?? "",
+      email: a.email ?? "",
+      phone: a.phone ?? "",
+      tableNumber: "",
+    });
+  }, []);
+
+  const closeEdit = () => setEditFor(null);
+
+  const handleEditSave = () => {
+    if (!editFor?.inviteId) return;
+    const payload: Record<string, string> = {};
+    if (editForm.name !== (editFor.name ?? "")) payload.name = editForm.name;
+    if (editForm.email !== (editFor.email ?? "")) payload.email = editForm.email;
+    if (editForm.phone !== (editFor.phone ?? "")) payload.phone = editForm.phone;
+    if (editForm.tableNumber) payload.tableNumber = editForm.tableNumber;
+
+    updateInvite(
+      { inviteId: editFor.inviteId, payload },
+      {
+        onSuccess: () => {
+          toast({ title: "Saved", description: "Invitee details updated." });
+          closeEdit();
+        },
+        onError: (err) => {
+          toast({ title: "Error", description: err.message, variant: "destructive" });
+        },
+      },
+    );
+  };
+
+  // ── Table data ───────────────────────────────────────────────────────────────
   const rows = data?.attendees ?? [];
   const counts = data?.counts;
 
@@ -247,6 +297,7 @@ export default function AttendeesPage() {
                       <TableHead>Type</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Category / Code</TableHead>
+                      <TableHead>Admits</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -288,6 +339,9 @@ export default function AttendeesPage() {
                               <span className="text-muted-foreground">—</span>
                             )}
                           </TableCell>
+                          <TableCell className="text-sm">
+                            {a.type === "INVITE" ? (a.admitsCount ?? 1) : <span className="text-muted-foreground">—</span>}
+                          </TableCell>
                           <TableCell className="text-right">
                             {a.type === "INVITE" ? (
                               <div className="flex justify-end gap-2 flex-wrap">
@@ -308,6 +362,16 @@ export default function AttendeesPage() {
                                   <Copy className="h-4 w-4 mr-1" />
                                   Link
                                 </Button>
+                                {a.status !== "CHECKED_IN" && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => openEdit(a)}
+                                  >
+                                    <Pencil className="h-4 w-4 mr-1" />
+                                    Edit
+                                  </Button>
+                                )}
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -333,6 +397,7 @@ export default function AttendeesPage() {
         </Card>
       </div>
 
+      {/* QR dialog */}
       <Dialog open={!!qrFor} onOpenChange={(open) => !open && closeQr()}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -348,6 +413,7 @@ export default function AttendeesPage() {
                 eventDate={event?.date}
                 eventLocation={event?.location}
                 inviteeName={qrFor.name}
+                admitsCount={qrFor.admitsCount}
                 qrUrl={qrBlobUrl}
               />
             ) : (
@@ -365,6 +431,67 @@ export default function AttendeesPage() {
                 <Download className="h-4 w-4 mr-2" />
               )}
               Download
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit dialog */}
+      <Dialog open={!!editFor} onOpenChange={(open) => !open && closeEdit()}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit invitee</DialogTitle>
+            <DialogDescription>
+              Changes take effect immediately. You cannot edit after check-in.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-2">
+            <div className="grid gap-1.5">
+              <Label htmlFor="edit-name">Name</Label>
+              <Input
+                id="edit-name"
+                value={editForm.name}
+                onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+                placeholder="Guest name"
+              />
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="edit-email">Email</Label>
+              <Input
+                id="edit-email"
+                type="email"
+                value={editForm.email}
+                onChange={(e) => setEditForm((f) => ({ ...f, email: e.target.value }))}
+                placeholder="guest@example.com"
+              />
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="edit-phone">Phone</Label>
+              <Input
+                id="edit-phone"
+                type="tel"
+                value={editForm.phone}
+                onChange={(e) => setEditForm((f) => ({ ...f, phone: e.target.value }))}
+                placeholder="+2348012345678"
+              />
+            </div>
+            <div className="grid gap-1.5">
+              <Label htmlFor="edit-table">Table number</Label>
+              <Input
+                id="edit-table"
+                value={editForm.tableNumber}
+                onChange={(e) => setEditForm((f) => ({ ...f, tableNumber: e.target.value }))}
+                placeholder="e.g. Table 5"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={closeEdit} disabled={updating}>
+              Cancel
+            </Button>
+            <Button onClick={handleEditSave} disabled={updating}>
+              {updating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+              Save
             </Button>
           </DialogFooter>
         </DialogContent>
