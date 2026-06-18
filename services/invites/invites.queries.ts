@@ -68,6 +68,16 @@ export const useGenerateShareableLink = (eventId: string) => {
   });
 };
 
+export const useUpdateInvite = (eventId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, { inviteId: string; payload: invitesAPI.UpdateInvitePayload }>({
+    mutationFn: ({ inviteId, payload }) => invitesAPI.updateInvite(eventId, inviteId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["attendees", eventId] });
+    },
+  });
+};
+
 export const useRevokeShareableLink = (eventId: string) => {
   const queryClient = useQueryClient();
   return useMutation<void, Error, void>({

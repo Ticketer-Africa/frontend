@@ -15,6 +15,7 @@ export interface Attendee {
   inviteLink: string | null;
   ticketCode: string | null;
   ticketCategoryName: string | null;
+  admitsCount: number | null;
   createdAt: string;
 }
 

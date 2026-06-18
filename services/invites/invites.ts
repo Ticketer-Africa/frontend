@@ -19,6 +19,14 @@ export interface AddInviteePayload {
   phone?: string;
   name: string;
   mode?: InviteDeliveryMode;
+  admitsCount?: number;
+}
+
+export interface UpdateInvitePayload {
+  name?: string;
+  email?: string;
+  phone?: string;
+  tableNumber?: string;
 }
 
 export interface ShareableLink {
@@ -155,6 +163,15 @@ export const verifyInvite = async (
   const endpoint = buildEndpoint("v2", "events/invite/verify");
   const res = await axios.post<VerifyInviteResponse>(endpoint, { inviteToken });
   return res.data;
+};
+
+export const updateInvite = async (
+  eventId: string,
+  inviteId: string,
+  payload: UpdateInvitePayload,
+): Promise<void> => {
+  const endpoint = buildEndpoint("v2", `${BASE(eventId)}/${inviteId}`);
+  await axios.patch(endpoint, payload);
 };
 
 export const revokeShareableLink = async (eventId: string): Promise<void> => {
