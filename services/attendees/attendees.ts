@@ -22,7 +22,7 @@ export interface Attendee {
 export interface AttendeesResponse {
   eventId: string;
   total: number;
-  counts: { invites: number; tickets: number };
+  counts: { invites: number; tickets: number; holders: number };
   attendees: Attendee[];
 }
 

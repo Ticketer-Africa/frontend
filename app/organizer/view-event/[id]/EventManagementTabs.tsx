@@ -53,6 +53,7 @@ import {
   useRemoveInvitee,
   useGenerateShareableLink,
   useRevokeShareableLink,
+  useUpdateInvite,
 } from "@/services/invites/invites.queries";
 import { useSendMessage } from "@/services/messages/messages.queries";
 
@@ -63,6 +64,7 @@ interface EventManagementTabsProps {
   eventName?: string;
   eventDate?: string | Date | null;
   eventLocation?: string | null;
+  ticketCategories?: Array<{ id: string; name: string }>;
 }
 
 export default function EventManagementTabs({
@@ -72,6 +74,7 @@ export default function EventManagementTabs({
   eventName,
   eventDate,
   eventLocation,
+  ticketCategories = [],
 }: EventManagementTabsProps) {
   const { toast } = useToast();
 
@@ -113,6 +116,7 @@ export default function EventManagementTabs({
 
   // ── Invites state ────────────────────────────────────────────
   const { data: invites, isLoading: invitesLoading } = useListInvites(eventId);
+  const { mutate: updateInvite } = useUpdateInvite(eventId);
   const { data: shareableLink, isLoading: linkLoading } =
     useShareableLink(eventId);
   const { mutate: addInvitee, isPending: addingInvitee } =
@@ -130,7 +134,14 @@ export default function EventManagementTabs({
     contactMethod: "email" | "phone";
     email: string;
     phone: string;
-  }>({ name: "", contactMethod: "email", email: "", phone: "" });
+    ticketCategoryId: string;
+  }>({
+    name: "",
+    contactMethod: "email",
+    email: "",
+    phone: "",
+    ticketCategoryId: "",
+  });
   const [copiedLink, setCopiedLink] = useState(false);
   const [qrInvite, setQrInvite] = useState<Invite | null>(null);
   const [qrBlobUrl, setQrBlobUrl] = useState<string | null>(null);
@@ -152,6 +163,9 @@ export default function EventManagementTabs({
       ...(inviteForm.contactMethod === "email"
         ? { email: inviteForm.email }
         : { phone: inviteForm.phone }),
+      ...(inviteForm.ticketCategoryId
+        ? { ticketCategoryId: inviteForm.ticketCategoryId }
+        : {}),
     };
     const label =
       inviteForm.contactMethod === "email"
@@ -164,6 +178,7 @@ export default function EventManagementTabs({
           contactMethod: inviteForm.contactMethod,
           email: "",
           phone: "",
+          ticketCategoryId: inviteForm.ticketCategoryId,
         });
         if (mode === "SEND") {
           toast({ title: "Invite sent", description: `Invite sent to ${label}.` });
@@ -184,6 +199,8 @@ export default function EventManagementTabs({
               status: "PENDING",
               token: added.inviteToken ?? "",
               inviteLink: added.inviteLink,
+              admitsCount: added.admitsCount,
+              ticketCategoryName: added.ticketCategoryName,
             });
           }
         }
@@ -546,6 +563,34 @@ export default function EventManagementTabs({
                     </div>
                   )}
 
+                  {ticketCategories.length > 0 && (
+                    <div className="space-y-1">
+                      <Label>Category (optional)</Label>
+                      <Select
+                        value={inviteForm.ticketCategoryId || "none"}
+                        onValueChange={(v) =>
+                          setInviteForm((f) => ({
+                            ...f,
+                            ticketCategoryId: v === "none" ? "" : v,
+                          }))
+                        }
+                        disabled={addingInvitee}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="No category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">No category</SelectItem>
+                          {ticketCategories.map((c) => (
+                            <SelectItem key={c.id} value={c.id}>
+                              {c.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
                   <div className="flex flex-col sm:flex-row gap-2 pt-1">
                     <Button
                       type="button"
@@ -600,6 +645,11 @@ export default function EventManagementTabs({
                         <tr className="border-b text-muted-foreground">
                           <th className="text-left py-2 pr-4 font-medium">Name</th>
                           <th className="text-left py-2 pr-4 font-medium">Contact</th>
+                          {ticketCategories.length > 0 && (
+                            <th className="text-left py-2 pr-4 font-medium">
+                              Category
+                            </th>
+                          )}
                           <th className="text-left py-2 pr-4 font-medium">Status</th>
                           <th className="text-left py-2 font-medium">Actions</th>
                         </tr>
@@ -615,6 +665,51 @@ export default function EventManagementTabs({
                                 </span>
                               )}
                             </td>
+                            {ticketCategories.length > 0 && (
+                              <td className="py-2 pr-4">
+                                <Select
+                                  value={inv.ticketCategoryId || "none"}
+                                  onValueChange={(v) =>
+                                    updateInvite(
+                                      {
+                                        inviteId: inv.id,
+                                        payload: {
+                                          ticketCategoryId:
+                                            v === "none" ? null : v,
+                                        },
+                                      },
+                                      {
+                                        onSuccess: () =>
+                                          toast({
+                                            title: "Category updated",
+                                          }),
+                                        onError: () =>
+                                          toast({
+                                            title: "Error",
+                                            description:
+                                              "Failed to update category.",
+                                            variant: "destructive",
+                                          }),
+                                      },
+                                    )
+                                  }
+                                >
+                                  <SelectTrigger className="h-8 w-[140px]">
+                                    <SelectValue placeholder="No category" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="none">
+                                      No category
+                                    </SelectItem>
+                                    {ticketCategories.map((c) => (
+                                      <SelectItem key={c.id} value={c.id}>
+                                        {c.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </td>
+                            )}
                             <td className="py-2 pr-4">
                               <span
                                 className={`text-xs font-medium px-2 py-0.5 rounded-full ${
@@ -909,6 +1004,8 @@ export default function EventManagementTabs({
                 eventDate={eventDate}
                 eventLocation={eventLocation}
                 inviteeName={qrInvite?.name}
+                admitsCount={qrInvite?.admitsCount}
+                categoryName={qrInvite?.ticketCategoryName}
                 qrUrl={qrBlobUrl}
               />
             )}
