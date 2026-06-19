@@ -1,12 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as invitesAPI from "@/services/invites/invites";
-import { AddInviteePayload, AddInvitesResponse, Invite, ShareableLink } from "@/services/invites/invites";
+import { AddInviteePayload, AddInvitesResponse, BulkAddPayload, Invite, ShareableLink } from "@/services/invites/invites";
 
 export const useListInvites = (eventId: string) => {
   return useQuery<Invite[], Error>({
     queryKey: ["invites", eventId],
     queryFn: () => invitesAPI.listInvites(eventId),
     enabled: !!eventId,
+  });
+};
+
+export const useAddInvitees = (eventId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation<AddInvitesResponse, Error, BulkAddPayload>({
+    mutationFn: (payload) => invitesAPI.addInvitees(eventId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["invites", eventId] });
+    },
   });
 };
 

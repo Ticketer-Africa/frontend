@@ -107,6 +107,32 @@ export const addInvitee = async (
   return res.data;
 };
 
+export interface BulkInvitee {
+  name?: string;
+  email?: string;
+  phone?: string;
+  admitsCount?: number;
+  ticketCategoryId?: string;
+}
+
+export interface BulkAddPayload {
+  invitees: BulkInvitee[];
+  mode?: InviteDeliveryMode;
+}
+
+export const addInvitees = async (
+  eventId: string,
+  payload: BulkAddPayload,
+): Promise<AddInvitesResponse> => {
+  const endpoint = buildEndpoint("v2", BASE(eventId));
+  const { invitees, mode } = payload;
+  const res = await axios.post<AddInvitesResponse>(endpoint, {
+    invitees,
+    ...(mode ? { mode } : {}),
+  });
+  return res.data;
+};
+
 export const resendInvite = async (
   eventId: string,
   inviteId: string,

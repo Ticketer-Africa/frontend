@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import { InviteCard } from "@/components/invite-card";
 import {
@@ -54,7 +54,9 @@ import {
   useGenerateShareableLink,
   useRevokeShareableLink,
   useUpdateInvite,
+  useAddInvitees,
 } from "@/services/invites/invites.queries";
+import { parseBulkInvitees } from "@/lib/parse-bulk-invitees";
 import { useSendMessage } from "@/services/messages/messages.queries";
 
 interface EventManagementTabsProps {
@@ -117,6 +119,43 @@ export default function EventManagementTabs({
   // ── Invites state ────────────────────────────────────────────
   const { data: invites, isLoading: invitesLoading } = useListInvites(eventId);
   const { mutate: updateInvite } = useUpdateInvite(eventId);
+  const { mutate: addInvitees, isPending: addingBulk } = useAddInvitees(eventId);
+
+  // ── Bulk paste-from-Excel state ──
+  const [bulkText, setBulkText] = useState("");
+  const [bulkCategoryId, setBulkCategoryId] = useState("");
+  const bulkParsed = useMemo(() => parseBulkInvitees(bulkText), [bulkText]);
+
+  const submitBulk = (mode: "GENERATE" | "SEND") => {
+    if (!bulkParsed.invitees.length) return;
+    addInvitees(
+      {
+        mode,
+        invitees: bulkParsed.invitees.map((inv) => ({
+          ...inv,
+          ...(bulkCategoryId ? { ticketCategoryId: bulkCategoryId } : {}),
+        })),
+      },
+      {
+        onSuccess: (resp) => {
+          setBulkText("");
+          toast({
+            title: "Invites added",
+            description: `Added ${resp.addedCount}${
+              resp.skippedCount ? `, skipped ${resp.skippedCount} duplicate(s)` : ""
+            }.`,
+          });
+        },
+        onError: () => {
+          toast({
+            title: "Error",
+            description: "Failed to add invites. Check the pasted data.",
+            variant: "destructive",
+          });
+        },
+      },
+    );
+  };
   const { data: shareableLink, isLoading: linkLoading } =
     useShareableLink(eventId);
   const { mutate: addInvitee, isPending: addingInvitee } =
@@ -630,6 +669,96 @@ export default function EventManagementTabs({
                         <Send className="h-4 w-4 mr-2" />
                       )}
                       Send Invite
+                    </Button>
+                  </div>
+                </div>
+
+                {/* ── Bulk add (paste from Excel) ── */}
+                <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
+                  <h3 className="font-semibold text-base">
+                    Bulk add — paste from Excel
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Copy rows from your spreadsheet and paste below. If the first
+                    row has headers (<strong>Name</strong>, <strong>Phone</strong>,{" "}
+                    <strong>Email</strong>, <strong>Admits</strong>) the columns are
+                    matched automatically; otherwise the first column is the name and
+                    the second is the phone. Guests with no phone/email are still
+                    added — share their QR manually.
+                  </p>
+                  <Textarea
+                    rows={6}
+                    placeholder={"Name\tPhone\tAdmits\nJane Doe\t08012345678\t2\nJohn Smith\t08087654321"}
+                    value={bulkText}
+                    onChange={(e) => setBulkText(e.target.value)}
+                    disabled={addingBulk}
+                    className="font-mono text-xs"
+                  />
+
+                  {ticketCategories.length > 0 && (
+                    <div className="space-y-1">
+                      <Label>Category for all pasted invites (optional)</Label>
+                      <Select
+                        value={bulkCategoryId || "none"}
+                        onValueChange={(v) =>
+                          setBulkCategoryId(v === "none" ? "" : v)
+                        }
+                        disabled={addingBulk}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="No category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">No category</SelectItem>
+                          {ticketCategories.map((c) => (
+                            <SelectItem key={c.id} value={c.id}>
+                              {c.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {bulkText.trim() && (
+                    <p className="text-xs text-muted-foreground">
+                      {bulkParsed.invitees.length} invite
+                      {bulkParsed.invitees.length === 1 ? "" : "s"} detected
+                      {bulkParsed.hadHeader ? " (headers found)" : ""}
+                      {bulkParsed.skipped
+                        ? ` · ${bulkParsed.skipped} empty row(s) skipped`
+                        : ""}
+                      .
+                    </p>
+                  )}
+
+                  <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => submitBulk("GENERATE")}
+                      disabled={addingBulk || !bulkParsed.invitees.length}
+                      className="flex-1"
+                    >
+                      {addingBulk ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <QrCode className="h-4 w-4 mr-2" />
+                      )}
+                      Add {bulkParsed.invitees.length || ""} (Generate)
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() => submitBulk("SEND")}
+                      disabled={addingBulk || !bulkParsed.invitees.length}
+                      className="flex-1"
+                    >
+                      {addingBulk ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Send className="h-4 w-4 mr-2" />
+                      )}
+                      Add & email those with email
                     </Button>
                   </div>
                 </div>
