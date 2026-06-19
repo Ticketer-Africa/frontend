@@ -18,6 +18,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import {
   Tabs,
@@ -172,7 +179,7 @@ export default function AttendeesPage() {
     name: "",
     email: "",
     phone: "",
-    tableNumber: "",
+    ticketCategoryId: "",
   });
 
   const openEdit = useCallback((a: Attendee) => {
@@ -181,7 +188,7 @@ export default function AttendeesPage() {
       name: a.name ?? "",
       email: a.email ?? "",
       phone: a.phone ?? "",
-      tableNumber: "",
+      ticketCategoryId: a.ticketCategoryId ?? "",
     });
   }, []);
 
@@ -189,11 +196,12 @@ export default function AttendeesPage() {
 
   const handleEditSave = () => {
     if (!editFor?.inviteId) return;
-    const payload: Record<string, string> = {};
+    const payload: Record<string, string | null> = {};
     if (editForm.name !== (editFor.name ?? "")) payload.name = editForm.name;
     if (editForm.email !== (editFor.email ?? "")) payload.email = editForm.email;
     if (editForm.phone !== (editFor.phone ?? "")) payload.phone = editForm.phone;
-    if (editForm.tableNumber) payload.tableNumber = editForm.tableNumber;
+    if (editForm.ticketCategoryId !== (editFor.ticketCategoryId ?? ""))
+      payload.ticketCategoryId = editForm.ticketCategoryId || null;
 
     updateInvite(
       { inviteId: editFor.inviteId, payload },
@@ -414,6 +422,7 @@ export default function AttendeesPage() {
                 eventLocation={event?.location}
                 inviteeName={qrFor.name}
                 admitsCount={qrFor.admitsCount}
+                categoryName={qrFor.ticketCategoryName}
                 qrUrl={qrBlobUrl}
               />
             ) : (
@@ -475,15 +484,32 @@ export default function AttendeesPage() {
                 placeholder="+2348012345678"
               />
             </div>
-            <div className="grid gap-1.5">
-              <Label htmlFor="edit-table">Table number</Label>
-              <Input
-                id="edit-table"
-                value={editForm.tableNumber}
-                onChange={(e) => setEditForm((f) => ({ ...f, tableNumber: e.target.value }))}
-                placeholder="e.g. Table 5"
-              />
-            </div>
+            {(event?.ticketCategories?.length ?? 0) > 0 && (
+              <div className="grid gap-1.5">
+                <Label htmlFor="edit-category">Category</Label>
+                <Select
+                  value={editForm.ticketCategoryId || "none"}
+                  onValueChange={(v) =>
+                    setEditForm((f) => ({
+                      ...f,
+                      ticketCategoryId: v === "none" ? "" : v,
+                    }))
+                  }
+                >
+                  <SelectTrigger id="edit-category">
+                    <SelectValue placeholder="No category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No category</SelectItem>
+                    {event?.ticketCategories?.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={closeEdit} disabled={updating}>
