@@ -54,6 +54,57 @@ function matchHeader(cell: string): keyof ParsedInvitee | null {
 const looksLikePhone = (s: string) => /^\+?[0-9()\-\s]{7,20}$/.test(s.trim());
 const looksLikeEmail = (s: string) => /\S+@\S+\.\S+/.test(s.trim());
 
+// Infer columns from cell content when headers are missing or incomplete.
+// - phone/email: the column whose values most often look like a phone/email.
+// - name: the remaining text column with the most distinct values (names are
+//   varied, unlike Category/Status which repeat) — this skips the leading
+//   "Category" column and "Status" columns automatically.
+function inferColumns(
+  rows: string[][],
+): Partial<Record<keyof ParsedInvitee, number>> {
+  const ncol = rows.reduce((m, r) => Math.max(m, r.length), 0);
+  const col = (i: number) => rows.map((r) => (r[i] ?? "").trim());
+
+  let phoneIdx = -1;
+  let phoneScore = 0;
+  let emailIdx = -1;
+  let emailScore = 0;
+  for (let i = 0; i < ncol; i++) {
+    const cells = col(i).filter(Boolean);
+    const ph = cells.filter(looksLikePhone).length;
+    const em = cells.filter(looksLikeEmail).length;
+    if (ph > phoneScore) {
+      phoneScore = ph;
+      phoneIdx = i;
+    }
+    if (em > emailScore) {
+      emailScore = em;
+      emailIdx = i;
+    }
+  }
+
+  let nameIdx = -1;
+  let nameScore = -1;
+  for (let i = 0; i < ncol; i++) {
+    if (i === phoneIdx || i === emailIdx) continue;
+    const cells = col(i).filter(
+      (c) =>
+        c && !looksLikePhone(c) && !looksLikeEmail(c) && !/^\d+$/.test(c),
+    );
+    const distinct = new Set(cells.map((c) => c.toLowerCase())).size;
+    if (distinct > nameScore) {
+      nameScore = distinct;
+      nameIdx = i;
+    }
+  }
+
+  const map: Partial<Record<keyof ParsedInvitee, number>> = {};
+  if (nameIdx >= 0) map.name = nameIdx;
+  if (phoneIdx >= 0) map.phone = phoneIdx;
+  if (emailIdx >= 0) map.email = emailIdx;
+  return map;
+}
+
 function toInvitee(
   cells: string[],
   map: Partial<Record<keyof ParsedInvitee, number>>,
@@ -103,28 +154,15 @@ export function parseBulkInvitees(raw: string): ParseResult {
   });
   const hadHeader = Object.keys(headerMap).length > 0;
 
-  let map: Partial<Record<keyof ParsedInvitee, number>>;
-  let dataRows: string[][];
+  const dataRows = hadHeader ? rows.slice(1) : rows;
 
-  if (hadHeader) {
-    map = headerMap;
-    dataRows = rows.slice(1);
-  } else {
-    // Positional. Single column → name only. Otherwise first two columns are
-    // name + phone, but if the first column looks like a phone/email, treat it
-    // as such so a 1-column phone list still works.
-    dataRows = rows;
-    if (headerCells.length === 1) {
-      const only = headerCells[0];
-      map = looksLikePhone(only)
-        ? { phone: 0 }
-        : looksLikeEmail(only)
-          ? { email: 0 }
-          : { name: 0 };
-    } else {
-      map = { name: 0, phone: 1, admitsCount: 2 };
-    }
-  }
+  // Always infer from content, then let explicit headers win. This fills in any
+  // column an unrecognized header missed and handles header-less pastes.
+  const inferred = inferColumns(dataRows);
+  const map: Partial<Record<keyof ParsedInvitee, number>> = {
+    ...inferred,
+    ...headerMap,
+  };
 
   const invitees: ParsedInvitee[] = [];
   let skipped = 0;
