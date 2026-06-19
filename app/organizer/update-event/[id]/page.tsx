@@ -101,8 +101,8 @@ export default function UpdateEventPage() {
       setValue(
         "ticketCategories",
         event.ticketCategories?.length
-          ? event.ticketCategories.map((cat: any, index: number) => ({
-              id: (index + 1).toString(),
+          ? event.ticketCategories.map((cat: any) => ({
+              id: cat.id,
               name: cat.name,
               price: cat.price,
               maxTickets: cat.maxTickets,
@@ -154,7 +154,21 @@ export default function UpdateEventPage() {
     if (data.customFields?.length) {
       formData.append("customFields", JSON.stringify(data.customFields.map(({ id, ...rest }) => rest)));
     }
-    formData.append("ticketCategories", JSON.stringify(ticketCategories.map(({ id, ...rest }) => rest)));
+    // Send the real category id for existing categories so the backend can
+    // match them (and apply renames). New categories (no real id) are sent
+    // without one and matched by name.
+    const existingCategoryIds = new Set(
+      (event?.ticketCategories ?? []).map((c: any) => c.id),
+    );
+    formData.append(
+      "ticketCategories",
+      JSON.stringify(
+        ticketCategories.map((cat) => {
+          const { id, ...rest } = cat;
+          return existingCategoryIds.has(id) ? { id, ...rest } : rest;
+        }),
+      ),
+    );
     if (data.banner instanceof File) formData.append("banner", data.banner);
 
     try {
