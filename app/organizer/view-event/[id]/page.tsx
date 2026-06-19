@@ -409,6 +409,7 @@ export default function EventDashboard() {
               eventName={event.name}
               eventDate={event.date}
               eventLocation={event.location}
+              ticketCategories={event.ticketCategories ?? []}
             />
           </motion.div>
         </motion.div>

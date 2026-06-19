@@ -6,6 +6,7 @@ export interface InviteCardProps {
   eventLocation?: string | null;
   inviteeName?: string | null;
   admitsCount?: number | null;
+  categoryName?: string | null;
   qrUrl: string;
 }
 
@@ -25,7 +26,15 @@ const formatEventDate = (raw?: string | Date | null) => {
 
 export const InviteCard = forwardRef<HTMLDivElement, InviteCardProps>(
   function InviteCard(
-    { eventName, eventDate, eventLocation, inviteeName, admitsCount, qrUrl },
+    {
+      eventName,
+      eventDate,
+      eventLocation,
+      inviteeName,
+      admitsCount,
+      categoryName,
+      qrUrl,
+    },
     ref,
   ) {
     return (
@@ -77,12 +86,21 @@ export const InviteCard = forwardRef<HTMLDivElement, InviteCardProps>(
           >
             {inviteeName ? `Guest: ${inviteeName}` : "Personal invite"}
           </p>
-          <p
-            style={{ marginBottom: 4, lineHeight: 1.4 }}
-            className="text-xs text-slate-500"
-          >
-            Admits: {admitsCount && admitsCount > 1 ? admitsCount : 1}
-          </p>
+          {(() => {
+            const parts = [
+              categoryName || null,
+              admitsCount && admitsCount > 1 ? `admits ${admitsCount}` : null,
+            ].filter(Boolean);
+            if (!parts.length) return null;
+            return (
+              <p
+                style={{ marginBottom: 4, lineHeight: 1.4 }}
+                className="text-xs font-medium text-indigo-600 break-words"
+              >
+                {parts.join(" - ")}
+              </p>
+            );
+          })()}
           <p
             style={{ marginBottom: 20, lineHeight: 1.4 }}
             className="text-xs text-slate-500"

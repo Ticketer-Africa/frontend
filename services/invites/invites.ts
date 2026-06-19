@@ -10,6 +10,9 @@ export interface Invite {
   status: "PENDING" | "ACCEPTED" | "REVOKED";
   token: string;
   inviteLink?: string;
+  admitsCount?: number | null;
+  ticketCategoryId?: string | null;
+  ticketCategoryName?: string | null;
 }
 
 export type InviteDeliveryMode = "GENERATE" | "SEND";
@@ -20,6 +23,7 @@ export interface AddInviteePayload {
   name: string;
   mode?: InviteDeliveryMode;
   admitsCount?: number;
+  ticketCategoryId?: string;
 }
 
 export interface UpdateInvitePayload {
@@ -27,6 +31,7 @@ export interface UpdateInvitePayload {
   email?: string;
   phone?: string;
   tableNumber?: string;
+  ticketCategoryId?: string | null;
 }
 
 export interface ShareableLink {
@@ -35,10 +40,39 @@ export interface ShareableLink {
 
 const BASE = (eventId: string) => `events/${eventId}/invites`;
 
+interface RawInvite {
+  id: string;
+  email?: string | null;
+  phone?: string | null;
+  name?: string | null;
+  admitsCount?: number | null;
+  ticketCategoryId?: string | null;
+  ticketCategoryName?: string | null;
+  inviteLink?: string;
+  inviteToken?: string;
+  usedAt?: string | null;
+}
+
 export const listInvites = async (eventId: string): Promise<Invite[]> => {
   const endpoint = buildEndpoint("v2", BASE(eventId));
-  const res = await axios.get<Invite[]>(endpoint);
-  return res.data;
+  const res = await axios.get<{ invites?: RawInvite[] } | RawInvite[]>(endpoint);
+  // Backend returns { eventId, total, invites: [...] }; tolerate a bare array too.
+  const raw: RawInvite[] = Array.isArray(res.data)
+    ? res.data
+    : (res.data?.invites ?? []);
+  return raw.map((inv) => ({
+    id: inv.id,
+    eventId,
+    email: inv.email ?? null,
+    phone: inv.phone ?? null,
+    name: inv.name ?? "",
+    status: inv.usedAt ? "ACCEPTED" : "PENDING",
+    token: inv.inviteToken ?? "",
+    inviteLink: inv.inviteLink,
+    admitsCount: inv.admitsCount ?? null,
+    ticketCategoryId: inv.ticketCategoryId ?? null,
+    ticketCategoryName: inv.ticketCategoryName ?? null,
+  }));
 };
 
 export interface AddInvitesResponse {
@@ -51,6 +85,9 @@ export interface AddInvitesResponse {
     email: string | null;
     phone: string | null;
     name: string | null;
+    admitsCount?: number | null;
+    ticketCategoryId?: string | null;
+    ticketCategoryName?: string | null;
     inviteLink?: string;
     inviteToken?: string;
     createdAt?: string;
@@ -142,6 +179,8 @@ export interface VerifyInviteResponse {
     name: string | null;
     email: string | null;
     phone: string | null;
+    admitsCount?: number | null;
+    ticketCategoryName?: string | null;
   };
   event: {
     id: string;
