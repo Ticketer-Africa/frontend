@@ -79,9 +79,7 @@ export const InviteCard = forwardRef<HTMLDivElement, InviteCardProps>(
           </div>
 
           {(() => {
-            const parts = [
-              admitsCount && admitsCount > 1 ? `admits ${admitsCount}` : null,
-            ].filter(Boolean);
+            const parts = [`Admits ${admitsCount || 1}`].filter(Boolean);
             if (!parts.length) return null;
             return (
               <p
