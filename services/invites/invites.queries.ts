@@ -54,6 +54,7 @@ export const useRegenerateToken = (eventId: string) => {
     mutationFn: (inviteId) => invitesAPI.regenerateToken(eventId, inviteId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invites", eventId] });
+      queryClient.invalidateQueries({ queryKey: ["attendees", eventId] });
     },
   });
 };
@@ -64,6 +65,7 @@ export const useRemoveInvitee = (eventId: string) => {
     mutationFn: (inviteId) => invitesAPI.removeInvitee(eventId, inviteId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invites", eventId] });
+      queryClient.invalidateQueries({ queryKey: ["attendees", eventId] });
     },
   });
 };
