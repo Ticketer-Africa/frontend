@@ -32,7 +32,6 @@ export const InviteCard = forwardRef<HTMLDivElement, InviteCardProps>(
       eventLocation,
       inviteeName,
       admitsCount,
-      categoryName,
       qrUrl,
     },
     ref,
@@ -88,7 +87,6 @@ export const InviteCard = forwardRef<HTMLDivElement, InviteCardProps>(
           </p>
           {(() => {
             const parts = [
-              categoryName || null,
               admitsCount && admitsCount > 1 ? `admits ${admitsCount}` : null,
             ].filter(Boolean);
             if (!parts.length) return null;
