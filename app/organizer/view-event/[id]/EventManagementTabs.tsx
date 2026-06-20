@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import NextLink from "next/link";
 import { toPng } from "html-to-image";
 import { InviteCard } from "@/components/invite-card";
 import {
@@ -16,6 +17,7 @@ import {
   QrCode,
   Download,
   Phone,
+  Users,
 } from "lucide-react";
 import {
   Dialog,
@@ -763,190 +765,20 @@ export default function EventManagementTabs({
                   </div>
                 </div>
 
-                {invitesLoading ? (
-                  <div className="flex justify-center py-8">
-                    <Loader2 className="h-6 w-6 animate-spin text-[#1E88E5]" />
-                  </div>
-                ) : invites && invites.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b text-muted-foreground">
-                          <th className="text-left py-2 pr-4 font-medium">Name</th>
-                          <th className="text-left py-2 pr-4 font-medium">Contact</th>
-                          {ticketCategories.length > 0 && (
-                            <th className="text-left py-2 pr-4 font-medium">
-                              Category
-                            </th>
-                          )}
-                          <th className="text-left py-2 pr-4 font-medium">Status</th>
-                          <th className="text-left py-2 font-medium">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {invites.map((inv) => (
-                          <tr key={inv.id} className="border-b last:border-0">
-                            <td className="py-2 pr-4">{inv.name}</td>
-                            <td className="py-2 pr-4">
-                              {inv.email || inv.phone || (
-                                <span className="text-muted-foreground italic">
-                                  —
-                                </span>
-                              )}
-                            </td>
-                            {ticketCategories.length > 0 && (
-                              <td className="py-2 pr-4">
-                                <Select
-                                  value={inv.ticketCategoryId || "none"}
-                                  onValueChange={(v) =>
-                                    updateInvite(
-                                      {
-                                        inviteId: inv.id,
-                                        payload: {
-                                          ticketCategoryId:
-                                            v === "none" ? null : v,
-                                        },
-                                      },
-                                      {
-                                        onSuccess: () =>
-                                          toast({
-                                            title: "Category updated",
-                                          }),
-                                        onError: () =>
-                                          toast({
-                                            title: "Error",
-                                            description:
-                                              "Failed to update category.",
-                                            variant: "destructive",
-                                          }),
-                                      },
-                                    )
-                                  }
-                                >
-                                  <SelectTrigger className="h-8 w-[140px]">
-                                    <SelectValue placeholder="No category" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="none">
-                                      No category
-                                    </SelectItem>
-                                    {ticketCategories.map((c) => (
-                                      <SelectItem key={c.id} value={c.id}>
-                                        {c.name}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </td>
-                            )}
-                            <td className="py-2 pr-4">
-                              <span
-                                className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                                  inv.status === "ACCEPTED"
-                                    ? "bg-green-100 text-green-700"
-                                    : inv.status === "REVOKED"
-                                      ? "bg-red-100 text-red-700"
-                                      : "bg-yellow-100 text-yellow-700"
-                                }`}
-                              >
-                                {inv.status}
-                              </span>
-                            </td>
-                            <td className="py-2">
-                              <div className="flex gap-2 flex-wrap">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => openQrFor(inv)}
-                                >
-                                  <QrCode className="h-3 w-3 mr-1" />
-                                  QR
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() =>
-                                    resendInvite(inv.id, {
-                                      onSuccess: () =>
-                                        toast({
-                                          title: "Invite resent",
-                                          description: `Resent to ${inv.email}.`,
-                                        }),
-                                      onError: () =>
-                                        toast({
-                                          title: "Error",
-                                          description: "Failed to resend invite.",
-                                          variant: "destructive",
-                                        }),
-                                    })
-                                  }
-                                  disabled={resendingInvite || !inv.email}
-                                  title={
-                                    !inv.email
-                                      ? "No email on file — share the QR instead"
-                                      : undefined
-                                  }
-                                >
-                                  <Send className="h-3 w-3 mr-1" />
-                                  Resend
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() =>
-                                    regenerateToken(inv.id, {
-                                      onSuccess: () =>
-                                        toast({
-                                          title: "Token regenerated",
-                                          description: "A new invite link has been generated.",
-                                        }),
-                                      onError: () =>
-                                        toast({
-                                          title: "Error",
-                                          description: "Failed to regenerate token.",
-                                          variant: "destructive",
-                                        }),
-                                    })
-                                  }
-                                >
-                                  <RefreshCw className="h-3 w-3 mr-1" />
-                                  Regenerate
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="text-red-600 hover:text-red-700 hover:border-red-300"
-                                  onClick={() =>
-                                    removeInvitee(inv.id, {
-                                      onSuccess: () =>
-                                        toast({
-                                          title: "Invitee removed",
-                                          description: `${inv.name} has been removed.`,
-                                        }),
-                                      onError: () =>
-                                        toast({
-                                          title: "Error",
-                                          description: "Failed to remove invitee.",
-                                          variant: "destructive",
-                                        }),
-                                    })
-                                  }
-                                >
-                                  <Trash2 className="h-3 w-3 mr-1" />
-                                  Remove
-                                </Button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p className="text-muted-foreground text-sm">
-                    No invitees yet.
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pt-2">
+                  <p className="text-sm text-muted-foreground">
+                    {invitesLoading
+                      ? "Loading invitees…"
+                      : `${invites?.length ?? 0} invitee${(invites?.length ?? 0) === 1 ? "" : "s"} so far.`}{" "}
+                    Manage, edit or remove guests on the attendees page.
                   </p>
-                )}
+                  <Button asChild variant="outline" size="sm" className="rounded-full">
+                    <NextLink href={`/organizer/event/${eventId}/attendees`}>
+                      <Users className="h-4 w-4 mr-2" />
+                      View attendees
+                    </NextLink>
+                  </Button>
+                </div>
               </div>
 
               {/* Shareable link */}

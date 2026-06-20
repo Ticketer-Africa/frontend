@@ -6,13 +6,17 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
   ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
   Copy,
   Download,
   Loader2,
+  MoreHorizontal,
   Pencil,
   RefreshCw,
   Search,
   QrCode,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,12 +51,30 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useEventByIdV2 } from "@/services/events/events-v2.queries";
 import { useListAttendees } from "@/services/attendees/attendees.queries";
 import type { Attendee, AttendeeStatus } from "@/services/attendees/attendees";
 import { useRegenerateToken } from "@/services/invites/invites.queries";
 import { useUpdateInvite } from "@/services/invites/invites.queries";
+import { useRemoveInvitee } from "@/services/invites/invites.queries";
 import { getInviteQrDataUrl } from "@/services/invites/invites";
 import { InviteCard } from "@/components/invite-card";
 
@@ -71,13 +93,22 @@ export default function AttendeesPage() {
   const { toast } = useToast();
 
   const [type, setType] = useState<FilterType>("ALL");
+  const [categoryId, setCategoryId] = useState<string>("ALL");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [page, setPage] = useState(1);
+
+  const PAGE_SIZE = 20;
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(search.trim()), 300);
     return () => clearTimeout(t);
   }, [search]);
+
+  // Reset to first page whenever a filter changes.
+  useEffect(() => {
+    setPage(1);
+  }, [type, categoryId, debouncedSearch]);
 
   const { data: event } = useEventByIdV2(eventId);
   const { data, isLoading, isFetching } = useListAttendees(eventId, {
@@ -89,6 +120,34 @@ export default function AttendeesPage() {
     useRegenerateToken(eventId);
 
   const { mutate: updateInvite, isPending: updating } = useUpdateInvite(eventId);
+
+  const { mutate: removeInvitee, isPending: removing } =
+    useRemoveInvitee(eventId);
+
+  // ── Remove confirmation state ────────────────────────────────────────────────
+  const [removeFor, setRemoveFor] = useState<Attendee | null>(null);
+
+  const confirmRemove = () => {
+    if (!removeFor?.inviteId) return;
+    const target = removeFor;
+    const inviteId = removeFor.inviteId;
+    removeInvitee(inviteId, {
+      onSuccess: () => {
+        toast({
+          title: "Invitee removed",
+          description: `${target.name || "Attendee"} has been removed.`,
+        });
+        setRemoveFor(null);
+      },
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "Failed to remove invitee.",
+          variant: "destructive",
+        });
+      },
+    });
+  };
 
   // ── QR dialog state ──────────────────────────────────────────────────────────
   const [qrFor, setQrFor] = useState<Attendee | null>(null);
@@ -218,8 +277,41 @@ export default function AttendeesPage() {
   };
 
   // ── Table data ───────────────────────────────────────────────────────────────
-  const rows = data?.attendees ?? [];
+  const allRows = useMemo(() => data?.attendees ?? [], [data]);
   const counts = data?.counts;
+
+  // Categories present in the data (fallback when event categories aren't loaded).
+  const categoryOptions = useMemo(() => {
+    const fromEvent =
+      event?.ticketCategories?.map((c) => ({ id: c.id, name: c.name })) ?? [];
+    if (fromEvent.length) return fromEvent;
+    const seen = new Map<string, string>();
+    for (const a of allRows) {
+      if (a.ticketCategoryId && !seen.has(a.ticketCategoryId)) {
+        seen.set(a.ticketCategoryId, a.ticketCategoryName || "Unnamed");
+      }
+    }
+    return Array.from(seen, ([id, name]) => ({ id, name }));
+  }, [event, allRows]);
+
+  // Category filtering is applied client-side over the returned attendees.
+  const filteredRows = useMemo(() => {
+    if (categoryId === "ALL") return allRows;
+    if (categoryId === "NONE")
+      return allRows.filter((a) => !a.ticketCategoryId);
+    return allRows.filter((a) => a.ticketCategoryId === categoryId);
+  }, [allRows, categoryId]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const rows = useMemo(
+    () =>
+      filteredRows.slice(
+        (currentPage - 1) * PAGE_SIZE,
+        currentPage * PAGE_SIZE,
+      ),
+    [filteredRows, currentPage],
+  );
 
   const summary = useMemo(() => {
     if (!data) return null;
@@ -272,6 +364,22 @@ export default function AttendeesPage() {
                   <TabsTrigger value="TICKET">Ticket-holders</TabsTrigger>
                 </TabsList>
               </Tabs>
+              {categoryOptions.length > 0 && (
+                <Select value={categoryId} onValueChange={setCategoryId}>
+                  <SelectTrigger className="w-full sm:w-[200px]">
+                    <SelectValue placeholder="All categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">All categories</SelectItem>
+                    <SelectItem value="NONE">No category</SelectItem>
+                    {categoryOptions.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
               <div className="relative flex-1 max-w-sm">
                 <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -291,9 +399,9 @@ export default function AttendeesPage() {
               <div className="flex items-center justify-center py-16">
                 <Loader2 className="h-8 w-8 animate-spin text-[#1E88E5]" />
               </div>
-            ) : rows.length === 0 ? (
+            ) : filteredRows.length === 0 ? (
               <div className="text-center py-16 text-muted-foreground">
-                No attendees yet.
+                No attendees match your filters.
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -334,17 +442,15 @@ export default function AttendeesPage() {
                             </span>
                           </TableCell>
                           <TableCell className="text-sm">
-                            {a.type === "TICKET" ? (
-                              <>
-                                <div>{a.ticketCategoryName || "—"}</div>
-                                {a.ticketCode && (
-                                  <div className="text-muted-foreground font-mono text-xs">
-                                    {a.ticketCode}
-                                  </div>
-                                )}
-                              </>
-                            ) : (
-                              <span className="text-muted-foreground">—</span>
+                            <div>
+                              {a.ticketCategoryName || (
+                                <span className="text-muted-foreground">—</span>
+                              )}
+                            </div>
+                            {a.type === "TICKET" && a.ticketCode && (
+                              <div className="text-muted-foreground font-mono text-xs">
+                                {a.ticketCode}
+                              </div>
                             )}
                           </TableCell>
                           <TableCell className="text-sm">
@@ -352,44 +458,54 @@ export default function AttendeesPage() {
                           </TableCell>
                           <TableCell className="text-right">
                             {a.type === "INVITE" ? (
-                              <div className="flex justify-end gap-2 flex-wrap">
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => openQr(a)}
-                                >
-                                  <QrCode className="h-4 w-4 mr-1" />
-                                  QR
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => copyLink(a.inviteLink)}
-                                  disabled={!a.inviteLink}
-                                >
-                                  <Copy className="h-4 w-4 mr-1" />
-                                  Link
-                                </Button>
-                                {a.status !== "CHECKED_IN" && (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
                                   <Button
                                     variant="ghost"
-                                    size="sm"
-                                    onClick={() => openEdit(a)}
+                                    size="icon"
+                                    className="h-8 w-8"
                                   >
-                                    <Pencil className="h-4 w-4 mr-1" />
-                                    Edit
+                                    <MoreHorizontal className="h-4 w-4" />
+                                    <span className="sr-only">
+                                      Open actions menu
+                                    </span>
                                   </Button>
-                                )}
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleRegenerate(a)}
-                                  disabled={regenerating}
-                                >
-                                  <RefreshCw className={`h-4 w-4 mr-1 ${regenerating ? "animate-spin" : ""}`} />
-                                  Regenerate
-                                </Button>
-                              </div>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-44">
+                                  <DropdownMenuItem onClick={() => openQr(a)}>
+                                    <QrCode className="h-4 w-4 mr-2" />
+                                    View QR
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => copyLink(a.inviteLink)}
+                                    disabled={!a.inviteLink}
+                                  >
+                                    <Copy className="h-4 w-4 mr-2" />
+                                    Copy link
+                                  </DropdownMenuItem>
+                                  {a.status !== "CHECKED_IN" && (
+                                    <DropdownMenuItem onClick={() => openEdit(a)}>
+                                      <Pencil className="h-4 w-4 mr-2" />
+                                      Edit
+                                    </DropdownMenuItem>
+                                  )}
+                                  <DropdownMenuItem
+                                    onClick={() => handleRegenerate(a)}
+                                    disabled={regenerating}
+                                  >
+                                    <RefreshCw className="h-4 w-4 mr-2" />
+                                    Regenerate
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    className="text-red-600 focus:text-red-600"
+                                    onClick={() => setRemoveFor(a)}
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Remove
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             ) : (
                               <span className="text-muted-foreground text-xs">—</span>
                             )}
@@ -399,6 +515,43 @@ export default function AttendeesPage() {
                     })}
                   </TableBody>
                 </Table>
+              </div>
+            )}
+
+            {filteredRows.length > 0 && (
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4">
+                <p className="text-xs text-muted-foreground">
+                  Showing {(currentPage - 1) * PAGE_SIZE + 1}–
+                  {Math.min(currentPage * PAGE_SIZE, filteredRows.length)} of{" "}
+                  {filteredRows.length}
+                </p>
+                {totalPages > 1 && (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage <= 1}
+                    >
+                      <ChevronLeft className="h-4 w-4 mr-1" />
+                      Prev
+                    </Button>
+                    <span className="text-sm text-muted-foreground">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setPage((p) => Math.min(totalPages, p + 1))
+                      }
+                      disabled={currentPage >= totalPages}
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
@@ -522,6 +675,40 @@ export default function AttendeesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Remove confirmation */}
+      <AlertDialog
+        open={!!removeFor}
+        onOpenChange={(open) => !open && !removing && setRemoveFor(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove this invitee?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {removeFor?.name || "This attendee"} will be removed and their
+              invite link / QR code will stop working. This can&apos;t be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={removing}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                confirmRemove();
+              }}
+              disabled={removing}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            >
+              {removing ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4 mr-2" />
+              )}
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
