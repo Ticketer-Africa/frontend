@@ -30,7 +30,6 @@ export const InviteCard = forwardRef<HTMLDivElement, InviteCardProps>(
       eventName,
       eventDate,
       eventLocation,
-      inviteeName,
       admitsCount,
       qrUrl,
     },
@@ -79,16 +78,8 @@ export const InviteCard = forwardRef<HTMLDivElement, InviteCardProps>(
             <img src={qrUrl} alt="Invite QR" className="w-full h-auto block" />
           </div>
 
-          <p
-            style={{ marginBottom: 4, lineHeight: 1.4 }}
-            className="text-sm font-semibold text-slate-900 break-words"
-          >
-            {inviteeName ? `Guest: ${inviteeName}` : "Personal invite"}
-          </p>
           {(() => {
-            const parts = [
-              admitsCount && admitsCount > 1 ? `admits ${admitsCount}` : null,
-            ].filter(Boolean);
+            const parts = [`Admits ${admitsCount || 1}`].filter(Boolean);
             if (!parts.length) return null;
             return (
               <p
