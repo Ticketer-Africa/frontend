@@ -349,6 +349,14 @@ export default function VerifyTicketPage() {
                     </span>
                   </div>
                 )}
+                {inviteVerification.invite.tableNumber && (
+                  <div className="flex justify-between gap-3">
+                    <span className="text-gray-600">Table</span>
+                    <span className="text-right font-bold text-gray-900 break-words">
+                      {inviteVerification.invite.tableNumber}
+                    </span>
+                  </div>
+                )}
                 {!!inviteVerification.invite.admitsCount &&
                   inviteVerification.invite.admitsCount > 1 && (
                     <div className="flex justify-between">

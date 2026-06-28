@@ -17,6 +17,7 @@ export interface Attendee {
   ticketCategoryId: string | null;
   ticketCategoryName: string | null;
   admitsCount: number | null;
+  tableNumber: string | null;
   createdAt: string;
 }
 

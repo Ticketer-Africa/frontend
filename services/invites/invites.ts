@@ -207,6 +207,7 @@ export interface VerifyInviteResponse {
     phone: string | null;
     admitsCount?: number | null;
     ticketCategoryName?: string | null;
+    tableNumber?: string | null;
   };
   event: {
     id: string;
