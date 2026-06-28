@@ -413,6 +413,7 @@ export default function AttendeesPage() {
                       <TableHead>Type</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Category / Code</TableHead>
+                      <TableHead>Table</TableHead>
                       <TableHead>Admits</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
@@ -451,6 +452,13 @@ export default function AttendeesPage() {
                               <div className="text-muted-foreground font-mono text-xs">
                                 {a.ticketCode}
                               </div>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-sm">
+                            {a.tableNumber ? (
+                              <span className="font-medium">{a.tableNumber}</span>
+                            ) : (
+                              <span className="text-muted-foreground">—</span>
                             )}
                           </TableCell>
                           <TableCell className="text-sm">
