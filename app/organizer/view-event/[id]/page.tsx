@@ -402,15 +402,7 @@ export default function EventDashboard() {
             transition={{ duration: 0.6, delay: 0.7 }}
             className="mt-8"
           >
-            <EventManagementTabs
-              eventId={event.id}
-              accessType={event.accessType}
-              eventSlug={event.slug}
-              eventName={event.name}
-              eventDate={event.date}
-              eventLocation={event.location}
-              ticketCategories={event.ticketCategories ?? []}
-            />
+            <EventManagementTabs eventId={event.id} />
           </motion.div>
         </motion.div>
       </div>
