@@ -23,7 +23,6 @@ export interface BuyTicketsV2Payload {
   eventId: string;
   ticketCategories: TicketPurchaseItemV2[];
   discountCode?: string;
-  inviteToken?: string;
   occurrenceId?: string;
   customFieldResponses?: CustomFieldResponse[];
 }

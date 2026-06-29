@@ -85,11 +85,6 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
   const [customFieldValues, setCustomFieldValues] = useState<Record<string, string>>({});
-  const [inviteSession, setInviteSession] = useState<{
-    inviteToken?: string;
-    guestName?: string;
-    guestEmail?: string;
-  } | null>(null);
 
   // Redirect to my-tickets after successful free ticket purchase
   useEffect(() => {
@@ -113,32 +108,13 @@ export default function CheckoutPage() {
     const parsed = JSON.parse(data) as CheckoutData;
     setCheckoutData(parsed);
 
-    // Load invite session if present
-    const inviteRaw = sessionStorage.getItem("inviteSession");
-    let inv: { guestName?: string; guestEmail?: string } | null = null;
-    if (inviteRaw) {
-      try {
-        inv = JSON.parse(inviteRaw);
-        setInviteSession(inv);
-      } catch {}
-    }
-
     // Initialize recipients if multiple recipients is toggled
     if (useMultipleRecipients) {
       const recipientsByCategory: RecipientForm = {};
-      // Use already-parsed invite for pre-fill if available
-      let invitePreFill: { recipientName: string; recipientEmail: string } | null = null;
-      if (inv && (inv.guestName || inv.guestEmail)) {
-        invitePreFill = { recipientName: inv.guestName ?? "", recipientEmail: inv.guestEmail ?? "" };
-      }
-      parsed.tickets.forEach((ticket, idx) => {
+      parsed.tickets.forEach((ticket) => {
         recipientsByCategory[ticket.ticketCategoryId] = Array(ticket.quantity)
           .fill(null)
-          .map((_, i) =>
-            idx === 0 && i === 0 && invitePreFill
-              ? invitePreFill
-              : { recipientName: "", recipientEmail: "" }
-          );
+          .map(() => ({ recipientName: "", recipientEmail: "" }));
       });
       setRecipients(recipientsByCategory);
     }
@@ -306,8 +282,7 @@ export default function CheckoutPage() {
           discountCode: discountState.appliedDiscount.code,
         }),
         ...(checkoutData.occurrenceId && { occurrenceId: checkoutData.occurrenceId }),
-        ...(inviteSession?.inviteToken && { inviteToken: inviteSession.inviteToken }),
-        ...(checkoutData.customFields?.length && {
+...(checkoutData.customFields?.length && {
           customFieldResponses: checkoutData.customFields.map((f) => ({
             customFieldId: f.id,
             value: customFieldValues[f.id] ?? "",
@@ -319,7 +294,6 @@ export default function CheckoutPage() {
 
       // Clear session data
       sessionStorage.removeItem("checkoutData");
-      sessionStorage.removeItem("inviteSession");
 
       // Redirect to payment URL if available
       if (response.checkoutUrl) {
@@ -342,7 +316,6 @@ export default function CheckoutPage() {
     recipients,
     buyTickets,
     router,
-    inviteSession,
     customFieldValues,
     discountState,
   ]);
