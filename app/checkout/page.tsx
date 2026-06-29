@@ -282,7 +282,7 @@ export default function CheckoutPage() {
           discountCode: discountState.appliedDiscount.code,
         }),
         ...(checkoutData.occurrenceId && { occurrenceId: checkoutData.occurrenceId }),
-...(checkoutData.customFields?.length && {
+        ...(checkoutData.customFields?.length && {
           customFieldResponses: checkoutData.customFields.map((f) => ({
             customFieldId: f.id,
             value: customFieldValues[f.id] ?? "",
