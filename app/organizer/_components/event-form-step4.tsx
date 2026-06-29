@@ -27,7 +27,7 @@ const FIELD_TYPES = [
 ] as const;
 
 export function EventFormStep4({ watch, setValue, register, errors, isDisabled }: Step4Props) {
-  const accessType = watch("accessType") ?? "PUBLIC";
+
   const isVirtual = watch("isVirtual") ?? false;
   const isRecurring = watch("isRecurring") ?? false;
   const occurrences = watch("occurrences") ?? [];
@@ -108,19 +108,6 @@ export function EventFormStep4({ watch, setValue, register, errors, isDisabled }
   return (
     <div className="space-y-4">
       <p className="text-xs text-gray-400">All sections below are optional. Enable only what applies to your event.</p>
-
-      {/* Access Type */}
-      <Section
-        title="Invite-Only Event"
-        description="Restrict ticket purchases to people you personally invite"
-        enabled={accessType === "INVITE_ONLY"}
-        onToggle={(on) => setValue("accessType", on ? "INVITE_ONLY" : "PUBLIC")}
-        disabled={isDisabled}
-      >
-        <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-xs text-blue-700">
-          Only invited people can purchase tickets. You can manage invites from your event dashboard after creating the event.
-        </div>
-      </Section>
 
       {/* Virtual Event */}
       <Section

@@ -59,7 +59,6 @@ const bannerSchemaOptional = z
   .optional();
 
 const advancedFields = {
-  accessType: z.enum(["PUBLIC", "INVITE_ONLY"]).default("PUBLIC"),
   isVirtual: z.boolean().default(false),
   virtualLink: z.string().optional(),
   virtualLinkReleaseAt: z.string().optional(),

@@ -83,11 +83,6 @@ export default function CheckoutPage() {
   const [discountCode, setDiscountCode] = useState("");
   const [buyerEmail, setBuyerEmail] = useState("");
   const [buyerName, setBuyerName] = useState("");
-  const [inviteSession, setInviteSession] = useState<{
-    inviteToken?: string;
-    guestName?: string;
-    guestEmail?: string;
-  } | null>(null);
 
   useEffect(() => {
     if (purchaseSuccess) {
@@ -103,33 +98,18 @@ export default function CheckoutPage() {
 
     const parsed = JSON.parse(data) as CheckoutData;
     setCheckoutData(parsed);
-
-    const inviteRaw = sessionStorage.getItem("inviteSession");
-    let inv: { guestName?: string; guestEmail?: string; inviteToken?: string } | null = null;
-    if (inviteRaw) {
-      try {
-        inv = JSON.parse(inviteRaw);
-        setInviteSession(inv);
-        if (inv?.guestEmail) setBuyerEmail(inv.guestEmail);
-        if (inv?.guestName) setBuyerName(inv.guestName);
-      } catch {}
-    }
   }, []);
 
   useEffect(() => {
     if (!checkoutData || !useMultipleRecipients) return;
     const recipientsByCategory: RecipientForm = {};
-    checkoutData.tickets.forEach((ticket, idx) => {
+    checkoutData.tickets.forEach((ticket) => {
       recipientsByCategory[ticket.ticketCategoryId] = Array(ticket.quantity)
         .fill(null)
-        .map((_, i) =>
-          idx === 0 && i === 0 && inviteSession?.guestName
-            ? { recipientName: inviteSession.guestName ?? "", recipientEmail: inviteSession.guestEmail ?? "" }
-            : { recipientName: "", recipientEmail: "" }
-        );
+        .map(() => ({ recipientName: "", recipientEmail: "" }));
     });
     setRecipients(recipientsByCategory);
-  }, [useMultipleRecipients, checkoutData, inviteSession]);
+  }, [useMultipleRecipients, checkoutData]);
 
   const validateEmail = useCallback((email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), []);
 
@@ -228,7 +208,6 @@ export default function CheckoutPage() {
         ...(!user && buyerName.trim() && { buyerName: buyerName.trim() }),
         ...(discountState.appliedDiscount && { discountCode: discountState.appliedDiscount.code }),
         ...(checkoutData.occurrenceId && { occurrenceId: checkoutData.occurrenceId }),
-        ...(inviteSession?.inviteToken && { inviteToken: inviteSession.inviteToken }),
         ...(checkoutData.customFields?.length && {
           customFieldResponses: checkoutData.customFields.map((f) => ({
             fieldId: f.id,
@@ -239,7 +218,6 @@ export default function CheckoutPage() {
 
       const response = await buyTickets(payload);
       sessionStorage.removeItem("checkoutData");
-      sessionStorage.removeItem("inviteSession");
 
       if (response.checkoutUrl) {
         window.location.href = response.checkoutUrl;
@@ -253,7 +231,7 @@ export default function CheckoutPage() {
     }
   }, [
     checkoutData, validate, useMultipleRecipients, recipients, user,
-    buyerEmail, buyerName, discountState, inviteSession, customFieldValues, buyTickets,
+    buyerEmail, buyerName, discountState, customFieldValues, buyTickets,
   ]);
 
   // ── Loading state ──────────────────────────────────────────────
