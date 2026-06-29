@@ -13,7 +13,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useRegister } from "@/services/auth/auth.queries";
-import { useBecomeOrganizer } from "@/services/user/user.queries";
 import { toast } from "sonner";
 import { Logo } from "@/components/layout/logo";
 
@@ -73,7 +72,6 @@ export default function RegisterPage() {
   });
 
   const { mutateAsync: registerUser, isPending } = useRegister();
-  const becomeOrganizerMutation = useBecomeOrganizer();
 
   const goToNextStep = async () => {
     const isStepOneValid = await trigger(["name", "email"]);
@@ -88,10 +86,10 @@ export default function RegisterPage() {
         name: data.name,
         email: data.email.toLowerCase(),
         password: data.password,
+        role: "ORGANIZER" as const,
       };
 
       await registerUser(payload);
-      await becomeOrganizerMutation.mutateAsync(data.email);
 
       localStorage.setItem(
         "otpPayload",
