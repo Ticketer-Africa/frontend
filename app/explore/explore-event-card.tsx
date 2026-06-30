@@ -168,15 +168,6 @@ function ExploreEventCardComponent({
                       {ticket.name} (
                       {ticket.displayPrice === 0 ? "Free" : formatPrice(ticket.displayPrice)})
                     </span>
-                    <span
-                      className={
-                        ticket.maxTickets - (ticket.minted ?? 0) < 5
-                          ? "text-red-500 font-medium"
-                          : "text-gray-600"
-                      }
-                    >
-                      {ticket.maxTickets - (ticket.minted ?? 0)} available
-                    </span>
                   </div>
                 ))}
               </div>
