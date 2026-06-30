@@ -51,7 +51,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
     const category = event?.ticketCategories.find((c) => c.id === id);
     if (!category) return;
 
-    const max = Math.min(category.maxTickets - category.minted, 10); // Max 10 per category
+    const max = Math.min(category.maxTickets - (category.minted ?? 0), 10); // Max 10 per category
     setQuantities((prev) => {
       const current = prev[id] ?? 1;
       const next = typeof value === "function" ? value(current) : value;
@@ -223,17 +223,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
                 </section>
 
                 <section className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  <StatCard
-                    label="Attendees"
-                    value={
-                      event.ticketCategories?.reduce(
-                        (a, b) => a + b.minted,
-                        0,
-                      ) ?? 0
-                    }
-                    icon={<Ticket className="h-5 w-5" />}
-                  />
-                  {/* Add more stats if you have data */}
+                  {/* Attendee count is not shown publicly */}
                 </section>
               </div>
 

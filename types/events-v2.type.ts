@@ -8,7 +8,7 @@ export interface TicketCategoryV2 {
   price: number;
   maxTickets: number;
   maxAdmissions: number;
-  minted: number;
+  minted?: number;
   eventId: string;
   displayPrice: number;
 }

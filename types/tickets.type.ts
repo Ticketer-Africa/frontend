@@ -6,7 +6,7 @@ export interface TicketCategory {
   id: string;
   name: string;
   price: number;
-  minted: number;
+  minted?: number;
   maxTickets: number;
 }
 

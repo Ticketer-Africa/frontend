@@ -13,7 +13,7 @@ interface EventStructuredDataProps {
       price: number;
       name: string;
       maxTickets: number;
-      minted: number;
+      minted?: number;
     }>;
   };
 }
@@ -30,7 +30,7 @@ export function EventStructuredData({ event }: EventStructuredDataProps) {
   const totalTickets =
     event.ticketCategories?.reduce((sum, tc) => sum + tc.maxTickets, 0) || 0;
   const soldTickets =
-    event.ticketCategories?.reduce((sum, tc) => sum + tc.minted, 0) || 0;
+    event.ticketCategories?.reduce((sum, tc) => sum + (tc.minted ?? 0), 0) || 0;
   const availability = soldTickets >= totalTickets ? "SoldOut" : "InStock";
 
   const structuredData = {

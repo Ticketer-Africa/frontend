@@ -35,7 +35,7 @@ export function filterEvents(
 export function getTicketStats(event: EventV2) {
   const ticketCategories = event.ticketCategories || [];
   const maxTickets = ticketCategories.reduce((sum, t) => sum + t.maxTickets, 0);
-  const mintedTickets = ticketCategories.reduce((sum, t) => sum + t.minted, 0);
+  const mintedTickets = ticketCategories.reduce((sum, t) => sum + (t.minted ?? 0), 0);
   const ticketsAvailable = maxTickets - mintedTickets;
 
   return { ticketCategories, maxTickets, mintedTickets, ticketsAvailable };

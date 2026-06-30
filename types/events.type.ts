@@ -18,7 +18,7 @@ export interface TicketCategory {
   name: string;
   price: number;
   maxTickets: number;
-  minted: number;
+  minted?: number;
 }
 
 export interface Event {
@@ -36,7 +36,7 @@ export interface Event {
   updatedAt: string;
   slug: string;
   maxTickets: number;
-  minted: number;
+  minted?: number;
   organizerd: string;
   tickets: ResaleTicket[];
   ticketCategories?: TicketCategory[];

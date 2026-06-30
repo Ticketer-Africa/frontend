@@ -170,13 +170,12 @@ function ExploreEventCardComponent({
                     </span>
                     <span
                       className={
-                        ticket.maxTickets - ticket.minted < 5
+                        ticket.maxTickets - (ticket.minted ?? 0) < 5
                           ? "text-red-500 font-medium"
                           : "text-gray-600"
                       }
                     >
-                      {ticket.maxTickets - ticket.minted} of {ticket.maxTickets}{" "}
-                      available
+                      {ticket.maxTickets - (ticket.minted ?? 0)} available
                     </span>
                   </div>
                 ))}
