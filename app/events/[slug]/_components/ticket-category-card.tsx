@@ -44,7 +44,7 @@ export function TicketCategoryCardV2({
         <div>
           <h3 className="font-semibold text-lg">{category.name}</h3>
           <p className="text-sm text-muted-foreground mt-1">
-            {available} remaining • Admits {category.maxAdmissions}
+            Admits {category.maxAdmissions}
           </p>
         </div>
 
