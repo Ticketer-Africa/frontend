@@ -222,9 +222,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
                   </div>
                 </section>
 
-                <section className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  {/* Attendee count is not shown publicly */}
-                </section>
+
               </div>
 
               {/* Poster + tickets column */}
@@ -357,24 +355,6 @@ export default function EventPage({ params }: { params: { slug: string } }) {
 // Helper Components
 // ────────────────────────────────────────────────
 
-function StatCard({
-  label,
-  value,
-  icon,
-}: {
-  label: string;
-  value: number | string;
-  icon: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-xl border bg-card/50 p-5 text-center">
-      <div className="text-muted-foreground mb-1.5 text-sm font-medium">
-        {label}
-      </div>
-      <div className="text-2xl font-bold">{value.toLocaleString()}</div>
-    </div>
-  );
-}
 
 function OccurrenceSelector({
   occurrences,
