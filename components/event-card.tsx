@@ -21,8 +21,7 @@ interface EventCardProps {
  * 2. CSS transition for smooth hover effect
  */
 export function EventCard({ event }: EventCardProps) {
-  const availableTickets = event.maxTickets - event.minted;
-  const soldOutPercentage = (event.minted / event.maxTickets) * 100;
+  const availableTickets = event.maxTickets - (event.minted ?? 0);
 
   return (
     <div className="event-card-hover">
@@ -71,19 +70,7 @@ export function EventCard({ event }: EventCardProps) {
               </div>
             </div>
 
-            {/* Progress bar for ticket sales */}
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{event.minted} sold</span>
-                <span>{soldOutPercentage.toFixed(0)}% sold</span>
-              </div>
-              <div className="w-full bg-muted rounded-full h-2">
-                <div
-                  className="bg-primary h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${soldOutPercentage}%` }}
-                />
-              </div>
-            </div>
+
 
             <div className="flex items-center justify-between pt-2">
               <div className="space-y-1">

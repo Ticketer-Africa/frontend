@@ -23,7 +23,7 @@ export function TicketCategoryCardV2({
   feeMode,
   primaryFeeBps,
 }: Props) {
-  const available = category.maxTickets - category.minted;
+  const available = category.maxTickets - (category.minted ?? 0);
   const outOfStock = available <= 0;
   const fee =
     feeMode === "ATTENDEE"

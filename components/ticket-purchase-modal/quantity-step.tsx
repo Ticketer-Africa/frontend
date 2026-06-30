@@ -104,7 +104,7 @@ export function QuantityStep({
                 onClick={() => onQuantityChange(category.id, 1)}
                 disabled={
                   (quantities[category.id] || 0) >= 10 ||
-                  category.maxTickets - category.minted <=
+                  category.maxTickets - (category.minted ?? 0) <=
                     (quantities[category.id] || 0)
                 }
                 className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
@@ -113,7 +113,7 @@ export function QuantityStep({
               </Button>
             </div>
             <p className="text-xs text-gray-500 text-center mt-2">
-              {category.maxTickets - category.minted} tickets available
+              {category.maxTickets - (category.minted ?? 0)} tickets available
             </p>
           </div>
         ))
