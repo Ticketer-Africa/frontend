@@ -188,7 +188,7 @@ export default function CheckoutPage() {
   }, [user, buyerEmail, validateEmail, useMultipleRecipients, recipients, checkoutData, customFieldValues, scrollToFirstError]);
 
   const handleApplyDiscount = useCallback(async () => {
-    if (!discountCode.trim()) { toast.error("Please enter a discount code"); return; }
+
     if (!checkoutData) return;
 
     try {
