@@ -135,22 +135,38 @@ export default function CheckoutPage() {
     [clearError]
   );
 
+  const scrollToFirstError = useCallback((errors: Record<string, string>) => {
+    const firstKey = Object.keys(errors)[0];
+    if (!firstKey) return;
+
+    let elementId: string;
+    if (firstKey === "buyerEmail") elementId = "buyer-email";
+    else if (firstKey.startsWith("cf-")) elementId = firstKey;
+    else elementId = `recipient-${firstKey}`;
+
+    const el = document.getElementById(elementId) ?? document.querySelector(`[data-error-key="${firstKey}"]`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      (el as HTMLElement).focus?.();
+    }
+  }, []);
+
   const validate = useCallback((): boolean => {
     const errors: Record<string, string> = {};
 
     if (!user && !buyerEmail.trim()) {
-      errors["buyerEmail"] = "Email is required to complete your purchase";
+      errors["buyerEmail"] = "Email address is required";
     } else if (!user && buyerEmail.trim() && !validateEmail(buyerEmail)) {
-      errors["buyerEmail"] = "Please enter a valid email address";
+      errors["buyerEmail"] = "Enter a valid email address (e.g. you@example.com)";
     }
 
     if (useMultipleRecipients) {
       Object.entries(recipients).forEach(([categoryId, list]) => {
         list.forEach((r, i) => {
           const key = `${categoryId}-${i}`;
-          if (!r.recipientName.trim()) errors[key] = "Name is required";
-          else if (!r.recipientEmail.trim()) errors[key] = "Email is required";
-          else if (!validateEmail(r.recipientEmail)) errors[key] = "Invalid email address";
+          if (!r.recipientName.trim()) errors[key] = "Recipient name is required";
+          else if (!r.recipientEmail.trim()) errors[key] = "Recipient email is required";
+          else if (!validateEmail(r.recipientEmail)) errors[key] = "Enter a valid email address for this recipient";
         });
       });
     }
@@ -160,16 +176,19 @@ export default function CheckoutPage() {
         const val = customFieldValues[field.id]?.trim() ?? "";
         if (field.required && !val) errors[`cf-${field.id}`] = `${field.label} is required`;
         else if (field.fieldType === "EMAIL" && val && !validateEmail(val))
-          errors[`cf-${field.id}`] = `${field.label} must be a valid email`;
+          errors[`cf-${field.id}`] = `${field.label} must be a valid email address`;
       }
     }
 
     setValidationErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      setTimeout(() => scrollToFirstError(errors), 50);
+    }
     return Object.keys(errors).length === 0;
-  }, [user, buyerEmail, validateEmail, useMultipleRecipients, recipients, checkoutData, customFieldValues]);
+  }, [user, buyerEmail, validateEmail, useMultipleRecipients, recipients, checkoutData, customFieldValues, scrollToFirstError]);
 
   const handleApplyDiscount = useCallback(async () => {
-    if (!discountCode.trim()) { toast.error("Please enter a discount code"); return; }
+
     if (!checkoutData) return;
 
     try {
@@ -188,10 +207,7 @@ export default function CheckoutPage() {
 
   const handlePurchase = useCallback(async () => {
     if (!checkoutData) return;
-    if (!validate()) {
-      toast.error("Please fix the errors below before continuing");
-      return;
-    }
+    if (!validate()) return;
 
     setIsSubmitting(true);
     try {

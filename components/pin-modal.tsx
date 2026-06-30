@@ -19,6 +19,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { AlertCircle } from "lucide-react";
 
 interface PinModalProps {
   isOpen: boolean;
@@ -26,37 +27,44 @@ interface PinModalProps {
   hasPin: boolean;
 }
 
+const OTP_SLOTS = [0, 1, 2, 3];
+
 export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
   const [newPin, setNewPin] = useState("");
   const [oldPin, setOldPin] = useState("");
+  const [newPinError, setNewPinError] = useState("");
+  const [oldPinError, setOldPinError] = useState("");
   const { mutateAsync, isPending } = useSetWalletPin();
   const queryClient = useQueryClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    let hasError = false;
     if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
-      toast.error("New PIN must be exactly 4 digits");
-      return;
+      setNewPinError("New PIN must be exactly 4 digits");
+      hasError = true;
     }
     if (hasPin && (oldPin.length !== 4 || !/^\d{4}$/.test(oldPin))) {
-      toast.error("Current PIN must be exactly 4 digits");
-      return;
+      setOldPinError("Current PIN must be exactly 4 digits");
+      hasError = true;
     }
+    if (hasError) return;
+
     const payload: SetWalletPinPayload = { newPin };
-    if (hasPin) {
-      payload.oldPin = oldPin;
-    }
+    if (hasPin) payload.oldPin = oldPin;
+
     try {
       await mutateAsync(payload);
-      toast.success(
-        hasPin ? "PIN updated successfully" : "PIN set successfully"
-      );
+      toast.success(hasPin ? "PIN updated successfully" : "PIN set successfully");
       queryClient.invalidateQueries({ queryKey: ["wallet-pin-status"] });
       setNewPin("");
       setOldPin("");
+      setNewPinError("");
+      setOldPinError("");
       onClose();
     } catch (error: any) {
-      console.error("Error setting PIN:", error.message);
+      toast.error(error?.message || "Failed to update PIN. Please try again.");
     }
   };
 
@@ -68,92 +76,79 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
             {hasPin ? "Update Wallet PIN" : "Set Wallet PIN"}
           </DialogTitle>
         </DialogHeader>
-        <form
-          onSubmit={handleSubmit}
-          className="w-full flex flex-col items-center"
-        >
+        <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
           <div className="space-y-6 py-4 w-full">
             {hasPin && (
               <div className="flex flex-col items-center gap-2">
-                <Label
-                  htmlFor="oldPin"
-                  className="text-sm font-medium text-gray-900 text-center"
-                >
+                <Label htmlFor="oldPin" className="text-sm font-medium text-gray-900 text-center">
                   Current PIN
                 </Label>
                 <InputOTP
                   id="oldPin"
                   maxLength={4}
                   value={oldPin}
-                  onChange={setOldPin}
+                  onChange={(v) => { setOldPin(v); setOldPinError(""); }}
                   disabled={isPending}
                   type="password"
                   className="flex justify-center"
                 >
                   <InputOTPGroup className="flex justify-center gap-2">
-                    <InputOTPSlot
-                      index={0}
-                      className="bg-gray-50 border-gray-200 rounded-xl w-12 h-12 text-center"
-                    />
-                    <InputOTPSlot
-                      index={1}
-                      className="bg-gray-50 border-gray-200 rounded-xl w-12 h-12 text-center"
-                    />
-                    <InputOTPSlot
-                      index={2}
-                      className="bg-gray-50 border-gray-200 rounded-xl w-12 h-12 text-center"
-                    />
-                    <InputOTPSlot
-                      index={3}
-                      className="bg-gray-50 border-gray-200 rounded-xl w-12 h-12 text-center"
-                    />
+                    {OTP_SLOTS.map((i) => (
+                      <InputOTPSlot
+                        key={i}
+                        index={i}
+                        className={`bg-gray-50 rounded-xl w-12 h-12 text-center ${oldPinError ? "border-red-500" : "border-gray-200"}`}
+                      />
+                    ))}
                   </InputOTPGroup>
                 </InputOTP>
+                {oldPinError && (
+                  <p className="text-xs text-red-600 flex items-center gap-1">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    {oldPinError}
+                  </p>
+                )}
               </div>
             )}
+
             <div className="flex flex-col items-center gap-2">
-              <Label
-                htmlFor="newPin"
-                className="text-sm font-medium text-gray-900 text-center"
-              >
+              <Label htmlFor="newPin" className="text-sm font-medium text-gray-900 text-center">
                 New PIN
               </Label>
               <InputOTP
                 id="newPin"
                 maxLength={4}
                 value={newPin}
-                onChange={setNewPin}
+                onChange={(v) => { setNewPin(v); setNewPinError(""); }}
                 disabled={isPending}
                 type="password"
                 className="flex justify-center"
               >
                 <InputOTPGroup className="flex justify-center gap-2">
-                  <InputOTPSlot
-                    index={0}
-                    className="bg-gray-50 border-gray-200 rounded-xl w-12 h-12 text-center"
-                  />
-                  <InputOTPSlot
-                    index={1}
-                    className="bg-gray-50 border-gray-200 rounded-xl w-12 h-12 text-center"
-                  />
-                  <InputOTPSlot
-                    index={2}
-                    className="bg-gray-50 border-gray-200 rounded-xl w-12 h-12 text-center"
-                  />
-                  <InputOTPSlot
-                    index={3}
-                    className="bg-gray-50 border-gray-200 rounded-xl w-12 h-12 text-center"
-                  />
+                  {OTP_SLOTS.map((i) => (
+                    <InputOTPSlot
+                      key={i}
+                      index={i}
+                      className={`bg-gray-50 rounded-xl w-12 h-12 text-center ${newPinError ? "border-red-500" : "border-gray-200"}`}
+                    />
+                  ))}
                 </InputOTPGroup>
               </InputOTP>
+              {newPinError && (
+                <p className="text-xs text-red-600 flex items-center gap-1">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  {newPinError}
+                </p>
+              )}
             </div>
+
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
               <p className="text-sm text-blue-800 text-center">
-                <strong>Note:</strong> Your PIN must be a 4-digit number. Keep
-                it secure and do not share it with anyone.
+                <strong>Note:</strong> Your PIN must be a 4-digit number. Keep it secure and do not share it with anyone.
               </p>
             </div>
           </div>
+
           <DialogFooter className="flex space-x-2 w-full">
             <Button
               type="button"
@@ -169,7 +164,7 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
               type="submit"
               disabled={isPending}
             >
-              {isPending ? "Processing..." : hasPin ? "Update PIN" : "Set PIN"}
+              {isPending ? "Processing…" : hasPin ? "Update PIN" : "Set PIN"}
             </Button>
           </DialogFooter>
         </form>

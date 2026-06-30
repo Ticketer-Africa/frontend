@@ -19,16 +19,16 @@ import { Logo } from "@/components/layout/logo";
 // 🧠 ZOD SCHEMA + TYPE
 const registerSchema = z
   .object({
-    name: z.string().min(1, "Full name is required"),
-    email: z.string().email("Invalid email"),
+    name: z.string().min(2, "Enter your full name (at least 2 characters)"),
+    email: z.string().email("Enter a valid email address (e.g. you@example.com)"),
     password: z.string().min(8, "Password must be at least 8 characters"),
-    confirmPassword: z.string().min(8, "Confirm your password"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
     agreementAccepted: z.boolean().refine((value) => value, {
       message: "You must accept the Service Agreement to continue",
     }),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: "Passwords don't match — please re-enter your password",
     path: ["confirmPassword"],
   });
 
