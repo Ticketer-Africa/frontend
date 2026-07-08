@@ -21,6 +21,8 @@ const buttonVariants = cva(
           "border-input bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "border-transparent bg-transparent hover:bg-accent hover:text-accent-foreground",
         link: "border-transparent bg-transparent text-primary underline-offset-4 hover:underline",
+        homeAccent:
+          "border-transparent bg-[var(--home-accent)] text-[var(--home-accent-fg)] font-['Hanken_Grotesk'] font-semibold transition-opacity hover:opacity-90",
       },
       size: {
         default: "h-11 px-5 py-3",
