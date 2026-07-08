@@ -46,8 +46,7 @@ All new tokens are scoped under a `.home-theme` class applied to the root wrappe
 ```css
 .home-theme {
   /* surfaces */
-  --home-bg: #0b0e14;             /* page / footer base */
-  --home-hero-bg: #0c1322;        /* hero gradient base */
+  --home-bg: #0b0e14;             /* page / footer / hero base — unified across the page */
   --home-card: #141b2b;           /* feature card */
   --home-card-elevated: #191f2f;  /* FAQ row */
   --home-card-highlight: #232a3a; /* pricing card */
@@ -92,7 +91,7 @@ All new tokens are scoped under a `.home-theme` class applied to the root wrappe
 ## Section-by-section changes
 
 ### Hero (`hero-section.tsx`)
-- Full-bleed section, `--home-hero-bg` background with a radial/linear gradient overlay (decorative — no real photo asset since this isn't event-driven data; a CSS gradient standing in for the Figma photo backdrop).
+- Full-bleed section, `--home-bg` background (same base tone as the rest of the page) with a radial coral gradient overlay (decorative — no real photo asset since this isn't event-driven data; a CSS gradient standing in for the Figma photo backdrop).
 - Small eyebrow text ("Experience the Rhythm"), Syne extrabold headline with the last line ("Effortlessly.") in `--home-text-highlight`.
 - Hanken Grotesk subcopy, single `Button variant="homeAccent"` CTA ("Become an Organizer") with arrow icon, routes to `/register?intent=organizer` (unchanged from current behavior).
 - The current `HeroSearchBar` is removed (not present in Figma design).

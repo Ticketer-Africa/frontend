@@ -59,8 +59,7 @@ Insert immediately after the closing `}` of the `.dark { ... }` block (currently
 ```css
   .home-theme {
     /* surfaces */
-    --home-bg: #0b0e14;
-    --home-hero-bg: #0c1322;
+    --home-bg: #0b0e14; /* page / footer / hero base — unified across the page */
     --home-card: #141b2b;
     --home-card-elevated: #191f2f;
     --home-card-highlight: #232a3a;
@@ -705,7 +704,7 @@ export function HeroSection() {
       className="home-theme relative flex items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 pt-32 pb-24 min-h-[720px]"
       style={{
         background:
-          "radial-gradient(circle at 50% 0%, rgba(226,114,91,0.16), transparent 60%), var(--home-hero-bg)",
+          "radial-gradient(circle at 50% 0%, rgba(226,114,91,0.16), transparent 60%), var(--home-bg)",
       }}
     >
       <div className="relative z-0 text-center max-w-5xl mx-auto w-full">
