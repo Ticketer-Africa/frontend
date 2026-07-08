@@ -82,6 +82,8 @@ Insert immediately after the closing `}` of the `.dark { ... }` block (currently
     --home-success-fg: #003403;
     --home-success-text: #92fa83;
     --home-highlight-yellow: #f4d03f;
+    --home-social-bg: #2e3545; /* footer social icon circles — distinct from --home-border-strong */
+    --home-badge-bg: rgba(46, 53, 69, 0.3); /* eyebrow pill / Show More button translucent fill */
 
     /* radii */
     --home-radius-card: 16px;
@@ -535,7 +537,12 @@ export function Header() {
                 </div>
               </>
             ) : isHome ? (
-              <Button variant="homeAccent" asChild>
+              <Button
+                variant="homeAccent"
+                asChild
+                className="border"
+                style={{ borderColor: "var(--home-accent-fg)" }}
+              >
                 <Link href="/login">Sign In</Link>
               </Button>
             ) : (
@@ -629,7 +636,12 @@ export function Header() {
               </div>
             ) : isHome ? (
               <div className="mt-3 border-t border-[var(--home-border)] pt-3">
-                <Button variant="homeAccent" asChild className="w-full">
+                <Button
+                  variant="homeAccent"
+                  asChild
+                  className="w-full border"
+                  style={{ borderColor: "var(--home-accent-fg)" }}
+                >
                   <Link href="/login" onClick={closeMenu}>
                     Sign In
                   </Link>
@@ -708,21 +720,26 @@ export function HeroSection() {
       }}
     >
       <div className="relative z-0 text-center max-w-5xl mx-auto w-full">
-        <p
-          className="mb-4 text-sm tracking-[0.5px] font-['Hanken_Grotesk'] font-semibold"
-          style={{ color: "var(--home-text-highlight)" }}
+        <span
+          className="inline-block mb-4 px-4 py-1 rounded-full border text-sm tracking-[0.5px] font-['Hanken_Grotesk'] font-semibold backdrop-blur-[2px]"
+          style={{
+            color: "var(--home-text-highlight)",
+            borderColor: "var(--home-border-strong)",
+            backgroundColor: "var(--home-badge-bg)",
+          }}
         >
           Experience the Rhythm
-        </p>
+        </span>
 
         <h1
           className="font-['Syne'] font-extrabold text-4xl sm:text-5xl lg:text-7xl mb-6 leading-tight tracking-[-1.2px]"
           style={{ color: "var(--home-text)" }}
         >
-          Buy. Sell. Enjoy Events{" "}
-          <span style={{ color: "var(--home-text-highlight)" }}>
-            Effortlessly.
-          </span>
+          Buy. Sell. Enjoy
+          <br />
+          Events
+          <br />
+          <span style={{ color: "var(--home-accent)" }}>Effortlessly.</span>
         </h1>
 
         <p
@@ -737,6 +754,7 @@ export function HeroSection() {
           <Button
             variant="homeAccent"
             size="lg"
+            className="drop-shadow-[0px_0px_7.5px_rgba(226,114,91,0.2)]"
             onClick={() => router.push("/register?intent=organizer")}
           >
             Become an Organizer
@@ -1044,7 +1062,7 @@ export function FeaturesSection() {
         <div className="section-animate text-center mb-16">
           <h2
             className="font-['Syne'] font-bold text-3xl sm:text-4xl lg:text-5xl mb-4"
-            style={{ color: "var(--home-text)" }}
+            style={{ color: "var(--home-text-highlight)" }}
           >
             Everything you need for events
           </h2>
@@ -1213,7 +1231,12 @@ export function PricingSection() {
         </div>
 
         <div className="section-animate section-delay-2 mt-16">
-          <Button variant="homeAccent" size="lg" asChild>
+          <Button
+            variant="homeAccent"
+            size="lg"
+            asChild
+            className="drop-shadow-[0px_0px_7.5px_rgba(226,114,91,0.2)]"
+          >
             <a href="/register?intent=organizer">
               <Ticket className="mr-2 w-4 h-4" />
               Start Selling Tickets
@@ -1411,7 +1434,7 @@ export function FAQSection() {
               onClick={loadMore}
               className="px-8 py-3 rounded-full font-['Hanken_Grotesk'] text-base transition-colors border"
               style={{
-                backgroundColor: "rgba(46,53,69,0.3)",
+                backgroundColor: "var(--home-badge-bg)",
                 borderColor: "var(--home-border-strong)",
                 color: "var(--home-text)",
               }}
@@ -1504,7 +1527,7 @@ export function Footer() {
                   key={label}
                   href={href}
                   className="flex items-center justify-center w-10 h-10 rounded-full transition-opacity hover:opacity-80"
-                  style={{ backgroundColor: "var(--home-border-strong)" }}
+                  style={{ backgroundColor: "var(--home-social-bg)" }}
                   aria-label={label}
                 >
                   <Icon className="h-4 w-4" style={{ color: "var(--home-text)" }} aria-hidden="true" />

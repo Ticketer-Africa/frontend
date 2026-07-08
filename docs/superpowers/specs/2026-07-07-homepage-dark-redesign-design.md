@@ -58,7 +58,7 @@ All new tokens are scoped under a `.home-theme` class applied to the root wrappe
 
   /* text */
   --home-text: #dce2f7;           /* headings */
-  --home-text-highlight: #ffb4a5; /* hero "Effortlessly.", footer wordmark */
+  --home-text-highlight: #ffb4a5; /* eyebrow badge text, nav active link, footer wordmark, hero/trending divider */
   --home-muted: #ddc0ba;          /* body / nav / descriptions */
   --home-muted-dim: #a48b86;      /* footer copyright */
 
@@ -85,14 +85,14 @@ All new tokens are scoped under a `.home-theme` class applied to the root wrappe
 
 ### Shared primitives
 
-- **`Button` `variant="homeAccent"`** — added to the existing shadcn-style `components/ui/button.tsx` variants map. Coral background (`--home-accent`), `--home-accent-fg` text, pill shape. Used by: Hero CTA ("Become an Organizer"), Pricing CTA ("Start Selling Tickets"), and the Home-only "Sign In" pill in `Header`.
+- **`Button` `variant="homeAccent"`** — added to the existing shadcn-style `components/ui/button.tsx` variants map. Coral background (`--home-accent`), `--home-accent-fg` text, pill shape. Used by: Hero CTA ("Become an Organizer"), Pricing CTA ("Start Selling Tickets"), and the Home-only "Sign In" pill in `Header`. Figma actually gives the Hero/Pricing CTAs a coral drop-shadow glow and no border, while the Header's Sign In pill has a border and no glow — the shared variant carries neither by default, and each usage adds its own `className` for the glow or border as needed.
 - **`HomeCard`** (new, `components/home/home-card.tsx`) — thin wrapper applying `bg-[var(--home-card)] border border-[var(--home-border)] rounded-[var(--home-radius-card)]` (or the elevated/highlight background via a prop), accepts `className` for per-use padding/layout. Used by: Feature cards, Pricing cards (with `background` prop for the 3 distinct card tones), FAQ rows.
 
 ## Section-by-section changes
 
 ### Hero (`hero-section.tsx`)
 - Full-bleed section, `--home-bg` background (same base tone as the rest of the page) with a radial coral gradient overlay (decorative — no real photo asset since this isn't event-driven data; a CSS gradient standing in for the Figma photo backdrop).
-- Small eyebrow text ("Experience the Rhythm"), Syne extrabold headline with the last line ("Effortlessly.") in `--home-text-highlight`.
+- Small eyebrow text ("Experience the Rhythm") inside a bordered/blurred pill badge, Syne extrabold 3-line headline ("Buy. Sell. Enjoy" / "Events" / "Effortlessly.") with the last line in `--home-accent` (not `--home-text-highlight`).
 - Hanken Grotesk subcopy, single `Button variant="homeAccent"` CTA ("Become an Organizer") with arrow icon, routes to `/register?intent=organizer` (unchanged from current behavior).
 - The current `HeroSearchBar` is removed (not present in Figma design).
 - CSS background-circle decorations removed/replaced by the new gradient treatment.
