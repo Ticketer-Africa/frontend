@@ -827,21 +827,27 @@ const EventCard = memo(function EventCard({
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to top, var(--home-bg) 0%, rgba(11,14,20,0) 50%)",
+          }}
+        />
 
-        <div className="absolute bottom-0 left-0 right-0 p-6">
+        <div className="absolute bottom-6 left-6 right-6">
           <h3
-            className="font-['Syne'] font-semibold text-xl mb-2 line-clamp-2"
+            className="font-['Syne'] font-bold text-2xl sm:text-3xl mb-2 line-clamp-2"
             style={{ color: "var(--home-text)" }}
           >
             {truncateText(event.name, 8)}
           </h3>
 
           <div
-            className="flex items-center text-sm font-['Hanken_Grotesk']"
-            style={{ color: "var(--home-muted)" }}
+            className="flex items-center gap-3 text-base font-['Hanken_Grotesk'] font-semibold"
+            style={{ color: "var(--home-text)" }}
           >
-            <Calendar className="w-3.5 h-3.5 mr-2 flex-shrink-0" aria-hidden="true" />
+            <Calendar className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
             <span className="line-clamp-1">{formattedDate}</span>
           </div>
         </div>
@@ -877,15 +883,15 @@ export function EventsSection() {
               Trending Events
             </h2>
             <span
-              className="hidden sm:block w-12 h-px"
-              style={{ backgroundColor: "var(--home-border-strong)" }}
+              className="hidden sm:block w-12 h-[2px]"
+              style={{ backgroundColor: "var(--home-text-highlight)" }}
               aria-hidden="true"
             />
           </div>
           <Link
             href="/explore"
-            className="font-['Hanken_Grotesk'] text-sm font-semibold underline underline-offset-4"
-            style={{ color: "var(--home-text-highlight)" }}
+            className="font-['Hanken_Grotesk'] text-base font-semibold border-b pb-1.5"
+            style={{ color: "var(--home-text-highlight)", borderColor: "var(--home-text-highlight)" }}
           >
             View All
           </Link>
@@ -1403,10 +1409,10 @@ export function FAQSection() {
           <div className="text-center mt-8">
             <button
               onClick={loadMore}
-              className="px-6 py-3 rounded-full font-['Hanken_Grotesk'] text-sm font-semibold transition-colors border"
+              className="px-8 py-3 rounded-full font-['Hanken_Grotesk'] text-base transition-colors border"
               style={{
-                backgroundColor: "var(--home-card-elevated)",
-                borderColor: "var(--home-border)",
+                backgroundColor: "rgba(46,53,69,0.3)",
+                borderColor: "var(--home-border-strong)",
                 color: "var(--home-text)",
               }}
             >

@@ -99,8 +99,8 @@ All new tokens are scoped under a `.home-theme` class applied to the root wrappe
 
 ### Events → "Trending Events" (`events-section.tsx`)
 - Data wiring unchanged: `useAllEvents()`, `event.bannerUrl`, `event.slug` navigation all stay exactly as-is.
-- Section header restyled: "Trending Events" heading + short horizontal divider + "View All" link (routes to `/explore`), replacing the current centered "Upcoming Events" header + bottom CTA button.
-- Cards: full-bleed `event.bannerUrl` image, bottom gradient overlay, title in Syne, a calendar-icon + date row in Hanken Grotesk (using `event` date field), rounded-2xl corners. Still `events.slice(0, 3)`.
+- Section header restyled: "Trending Events" heading + a short coral (`--home-text-highlight`) divider + a coral "View All" link with a bottom border (not underlined) (routes to `/explore`), replacing the current centered "Upcoming Events" header + bottom CTA button.
+- Cards: full-bleed `event.bannerUrl` image at 514px tall, gradient overlay fading from `--home-bg` (not black) into transparency, full-brightness (`--home-text`) 32px bold Syne title, a calendar-icon + date row also in full-brightness text (16px semibold Hanken Grotesk, not muted), rounded-2xl corners. Still `events.slice(0, 3)`.
 
 ### Features → "Everything you need for events" (`features-section.tsx`)
 - Header restyled: Syne bold heading + Hanken Grotesk subcopy.
