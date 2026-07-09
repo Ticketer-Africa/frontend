@@ -114,11 +114,12 @@ export function Header() {
           <Link href="/" className="flex items-center">
             <Logo
               size="md"
+              showImage={!isHome}
               textClassName={isHome ? "text-[var(--home-text-highlight)]" : undefined}
             />
           </Link>
 
-          <div className="hidden min-w-0 items-center gap-4 md:flex">
+          <div className="hidden min-w-0 items-center justify-center gap-4 md:flex">
             <nav className="flex items-center gap-2">
               {navItems.map((item) => (
                 <Link

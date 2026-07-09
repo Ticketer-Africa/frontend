@@ -35,7 +35,7 @@ export function Footer() {
       <div className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-16">
           <div className="lg:col-span-2 space-y-6">
-            <Logo textClassName="text-[var(--home-text-highlight)]" />
+            <Logo showImage={false} textClassName="text-[var(--home-text-highlight)]" />
             <p
               className="font-['Hanken_Grotesk'] text-base max-w-md"
               style={{ color: "var(--home-muted)" }}

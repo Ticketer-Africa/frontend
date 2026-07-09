@@ -4,6 +4,7 @@ import clsx from "clsx";
 type LogoProps = {
   size?: "sm" | "md" | "lg" | number; // pre-defined or custom number (in rem)
   withText?: boolean;
+  showImage?: boolean;
   text?: string;
   imgSrc?: string;
   className?: string;
@@ -19,6 +20,7 @@ const sizeMap = {
 export const Logo: React.FC<LogoProps> = ({
   size = "md",
   withText = true,
+  showImage = true,
   text = "Ticketer Africa",
   imgSrc = "/logo.png",
   className = "",
@@ -39,13 +41,15 @@ export const Logo: React.FC<LogoProps> = ({
 
   return (
     <div className={clsx("flex items-center gap-2", className)}>
-      <div className={imageClasses}>
-        <img
-          src={imgSrc}
-          alt={`${text} Logo`}
-          className="w-full h-full object-cover"
-        />
-      </div>
+      {showImage && (
+        <div className={imageClasses}>
+          <img
+            src={imgSrc}
+            alt={`${text} Logo`}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
       {withText && (
         <span
           className={clsx(
