@@ -21,6 +21,12 @@ import {
 } from "./constants";
 
 /**
+ * Curated subset of CATEGORIES shown as quick-access pills above the grid.
+ * "All" clears the category filter; each pill sets it directly (no Apply step).
+ */
+const QUICK_CATEGORIES = ["Music", "Concert", "Festival", "Party", "Networking"];
+
+/**
  * EventsPage - Optimized explore page for discovering events
  *
  * Performance optimizations applied:
@@ -332,6 +338,12 @@ export default function EventsPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
+  const handleQuickCategorySelect = useCallback((category: string) => {
+    setTempCategory(category);
+    setSelectedCategory(category);
+    setCurrentPage(1);
+  }, []);
+
   // ─────────────────────────────────────────────────────────────────────────────
   // RENDER
   // ─────────────────────────────────────────────────────────────────────────────
@@ -364,16 +376,18 @@ export default function EventsPage() {
          */}
         <header className="text-center mb-12">
           <h1
-            className="text-4xl sm:text-5xl font-bold mb-4"
+            className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 leading-[1.05]"
             style={{ color: "var(--home-text)" }}
           >
-            Discover Amazing Events
+            Discover Amazing
+            <br />
+            Events
           </h1>
           <p
-            className="text-xl max-w-2xl mx-auto"
+            className="text-lg max-w-2xl mx-auto"
             style={{ color: "var(--home-muted)" }}
           >
-            Find and book tickets for the best events happening near you
+            Find and book tickets for the best events happening near you across the continent.
           </p>
         </header>
 
@@ -406,6 +420,45 @@ export default function EventsPage() {
           onClearFilters={handleClearFilters}
           resultsCount={filteredEvents.length}
         />
+
+        {/*
+         * Quick category pills - direct-apply shortcut for a curated
+         * subset of CATEGORIES, distinct from the full Location/Price/
+         * Category panel toggled by the "Filters" button above.
+         */}
+        <div
+          className="flex gap-4 items-center overflow-x-auto pb-2 mb-8"
+          role="group"
+          aria-label="Quick category filters"
+        >
+          <button
+            type="button"
+            onClick={() => handleQuickCategorySelect("")}
+            className="px-8 py-3 rounded-full text-sm font-semibold whitespace-nowrap transition-colors shrink-0"
+            style={
+              selectedCategory === ""
+                ? { backgroundColor: "var(--home-accent)", color: "var(--home-accent-fg)" }
+                : { backgroundColor: "var(--home-card-elevated)", color: "var(--home-muted)", border: "1px solid var(--home-border)" }
+            }
+          >
+            All
+          </button>
+          {QUICK_CATEGORIES.map((category) => (
+            <button
+              key={category}
+              type="button"
+              onClick={() => handleQuickCategorySelect(category)}
+              className="px-8 py-3 rounded-full text-sm font-semibold whitespace-nowrap transition-colors shrink-0"
+              style={
+                selectedCategory === category
+                  ? { backgroundColor: "var(--home-accent)", color: "var(--home-accent-fg)" }
+                  : { backgroundColor: "var(--home-card-elevated)", color: "var(--home-muted)", border: "1px solid var(--home-border)" }
+              }
+            >
+              {category}
+            </button>
+          ))}
+        </div>
 
         {/*
          * Events grid - shows skeleton only on first load

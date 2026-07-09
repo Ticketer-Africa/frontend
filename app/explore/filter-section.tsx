@@ -113,7 +113,7 @@ function FilterSectionComponent({
             />
             <Input
               type="text"
-              placeholder="Search events, locations..."
+              placeholder="Search events, locations, artists..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               className="pl-12 h-12 rounded-full"
