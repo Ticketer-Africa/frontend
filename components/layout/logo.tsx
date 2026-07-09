@@ -7,6 +7,7 @@ type LogoProps = {
   text?: string;
   imgSrc?: string;
   className?: string;
+  textClassName?: string;
 };
 
 const sizeMap = {
@@ -21,6 +22,7 @@ export const Logo: React.FC<LogoProps> = ({
   text = "Ticketer Africa",
   imgSrc = "/logo.png",
   className = "",
+  textClassName,
 }) => {
   const isCustomSize = typeof size === "number";
   const {
@@ -45,7 +47,13 @@ export const Logo: React.FC<LogoProps> = ({
         />
       </div>
       {withText && (
-        <span className={clsx("font-bold text-[#1E88E5]", fontClasses)}>
+        <span
+          className={clsx(
+            "font-bold",
+            textClassName ?? "text-[#1E88E5]",
+            fontClasses
+          )}
+        >
           {text}
         </span>
       )}
