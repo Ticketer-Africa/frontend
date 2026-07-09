@@ -157,7 +157,10 @@ export default function EventPage({ params }: { params: { slug: string } }) {
         </div>
       </div>
 
-      <div className="min-h-screen bg-background pb-32 md:pb-0">
+      <div
+        className="home-theme min-h-screen pb-32 md:pb-0"
+        style={{ backgroundColor: "var(--home-bg)" }}
+      >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back button */}
           <div className="pt-5 pb-3">
@@ -179,10 +182,13 @@ export default function EventPage({ params }: { params: { slug: string } }) {
                 <EventHeaderV2 event={event} />
 
                 <section>
-                  <h2 className="text-2xl font-bold tracking-tight mb-5">
+                  <h2 className="text-2xl font-bold tracking-tight mb-5" style={{ color: "var(--home-text)" }}>
                     About the Event
                   </h2>
-                  <div className="prose prose-neutral dark:prose-invert max-w-none leading-relaxed">
+                  <div
+                    className="prose prose-invert max-w-none leading-relaxed"
+                    style={{ color: "var(--home-muted)" }}
+                  >
                     {event.description.split("\n").map((p, i) => (
                       <p key={i} className="mb-4 last:mb-0">
                         {p}
@@ -192,12 +198,18 @@ export default function EventPage({ params }: { params: { slug: string } }) {
                 </section>
 
                 <section>
-                  <h2 className="text-2xl font-bold tracking-tight mb-5">
+                  <h2 className="text-2xl font-bold tracking-tight mb-5" style={{ color: "var(--home-text)" }}>
                     Organizer
                   </h2>
-                  <div className="flex items-center gap-4 p-6 rounded-2xl border bg-card">
+                  <div
+                    className="flex items-center gap-4 p-6 rounded-2xl border"
+                    style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)" }}
+                  >
                     <div className="shrink-0">
-                      <div className="h-14 w-14 rounded-full overflow-hidden border-2 border-background shadow-sm">
+                      <div
+                        className="h-14 w-14 rounded-full overflow-hidden border-2 shadow-sm"
+                        style={{ borderColor: "var(--home-bg)" }}
+                      >
                         {event.organizer.profileImage ? (
                           <img
                             src={event.organizer.profileImage}
@@ -205,17 +217,23 @@ export default function EventPage({ params }: { params: { slug: string } }) {
                             className="h-full w-full object-cover"
                           />
                         ) : (
-                          <div className="h-full w-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-xl">
+                          <div
+                            className="h-full w-full flex items-center justify-center font-semibold text-xl"
+                            style={{
+                              background: "linear-gradient(to bottom right, var(--home-accent), var(--home-accent-fg))",
+                              color: "var(--home-accent-fg)",
+                            }}
+                          >
                             {event.organizer.name.charAt(0).toUpperCase()}
                           </div>
                         )}
                       </div>
                     </div>
                     <div>
-                      <p className="font-semibold text-lg">
+                      <p className="font-semibold text-lg" style={{ color: "var(--home-text)" }}>
                         {event.organizer.name}
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm" style={{ color: "var(--home-muted)" }}>
                         Event Organizer
                       </p>
                     </div>
@@ -227,7 +245,10 @@ export default function EventPage({ params }: { params: { slug: string } }) {
 
               {/* Poster + tickets column */}
               <div className="lg:col-span-6 lg:-mt-16 lg:sticky lg:top-6 h-fit space-y-6">
-                <div className="rounded-2xl border bg-card overflow-hidden">
+                <div
+                  className="rounded-2xl border overflow-hidden"
+                  style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)" }}
+                >
                   <div className="relative aspect-[3/4] bg-muted">
                     {event.bannerUrl ? (
                       <Image
@@ -238,16 +259,19 @@ export default function EventPage({ params }: { params: { slug: string } }) {
                         priority
                       />
                     ) : (
-                      <div className="h-full w-full flex items-center justify-center text-muted-foreground text-sm">
+                      <div className="h-full w-full flex items-center justify-center text-sm" style={{ color: "var(--home-muted)" }}>
                         Event poster
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="rounded-2xl border bg-card overflow-hidden">
-                  <div className="px-6 py-5 border-b bg-muted/30">
-                    <h2 className="text-xl font-bold tracking-tight">
+                <div
+                  className="rounded-2xl border overflow-hidden"
+                  style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)" }}
+                >
+                  <div className="px-6 py-5 border-b" style={{ borderColor: "var(--home-border)", backgroundColor: "var(--home-card-elevated)" }}>
+                    <h2 className="text-xl font-bold tracking-tight" style={{ color: "var(--home-text)" }}>
                       Tickets
                     </h2>
                   </div>
@@ -287,7 +311,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
                           />
                         ))
                       ) : (
-                        <div className="py-10 text-center text-muted-foreground">
+                        <div className="py-10 text-center" style={{ color: "var(--home-muted)" }}>
                           No tickets available yet
                         </div>
                       )}
@@ -296,8 +320,8 @@ export default function EventPage({ params }: { params: { slug: string } }) {
 
                   {/* Desktop order summary */}
                   {hasSelection && (
-                    <div className="p-6 border-t bg-muted/20">
-                      <h3 className="font-semibold mb-4">Order Summary</h3>
+                    <div className="p-6 border-t" style={{ borderColor: "var(--home-border)", backgroundColor: "var(--home-card-elevated)" }}>
+                      <h3 className="font-semibold mb-4" style={{ color: "var(--home-text)" }}>Order Summary</h3>
 
                       <div className="space-y-3 mb-6 text-sm">
                         {Array.from(selected).map((id) => {
@@ -307,10 +331,10 @@ export default function EventPage({ params }: { params: { slug: string } }) {
                           const qty = quantities[id] ?? 1;
                           return (
                             <div key={id} className="flex justify-between">
-                              <span className="text-muted-foreground">
+                              <span style={{ color: "var(--home-muted)" }}>
                                 {cat.name} × {qty}
                               </span>
-                              <span className="font-medium">
+                              <span className="font-medium" style={{ color: "var(--home-text)" }}>
                                 ₦{(cat.displayPrice * qty).toLocaleString()}
                               </span>
                             </div>
@@ -318,14 +342,19 @@ export default function EventPage({ params }: { params: { slug: string } }) {
                         })}
                       </div>
 
-                      <div className="flex justify-between items-center py-4 border-t font-bold text-lg">
+                      <div
+                        className="flex justify-between items-center py-4 border-t font-bold text-lg"
+                        style={{ borderColor: "var(--home-border)", color: "var(--home-text)" }}
+                      >
                         <span>Total</span>
                         <span>₦{totalAmount.toLocaleString()}</span>
                       </div>
 
-                      {/* Disclaimer */}
-                      <div className="bg-muted/40 border border-border rounded-lg p-3 mt-4">
-                        <p className="text-xs text-muted-foreground">
+                      <div
+                        className="border rounded-lg p-3 mt-4"
+                        style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)" }}
+                      >
+                        <p className="text-xs" style={{ color: "var(--home-muted)" }}>
                           <strong>Note:</strong> Maximum of 10 tickets per
                           purchase. Tickets are non-refundable once purchased.
                         </p>
@@ -333,7 +362,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
 
                       <Button
                         size="lg"
-                        variant="primary"
+                        variant="homeAccent"
                         className="w-full mt-5"
                         onClick={handleCheckout}
                       >
@@ -369,8 +398,14 @@ function OccurrenceSelector({
   if (!active.length) return null;
 
   return (
-    <div className="rounded-xl border bg-amber-50 border-amber-200 p-4">
-      <p className="text-xs font-semibold text-amber-800 uppercase tracking-wide mb-3">
+    <div
+      className="rounded-xl border p-4"
+      style={{ backgroundColor: "rgba(244,208,63,0.1)", borderColor: "var(--home-highlight-yellow)" }}
+    >
+      <p
+        className="text-xs font-semibold uppercase tracking-wide mb-3"
+        style={{ color: "var(--home-highlight-yellow)" }}
+      >
         Pick a date to unlock tickets
       </p>
       <div className="flex flex-wrap gap-2">
@@ -383,12 +418,12 @@ function OccurrenceSelector({
             <button
               key={o.id}
               onClick={() => onSelect(o.id)}
-              className={cn(
-                "flex flex-col items-center px-3 py-1.5 rounded-full text-sm font-semibold border transition-colors",
+              className="flex flex-col items-center px-3 py-1.5 rounded-full text-sm font-semibold border transition-colors"
+              style={
                 isSelected
-                  ? "border-2 border-[#1E88E5] bg-blue-50 text-[#1E88E5]"
-                  : "border border-border bg-background text-foreground hover:border-[#1E88E5]",
-              )}
+                  ? { borderWidth: 2, borderColor: "var(--home-accent)", backgroundColor: "var(--home-card-highlight)", color: "var(--home-accent)" }
+                  : { borderColor: "var(--home-border)", backgroundColor: "var(--home-card)", color: "var(--home-text)" }
+              }
               title={`${sublabel}${o.locationOverride ? " · " + o.locationOverride : ""}`}
             >
               {label}
@@ -403,7 +438,7 @@ function OccurrenceSelector({
 
 function LoadingSkeleton() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="home-theme min-h-screen" style={{ backgroundColor: "var(--home-bg)" }}>
       <div className="container mx-auto px-4 py-8">
         <Skeleton className="h-72 w-full rounded-2xl mb-10" />
         <div className="grid lg:grid-cols-12 gap-8">
@@ -421,14 +456,14 @@ function LoadingSkeleton() {
 
 function NotFound({ router }: { router: any }) {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="home-theme min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "var(--home-bg)" }}>
       <div className="max-w-md text-center">
-        <AlertCircle className="mx-auto h-16 w-16 text-muted-foreground/50" />
-        <h2 className="mt-6 text-2xl font-bold">Event not found</h2>
-        <p className="mt-3 text-muted-foreground">
+        <AlertCircle className="mx-auto h-16 w-16" style={{ color: "var(--home-muted)" }} />
+        <h2 className="mt-6 text-2xl font-bold" style={{ color: "var(--home-text)" }}>Event not found</h2>
+        <p className="mt-3" style={{ color: "var(--home-muted)" }}>
           The event you're looking for doesn't exist or has been removed.
         </p>
-        <Button className="mt-8 w-full" onClick={() => router.push("/explore")}>
+        <Button variant="homeAccent" className="mt-8 w-full" onClick={() => router.push("/explore")}>
           Discover Events
         </Button>
       </div>
