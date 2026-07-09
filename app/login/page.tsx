@@ -13,9 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
 import { useLogin } from "@/services/auth/auth.queries";
-import { Logo } from "@/components/layout/logo";
 import { AuthShell } from "@/components/auth/auth-shell";
-import { HomeCard } from "@/components/home/home-card";
 
 const loginSchema = z.object({
   email: z.string().email("Enter a valid email address"),
@@ -70,155 +68,143 @@ export default function LoginPage() {
 
   return (
     <AuthShell>
-      <HomeCard tone="card" radius="card-lg" className="p-8">
-        <div className="text-center mb-8">
-          <Link
-            href="/"
-            className="inline-flex items-center space-x-2 mb-6 group"
+      <div className="text-center mb-8">
+        <h1
+          className="text-3xl font-bold mb-2"
+          style={{ color: "var(--home-text)" }}
+        >
+          Welcome back
+        </h1>
+        <p style={{ color: "var(--home-muted)" }}>
+          Sign in to your account to continue
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <div className="space-y-2">
+          <Label
+            htmlFor="email"
+            className="text-sm font-medium px-1"
+            style={{ color: "var(--home-muted)" }}
           >
-            <Logo
-              size="sm"
-              showImage={false}
-              textClassName="text-[var(--home-text-highlight)]"
+            Email address
+          </Label>
+          <div className="relative">
+            <Mail
+              className="absolute left-8 top-1/2 transform -translate-y-1/2 w-5 h-5"
+              style={{ color: "var(--home-muted)" }}
             />
-          </Link>
-          <h1
-            className="text-3xl font-bold mb-2"
-            style={{ color: "var(--home-text)" }}
-          >
-            Welcome back
-          </h1>
-          <p style={{ color: "var(--home-muted)" }}>
-            Sign in to your account to continue
-          </p>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              className="pl-16 h-14 rounded-lg"
+              style={{
+                backgroundColor: "rgba(12,19,34,0.5)",
+                borderColor: "rgba(86,66,62,0.5)",
+                color: "var(--home-text)",
+              }}
+              {...register("email")}
+            />
+          </div>
+          {errors.email && (
+            <p className="text-sm text-red-400 flex items-center gap-1 px-1">
+              <AlertCircle className="w-4 h-4" /> {errors.email.message}
+            </p>
+          )}
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="space-y-2">
-            <Label
-              htmlFor="email"
-              className="text-sm font-medium"
-              style={{ color: "var(--home-muted)" }}
-            >
-              Email address
-            </Label>
-            <div className="relative">
-              <Mail
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
-                style={{ color: "var(--home-muted)" }}
-              />
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                className="pl-10 h-12 rounded-xl"
-                style={{
-                  backgroundColor: "var(--home-card)",
-                  borderColor: "var(--home-border)",
-                  color: "var(--home-text)",
-                }}
-                {...register("email")}
-              />
-            </div>
-            {errors.email && (
-              <p className="text-sm text-red-400 flex items-center gap-1">
-                <AlertCircle className="w-4 h-4" /> {errors.email.message}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label
-              htmlFor="password"
-              className="text-sm font-medium"
-              style={{ color: "var(--home-muted)" }}
-            >
-              Password
-            </Label>
-            <div className="relative">
-              <Lock
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
-                style={{ color: "var(--home-muted)" }}
-              />
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
-                className="pl-10 pr-10 h-12 rounded-xl"
-                style={{
-                  backgroundColor: "var(--home-card)",
-                  borderColor: "var(--home-border)",
-                  color: "var(--home-text)",
-                }}
-                {...register("password")}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                style={{ color: "var(--home-muted)" }}
-              >
-                {showPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
-              </button>
-            </div>
-            {errors.password && (
-              <p className="text-sm text-red-400 flex items-center gap-1">
-                <AlertCircle className="w-4 h-4" /> {errors.password.message}
-              </p>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                className="w-4 h-4 rounded"
-                style={{ accentColor: "var(--home-accent)" }}
-              />
-              <span
-                className="ml-2 text-sm"
-                style={{ color: "var(--home-muted)" }}
-              >
-                Remember me
-              </span>
-            </label>
-            <Link
-              href="/forgot-password"
-              className="text-sm font-medium hover:opacity-80"
-              style={{ color: "var(--home-text-highlight)" }}
-            >
-              Forgot password?
-            </Link>
-          </div>
-
-          <Button
-            type="submit"
-            variant="homeAccent"
-            disabled={loginMutation.isPending}
-            className="w-full h-12 disabled:opacity-50"
+        <div className="space-y-2">
+          <Label
+            htmlFor="password"
+            className="text-sm font-medium px-1"
+            style={{ color: "var(--home-muted)" }}
           >
-            {loginMutation.isPending ? "Signing in..." : "Sign in"}
-          </Button>
-        </form>
+            Password
+          </Label>
+          <div className="relative">
+            <Lock
+              className="absolute left-8 top-1/2 transform -translate-y-1/2 w-5 h-5"
+              style={{ color: "var(--home-muted)" }}
+            />
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              className="pl-16 pr-16 h-14 rounded-lg"
+              style={{
+                backgroundColor: "rgba(12,19,34,0.5)",
+                borderColor: "rgba(86,66,62,0.5)",
+                color: "var(--home-text)",
+              }}
+              {...register("password")}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-8 top-1/2 transform -translate-y-1/2"
+              style={{ color: "var(--home-muted)" }}
+            >
+              {showPassword ? (
+                <EyeOff className="w-5 h-5" />
+              ) : (
+                <Eye className="w-5 h-5" />
+              )}
+            </button>
+          </div>
+          {errors.password && (
+            <p className="text-sm text-red-400 flex items-center gap-1 px-1">
+              <AlertCircle className="w-4 h-4" /> {errors.password.message}
+            </p>
+          )}
+        </div>
 
-        <p
-          className="mt-6 text-center text-sm"
-          style={{ color: "var(--home-muted)" }}
-        >
-          Don&apos;t have an account?{" "}
+        <div className="flex items-center justify-between px-1">
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              className="w-4 h-4 rounded"
+              style={{ accentColor: "var(--home-accent)" }}
+            />
+            <span
+              className="ml-2 text-sm"
+              style={{ color: "var(--home-muted)" }}
+            >
+              Remember me
+            </span>
+          </label>
           <Link
-            href={registerHref}
-            className="font-medium hover:opacity-80"
+            href="/forgot-password"
+            className="text-sm font-medium hover:opacity-80"
             style={{ color: "var(--home-text-highlight)" }}
           >
-            Sign up
+            Forgot password?
           </Link>
-        </p>
-      </HomeCard>
+        </div>
+
+        <Button
+          type="submit"
+          variant="homeAccent"
+          disabled={loginMutation.isPending}
+          className="w-full h-14 rounded-lg disabled:opacity-50"
+        >
+          {loginMutation.isPending ? "Signing in..." : "Sign in"}
+        </Button>
+      </form>
+
+      <p
+        className="mt-6 text-center text-sm"
+        style={{ color: "var(--home-muted)" }}
+      >
+        Don&apos;t have an account?{" "}
+        <Link
+          href={registerHref}
+          className="font-semibold hover:opacity-80"
+          style={{ color: "var(--home-text-highlight)" }}
+        >
+          Sign up
+        </Link>
+      </p>
     </AuthShell>
   );
 }
