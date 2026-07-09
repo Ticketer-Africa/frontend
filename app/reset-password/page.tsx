@@ -10,9 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Lock, AlertCircle } from "lucide-react";
 import { useResetPassword } from "@/services/auth/auth.queries";
-import { Logo } from "@/components/layout/logo";
 import { AuthShell } from "@/components/auth/auth-shell";
-import { HomeCard } from "@/components/home/home-card";
 
 const resetPasswordSchema = z
   .object({
@@ -82,111 +80,102 @@ export default function ResetPasswordPage() {
 
   return (
     <AuthShell>
-      <HomeCard tone="card" radius="card-lg" className="p-8">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center mb-6">
-            <Logo
-              size="sm"
-              showImage={false}
-              textClassName="text-[var(--home-text-highlight)]"
-            />
-          </div>
-          <h1
-            className="text-3xl font-bold mb-2"
-            style={{ color: "var(--home-text)" }}
-          >
-            Set New Password
-          </h1>
-          <p style={{ color: "var(--home-muted)" }}>
-            Enter your new password below to secure your account
+      <div className="text-center mb-8">
+        <h1
+          className="text-3xl font-bold mb-2"
+          style={{ color: "var(--home-text)" }}
+        >
+          Set New Password
+        </h1>
+        <p style={{ color: "var(--home-muted)" }}>
+          Enter your new password below to secure your account
+        </p>
+      </div>
+
+      {errors.password && (
+        <div
+          className="mb-4 p-3 rounded-lg flex items-center space-x-2 border"
+          style={{
+            backgroundColor: "rgba(20,27,43,0.5)",
+            borderColor: "var(--home-border-strong)",
+          }}
+        >
+          <AlertCircle className="w-5 h-5 text-red-400" />
+          <p className="text-sm text-red-400">{errors.password.message}</p>
+        </div>
+      )}
+      {errors.confirmPassword && (
+        <div
+          className="mb-4 p-3 rounded-lg flex items-center space-x-2 border"
+          style={{
+            backgroundColor: "rgba(20,27,43,0.5)",
+            borderColor: "var(--home-border-strong)",
+          }}
+        >
+          <AlertCircle className="w-5 h-5 text-red-400" />
+          <p className="text-sm text-red-400">
+            {errors.confirmPassword.message}
           </p>
         </div>
+      )}
 
-        {errors.password && (
-          <div
-            className="mb-4 p-3 rounded-xl flex items-center space-x-2 border"
-            style={{
-              backgroundColor: "var(--home-card-elevated)",
-              borderColor: "var(--home-border-strong)",
-            }}
-          >
-            <AlertCircle className="w-5 h-5 text-red-400" />
-            <p className="text-sm text-red-400">{errors.password.message}</p>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <div className="space-y-2">
+          <Label htmlFor="password" className="px-1" style={{ color: "var(--home-muted)" }}>
+            New Password
+          </Label>
+          <div className="relative">
+            <Lock
+              className="absolute left-8 top-1/2 transform -translate-y-1/2 w-5 h-5"
+              style={{ color: "var(--home-muted)" }}
+            />
+            <Input
+              id="password"
+              type="password"
+              {...register("password")}
+              className="pl-16 h-14 rounded-lg"
+              style={{
+                backgroundColor: "rgba(12,19,34,0.5)",
+                borderColor: "rgba(86,66,62,0.5)",
+                color: "var(--home-text)",
+              }}
+              placeholder="Enter new password"
+            />
           </div>
-        )}
-        {errors.confirmPassword && (
-          <div
-            className="mb-4 p-3 rounded-xl flex items-center space-x-2 border"
-            style={{
-              backgroundColor: "var(--home-card-elevated)",
-              borderColor: "var(--home-border-strong)",
-            }}
-          >
-            <AlertCircle className="w-5 h-5 text-red-400" />
-            <p className="text-sm text-red-400">
-              {errors.confirmPassword.message}
-            </p>
-          </div>
-        )}
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="password" style={{ color: "var(--home-muted)" }}>
-              New Password
-            </Label>
-            <div className="relative">
-              <Lock
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
-                style={{ color: "var(--home-muted)" }}
-              />
-              <Input
-                id="password"
-                type="password"
-                {...register("password")}
-                className="pl-10 h-12 rounded-xl"
-                style={{
-                  backgroundColor: "var(--home-card)",
-                  borderColor: "var(--home-border)",
-                  color: "var(--home-text)",
-                }}
-                placeholder="Enter new password"
-              />
-            </div>
+        <div className="space-y-2">
+          <Label htmlFor="confirmPassword" className="px-1" style={{ color: "var(--home-muted)" }}>
+            Confirm Password
+          </Label>
+          <div className="relative">
+            <Lock
+              className="absolute left-8 top-1/2 transform -translate-y-1/2 w-5 h-5"
+              style={{ color: "var(--home-muted)" }}
+            />
+            <Input
+              id="confirmPassword"
+              type="password"
+              {...register("confirmPassword")}
+              className="pl-16 h-14 rounded-lg"
+              style={{
+                backgroundColor: "rgba(12,19,34,0.5)",
+                borderColor: "rgba(86,66,62,0.5)",
+                color: "var(--home-text)",
+              }}
+              placeholder="Re-enter new password"
+            />
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword" style={{ color: "var(--home-muted)" }}>
-              Confirm Password
-            </Label>
-            <div className="relative">
-              <Lock
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5"
-                style={{ color: "var(--home-muted)" }}
-              />
-              <Input
-                id="confirmPassword"
-                type="password"
-                {...register("confirmPassword")}
-                className="pl-10 h-12 rounded-xl"
-                style={{
-                  backgroundColor: "var(--home-card)",
-                  borderColor: "var(--home-border)",
-                  color: "var(--home-text)",
-                }}
-                placeholder="Re-enter new password"
-              />
-            </div>
-          </div>
-
-          <Button
-            type="submit"
-            variant="homeAccent"
-            className="w-full h-12"
-          >
-            Reset Password
-          </Button>
-        </form>
-      </HomeCard>
+        <Button
+          type="submit"
+          variant="homeAccent"
+          className="w-full h-14 rounded-lg"
+        >
+          Reset Password
+        </Button>
+      </form>
     </AuthShell>
   );
 }
