@@ -3,76 +3,59 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Logo } from "./layout/logo";
-import { HeroSearchBar } from "./hero-search-bar";
 
-/**
- * HeroSection - Optimized for LCP and above-the-fold performance
- *
- * Performance optimizations:
- * 1. Removed framer-motion animations that blocked initial render
- * 2. Using CSS animations instead (GPU-accelerated, non-blocking)
- * 3. Background animations use CSS @keyframes (no JS execution)
- * 4. Content renders immediately without waiting for animation library
- * 5. Text is the LCP element - renders instantly
- */
 export function HeroSection() {
   const router = useRouter();
 
   return (
-    <section className="relative flex mt-12 items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 pt-16">
-      {/*
-       * CSS-only animated background elements
-       * Performance: CSS animations are GPU-accelerated and don't block main thread
-       * Using will-change sparingly to hint browser about animations
-       */}
-      <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div className="hero-bg-circle hero-bg-circle-1" />
-        <div className="hero-bg-circle hero-bg-circle-2" />
-        <div className="hero-bg-circle hero-bg-circle-3" />
-      </div>
-
+    <section
+      className="home-theme relative flex items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 pt-32 pb-24 min-h-[720px]"
+      style={{
+        background:
+          "radial-gradient(circle at 50% 0%, rgba(226,114,91,0.16), transparent 60%), var(--home-bg)",
+      }}
+    >
       <div className="relative z-0 text-center max-w-5xl mx-auto w-full">
-        {/* Logo - uses CSS fade-in animation */}
-        <div className="hero-fade-in flex items-center justify-center mb-6">
-          <Logo size="sm" />
-        </div>
+        <span
+          className="inline-block mb-4 px-4 py-1 rounded-full border text-sm tracking-[0.5px] font-['Hanken_Grotesk'] font-semibold backdrop-blur-[2px]"
+          style={{
+            color: "var(--home-text-highlight)",
+            borderColor: "var(--home-border-strong)",
+            backgroundColor: "var(--home-badge-bg)",
+          }}
+        >
+          Experience the Rhythm
+        </span>
 
-        {/*
-         * Main heading - LCP candidate
-         * No animation delay - renders immediately for best LCP score
-         */}
-        <h1 className="hero-fade-in hero-delay-1 text-4xl sm:text-5xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight px-2 sm:px-4 max-w-4xl mx-auto">
-          Buy. Sell. Enjoy Events{" "}
-          <span className="text-transparent bg-clip-text bg-[#1E88E5]">
-            Effortlessly.
-          </span>
+        <h1
+          className="font-['Syne'] font-extrabold text-4xl sm:text-5xl lg:text-7xl mb-6 leading-tight tracking-[-1.2px]"
+          style={{ color: "var(--home-text)" }}
+        >
+          Buy. Sell. Enjoy
+          <br />
+          Events
+          <br />
+          <span style={{ color: "var(--home-accent)" }}>Effortlessly.</span>
         </h1>
 
-        <p className="hero-fade-in hero-delay-2 text-lg sm:text-xl lg:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed px-3 sm:px-4">
-          Discover events, buy or resell tickets, and never miss out again.
+        <p
+          className="font-['Hanken_Grotesk'] text-lg sm:text-xl mb-10 max-w-3xl mx-auto leading-relaxed tracking-[0.5px]"
+          style={{ color: "var(--home-muted)" }}
+        >
+          Discover the continent&apos;s most exclusive curated experiences, buy
+          tickets securely, and never miss a heartbeat of African culture.
         </p>
-        <div className="hero-fade-in hero-delay-3 flex flex-col sm:flex-row gap-4 justify-center items-center px-2">
-          {/* <Button
-            size="lg"
-            onClick={() => router.push("/explore")}
-            className="bg-[#1E88E5] hover:bg-blue-500 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto"
-          >
-            Explore Events
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Button> */}
+
+        <div className="flex justify-center items-center px-2">
           <Button
-            variant="outline"
+            variant="homeAccent"
             size="lg"
+            className="drop-shadow-[0px_0px_7.5px_rgba(226,114,91,0.2)]"
             onClick={() => router.push("/register?intent=organizer")}
-            className="bg-[#1E88E5] hover:bg-blue-500 max-w-lg text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl hoveR:text-white transition-all duration-300 w-full sm:w-auto"
           >
             Become an Organizer
+            <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
-        </div>
-
-        <div className="hero-fade-in hero-delay-3 px-2 sm:px-4 mt-4 md:mt-16">
-          <HeroSearchBar />
         </div>
       </div>
     </section>
