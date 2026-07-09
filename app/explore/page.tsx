@@ -353,17 +353,26 @@ export default function EventsPage() {
   const isRefetching = isFetching && !!response;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 pt-16">
+    <div
+      className="home-theme min-h-screen pt-16"
+      style={{ backgroundColor: "var(--home-bg)" }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/*
          * Header - renders immediately without animation
          * Performance: No JS animation delay, text is LCP candidate
          */}
         <header className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+          <h1
+            className="text-4xl sm:text-5xl font-bold mb-4"
+            style={{ color: "var(--home-text)" }}
+          >
             Discover Amazing Events
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p
+            className="text-xl max-w-2xl mx-auto"
+            style={{ color: "var(--home-muted)" }}
+          >
             Find and book tickets for the best events happening near you
           </p>
         </header>

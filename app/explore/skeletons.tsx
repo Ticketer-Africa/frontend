@@ -12,7 +12,8 @@ import { EVENT_IMAGE_HEIGHT } from "./constants";
 export function EventCardSkeleton() {
   return (
     <div
-      className="bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col"
+      className="rounded-2xl overflow-hidden flex flex-col"
+      style={{ backgroundColor: "var(--home-card)" }}
       /**
        * aria-hidden because this is purely decorative loading state
        * Screen readers will hear "Loading events..." from parent
@@ -84,7 +85,10 @@ export function EventsGridSkeleton() {
  */
 export function FiltersSkeleton() {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 border border-gray-100">
+    <div
+      className="rounded-2xl p-6 mb-6 border"
+      style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)" }}
+    >
       {/* Search input skeleton */}
       <Skeleton className="h-12 w-full rounded-xl mb-4" />
 
