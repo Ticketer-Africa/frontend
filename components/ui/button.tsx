@@ -23,6 +23,8 @@ const buttonVariants = cva(
         link: "border-transparent bg-transparent text-primary underline-offset-4 hover:underline",
         homeAccent:
           "border-transparent bg-[var(--home-accent)] text-[var(--home-accent-fg)] font-['Hanken_Grotesk'] font-semibold transition-opacity hover:opacity-90",
+        homeOutline:
+          "border-[var(--home-border-strong)] bg-transparent text-[var(--home-text)] font-['Hanken_Grotesk'] font-semibold hover:bg-[var(--home-card)] transition-colors",
       },
       size: {
         default: "h-11 px-5 py-3",
