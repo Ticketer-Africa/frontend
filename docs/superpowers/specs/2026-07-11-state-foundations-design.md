@@ -80,14 +80,26 @@ every later phase inherits the fix instead of working around the problem.
 - `lib/provider.tsx` keeps only genuinely global, safe-for-everything defaults:
   `gcTime`, `staleTime`, the 401/403-aware `retry` function, `refetchOnReconnect`,
   `refetchOnMount`.
-- The `refetchOnWindowFocus` allowlist is deleted from `provider.tsx`. Each feature
-  that wants focus-refetch sets `refetchOnWindowFocus: true` directly on its own
-  `useQuery` call in its `*.queries.ts` file (`services/wallet/wallet.queries.ts`,
-  `services/events/events.queries.ts`, `services/auth/*.queries.ts` — i.e. wherever
-  `"me"`, `"wallet-balance"`, `"events"`, `"resaleListings"`, `"event"` are currently
-  defined as query keys).
-- This is a mechanical, behavior-preserving move: the same five query keys keep
-  focus-refetch, just declared where they're used instead of in a shared string list.
+- The `refetchOnWindowFocus` allowlist (`["me", "wallet-balance", "events",
+  "resaleListings", "event"]`) is deleted from `provider.tsx`. Auditing every query
+  that key list was meant to cover shows most of it is already dead:
+  - `"me"` isn't a React Query key at all — `AuthProvider` fetches the current user via
+    a raw `Axios.get` call (see part A), not `useQuery`, so this entry has never done
+    anything.
+  - `"events"` and `"event"` are matched by seven different `useQuery` calls in
+    `services/events/events.queries.ts` (`usePriceRange`, `useAllEvents`,
+    `useEventById`, `useEventBySlug`, `useUserEvents`, `useOrganizerEvents`,
+    `useUpcomingEvents`), and every one of them already sets
+    `refetchOnWindowFocus: false` explicitly. Per-query options always win over
+    `defaultOptions`, so the global allowlist's entries for these two keys have no
+    effect today.
+  - Only two keys actually depend on the global allowlist for their current behavior:
+    `"wallet-balance"` (`useWalletBalance` in `services/wallet/wallet.queries.ts`) and
+    `"resaleListings"` (`useResaleListings` in `services/tickets/tickets.queries.ts`),
+    neither of which sets `refetchOnWindowFocus` itself.
+  - These two get `refetchOnWindowFocus: true` added directly to their `useQuery`
+    calls, preserving current behavior. Nothing else needs to change to stay
+    behavior-preserving.
 
 ### C. Shared optimistic-mutation helper
 
@@ -109,13 +121,18 @@ every later phase inherits the fix instead of working around the problem.
   with the server. This is a thin wrapper over existing React Query primitives, not a
   new abstraction layer over them — call sites still use `useMutation` directly and
   spread the returned handlers in.
-- Applied to two real mutations as the reference implementation: attendee edit and
-  attendee remove (`services/attendees/attendees.queries.ts`). Chosen because the
-  attendee list is the clearest near-term candidate for realtime check-in updates, so
-  proving the pattern here directly de-risks Phase 1's attendees work. (Wallet's one
-  mutation, `useWithdrawWallet`, redirects to an external checkout URL on success
-  rather than updating in place, so it isn't a useful optimistic-update candidate —
-  left as-is.)
+- Applied to one real mutation as the reference implementation: `useCreateDiscount`
+  (`services/discounts/discounts.queries.ts`), which appends a `Discount` to the
+  `["discounts", eventId]` list cached by `useListDiscounts`. This pair is live today
+  in `app/organizer/view-event/[id]/EventManagementTabs.tsx` (an organizer-facing
+  page, in scope for Phase 1), so the pattern can be exercised end-to-end in the
+  running app rather than only unit-tested in isolation.
+  - (Two other candidates were considered and rejected: attendee
+    edit/remove/regenerate mutations do not exist in the current codebase — that
+    functionality was removed along with the invite-only flow in `fa92ae6` — and
+    `useToggleEventStatus` / `useAdminToggleEvent` exist but are not wired into any
+    component yet, so exercising them would require building UI out of scope for
+    Phase 0.)
 - Every other mutation is left as invalidate-and-refetch for now — Phase 0 does not
   rewrite all mutations, only proves the pattern.
 
@@ -138,8 +155,8 @@ Route change
   → page renders immediately (no client-side auth block)
   → useUser()/useAuthStatus() hydrate in the background
   → feature components read server state via their own *.queries.ts hooks
-  → mutations on attendees (and the chosen wallet mutation) apply optimistically
-    via query-utils.optimisticUpdate, roll back on error, reconcile via invalidate
+  → useCreateDiscount applies optimistically via query-utils.optimisticUpdate,
+    rolls back on error, reconciles via invalidate
   → all other mutations: unchanged invalidate-and-refetch
 ```
 
@@ -156,11 +173,12 @@ Route change
 - Manual verification (this app has no existing frontend test suite to extend):
   - Navigate between at least one public and one protected route repeatedly; confirm
     no full-page loader/remount occurs after initial load.
-  - Confirm `wallet-balance`, `events`, `event`, `resaleListings`, and `me` still
-    refetch on window focus (unchanged behavior, just relocated).
-  - Trigger an attendee edit and an attendee remove; confirm the row updates
-    immediately (before the network response returns) and rolls back correctly if the
-    request is forced to fail (e.g. via devtools network throttling/offline).
+  - Confirm `wallet-balance` and `resaleListings` still refetch on window focus
+    (unchanged behavior, just relocated).
+  - On an organizer's event management page, create a discount code; confirm it
+    appears in the list immediately (before the network response returns) and rolls
+    back correctly if the request is forced to fail (e.g. via devtools network
+    throttling/offline).
   - `npx tsc --noEmit` clean (no new errors beyond the pre-existing 19 documented in
     the prior staging-merge work).
 
