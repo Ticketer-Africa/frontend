@@ -18,7 +18,7 @@ interface User {
   sub: string;
   email: string;
   name: string;
-  role: "USER" | "ORGANIZER" | "ADMIN" | "SUPERADMIN";
+  role: "USER" | "ORGANIZER";
   profileImage?: string;
   isVerified: boolean;
 }

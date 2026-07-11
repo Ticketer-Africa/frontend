@@ -91,11 +91,6 @@ export function Header() {
         ]
       : [];
 
-  const adminNavigation =
-    user?.role === "ADMIN" || user?.role === "SUPERADMIN"
-      ? [{ name: "Admin Dashboard", href: "/admin/dashboard", icon: Settings }]
-      : [];
-
   const handleLogout = useCallback(() => {
     logout();
     setIsProfileOpen(false);
@@ -176,7 +171,6 @@ export function Header() {
                         {[
                           ...userNavigation,
                           ...organizerNavigation,
-                          ...adminNavigation,
                         ].map((item) => (
                           <Link
                             key={item.name}
@@ -245,7 +239,7 @@ export function Header() {
 
             {user ? (
               <div className="mt-3 space-y-2 border-t border-border pt-3">
-                {[...userNavigation, ...organizerNavigation, ...adminNavigation].map(
+                {[...userNavigation, ...organizerNavigation].map(
                   (item) => (
                     <Link
                       key={item.name}

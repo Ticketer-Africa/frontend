@@ -57,7 +57,7 @@ export default function WalletPage() {
   }
 
   // Auth check
-  if (!currentUser || !["ORGANIZER", "ADMIN", "SUPERADMIN"].includes(currentUser.role)) {
+  if (!currentUser || currentUser.role !== "ORGANIZER") {
     return null;
   }
 
