@@ -1,6 +1,5 @@
 "use client";
 
-import { Logo } from "@/components/layout/logo";
 import { buildEndpoint } from "@/services/api-config";
 import Axios from "@/services/axios";
 import { useRouter, usePathname } from "next/navigation";
@@ -11,6 +10,7 @@ import {
   useEffect,
   useCallback,
   useMemo,
+  useRef,
   type ReactNode,
 } from "react";
 
@@ -42,6 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
+  const fetchAttemptedRef = useRef(false);
 
   // Define public routes that don't require authentication
   const publicRoutes = [
@@ -93,7 +94,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [pathname, router]);
 
   useEffect(() => {
-    // Don't fetch user if we're on a public route AND there's no stored user hint
+    // Re-evaluates per navigation (cheap — no network call), but the network
+    // fetch itself only ever fires once per session via fetchAttemptedRef.
+    // middleware.ts is the actual route-protection boundary; this client-side
+    // fetch only needs to happen once, to hydrate `user` for display. We can't
+    // gate on mount alone: if the app first mounts on a public route with no
+    // stored user hint, we skip the fetch — but if the visitor then navigates
+    // into a protected route with a valid session cookie the middleware let
+    // them through on, we still need to hydrate `user` at that point, or the
+    // UI stays stuck showing them as logged out until a hard reload.
+    if (fetchAttemptedRef.current) return;
+
     const isPublicRoute = publicRoutes.some((route) =>
       pathname.startsWith(route)
     );
@@ -107,9 +118,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    fetchAttemptedRef.current = true;
     fetchUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]); // Add pathname as dependency
+  }, [pathname]);
 
   const logout = useCallback(async () => {
     try {
@@ -132,24 +144,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({ isLoading }),
     [isLoading],
   );
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="relative">
-            <Logo
-              size="lg"
-              withText={true}
-              text="Ticketer Africa"
-              imgSrc="/logo.png"
-              className="animate-pulse-glow"
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <UserContext.Provider value={userValue}>
