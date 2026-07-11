@@ -17,6 +17,7 @@ export const useWalletBalance = () =>
   useQuery({
     queryKey: ["wallet-balance"],
     queryFn: checkWalletBalance,
+    refetchOnWindowFocus: true,
   });
 
 // Withdraw from wallet
