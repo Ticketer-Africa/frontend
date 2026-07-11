@@ -85,7 +85,7 @@ const FAQItem = memo(function FAQItem({
         />
       </button>
       <div
-        className={`grid transition-opacity duration-150 ease-[var(--motion-ease-out)] ${
+        className={`grid transition-opacity duration-150 [transition-timing-function:var(--motion-ease-out)] ${
           isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
         }`}
         aria-hidden={!isOpen}

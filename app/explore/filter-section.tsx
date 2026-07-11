@@ -154,7 +154,7 @@ function FilterSectionComponent({
         <div
           id="filter-panel"
           className={`
-            grid transition-opacity duration-150 ease-[var(--motion-ease-out)]
+            grid transition-opacity duration-150 [transition-timing-function:var(--motion-ease-out)]
             ${
               showFilters
                 ? "grid-rows-[1fr] opacity-100 mt-4 pt-4 border-t border-gray-200"
