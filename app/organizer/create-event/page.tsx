@@ -49,11 +49,17 @@ export default function CreateEventPage() {
   });
 
   const bannerFile = watch("banner");
-  const previewUrl = bannerFile ? URL.createObjectURL(bannerFile) : null;
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    return () => { if (previewUrl) URL.revokeObjectURL(previewUrl); };
-  }, [previewUrl]);
+    if (!(bannerFile instanceof File)) {
+      setPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(bannerFile);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [bannerFile]);
 
   const ticketCategories = watch("ticketCategories") || [];
 

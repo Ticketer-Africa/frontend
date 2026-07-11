@@ -114,11 +114,19 @@ export default function UpdateEventPage() {
   }, [event, eventLoading, setValue]);
 
   const bannerFile = watch("banner");
-  const previewUrl = bannerFile ? URL.createObjectURL(bannerFile) : event?.bannerUrl || null;
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    event?.bannerUrl ?? null,
+  );
 
   useEffect(() => {
-    return () => { if (previewUrl && bannerFile) URL.revokeObjectURL(previewUrl); };
-  }, [previewUrl, bannerFile]);
+    if (!(bannerFile instanceof File)) {
+      setPreviewUrl(event?.bannerUrl ?? null);
+      return;
+    }
+    const url = URL.createObjectURL(bannerFile);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [bannerFile, event?.bannerUrl]);
 
   const ticketCategories = watch("ticketCategories") || [];
 
