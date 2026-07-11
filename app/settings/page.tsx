@@ -2,7 +2,6 @@
 
 import type React from "react";
 import { useEffect, useState, useMemo } from "react";
-import { motion } from "framer-motion";
 import { User, Lock, Camera, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -143,10 +142,7 @@ export default function SettingsPage() {
 
   if (isLoading) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
+      <div
         className="fixed inset-0 bg-gray-50 bg-opacity-90 flex items-center justify-center z-50"
       >
         <div className="text-center">
@@ -158,18 +154,14 @@ export default function SettingsPage() {
             Please wait while we verify your session
           </p>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+        <div>
           <div className="mb-8">
             <h1 className="text-3xl font-bold">Settings</h1>
             <p className="text-muted-foreground">
@@ -179,11 +171,7 @@ export default function SettingsPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Profile Overview */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-            >
+            <div>
               <Card>
                 <CardHeader>
                   <CardTitle>Profile Overview</CardTitle>
@@ -236,16 +224,12 @@ export default function SettingsPage() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
 
             {/* Profile + Password Forms */}
             <div className="lg:col-span-2 space-y-6">
               {/* Profile Form */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
+              <div>
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
@@ -299,21 +283,17 @@ export default function SettingsPage() {
                           isSubmitting ||
                           !hasProfileChanges
                         }
-                        className="mt-4 sm:mt-0 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                        className="mt-4 sm:mt-0 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
                       >
                         Save Changes
                       </Button>
                     </form>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
 
               {/* Change Password */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              >
+              <div>
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
@@ -387,17 +367,17 @@ export default function SettingsPage() {
                           !hasPasswordChanges
                         }
                         variant="outline"
-                        className="mt-4 sm:mt-0 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                        className="mt-4 sm:mt-0 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
                       >
                         Update Password
                       </Button>
                     </form>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

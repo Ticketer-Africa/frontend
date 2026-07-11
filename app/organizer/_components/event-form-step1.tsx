@@ -75,7 +75,7 @@ export function EventFormStep1({
                 type="button"
                 onClick={() => setValue("category", category.toUpperCase())}
                 disabled={isDisabled}
-                className={`py-2 px-3 rounded-xl text-sm font-medium transition-all border ${
+                className={`py-2 px-3 rounded-xl text-sm font-medium transition-[background-color,color,border-color,opacity,transform] border ${
                   isSelected
                     ? "bg-[#1E88E5] text-white border-[#1E88E5] shadow-sm"
                     : "bg-white text-gray-600 border-gray-200 hover:border-[#1E88E5] hover:text-[#1E88E5]"

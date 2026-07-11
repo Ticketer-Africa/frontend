@@ -27,7 +27,7 @@ interface ExploreEventCardProps {
  * - memo() prevents re-renders when parent state changes but props don't
  * - Explicit image dimensions prevent CLS (Cumulative Layout Shift)
  * - Priority loading only for above-the-fold images
- * - No framer-motion animations on individual cards (moved to CSS)
+ * - No framer-motion animations on individual cards
  * - Minimal inline calculations
  */
 function ExploreEventCardComponent({
@@ -52,12 +52,11 @@ function ExploreEventCardComponent({
     <article
       className="explore-card group"
       /**
-       * CSS animations via class instead of JS framer-motion
-       * Performance: CSS animations are GPU-accelerated and don't block main thread
+       * Performance: card renders immediately; hover feedback is transform-only
        */
     >
       <Link href={`/events/${event.slug}`} className="block h-full">
-        <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 flex flex-col h-full">
+        <div className="bg-white rounded-2xl overflow-hidden shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150 motion-hover-lift flex flex-col h-full">
           {/*
            * Image container with fixed aspect ratio
            * CRITICAL FOR CLS: The wrapper has explicit dimensions so space is reserved
@@ -90,7 +89,7 @@ function ExploreEventCardComponent({
                * Prevents downloading unnecessarily large images
                */
               sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+              className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-150"
               /**
                * placeholder="blur" would be ideal but requires static import
                * For dynamic images, we use a background color as placeholder

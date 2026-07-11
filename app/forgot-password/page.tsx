@@ -67,7 +67,7 @@ export default function ForgotPasswordPage() {
               href="/"
               className="inline-flex items-center space-x-2 mb-6 group"
             >
-              <Sparkles className="w-8 h-8 text-[#1E88E5] hover:rotate-180 transition-transform duration-300" />
+              <Sparkles className="w-8 h-8 text-[#1E88E5] transition-transform duration-150" />
               <span className="text-2xl font-bold text-gray-900 group-hover:text-[#1E88E5] transition-colors">
                 Ticketer Africa
               </span>
@@ -110,7 +110,7 @@ export default function ForgotPasswordPage() {
             <Button
               type="submit"
               disabled={forgotPasswordMutation.isPending}
-              className="w-full h-12 bg-[#1E88E5] hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+              className="w-full h-12 bg-[#1E88E5] hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150 disabled:opacity-50"
             >
               {forgotPasswordMutation.isPending ? "Sending..." : "Send OTP"}
             </Button>

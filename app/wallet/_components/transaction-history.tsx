@@ -74,11 +74,10 @@ export const TransactionHistory = memo(function TransactionHistory({
         <CardContent>
           {paginatedTransactions.length > 0 ? (
             <div className="space-y-2">
-              {paginatedTransactions.map((transaction, index) => (
+              {paginatedTransactions.map((transaction) => (
                 <TransactionItem
                   key={transaction.id}
                   transaction={transaction}
-                  index={index}
                   onClick={() => onSelectTransaction(transaction)}
                 />
               ))}
@@ -160,7 +159,7 @@ const EmptyTransactions = memo(function EmptyTransactions({
           : "Your transaction history will appear here once your events generate sales."}
       </p>
       <Button
-        className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+        className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
         asChild
       >
         <Link href="/explore">Explore Events</Link>

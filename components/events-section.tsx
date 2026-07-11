@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
  * Performance optimizations:
  * - Explicit image dimensions prevent CLS (224px = h-56)
  * - priority={true} for first card (likely LCP element)
- * - CSS animations instead of framer-motion
+ * - Decorative entrance animation removed for faster first paint
  */
 interface EventCardProps {
   event: Event;
@@ -32,9 +32,8 @@ const EventCard = memo(function EventCard({
     <article
       onClick={onClick}
       className="cursor-pointer group section-animate"
-      style={{ animationDelay: `${index * 100}ms` }}
     >
-      <div className="relative h-80 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+      <div className="relative h-80 rounded-2xl overflow-hidden shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150 motion-hover-lift">
         {/* Full-card background image */}
         <Image
           src={event.bannerUrl || "/placeholder.svg"}
@@ -43,7 +42,7 @@ const EventCard = memo(function EventCard({
           priority={index === 0}
           loading={index === 0 ? undefined : "lazy"}
           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          className="object-cover group-hover:scale-[1.02] transition-transform duration-150"
         />
 
         {/* Gradient overlay for text readability */}
@@ -75,7 +74,7 @@ const EventCard = memo(function EventCard({
  * EventsSection - Homepage upcoming events
  *
  * Performance optimizations:
- * 1. Removed framer-motion - uses CSS animations
+ * 1. Removed framer-motion and decorative entrance animations
  * 2. Memoized EventCard component
  * 3. Explicit image dimensions for CLS prevention
  * 4. Lazy loading for non-critical images
@@ -96,7 +95,7 @@ export function EventsSection() {
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-7xl mx-auto">
-        {/* Section header - CSS animation */}
+        {/* Section header */}
         <div className="section-animate text-center mb-12">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3">
             Upcoming Events
@@ -106,7 +105,7 @@ export function EventsSection() {
           </p>
         </div>
 
-        {/* Events grid with staggered CSS animations */}
+        {/* Events grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {events.slice(0, 3).map((event, index) => (
             <EventCard
@@ -123,7 +122,7 @@ export function EventsSection() {
           <Button
             size="lg"
             onClick={() => router.push("/explore")}
-            className="bg-[#1E88E5] hover:bg-blue-500 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+            className="bg-[#1E88E5] hover:bg-blue-500 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
           >
             Explore More Events
           </Button>

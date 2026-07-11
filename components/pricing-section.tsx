@@ -4,7 +4,7 @@
  * PricingSection - Optimized for performance
  *
  * Performance optimizations:
- * 1. Removed framer-motion - uses CSS animations
+ * 1. Removed framer-motion and decorative entrance animations
  * 2. No dynamic imports needed - simple static content
  * 3. CSS-only animations for fade-in effects
  */
@@ -22,7 +22,7 @@ export function PricingSection() {
           </p>
         </div>
 
-        {/* Pricing details with staggered CSS animation */}
+        {/* Pricing details */}
         <div className="section-animate section-delay-1 space-y-12">
           <div>
             <h3 className="text-2xl font-semibold text-gray-900 mb-2">
@@ -66,7 +66,7 @@ export function PricingSection() {
         <div className="section-animate section-delay-2 mt-16">
           <a
             href="/register?intent=organizer"
-            className="inline-block bg-[#1E88E5] hover:bg-blue-700 text-white px-10 py-4 rounded-full font-medium text-lg transition-all duration-300"
+            className="inline-block bg-[#1E88E5] hover:bg-blue-700 text-white px-10 py-4 rounded-full font-medium text-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
           >
             Start Selling Tickets
           </a>

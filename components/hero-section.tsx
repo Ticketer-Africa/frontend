@@ -11,7 +11,7 @@ import { HeroSearchBar } from "./hero-search-bar";
  *
  * Performance optimizations:
  * 1. Removed framer-motion animations that blocked initial render
- * 2. Using CSS animations instead (GPU-accelerated, non-blocking)
+ * 2. Decorative background motion removed for faster rendering
  * 3. Background animations use CSS @keyframes (no JS execution)
  * 4. Content renders immediately without waiting for animation library
  * 5. Text is the LCP element - renders instantly
@@ -23,7 +23,7 @@ export function HeroSection() {
     <section className="relative flex mt-12 items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 pt-16">
       {/*
        * CSS-only animated background elements
-       * Performance: CSS animations are GPU-accelerated and don't block main thread
+       * Performance: static background decoration avoids continuous compositor work
        * Using will-change sparingly to hint browser about animations
        */}
       <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
@@ -56,7 +56,7 @@ export function HeroSection() {
           {/* <Button
             size="lg"
             onClick={() => router.push("/explore")}
-            className="bg-[#1E88E5] hover:bg-blue-500 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto"
+            className="bg-[#1E88E5] hover:bg-blue-500 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150 w-full sm:w-auto"
           >
             Explore Events
             <ArrowRight className="ml-2 w-5 h-5" />
@@ -65,7 +65,7 @@ export function HeroSection() {
             variant="outline"
             size="lg"
             onClick={() => router.push("/register?intent=organizer")}
-            className="bg-[#1E88E5] hover:bg-blue-500 max-w-lg text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl hoveR:text-white transition-all duration-300 w-full sm:w-auto"
+            className="bg-[#1E88E5] hover:bg-blue-500 max-w-lg text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hoveR:text-white transition-[background-color,color,border-color,opacity,transform] duration-150 w-full sm:w-auto"
           >
             Become an Organizer
           </Button>

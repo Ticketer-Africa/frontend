@@ -1,7 +1,6 @@
 "use client";
 
 import { memo, useCallback, useMemo, useState } from "react";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import {
   Plus,
@@ -57,10 +56,7 @@ const EventRow = memo(function EventRow({
   );
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.1 }}
+    <div
       className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
       onClick={() => onNavigate(event.id)}
     >
@@ -122,7 +118,7 @@ const EventRow = memo(function EventRow({
           {stats.percentSold}% sold
         </p>
       </div>
-    </motion.div>
+    </div>
   );
 });
 
@@ -205,11 +201,7 @@ export default function OrganizerDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+        <div>
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
             <div>
@@ -220,7 +212,7 @@ export default function OrganizerDashboard() {
             </div>
             <Button
               asChild
-              className="w-full sm:w-auto bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="w-full sm:w-auto bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 py-2 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
             >
               <Link href="/organizer/create-event">
                 <Plus className="h-4 w-4 mr-2" />
@@ -231,11 +223,7 @@ export default function OrganizerDashboard() {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-            >
+            <div>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-xs sm:text-sm font-medium">
@@ -250,13 +238,9 @@ export default function OrganizerDashboard() {
                   <p className="text-xs text-muted-foreground">Active events</p>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
+            <div>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-xs sm:text-sm font-medium">
@@ -273,13 +257,9 @@ export default function OrganizerDashboard() {
                   </p>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
+            <div>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-xs sm:text-sm font-medium">
@@ -293,15 +273,11 @@ export default function OrganizerDashboard() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
           </div>
 
           {/* Events List */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-          >
+          <div>
             <Card>
               <CardHeader>
                 <CardTitle className="text-xl sm:text-2xl">Your Events</CardTitle>
@@ -338,8 +314,8 @@ export default function OrganizerDashboard() {
                 )}
               </CardContent>
             </Card>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
       {/* Global Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

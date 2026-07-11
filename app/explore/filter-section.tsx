@@ -150,15 +150,11 @@ function FilterSectionComponent({
           </p>
         </div>
 
-        {/*
-         * Filter panel with CSS transitions instead of framer-motion
-         * Performance: CSS transitions are GPU-accelerated and don't require JS execution
-         * grid-rows trick allows smooth height animation without measuring
-         */}
+        {/* Filter panel updates layout immediately and fades content feedback. */}
         <div
           id="filter-panel"
           className={`
-            grid transition-all duration-300 ease-in-out
+            grid transition-opacity duration-150 ease-[var(--motion-ease-out)]
             ${
               showFilters
                 ? "grid-rows-[1fr] opacity-100 mt-4 pt-4 border-t border-gray-200"

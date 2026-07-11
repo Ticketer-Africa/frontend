@@ -36,21 +36,18 @@ export const getStatusText = (ticket: {
  */
 export const TicketItem = memo(function TicketItem({
   ticket,
-  index,
   onListForResale,
   onRemoveFromResale,
   isRemovePending,
 }: {
   ticket: Ticket;
-  index: number;
   onListForResale: (ticket: Ticket, e: React.MouseEvent) => void;
   onRemoveFromResale: (ticketId: string) => void;
   isRemovePending: boolean;
 }) {
   return (
     <div
-      className={`ticket-item-animate bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200`}
-      style={{ animationDelay: `${index * 0.05}s` }}
+      className={`ticket-item-animate bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-lg p-4 transition-[background-color,color,border-color,opacity,transform] duration-200`}
     >
       {/* Mobile-optimized layout */}
       <div className="flex items-start space-x-3">
@@ -92,7 +89,7 @@ export const TicketItem = memo(function TicketItem({
               {!ticket.isListed && !ticket.isUsed && (
                 <Button
                   size="sm"
-                  className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-3 py-1 text-xs h-7 shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-3 py-1 text-xs h-7 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
                   onClick={(e) => onListForResale(ticket, e)}
                   disabled={ticket?.ticketCategory?.price === 0}
                 >

@@ -131,7 +131,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
       {/* Mobile sticky bottom bar */}
       <div
         className={cn(
-          "fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-xl transition-all duration-300 md:hidden",
+          "fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-xl transition-[background-color,color,border-color,opacity,transform] duration-150 md:hidden",
           hasSelection ? "translate-y-0 shadow-2xl" : "translate-y-full",
         )}
       >
@@ -263,7 +263,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
 
                     <div
                       className={cn(
-                        "space-y-4 transition-all duration-200",
+                        "space-y-4 transition-[background-color,color,border-color,opacity,transform] duration-200",
                         event.isRecurring &&
                         (event.occurrences ?? []).some((o) => o.isActive) &&
                         !selectedOccurrenceId

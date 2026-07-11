@@ -11,19 +11,16 @@ import {
 
 interface TransactionItemProps {
   transaction: Transaction;
-  index: number;
   onClick: () => void;
 }
 
 export const TransactionItem = memo(function TransactionItem({
   transaction,
-  index,
   onClick,
 }: TransactionItemProps) {
   return (
     <div
       className="transaction-item-animate flex items-center justify-between p-4 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
-      style={{ animationDelay: `${index * 0.1}s` }}
       onClick={onClick}
     >
       <div className="flex items-center space-x-4">
