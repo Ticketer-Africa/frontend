@@ -12,7 +12,7 @@ import {
 } from "@/services/tickets/tickets.queries";
 import { ResaleModal } from "@/components/resale-modal";
 import { QRCodeDisplay } from "@/components/qr-code-display";
-import { useAuth } from "@/lib/auth-context";
+import { useUser } from "@/lib/auth-context";
 import { formatDate, formatPrice } from "@/lib/helpers";
 import { toast } from "sonner";
 import { Ticket, ListResalePayload } from "@/types/tickets.type";
@@ -23,7 +23,7 @@ export default function TicketDetailPage({
   params: { id: string };
 }) {
   const { data: userTickets, isLoading, isError } = useMyTickets();
-  const { user } = useAuth();
+  const { user } = useUser();
   const [isResaleModalOpen, setIsResaleModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const { mutateAsync: listResale, isPending: isResalePending } =

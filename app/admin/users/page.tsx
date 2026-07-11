@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useAdminUsers } from "@/services/admin/admin.queries";
-import { useAuth } from "@/lib/auth-context";
+import { useUser, useAuthStatus } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import {
   UsersHeader,
@@ -23,7 +23,8 @@ export default function AdminUsersPage() {
   const [sortOrder, setSortOrder] = useState("desc");
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
-  const { isLoading: authLoading, user: currentUser } = useAuth();
+  const { user: currentUser } = useUser();
+  const { isLoading: authLoading } = useAuthStatus();
   const router = useRouter();
 
   useEffect(() => {

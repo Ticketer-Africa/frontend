@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { useUpdateEventV2 } from "@/services/events/events-v2.queries";
 import { getEventById } from "@/services/events/events";
-import { useAuth } from "@/lib/auth-context";
+import { useAuthStatus } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -34,7 +34,7 @@ export default function UpdateEventPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { mutateAsync: updateEvent, isPending } = useUpdateEventV2();
-  const { isLoading: authLoading } = useAuth();
+  const { isLoading: authLoading } = useAuthStatus();
   const router = useRouter();
   const params = useParams();
   const eventId = Array.isArray(params.id) ? params.id[0] : params.id;

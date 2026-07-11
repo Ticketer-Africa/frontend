@@ -3,13 +3,14 @@
 import { Logo } from "@/components/layout/logo";
 import { buildEndpoint } from "@/services/api-config";
 import Axios from "@/services/axios";
-import build from "next/dist/build";
 import { useRouter, usePathname } from "next/navigation";
 import {
   createContext,
   useContext,
   useState,
   useEffect,
+  useCallback,
+  useMemo,
   type ReactNode,
 } from "react";
 
@@ -22,13 +23,19 @@ interface User {
   isVerified: boolean;
 }
 
-interface AuthContextType {
+interface UserContextType {
   user: User | null;
   logout: () => Promise<void>;
+}
+
+interface AuthStatusContextType {
   isLoading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const UserContext = createContext<UserContextType | undefined>(undefined);
+const AuthStatusContext = createContext<AuthStatusContextType | undefined>(
+  undefined,
+);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -55,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const API_VERSION = "v1";
 
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       const response = await Axios.get(buildEndpoint(API_VERSION, "auth/me"));
       const userData = response.data.user;
@@ -83,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [pathname, router]);
 
   useEffect(() => {
     // Don't fetch user if we're on a public route AND there's no stored user hint
@@ -101,9 +108,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     fetchUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]); // Add pathname as dependency
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await Axios.post("/auth/logout");
     } catch (error) {
@@ -113,7 +121,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem("ticketer-user");
       router.push("/login");
     }
-  };
+  }, [router]);
+
+  const userValue = useMemo<UserContextType>(
+    () => ({ user, logout }),
+    [user, logout],
+  );
+
+  const statusValue = useMemo<AuthStatusContextType>(
+    () => ({ isLoading }),
+    [isLoading],
+  );
 
   if (isLoading) {
     return (
@@ -134,16 +152,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, logout, isLoading }}>
-      {children}
-    </AuthContext.Provider>
+    <UserContext.Provider value={userValue}>
+      <AuthStatusContext.Provider value={statusValue}>
+        {children}
+      </AuthStatusContext.Provider>
+    </UserContext.Provider>
   );
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
+export function useUser() {
+  const context = useContext(UserContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("useUser must be used within an AuthProvider");
+  }
+  return context;
+}
+
+export function useAuthStatus() {
+  const context = useContext(AuthStatusContext);
+  if (context === undefined) {
+    throw new Error("useAuthStatus must be used within an AuthProvider");
   }
   return context;
 }

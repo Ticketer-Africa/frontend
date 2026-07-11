@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { X } from "lucide-react";
-import { useAuth } from "@/lib/auth-context";
+import { useUser } from "@/lib/auth-context";
 import { useBuyTicket } from "@/services/tickets/tickets.queries";
 import { toast } from "sonner";
 import { BuyTicketPayload } from "@/types/tickets.type";
@@ -22,7 +22,7 @@ export function TicketPurchaseModal({
   quantities,
   setQuantities,
 }: TicketPurchaseModalProps) {
-  const { user } = useAuth();
+  const { user } = useUser();
   const [step, setStep] = useState<ModalStep>("quantity");
   const { mutateAsync: buyTicket, isPending: isBuying } = useBuyTicket();
 
@@ -33,32 +33,35 @@ export function TicketPurchaseModal({
     event.primaryFee,
   );
 
-  const handleQuantityChange = (categoryId: string, delta: number) => {
-    setQuantities((prev) => {
-      const currentTotal = Object.values(prev).reduce(
-        (sum, qty) => sum + qty,
-        0,
-      );
-      const currentQty = prev[categoryId] || 0;
-      const newQty = currentQty + delta;
+  const handleQuantityChange = useCallback(
+    (categoryId: string, delta: number) => {
+      setQuantities((prev) => {
+        const currentTotal = Object.values(prev).reduce(
+          (sum, qty) => sum + qty,
+          0,
+        );
+        const currentQty = prev[categoryId] || 0;
+        const newQty = currentQty + delta;
 
-      // Can't go below 0 (or 1 for resale)
-      if (newQty < 0) return prev;
-      if (resaleTicket && newQty < 1) return prev;
+        // Can't go below 0 (or 1 for resale)
+        if (newQty < 0) return prev;
+        if (resaleTicket && newQty < 1) return prev;
 
-      // Can't exceed 10 per category or 10 total
-      if (newQty > 10) {
-        toast.error("Maximum 10 tickets per category");
-        return prev;
-      }
-      if (currentTotal - currentQty + newQty > 10) {
-        toast.error("Maximum 10 tickets per purchase");
-        return prev;
-      }
+        // Can't exceed 10 per category or 10 total
+        if (newQty > 10) {
+          toast.error("Maximum 10 tickets per category");
+          return prev;
+        }
+        if (currentTotal - currentQty + newQty > 10) {
+          toast.error("Maximum 10 tickets per purchase");
+          return prev;
+        }
 
-      return { ...prev, [categoryId]: newQty };
-    });
-  };
+        return { ...prev, [categoryId]: newQty };
+      });
+    },
+    [setQuantities, resaleTicket],
+  );
 
   const handleContinue = () => {
     if (!user) {

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@/lib/auth-context";
+import { useUser } from "@/lib/auth-context";
 import { useRouter, useParams } from "next/navigation";
 import { useDeleteEvent } from "@/services/events/events.queries";
 import { useEventByIdV2 } from "@/services/events/events-v2.queries";
@@ -44,7 +44,7 @@ import { formatPrice } from "@/lib/helpers";
 import EventManagementTabs from "./EventManagementTabs";
 
 export default function EventDashboard() {
-  const { user: currentUser } = useAuth();
+  const { user: currentUser } = useUser();
   const router = useRouter();
   const params = useParams();
   const { id } = params; // Extract id from dynamic route

@@ -20,7 +20,7 @@ import {
 import { useWithdrawWallet } from "@/services/wallet/wallet.queries";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/helpers";
-import { useAuth } from "@/lib/auth-context";
+import { useUser } from "@/lib/auth-context";
 import { useBankCodes } from "@/services/banks/bank.queries";
 import { Bank } from "@/types/bank.type";
 import { AlertCircle } from "lucide-react";
@@ -63,7 +63,7 @@ function FieldError({ message }: { message?: string }) {
 }
 
 export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalProps) {
-  const { user } = useAuth();
+  const { user } = useUser();
   const [step, setStep] = useState<"details" | "pin">("details");
   const [formData, setFormData] = useState<Omit<WithdrawPayload, "email" | "name">>(emptyForm);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});

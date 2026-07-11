@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/lib/auth-context";
+import { useUser, useAuthStatus } from "@/lib/auth-context";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,7 +43,8 @@ export default function SettingsPage() {
 
   const updateUserMutation = useUpdateUser();
   const changePasswordMutation = useChangePassword();
-  const { isLoading, user: currentUser } = useAuth();
+  const { user: currentUser } = useUser();
+  const { isLoading } = useAuthStatus();
 
   const {
     register,

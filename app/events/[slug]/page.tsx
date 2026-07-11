@@ -8,7 +8,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
+import { useUser } from "@/lib/auth-context";
 import { useEventBySlugV2 } from "@/services/events/events-v2.queries";
 import { EventV2, EventOccurrence, TicketCategoryV2 } from "@/types/events-v2.type";
 import { EventHeaderV2 } from "./_components/event-header"; // updated version below
@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 
 export default function EventPage({ params }: { params: { slug: string } }) {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user } = useUser();
   const { data: event, isLoading, error } = useEventBySlugV2(params.slug);
 
   const [selected, setSelected] = useState<Set<string>>(new Set());

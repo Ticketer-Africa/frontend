@@ -26,7 +26,7 @@ import {
   Transaction,
 } from "@/types/admin.type";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
+import { useUser, useAuthStatus } from "@/lib/auth-context";
 import {
   MetricCard,
   ActivityCard,
@@ -46,7 +46,8 @@ export default function AdminDashboard() {
   const { data: users } = useAdminUsers();
   const { data: dailyRevenue } = useAdminDailyRevenue();
   const { data: eventCategories } = useEventCategories();
-  const { isLoading: authLoading, user: currentUser } = useAuth();
+  const { user: currentUser } = useUser();
+  const { isLoading: authLoading } = useAuthStatus();
   const router = useRouter();
 
   useEffect(() => {

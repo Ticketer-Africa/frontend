@@ -6,12 +6,13 @@ import {
   useRef,
   memo,
   useCallback,
+  type ReactNode,
 } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, LogOut, Settings, Wallet, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/lib/auth-context";
+import { useUser } from "@/lib/auth-context";
 import { Logo } from "./logo";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
@@ -20,11 +21,41 @@ const NAVIGATION = [
   { name: "Explore", href: "/explore" },
 ] as const;
 
+const NavLink = memo(function NavLink({
+  href,
+  className,
+  activeClassName,
+  inactiveClassName,
+  onClick,
+  children,
+}: {
+  href: string;
+  className: string;
+  activeClassName: string;
+  inactiveClassName: string;
+  onClick?: () => void;
+  children: ReactNode;
+}) {
+  const pathname = usePathname();
+  const isActive =
+    !href.startsWith("#") &&
+    (pathname === href || pathname.startsWith(href + "/"));
+
+  return (
+    <Link
+      href={href}
+      className={`${className} ${isActive ? activeClassName : inactiveClassName}`}
+      onClick={onClick}
+    >
+      {children}
+    </Link>
+  );
+});
+
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, logout } = useUser();
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -64,14 +95,6 @@ export function Header() {
       ? [{ name: "Admin Dashboard", href: "/admin/dashboard", icon: Settings }]
       : [];
 
-  const isActive = useCallback(
-    (href: string) => {
-      if (href.startsWith("#")) return false;
-      return pathname === href || pathname.startsWith(href + "/");
-    },
-    [pathname]
-  );
-
   const handleLogout = useCallback(() => {
     logout();
     setIsProfileOpen(false);
@@ -105,17 +128,15 @@ export function Header() {
           <div className="hidden min-w-0 items-center gap-4 md:flex">
             <nav className="flex items-center gap-2">
               {NAVIGATION.map((item) => (
-                <Link
+                <NavLink
                   key={item.name}
                   href={item.href}
-                  className={`inline-flex h-11 items-center rounded-full px-4 text-sm transition-colors ${
-                    isActive(item.href)
-                      ? "bg-primary/10 text-[#1E88E5]"
-                      : "text-muted-foreground hover:text-[#1E88E5]"
-                  }`}
+                  className="inline-flex h-11 items-center rounded-full px-4 text-sm transition-colors"
+                  activeClassName="bg-primary/10 text-[#1E88E5]"
+                  inactiveClassName="text-muted-foreground hover:text-[#1E88E5]"
                 >
                   {item.name}
-                </Link>
+                </NavLink>
               ))}
             </nav>
           </div>
@@ -206,18 +227,16 @@ export function Header() {
           <div className="mobile-menu-slide-in border-t border-border py-4 md:hidden">
             <nav className="space-y-2">
               {NAVIGATION.map((item) => (
-                <Link
+                <NavLink
                   key={item.name}
                   href={item.href}
-                  className={`flex h-11 items-center rounded-full px-4 text-sm ${
-                    isActive(item.href)
-                      ? "bg-primary/10 text-[#1E88E5]"
-                      : "text-muted-foreground"
-                  }`}
+                  className="flex h-11 items-center rounded-full px-4 text-sm"
+                  activeClassName="bg-primary/10 text-[#1E88E5]"
+                  inactiveClassName="text-muted-foreground"
                   onClick={closeMenu}
                 >
                   {item.name}
-                </Link>
+                </NavLink>
               ))}
             </nav>
 

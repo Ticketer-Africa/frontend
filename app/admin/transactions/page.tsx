@@ -18,7 +18,7 @@ import {
 import { useAdminTransactions } from "@/services/admin/admin.queries";
 import { Transaction } from "@/types/admin.type";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
+import { useUser, useAuthStatus } from "@/lib/auth-context";
 
 export default function AdminTransactionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,7 +34,8 @@ export default function AdminTransactionsPage() {
     error: transactionsError,
   } = useAdminTransactions();
 
-  const { isLoading: authLoading, user: currentUser } = useAuth();
+  const { user: currentUser } = useUser();
+  const { isLoading: authLoading } = useAuthStatus();
   const router = useRouter();
 
   useEffect(() => {

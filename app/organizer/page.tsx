@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/helpers";
-import { useAuth } from "@/lib/auth-context";
+import { useUser } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { useDeleteEvent } from "@/services/events/events.queries";
 import { useOrganizerEventsV2 } from "@/services/events/events-v2.queries";
@@ -40,7 +40,7 @@ import {
 import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
 
 export default function OrganizerDashboard() {
-  const { user: currentUser } = useAuth();
+  const { user: currentUser } = useUser();
   const router = useRouter();
   const { data: organizerEventList, isLoading: eventsLoading } =
     useOrganizerEventsV2();

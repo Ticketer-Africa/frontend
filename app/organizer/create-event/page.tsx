@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
 import { useCreateEventV2 } from "@/services/events/events-v2.queries";
-import { useAuth } from "@/lib/auth-context";
+import { useAuthStatus } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -33,7 +33,7 @@ export default function CreateEventPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const { mutateAsync: createEvent, isPending } = useCreateEventV2();
-  const { isLoading: authLoading } = useAuth();
+  const { isLoading: authLoading } = useAuthStatus();
   const router = useRouter();
 
   const {

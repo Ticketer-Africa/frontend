@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useAdminEvents } from "@/services/admin/admin.queries";
-import { useAuth } from "@/lib/auth-context";
+import { useUser, useAuthStatus } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import {
   EventsHeader,
@@ -26,7 +26,8 @@ export default function AdminEventsPage() {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const { data: events, isLoading: loadingEvents, error } = useAdminEvents();
-  const { isLoading: authLoading, user: currentUser } = useAuth();
+  const { user: currentUser } = useUser();
+  const { isLoading: authLoading } = useAuthStatus();
   const router = useRouter();
 
   useEffect(() => {
