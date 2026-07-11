@@ -108,7 +108,7 @@ export function EventFormStep1({
               <ImagePlus className="h-10 w-10" />
               <div className="text-center">
                 <p className="text-sm font-medium text-gray-600">Click to upload banner</p>
-                <p className="text-xs">PNG or JPG, up to 10MB</p>
+                <p className="text-xs">PNG, JPG, or WebP, up to 10MB</p>
               </div>
             </div>
           )}
@@ -116,7 +116,7 @@ export function EventFormStep1({
         <input
           type="file"
           id="banner"
-          accept="image/png,image/jpeg"
+          accept="image/png,image/jpeg,image/webp"
           className="hidden"
           onChange={onFileChange}
           disabled={isDisabled}

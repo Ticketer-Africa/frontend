@@ -9,10 +9,12 @@ import { ArrowLeft } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import { useUpdateEventV2 } from "@/services/events/events-v2.queries";
+import { uploadImageToS3 } from "@/services/uploads/images";
 import { getEventById } from "@/services/events/events";
 import { useAuthStatus } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 
 import {
   updateEventFormSchema,
@@ -186,12 +188,16 @@ export default function UpdateEventPage() {
         }),
       ),
     );
-    if (data.banner instanceof File) formData.append("banner", data.banner);
-
     try {
+      if (data.banner instanceof File) {
+        const bannerKey = await uploadImageToS3(data.banner, "images/events");
+        formData.append("bannerKey", bannerKey);
+      }
+
       await updateEvent({ eventId: eventId!, formData });
       setIsSubmitted(true);
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error?.message || "Event update failed");
       console.error("Event update failed:", error);
     }
   };

@@ -45,16 +45,16 @@ const bannerSchema = z
   .refine((file) => file instanceof File, "Event banner is required")
   .refine((file) => !file || file.size <= 10 * 1024 * 1024, "File size must be ≤10MB")
   .refine(
-    (file) => !file || ["image/png", "image/jpeg"].includes(file.type),
-    "File must be PNG or JPG",
+    (file) => !file || ["image/png", "image/jpeg", "image/webp"].includes(file.type),
+    "File must be PNG, JPG, or WebP",
   );
 
 const bannerSchemaOptional = z
   .any()
   .refine((file) => !file || file.size <= 10 * 1024 * 1024, "File size must be ≤10MB")
   .refine(
-    (file) => !file || ["image/png", "image/jpeg"].includes(file.type),
-    "File must be PNG or JPG",
+    (file) => !file || ["image/png", "image/jpeg", "image/webp"].includes(file.type),
+    "File must be PNG, JPG, or WebP",
   )
   .optional();
 
@@ -76,6 +76,7 @@ export const eventFormSchema = z
     date: z.string().min(1, "Date is required"),
     time: z.string().min(1, "Time is required"),
     feeMode: z.enum(["ORGANIZER", "ATTENDEE"]).default("ORGANIZER"),
+    accessType: z.enum(["PUBLIC", "PRIVATE"]).default("PUBLIC"),
     ticketCategories: z.array(ticketCategorySchema).min(1, "At least one ticket category is required"),
     banner: bannerSchema,
     ...advancedFields,
@@ -105,7 +106,7 @@ export const updateEventFormSchema = z
     date: z.string().min(1, "Date is required").refine((val) => new Date(val) >= new Date(), "Date cannot be in the past"),
     time: z.string().min(1, "Time is required"),
     feeMode: z.enum(["ORGANIZER", "ATTENDEE"]).default("ORGANIZER"),
-    visibility: z.enum(["PUBLIC", "PRIVATE"]).default("PUBLIC"),
+    accessType: z.enum(["PUBLIC", "PRIVATE"]).default("PUBLIC"),
     ticketCategories: z.array(ticketCategorySchema).min(1, "At least one ticket category is required"),
     banner: bannerSchemaOptional,
     ...advancedFields,
@@ -134,7 +135,7 @@ export const eventSubmissionSchema = z.object({
   date: z.string().min(1),
   time: z.string().min(1),
   feeMode: z.enum(["ORGANIZER", "ATTENDEE"]).default("ORGANIZER"),
-  visibility: z.enum(["PUBLIC", "PRIVATE"]).default("PUBLIC"),
+  accessType: z.enum(["PUBLIC", "PRIVATE"]).default("PUBLIC"),
   ticketCategories: z.array(ticketCategorySubmissionSchema).min(1),
   banner: bannerSchemaOptional,
   ...advancedFields,

@@ -15,6 +15,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useUpdateUser } from "@/services/user/user.queries";
 import { useRouter } from "next/navigation";
 import { useChangePassword } from "@/services/auth/auth.queries";
+import { uploadImageToS3 } from "@/services/uploads/images";
+import { toast } from "sonner";
 
 const profileSchema = z.object({
   name: z.string().min(2, { message: "Name is too short" }),
@@ -49,7 +51,7 @@ export default function SettingsPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     watch,
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -97,18 +99,28 @@ export default function SettingsPage() {
     );
   };
 
-  const onSubmit = (data: ProfileFormValues) => {
-    const formPayload = new FormData();
-    formPayload.append("name", data.name);
-    if (selectedImage) {
-      formPayload.append("file", selectedImage);
+  const onSubmit = async (data: ProfileFormValues) => {
+    try {
+      const formPayload = new FormData();
+      formPayload.append("name", data.name);
+
+      if (selectedImage) {
+        const profileImageKey = await uploadImageToS3(
+          selectedImage,
+          "images/avatars",
+        );
+        formPayload.append("profileImageKey", profileImageKey);
+      }
+
+      updateUserMutation.mutate(formPayload, {
+        onSuccess: () => {
+          setSelectedImage(null); // Reset image after successful submission
+          setPreviewUrl(null);
+        },
+      });
+    } catch (error: any) {
+      toast.error(error?.message || "Profile update failed");
     }
-    updateUserMutation.mutate(formPayload, {
-      onSuccess: () => {
-        setSelectedImage(null); // Reset image after successful submission
-        setPreviewUrl(null);
-      },
-    });
   };
 
   // Watch form values to detect changes
@@ -195,7 +207,7 @@ export default function SettingsPage() {
                     <input
                       id="fileUpload"
                       type="file"
-                      accept="image/*"
+                      accept="image/png,image/jpeg,image/webp"
                       className="hidden"
                       onChange={handleFileChange}
                     />
@@ -283,7 +295,9 @@ export default function SettingsPage() {
                       <Button
                         type="submit"
                         disabled={
-                          updateUserMutation.isPending || !hasProfileChanges
+                          updateUserMutation.isPending ||
+                          isSubmitting ||
+                          !hasProfileChanges
                         }
                         className="mt-4 sm:mt-0 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                       >

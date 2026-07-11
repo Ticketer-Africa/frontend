@@ -8,9 +8,11 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
 import { useCreateEventV2 } from "@/services/events/events-v2.queries";
+import { uploadImageToS3 } from "@/services/uploads/images";
 import { useAuthStatus } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 
 import {
   eventFormSchema,
@@ -123,14 +125,16 @@ export default function CreateEventPage() {
       JSON.stringify(ticketCategories.map(({ id, ...rest }) => rest)),
     );
 
-    if (data.banner instanceof File) {
-      formData.append("banner", data.banner);
-    }
-
     try {
+      if (data.banner instanceof File) {
+        const bannerKey = await uploadImageToS3(data.banner, "images/events");
+        formData.append("bannerKey", bannerKey);
+      }
+
       await createEvent(formData);
       setIsSubmitted(true);
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error?.message || "Event creation failed");
       console.error("Event creation failed:", error);
     }
   };
