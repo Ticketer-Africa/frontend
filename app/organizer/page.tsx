@@ -1,12 +1,12 @@
 "use client";
 
+import { memo, useCallback, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
   Plus,
   Calendar,
   Users,
-  TrendingUp,
   BarChart3,
   Trash2,
   MoreVertical,
@@ -16,11 +16,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/helpers";
+import { getEventTicketStats } from "@/lib/event-stats";
 import { useUser } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { useDeleteEvent } from "@/services/events/events.queries";
 import { useOrganizerEventsV2 } from "@/services/events/events-v2.queries";
-import { useEffect, useState } from "react";
 import { EventV2 } from "@/types/events-v2.type";
 import {
   DropdownMenu,
@@ -35,9 +35,96 @@ import {
   DialogDescription,
   DialogOverlay,
   DialogTitle,
-  DialogTrigger,
 } from "@radix-ui/react-dialog";
 import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
+
+const EventRow = memo(function EventRow({
+  event,
+  index,
+  onNavigate,
+  onEdit,
+  onDeleteClick,
+}: {
+  event: EventV2;
+  index: number;
+  onNavigate: (eventId: string) => void;
+  onEdit: (eventId: string) => void;
+  onDeleteClick: (eventId: string) => void;
+}) {
+  const stats = useMemo(
+    () => getEventTicketStats(event.ticketCategories),
+    [event.ticketCategories],
+  );
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.1 }}
+      className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+      onClick={() => onNavigate(event.id)}
+    >
+      <img
+        src={event.bannerUrl || "/placeholder.svg"}
+        alt={event.name}
+        className="w-16 h-16 rounded-lg object-cover"
+      />
+      <div className="flex-1 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 mb-1">
+          <h3 className="font-semibold text-sm sm:text-base">{event.name}</h3>
+        </div>
+        <p className="text-xs sm:text-sm text-muted-foreground mb-1 sm:mb-2">
+          {new Date(event.date).toLocaleDateString()} • {event.location}
+        </p>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-xs sm:text-sm">
+          <span className="text-muted-foreground">
+            {stats.sold}/{stats.total} sold
+          </span>
+          <span className="text-green-600 font-medium">
+            {formatPrice(stats.revenue).toLocaleString()} revenue
+          </span>
+        </div>
+      </div>
+      <div className="flex flex-col items-end w-full sm:w-auto">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            side="right"
+            className="bg-white shadow-lg rounded-md border border-gray-200 mt-2"
+          >
+            <DropdownMenuItem
+              onClick={() => onEdit(event.id)}
+              className="text-sm text-gray-700 hover:bg-gray-100 rounded-md p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
+            >
+              <Edit className="mr-2 h-4 w-4" /> Update Event
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-gray-200 h-px my-1" />
+            <DropdownMenuItem
+              onClick={() => onDeleteClick(event.id)}
+              className="text-sm text-white bg-red-600 hover:bg-red-400 rounded-md p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
+            >
+              <Trash2 className="mr-2 h-4 w-4" /> Delete Event
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <div className="w-full sm:w-24 bg-muted rounded-full h-2 mt-2">
+          <div
+            className="bg-gradient-to-r from-[#1E88E5] to-pink-600 h-2 rounded-full"
+            style={{ width: `${stats.percentSold}%` }}
+          />
+        </div>
+        <p className="text-xs sm:text-sm text-muted-foreground mt-1 text-right">
+          {stats.percentSold}% sold
+        </p>
+      </div>
+    </motion.div>
+  );
+});
 
 export default function OrganizerDashboard() {
   const { user: currentUser } = useUser();
@@ -49,48 +136,40 @@ export default function OrganizerDashboard() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
 
-  if (eventsLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-[#1E88E5] mx-auto mb-4" />
-          <p className="text-lg text-muted-foreground">Loading dashboard...</p>
-        </div>
-      </div>
-    );
-  }
   // Handle both array and paginated response formats
   const organizerEvents: EventV2[] = Array.isArray(organizerEventList)
     ? organizerEventList
     : organizerEventList?.data ?? [];
 
-  // Safe calculations
-  const totalEvents = organizerEvents?.length || 0;
-  const totalTicketsSold =
-    organizerEvents?.reduce((eventsum, event: EventV2) => {
-      const eventMinted =
-        event.ticketCategories?.reduce(
-          (catSum, cat) => catSum + (cat.minted || 0),
-          0
-        ) || 0;
-      return eventsum + eventMinted;
-    }, 0) || 0;
-  const totalRevenue =
-    organizerEvents?.reduce((sum, event: EventV2) => {
-      const eventRevenue =
-        event.ticketCategories?.reduce((catSum, cat) => {
-          return catSum + (cat.minted || 0) * (cat.price || 0);
-        }, 0) || 0;
-      return sum + eventRevenue;
-    }, 0) || 0;
+  const dashboardStats = useMemo(() => {
+    let totalTicketsSold = 0;
+    let totalRevenue = 0;
+    for (const event of organizerEvents) {
+      const stats = getEventTicketStats(event.ticketCategories);
+      totalTicketsSold += stats.sold;
+      totalRevenue += stats.revenue;
+    }
+    return {
+      totalEvents: organizerEvents.length,
+      totalTicketsSold,
+      totalRevenue,
+    };
+  }, [organizerEvents]);
 
-  const avgTicketsSold =
-    totalEvents > 0 ? Math.round(totalTicketsSold / totalEvents) : 0;
+  const handleNavigate = useCallback(
+    (eventId: string) => router.push(`/organizer/view-event/${eventId}`),
+    [router],
+  );
 
-  const handleDeleteClick = (eventId: string) => {
+  const handleEdit = useCallback(
+    (eventId: string) => router.push(`/organizer/update-event/${eventId}`),
+    [router],
+  );
+
+  const handleDeleteClick = useCallback((eventId: string) => {
     setDeleteEventId(eventId);
     setIsDeleteDialogOpen(true);
-  };
+  }, []);
 
   const confirmDelete = () => {
     if (deleteEventId) {
@@ -111,6 +190,17 @@ export default function OrganizerDashboard() {
     setIsDeleteDialogOpen(false);
     setDeleteEventId(null);
   };
+
+  if (eventsLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-[#1E88E5] mx-auto mb-4" />
+          <p className="text-lg text-muted-foreground">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -155,7 +245,7 @@ export default function OrganizerDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl sm:text-2xl font-bold">
-                    {totalEvents}
+                    {dashboardStats.totalEvents}
                   </div>
                   <p className="text-xs text-muted-foreground">Active events</p>
                 </CardContent>
@@ -176,7 +266,7 @@ export default function OrganizerDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl sm:text-2xl font-bold">
-                    {totalTicketsSold}
+                    {dashboardStats.totalTicketsSold}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Across all events
@@ -199,7 +289,7 @@ export default function OrganizerDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl sm:text-2xl font-bold">
-                    {formatPrice(Math.round(totalRevenue))}
+                    {formatPrice(Math.round(dashboardStats.totalRevenue))}
                   </div>
                 </CardContent>
               </Card>
@@ -214,146 +304,26 @@ export default function OrganizerDashboard() {
           >
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl sm:text-2xl">
-                  Your Events
-                </CardTitle>
+                <CardTitle className="text-xl sm:text-2xl">Your Events</CardTitle>
               </CardHeader>
               <CardContent>
-                {organizerEvents?.length > 0 ? (
+                {organizerEvents.length > 0 ? (
                   <div className="space-y-4">
-                    {organizerEvents?.map((event: EventV2, index: number) => (
-                      <motion.div
+                    {organizerEvents.map((event: EventV2, index: number) => (
+                      <EventRow
                         key={event.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.4, delay: index * 0.1 }}
-                        className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-                        onClick={() =>
-                          router.push(`/organizer/view-event/${event.id}`)
-                        }
-                      >
-                        <img
-                          src={event.bannerUrl || "/placeholder.svg"}
-                          alt={event.name}
-                          className="w-16 h-16 rounded-lg object-cover"
-                        />
-                        <div className="flex-1 w-full sm:w-auto">
-                          <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 mb-1">
-                            <h3 className="font-semibold text-sm sm:text-base">
-                              {event.name}
-                            </h3>
-                          </div>
-                          <p className="text-xs sm:text-sm text-muted-foreground mb-1 sm:mb-2">
-                            {new Date(event.date).toLocaleDateString()} •{" "}
-                            {event.location}
-                          </p>
-                          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-xs sm:text-sm">
-                            <span className="text-muted-foreground">
-                              {event.ticketCategories?.reduce(
-                                (sum, cat) => sum + (cat.minted || 0),
-                                0
-                              )}
-                              /
-                              {event.ticketCategories?.reduce(
-                                (sum, cat) => sum + (cat.maxTickets || 0),
-                                0
-                              )}{" "}
-                              sold
-                            </span>
-                            <span className="text-green-600 font-medium">
-                              {formatPrice(
-                                event.ticketCategories?.reduce(
-                                  (sum, cat) =>
-                                    sum + (cat.minted || 0) * (cat.price || 0),
-                                  0
-                                ) || 0
-                              ).toLocaleString()}{" "}
-                              revenue
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end w-full sm:w-auto">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                              >
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              align="end"
-                              side="right"
-                              className="bg-white shadow-lg rounded-md border border-gray-200 mt-2"
-                            >
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  router.push(
-                                    `/organizer/update-event/${event.id}`
-                                  )
-                                }
-                                className="text-sm text-gray-700 hover:bg-gray-100 rounded-md p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
-                              >
-                                <Edit className="mr-2 h-4 w-4" /> Update Event
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator className="bg-gray-200 h-px my-1" />
-                              <DropdownMenuItem
-                                onClick={() => handleDeleteClick(event.id)}
-                                className="text-sm text-white bg-red-600 hover:bg-red-400 rounded-md p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" /> Delete Event
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                          <div className="w-full sm:w-24 bg-muted rounded-full h-2 mt-2">
-                            <div
-                              className="bg-gradient-to-r from-[#1E88E5] to-pink-600 h-2 rounded-full"
-                              style={{
-                                width: `${
-                                  event.ticketCategories
-                                    ? (event.ticketCategories.reduce(
-                                        (sum, cat) => sum + (cat.minted || 0),
-                                        0
-                                      ) /
-                                        event.ticketCategories.reduce(
-                                          (sum, cat) =>
-                                            sum + (cat.maxTickets || 0),
-                                          0
-                                        )) *
-                                      100
-                                    : 0
-                                }%`,
-                              }}
-                            />
-                          </div>
-                          <p className="text-xs sm:text-sm text-muted-foreground mt-1 text-right">
-                            {event.ticketCategories
-                              ? Math.round(
-                                  (event.ticketCategories.reduce(
-                                    (sum, cat) => sum + (cat.minted || 0),
-                                    0
-                                  ) /
-                                    event.ticketCategories.reduce(
-                                      (sum, cat) => sum + (cat.maxTickets || 0),
-                                      0
-                                    )) *
-                                    100
-                                )
-                              : 0}
-                            % sold
-                          </p>
-                        </div>
-                      </motion.div>
+                        event={event}
+                        index={index}
+                        onNavigate={handleNavigate}
+                        onEdit={handleEdit}
+                        onDeleteClick={handleDeleteClick}
+                      />
                     ))}
                   </div>
                 ) : (
                   <div className="text-center py-8">
                     <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">
-                      No events yet
-                    </h3>
+                    <h3 className="text-lg font-semibold mb-2">No events yet</h3>
                     <p className="text-muted-foreground mb-4">
                       Create your first event to start selling tickets and
                       managing attendees.
