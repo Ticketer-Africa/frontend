@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -17,6 +17,7 @@ import {
   EventFormData,
   DEFAULT_FORM_VALUES,
 } from "../_components/event-form-schema";
+import { isStep1Valid, isStep2Valid } from "../_components/event-form-validation";
 import { ProgressBar } from "../_components/progress-bar";
 import { EventFormStep1 } from "../_components/event-form-step1";
 import { EventFormStep2 } from "../_components/event-form-step2";
@@ -62,15 +63,22 @@ export default function CreateEventPage() {
   }, [bannerFile]);
 
   const ticketCategories = watch("ticketCategories") || [];
+  const name = watch("name");
+  const description = watch("description");
+  const category = watch("category");
+  const banner = watch("banner");
+  const location = watch("location");
+  const date = watch("date");
+  const time = watch("time");
 
-  const canProceedStep1 =
-    !!watch("name") && !!watch("description") && !!watch("category") && !!watch("banner");
-  const canProceedStep2 =
-    !!watch("location") &&
-    !!watch("date") &&
-    !!watch("time") &&
-    ticketCategories.length > 0 &&
-    ticketCategories.every((cat) => cat.name && cat.price >= 0 && cat.maxTickets >= 1);
+  const canProceedStep1 = useMemo(
+    () => isStep1Valid({ name, description, category, banner, requireBanner: true }),
+    [name, description, category, banner],
+  );
+  const canProceedStep2 = useMemo(
+    () => isStep2Valid({ location, date, time, ticketCategories }),
+    [location, date, time, ticketCategories],
+  );
   const canProceedStep3 = true;
   const canProceedStep4 = true;
 
