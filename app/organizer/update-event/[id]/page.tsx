@@ -133,14 +133,14 @@ export default function UpdateEventPage() {
   const name = watch("name");
   const description = watch("description");
   const category = watch("category");
-  const banner = watch("banner");
   const location = watch("location");
   const date = watch("date");
   const time = watch("time");
 
   const canProceedStep1 = useMemo(
-    () => isStep1Valid({ name, description, category, banner, requireBanner: false }),
-    [name, description, category, banner],
+    () =>
+      isStep1Valid({ name, description, category, banner: bannerFile, requireBanner: false }),
+    [name, description, category, bannerFile],
   );
   const canProceedStep2 = useMemo(
     () => isStep2Valid({ location, date, time, ticketCategories }),
