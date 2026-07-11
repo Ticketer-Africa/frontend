@@ -12,7 +12,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, LogOut, Settings, Wallet, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useUser } from "@/lib/auth-context";
+import { useUser, useAuthStatus } from "@/lib/auth-context";
 import { Logo } from "./logo";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
@@ -56,6 +56,7 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { user, logout } = useUser();
+  const { isLoading: authLoading } = useAuthStatus();
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -142,7 +143,9 @@ export function Header() {
           </div>
 
           <div className="hidden items-center gap-2 md:flex">
-            {user ? (
+            {authLoading ? (
+              <div className="h-11 w-32 animate-pulse rounded-full bg-muted" />
+            ) : user ? (
               <>
                 <div className="relative" ref={profileRef}>
                   <Button
