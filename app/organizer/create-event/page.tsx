@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -8,15 +8,18 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
 import { useCreateEventV2 } from "@/services/events/events-v2.queries";
-import { useAuth } from "@/lib/auth-context";
+import { uploadImageToS3 } from "@/services/uploads/images";
+import { useAuthStatus } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 
 import {
   eventFormSchema,
   EventFormData,
   DEFAULT_FORM_VALUES,
 } from "../_components/event-form-schema";
+import { isStep1Valid, isStep2Valid } from "../_components/event-form-validation";
 import { ProgressBar } from "../_components/progress-bar";
 import { EventFormStep1 } from "../_components/event-form-step1";
 import { EventFormStep2 } from "../_components/event-form-step2";
@@ -33,7 +36,7 @@ export default function CreateEventPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const { mutateAsync: createEvent, isPending } = useCreateEventV2();
-  const { isLoading: authLoading } = useAuth();
+  const { isLoading: authLoading } = useAuthStatus();
   const router = useRouter();
 
   const {
@@ -49,22 +52,35 @@ export default function CreateEventPage() {
   });
 
   const bannerFile = watch("banner");
-  const previewUrl = bannerFile ? URL.createObjectURL(bannerFile) : null;
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    return () => { if (previewUrl) URL.revokeObjectURL(previewUrl); };
-  }, [previewUrl]);
+    if (!(bannerFile instanceof File)) {
+      setPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(bannerFile);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [bannerFile]);
 
   const ticketCategories = watch("ticketCategories") || [];
+  const name = watch("name");
+  const description = watch("description");
+  const category = watch("category");
+  const location = watch("location");
+  const date = watch("date");
+  const time = watch("time");
 
-  const canProceedStep1 =
-    !!watch("name") && !!watch("description") && !!watch("category") && !!watch("banner");
-  const canProceedStep2 =
-    !!watch("location") &&
-    !!watch("date") &&
-    !!watch("time") &&
-    ticketCategories.length > 0 &&
-    ticketCategories.every((cat) => cat.name && cat.price >= 0 && cat.maxTickets >= 1);
+  const canProceedStep1 = useMemo(
+    () =>
+      isStep1Valid({ name, description, category, banner: bannerFile, requireBanner: true }),
+    [name, description, category, bannerFile],
+  );
+  const canProceedStep2 = useMemo(
+    () => isStep2Valid({ location, date, time, ticketCategories }),
+    [location, date, time, ticketCategories],
+  );
   const canProceedStep3 = true;
   const canProceedStep4 = true;
 
@@ -109,14 +125,16 @@ export default function CreateEventPage() {
       JSON.stringify(ticketCategories.map(({ id, ...rest }) => rest)),
     );
 
-    if (data.banner instanceof File) {
-      formData.append("banner", data.banner);
-    }
-
     try {
+      if (data.banner instanceof File) {
+        const bannerKey = await uploadImageToS3(data.banner, "images/events");
+        formData.append("bannerKey", bannerKey);
+      }
+
       await createEvent(formData);
       setIsSubmitted(true);
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error?.message || "Event creation failed");
       console.error("Event creation failed:", error);
     }
   };

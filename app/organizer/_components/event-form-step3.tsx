@@ -101,7 +101,7 @@ export function EventFormStep3({
           <button
             type="button"
             onClick={() => setValue("feeMode", "ORGANIZER")}
-            className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-medium transition-all ${
+            className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-medium transition-[background-color,color,border-color,opacity,transform] ${
               feeMode === "ORGANIZER"
                 ? "bg-[#1E88E5] text-white shadow"
                 : "text-gray-600 hover:text-gray-900"
@@ -112,7 +112,7 @@ export function EventFormStep3({
           <button
             type="button"
             onClick={() => setValue("feeMode", "ATTENDEE")}
-            className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-medium transition-all ${
+            className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-medium transition-[background-color,color,border-color,opacity,transform] ${
               feeMode === "ATTENDEE"
                 ? "bg-[#1E88E5] text-white shadow"
                 : "text-gray-600 hover:text-gray-900"

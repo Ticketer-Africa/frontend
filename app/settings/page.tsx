@@ -2,19 +2,20 @@
 
 import type React from "react";
 import { useEffect, useState, useMemo } from "react";
-import { motion } from "framer-motion";
 import { User, Lock, Camera, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/lib/auth-context";
+import { useUser, useAuthStatus } from "@/lib/auth-context";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUpdateUser } from "@/services/user/user.queries";
 import { useRouter } from "next/navigation";
 import { useChangePassword } from "@/services/auth/auth.queries";
+import { uploadImageToS3 } from "@/services/uploads/images";
+import { toast } from "sonner";
 
 const profileSchema = z.object({
   name: z.string().min(2, { message: "Name is too short" }),
@@ -43,12 +44,13 @@ export default function SettingsPage() {
 
   const updateUserMutation = useUpdateUser();
   const changePasswordMutation = useChangePassword();
-  const { isLoading, user: currentUser } = useAuth();
+  const { user: currentUser } = useUser();
+  const { isLoading } = useAuthStatus();
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     watch,
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -96,18 +98,28 @@ export default function SettingsPage() {
     );
   };
 
-  const onSubmit = (data: ProfileFormValues) => {
-    const formPayload = new FormData();
-    formPayload.append("name", data.name);
-    if (selectedImage) {
-      formPayload.append("file", selectedImage);
+  const onSubmit = async (data: ProfileFormValues) => {
+    try {
+      const formPayload = new FormData();
+      formPayload.append("name", data.name);
+
+      if (selectedImage) {
+        const profileImageKey = await uploadImageToS3(
+          selectedImage,
+          "images/avatars",
+        );
+        formPayload.append("profileImageKey", profileImageKey);
+      }
+
+      updateUserMutation.mutate(formPayload, {
+        onSuccess: () => {
+          setSelectedImage(null); // Reset image after successful submission
+          setPreviewUrl(null);
+        },
+      });
+    } catch (error: any) {
+      toast.error(error?.message || "Profile update failed");
     }
-    updateUserMutation.mutate(formPayload, {
-      onSuccess: () => {
-        setSelectedImage(null); // Reset image after successful submission
-        setPreviewUrl(null);
-      },
-    });
   };
 
   // Watch form values to detect changes
@@ -130,10 +142,7 @@ export default function SettingsPage() {
 
   if (isLoading) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6 }}
+      <div
         className="fixed inset-0 bg-gray-50 bg-opacity-90 flex items-center justify-center z-50"
       >
         <div className="text-center">
@@ -145,18 +154,14 @@ export default function SettingsPage() {
             Please wait while we verify your session
           </p>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+        <div>
           <div className="mb-8">
             <h1 className="text-3xl font-bold">Settings</h1>
             <p className="text-muted-foreground">
@@ -166,11 +171,7 @@ export default function SettingsPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Profile Overview */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-            >
+            <div>
               <Card>
                 <CardHeader>
                   <CardTitle>Profile Overview</CardTitle>
@@ -194,7 +195,7 @@ export default function SettingsPage() {
                     <input
                       id="fileUpload"
                       type="file"
-                      accept="image/*"
+                      accept="image/png,image/jpeg,image/webp"
                       className="hidden"
                       onChange={handleFileChange}
                     />
@@ -223,16 +224,12 @@ export default function SettingsPage() {
                   </div>
                 </CardContent>
               </Card>
-            </motion.div>
+            </div>
 
             {/* Profile + Password Forms */}
             <div className="lg:col-span-2 space-y-6">
               {/* Profile Form */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-              >
+              <div>
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
@@ -282,23 +279,21 @@ export default function SettingsPage() {
                       <Button
                         type="submit"
                         disabled={
-                          updateUserMutation.isPending || !hasProfileChanges
+                          updateUserMutation.isPending ||
+                          isSubmitting ||
+                          !hasProfileChanges
                         }
-                        className="mt-4 sm:mt-0 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                        className="mt-4 sm:mt-0 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
                       >
                         Save Changes
                       </Button>
                     </form>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
 
               {/* Change Password */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-              >
+              <div>
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
@@ -372,17 +367,17 @@ export default function SettingsPage() {
                           !hasPasswordChanges
                         }
                         variant="outline"
-                        className="mt-4 sm:mt-0 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                        className="mt-4 sm:mt-0 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
                       >
                         Update Password
                       </Button>
                     </form>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

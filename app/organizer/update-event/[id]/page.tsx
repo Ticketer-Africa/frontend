@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -9,16 +9,19 @@ import { ArrowLeft } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import { useUpdateEventV2 } from "@/services/events/events-v2.queries";
+import { uploadImageToS3 } from "@/services/uploads/images";
 import { getEventById } from "@/services/events/events";
-import { useAuth } from "@/lib/auth-context";
+import { useAuthStatus } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 
 import {
   updateEventFormSchema,
   UpdateEventFormData,
   DEFAULT_FORM_VALUES,
 } from "../../_components/event-form-schema";
+import { isStep1Valid, isStep2Valid } from "../../_components/event-form-validation";
 import { ProgressBar } from "../../_components/progress-bar";
 import { EventFormStep1 } from "../../_components/event-form-step1";
 import { EventFormStep2 } from "../../_components/event-form-step2";
@@ -34,7 +37,7 @@ export default function UpdateEventPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { mutateAsync: updateEvent, isPending } = useUpdateEventV2();
-  const { isLoading: authLoading } = useAuth();
+  const { isLoading: authLoading } = useAuthStatus();
   const router = useRouter();
   const params = useParams();
   const eventId = Array.isArray(params.id) ? params.id[0] : params.id;
@@ -114,21 +117,37 @@ export default function UpdateEventPage() {
   }, [event, eventLoading, setValue]);
 
   const bannerFile = watch("banner");
-  const previewUrl = bannerFile ? URL.createObjectURL(bannerFile) : event?.bannerUrl || null;
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    event?.bannerUrl ?? null,
+  );
 
   useEffect(() => {
-    return () => { if (previewUrl && bannerFile) URL.revokeObjectURL(previewUrl); };
-  }, [previewUrl, bannerFile]);
+    if (!(bannerFile instanceof File)) {
+      setPreviewUrl(event?.bannerUrl ?? null);
+      return;
+    }
+    const url = URL.createObjectURL(bannerFile);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [bannerFile, event?.bannerUrl]);
 
   const ticketCategories = watch("ticketCategories") || [];
+  const name = watch("name");
+  const description = watch("description");
+  const category = watch("category");
+  const location = watch("location");
+  const date = watch("date");
+  const time = watch("time");
 
-  const canProceedStep1 = !!watch("name") && !!watch("description") && !!watch("category");
-  const canProceedStep2 =
-    !!watch("location") &&
-    !!watch("date") &&
-    !!watch("time") &&
-    ticketCategories.length > 0 &&
-    ticketCategories.every((cat) => cat.name && cat.price >= 0 && cat.maxTickets >= 1);
+  const canProceedStep1 = useMemo(
+    () =>
+      isStep1Valid({ name, description, category, banner: bannerFile, requireBanner: false }),
+    [name, description, category, bannerFile],
+  );
+  const canProceedStep2 = useMemo(
+    () => isStep2Valid({ location, date, time, ticketCategories }),
+    [location, date, time, ticketCategories],
+  );
 
   const canProceed = [canProceedStep1, canProceedStep2, true, true][currentStep - 1];
 
@@ -169,12 +188,16 @@ export default function UpdateEventPage() {
         }),
       ),
     );
-    if (data.banner instanceof File) formData.append("banner", data.banner);
-
     try {
+      if (data.banner instanceof File) {
+        const bannerKey = await uploadImageToS3(data.banner, "images/events");
+        formData.append("bannerKey", bannerKey);
+      }
+
       await updateEvent({ eventId: eventId!, formData });
       setIsSubmitted(true);
-    } catch (error) {
+    } catch (error: any) {
+      toast.error(error?.message || "Event update failed");
       console.error("Event update failed:", error);
     }
   };

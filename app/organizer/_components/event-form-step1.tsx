@@ -75,7 +75,7 @@ export function EventFormStep1({
                 type="button"
                 onClick={() => setValue("category", category.toUpperCase())}
                 disabled={isDisabled}
-                className={`py-2 px-3 rounded-xl text-sm font-medium transition-all border ${
+                className={`py-2 px-3 rounded-xl text-sm font-medium transition-[background-color,color,border-color,opacity,transform] border ${
                   isSelected
                     ? "bg-[#1E88E5] text-white border-[#1E88E5] shadow-sm"
                     : "bg-white text-gray-600 border-gray-200 hover:border-[#1E88E5] hover:text-[#1E88E5]"
@@ -108,7 +108,7 @@ export function EventFormStep1({
               <ImagePlus className="h-10 w-10" />
               <div className="text-center">
                 <p className="text-sm font-medium text-gray-600">Click to upload banner</p>
-                <p className="text-xs">PNG or JPG, up to 10MB</p>
+                <p className="text-xs">PNG, JPG, or WebP, up to 10MB</p>
               </div>
             </div>
           )}
@@ -116,7 +116,7 @@ export function EventFormStep1({
         <input
           type="file"
           id="banner"
-          accept="image/png,image/jpeg"
+          accept="image/png,image/jpeg,image/webp"
           className="hidden"
           onChange={onFileChange}
           disabled={isDisabled}

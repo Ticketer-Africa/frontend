@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Shield, Zap, Heart, Award } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -40,13 +39,7 @@ export function WhyChooseSection() {
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
             Why Choose Ticketer Africa?
           </h2>
@@ -54,21 +47,17 @@ export function WhyChooseSection() {
             We're not just another ticketing platform. We're your trusted
             partner for unforgettable experiences.
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {benefits.map((benefit, index) => (
-            <motion.div
+          {benefits.map((benefit) => (
+            <div
               key={benefit.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
               className="text-center group"
             >
               <div className="relative mb-6">
                 <div
-                  className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}
+                  className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center group-hover:scale-[1.02] transition-transform duration-150 shadow-lg`}
                 >
                   <benefit.icon className={`w-8 h-8 ${benefit.color}`} />
                 </div>
@@ -81,17 +70,11 @@ export function WhyChooseSection() {
               <p className="text-gray-600 leading-relaxed">
                 {benefit.description}
               </p>
-            </motion.div>
+            </div>
           ))}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          viewport={{ once: true }}
-          className="mt-16 text-center bg-gradient-to-r from-[#1E88E5] to-[#1E88E5] rounded-3xl p-12 text-white"
-        >
+        <div className="mt-16 text-center bg-gradient-to-r from-[#1E88E5] to-[#1E88E5] rounded-3xl p-12 text-white">
           <h3 className="text-2xl sm:text-3xl font-bold mb-4">
             Ready to get started?
           </h3>
@@ -100,23 +83,19 @@ export function WhyChooseSection() {
             their events.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <button
               onClick={() => router.push("/events")}
-              className="bg-white text-[#1E88E5] px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
+              className="bg-white text-[#1E88E5] px-8 py-3 rounded-full font-semibold hover:bg-gray-100 motion-press active:scale-[0.98]"
             >
               Start Exploring
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-[#1E88E5] transition-colors"
+            </button>
+            <button
+              className="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-[#1E88E5] motion-press active:scale-[0.98]"
             >
               Learn More
-            </motion.button>
+            </button>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

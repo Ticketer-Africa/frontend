@@ -10,6 +10,7 @@ import {
   Discount,
   CreateDiscountPayload,
 } from "@/services/discounts/discounts";
+import { optimisticUpdate } from "@/services/query-utils";
 
 /**
  * Apply discount code hook
@@ -30,10 +31,24 @@ export const useListDiscounts = (eventId: string) => {
 
 export const useCreateDiscount = (eventId: string) => {
   const queryClient = useQueryClient();
-  return useMutation<Discount, Error, CreateDiscountPayload>({
-    mutationFn: (payload) => discountsAPI.createDiscount(eventId, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["discounts", eventId] });
-    },
+  const queryKey = ["discounts", eventId];
+  return useMutation({
+    mutationFn: (payload: CreateDiscountPayload) =>
+      discountsAPI.createDiscount(eventId, payload),
+    ...optimisticUpdate<Discount[], CreateDiscountPayload>(
+      queryClient,
+      queryKey,
+      (old = [], payload) => [
+        ...old,
+        {
+          id: `optimistic-${Date.now()}`,
+          code: payload.code,
+          type: payload.type,
+          value: payload.value,
+          usageLimit: payload.usageLimit ?? null,
+          usedCount: 0,
+        },
+      ],
+    ),
   });
 };

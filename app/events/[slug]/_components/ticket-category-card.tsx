@@ -33,7 +33,7 @@ export function TicketCategoryCardV2({
   return (
     <div
       className={cn(
-        "rounded-xl border p-5 transition-all duration-200",
+        "rounded-xl border p-5 transition-[background-color,color,border-color,opacity,transform] duration-200",
         isSelected
           ? "border-[#1E88E5]/60 bg-[#1E88E5]/10 ring-1 ring-[#1E88E5]/30"
           : "border-border hover:border-[#1E88E5]/40",

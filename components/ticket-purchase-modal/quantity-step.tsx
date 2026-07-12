@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Plus, Minus, Info } from "lucide-react";
@@ -26,6 +27,62 @@ interface QuantityStepProps {
   onQuantityChange: (categoryId: string, delta: number) => void;
   onContinue: () => void;
 }
+
+const CategoryQuantityRow = memo(function CategoryQuantityRow({
+  category,
+  quantity,
+  onQuantityChange,
+}: {
+  category: TicketCategory;
+  quantity: number;
+  onQuantityChange: (categoryId: string, delta: number) => void;
+}) {
+  const handleDecrement = useCallback(
+    () => onQuantityChange(category.id, -1),
+    [onQuantityChange, category.id],
+  );
+  const handleIncrement = useCallback(
+    () => onQuantityChange(category.id, 1),
+    [onQuantityChange, category.id],
+  );
+
+  return (
+    <div>
+      <Label className="text-sm font-medium text-gray-700 mb-3 block">
+        {category.name} ({formatPrice(category.price)})
+      </Label>
+      <div className="flex items-center justify-center space-x-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleDecrement}
+          disabled={quantity <= 0}
+          className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
+        >
+          <Minus className="w-4 h-4" />
+        </Button>
+        <div className="text-2xl font-bold text-gray-900 w-12 text-center">
+          {quantity}
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleIncrement}
+          disabled={
+            quantity >= 10 ||
+            category.maxTickets - (category.minted ?? 0) <= quantity
+          }
+          className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
+        >
+          <Plus className="w-4 h-4" />
+        </Button>
+      </div>
+      <p className="text-xs text-gray-500 text-center mt-2">
+        {category.maxTickets - (category.minted ?? 0)} tickets available
+      </p>
+    </div>
+  );
+});
 
 export function QuantityStep({
   event,
@@ -81,41 +138,12 @@ export function QuantityStep({
         </div>
       ) : (
         ticketCategories?.map((category) => (
-          <div key={category.id}>
-            <Label className="text-sm font-medium text-gray-700 mb-3 block">
-              {category.name} ({formatPrice(category.price)})
-            </Label>
-            <div className="flex items-center justify-center space-x-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onQuantityChange(category.id, -1)}
-                disabled={(quantities[category.id] || 0) <= 0}
-                className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
-              >
-                <Minus className="w-4 h-4" />
-              </Button>
-              <div className="text-2xl font-bold text-gray-900 w-12 text-center">
-                {quantities[category.id] || 0}
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onQuantityChange(category.id, 1)}
-                disabled={
-                  (quantities[category.id] || 0) >= 10 ||
-                  category.maxTickets - (category.minted ?? 0) <=
-                    (quantities[category.id] || 0)
-                }
-                className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
-              >
-                <Plus className="w-4 h-4" />
-              </Button>
-            </div>
-            <p className="text-xs text-gray-500 text-center mt-2">
-              {category.maxTickets - (category.minted ?? 0)} tickets available
-            </p>
-          </div>
+          <CategoryQuantityRow
+            key={category.id}
+            category={category}
+            quantity={quantities[category.id] || 0}
+            onQuantityChange={onQuantityChange}
+          />
         ))
       )}
 

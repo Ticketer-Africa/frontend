@@ -60,7 +60,7 @@ export function Footer() {
               {SOCIAL_ICONS.map(({ Icon, label }) => (
                 <button
                   key={label}
-                  className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 hover:scale-105 active:scale-95 transition-all duration-200"
+                  className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 active:scale-[0.98] transition-[background-color,color,border-color,opacity,transform] duration-150"
                   aria-label={label}
                 >
                   <Icon className="h-5 w-5 text-gray-600" aria-hidden="true" />

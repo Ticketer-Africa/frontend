@@ -35,14 +35,14 @@ export function EventSuccessScreen({
         <p className="text-gray-600 mb-6">{displayMessage}</p>
         <div className="space-y-3">
           <Button
-            className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+            className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
             asChild
           >
             <Link href={dashboardHref}>Go to Dashboard</Link>
           </Button>
           {onCreateAnother && (
             <Button
-              className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
               onClick={onCreateAnother}
             >
               Create Another Event

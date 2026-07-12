@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { UseFormWatch, UseFormSetValue, UseFormRegister, FieldErrors } from "react-hook-form";
 import { Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -386,20 +385,7 @@ function Section({
           className="mt-0.5 shrink-0"
         />
       </div>
-      <AnimatePresence initial={false}>
-        {enabled && (
-          <motion.div
-            key="content"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            {children}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {enabled && <div className="motion-surface opacity-100">{children}</div>}
     </div>
   );
 }

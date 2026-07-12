@@ -24,16 +24,10 @@ const queryClient = new QueryClient({
         }
         return failureCount < 3;
       },
-      refetchOnWindowFocus: (query) => {
-        const queryKeys = [
-          "me",
-          "wallet-balance",
-          "events",
-          "resaleListings",
-          "event",
-        ];
-        return queryKeys.some((key) => query.queryKey.includes(key));
-      },
+      // Per-query opt-in only — see refetchOnWindowFocus: true on individual
+      // useQuery calls (e.g. useWalletBalance, useResaleListings) for queries
+      // that need focus-refetch.
+      refetchOnWindowFocus: false,
       // Refetch when reconnecting to the internet
       refetchOnReconnect: true,
       // Avoid refetching on mount unless data is stale

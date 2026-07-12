@@ -1,23 +1,13 @@
-"use client";
-
-import { motion } from "framer-motion";
-
 export default function TermsAndConditions() {
   return (
     <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-16">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
             Terms and Conditions
           </h1>
-        </motion.div>
+        </div>
 
         {/* Terms List */}
         <div className="space-y-10 text-gray-700 leading-relaxed">

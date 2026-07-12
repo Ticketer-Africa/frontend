@@ -52,25 +52,22 @@ const FAQS = [
 
 /**
  * FAQItem - Memoized accordion item
- * Performance: Uses CSS for expand/collapse instead of framer-motion
+ * Performance: Uses instant layout changes and opacity-only disclosure feedback.
  */
 interface FAQItemProps {
   faq: { question: string; answer: string };
-  index: number;
   isOpen: boolean;
   onToggle: () => void;
 }
 
 const FAQItem = memo(function FAQItem({
   faq,
-  index,
   isOpen,
   onToggle,
 }: FAQItemProps) {
   return (
     <div
-      className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:border-blue-200 transition-all faq-item"
-      style={{ animationDelay: `${index * 50}ms` }}
+      className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:border-blue-200 transition-[background-color,color,border-color,opacity,transform] faq-item"
     >
       <button
         onClick={onToggle}
@@ -81,18 +78,14 @@ const FAQItem = memo(function FAQItem({
           {faq.question}
         </span>
         <ChevronDown
-          className={`w-5 h-5 text-[#1E88E5] transition-transform duration-300 flex-shrink-0 ml-4 ${
+          className={`w-5 h-5 text-[#1E88E5] transition-transform duration-150 flex-shrink-0 ml-4 ${
             isOpen ? "rotate-180" : ""
           }`}
           aria-hidden="true"
         />
       </button>
-      {/*
-       * CSS-based expand/collapse
-       * Performance: Uses grid-rows trick for smooth height animation without JS
-       */}
       <div
-        className={`grid transition-all duration-300 ease-in-out ${
+        className={`grid transition-opacity duration-150 [transition-timing-function:var(--motion-ease-out)] ${
           isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
         }`}
         aria-hidden={!isOpen}
@@ -111,9 +104,9 @@ const FAQItem = memo(function FAQItem({
  * FAQSection - Optimized for performance
  *
  * Performance optimizations:
- * 1. Removed framer-motion - uses CSS animations
+ * 1. Removed framer-motion and decorative entrance animations
  * 2. Removed lodash debounce - not needed for simple toggle
- * 3. CSS grid-rows animation for expand/collapse (no layout thrashing)
+ * 3. Disclosure layout updates immediately while opacity provides light feedback
  * 4. Memoized FAQItem component
  * 5. Static data hoisted outside component
  */
@@ -143,16 +136,15 @@ export function FAQSection() {
           </p>
         </div>
 
-        {/* FAQ items with staggered CSS animations */}
+        {/* FAQ items */}
         <div className="space-y-4">
           {FAQS.slice(0, visibleFAQs).map((faq, index) => (
-            <FAQItem
-              key={faq.question}
-              faq={faq}
-              index={index}
-              isOpen={openIndex === index}
-              onToggle={() => toggleFAQ(index)}
-            />
+          <FAQItem
+            key={faq.question}
+            faq={faq}
+            isOpen={openIndex === index}
+            onToggle={() => toggleFAQ(index)}
+          />
           ))}
         </div>
 

@@ -48,7 +48,7 @@ export function ErrorScreen({
         <h1 className="text-3xl font-bold mb-4">{title}</h1>
         <p className="text-gray-600 mb-6">{message}</p>
         <Button
-          className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+          className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
           asChild
         >
           <Link href={backHref}>{backLabel}</Link>

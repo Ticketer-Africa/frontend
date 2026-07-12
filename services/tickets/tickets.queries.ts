@@ -29,6 +29,7 @@ export const useResaleListings = (eventId?: string) =>
   useQuery<TicketResale[]>({
     queryKey: ["resaleListings", eventId],
     queryFn: () => getResaleListings(eventId),
+    refetchOnWindowFocus: true,
   });
 
 // Fetch my resale listings

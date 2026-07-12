@@ -160,7 +160,7 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
               Cancel
             </Button>
             <Button
-              className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
               type="submit"
               disabled={isPending}
             >
