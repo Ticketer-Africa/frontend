@@ -49,11 +49,68 @@ export interface BuyTicketPayload {
   resaleTicketId?: string;
 }
 
-export interface ListResalePayload {
+export interface ResolveAccountPayload {
+  bankCode: string;
+  accountNumber: string;
+}
+
+export interface ResolvedAccount extends ResolveAccountPayload {
+  accountName: string;
+}
+
+export interface LoggedInListResalePayload {
   ticketId: string;
   resalePrice: number;
   bankCode: string;
   accountNumber: string;
+}
+
+export interface GuestListResalePayload {
+  ticketCode: string;
+  email: string;
+  resalePrice: number;
+  bankCode: string;
+  accountNumber: string;
+}
+
+export type ListResalePayload =
+  | LoggedInListResalePayload
+  | GuestListResalePayload;
+
+export type RemoveResalePayload =
+  | { ticketId: string }
+  | { ticketCode: string; email: string };
+
+export interface BuyResalePayload {
+  ticketIds: string[];
+  buyerEmail?: string;
+  buyerName?: string;
+}
+
+export interface GuestResaleStatusParams {
+  ticketCode: string;
+  email: string;
+}
+
+export interface GuestResaleStatus {
+  eventName?: string;
+  eventDate?: string;
+  ticketCategory?: string;
+  isListed?: boolean;
+  resalePrice?: number;
+  listedAt?: string;
+  isSold?: boolean;
+  payoutStatus?: string;
+  commissionStatus?: string;
+  ticket?: Pick<
+    Ticket,
+    "code" | "isListed" | "resalePrice" | "listedAt" | "status" | "ticketCategory"
+  >;
+  event?: {
+    name?: string;
+    date?: string;
+    location?: string;
+  };
 }
 
 export interface TicketResale {
