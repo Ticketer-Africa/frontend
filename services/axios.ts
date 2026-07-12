@@ -24,7 +24,14 @@ Axios.interceptors.request.use(
 Axios.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && [401].includes(error.response.status)) {
+    const isGuestResaleRequest =
+      error.config?.url?.includes("tickets/resale/") ||
+      error.config?.url?.includes("payment/resolve-account");
+    if (
+      error.response &&
+      [401].includes(error.response.status) &&
+      !isGuestResaleRequest
+    ) {
       // session expired
       if (typeof window !== "undefined") {
         window.location.href = "/login";

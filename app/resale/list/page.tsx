@@ -1,0 +1,168 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useBankCodes } from "@/services/banks/bank.queries";
+import {
+  useListResale,
+  useResolvePayoutAccount,
+} from "@/services/tickets/tickets.queries";
+import { Bank } from "@/types/bank.type";
+import { GuestListResalePayload, ResolvedAccount } from "@/types/tickets.type";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+
+const guestListSchema = z.object({
+  ticketCode: z.string().trim().min(1, "Ticket code is required"),
+  email: z.string().trim().email("Enter a valid purchase email"),
+  resalePrice: z
+    .string()
+    .min(1, "Enter resale price")
+    .transform((value) => Number(value))
+    .refine((value) => value >= 1200, "Minimum resale price is ₦1,200"),
+  bankCode: z.string().min(1, "Please select your bank"),
+  accountNumber: z
+    .string()
+    .regex(/^\d{10}$/, "Account number must be exactly 10 digits"),
+});
+
+type GuestListFormData = z.infer<typeof guestListSchema>;
+
+const maskAccountNumber = (value: string) =>
+  value.length >= 4 ? `****${value.slice(-4)}` : value;
+
+export default function GuestResaleListPage() {
+  const router = useRouter();
+  const { data: banks, isLoading: isLoadingBanks } = useBankCodes();
+  const { mutateAsync: resolveAccount, isPending: isVerifyingAccount } =
+    useResolvePayoutAccount();
+  const { mutateAsync: listResale, isPending: isListing } = useListResale();
+  const [resolvedAccount, setResolvedAccount] =
+    useState<ResolvedAccount | null>(null);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<GuestListFormData>({
+    resolver: zodResolver(guestListSchema),
+  });
+
+  const bankCode = watch("bankCode");
+  const accountNumber = watch("accountNumber");
+
+  useEffect(() => {
+    setResolvedAccount(null);
+  }, [bankCode, accountNumber]);
+
+  const handleVerifyAccount = async () => {
+    if (!bankCode || !/^\d{10}$/.test(accountNumber || "")) {
+      toast.error("Select a bank and enter a valid 10-digit account number");
+      return;
+    }
+
+    try {
+      const account = await resolveAccount({ bankCode, accountNumber });
+      setResolvedAccount(account);
+    } catch {
+      // The service shows the API error.
+    }
+  };
+
+  const onSubmit = async (data: GuestListFormData) => {
+    if (!resolvedAccount) {
+      toast.error("Verify your payout account before listing this ticket");
+      return;
+    }
+
+    const payload: GuestListResalePayload = {
+      ticketCode: data.ticketCode.trim(),
+      email: data.email.trim().toLowerCase(),
+      resalePrice: data.resalePrice,
+      bankCode: data.bankCode,
+      accountNumber: data.accountNumber,
+    };
+
+    try {
+      await listResale(payload);
+      router.push(
+        `/resale/status?ticketCode=${encodeURIComponent(payload.ticketCode)}&email=${encodeURIComponent(payload.email)}`
+      );
+    } catch {}
+  };
+
+  return (
+    <main className="min-h-screen bg-gray-50 px-4 py-10">
+      <section className="mx-auto max-w-xl">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">
+            List a ticket for resale
+          </h1>
+          <p className="mt-2 text-sm text-gray-600">
+            No account needed. Use the ticket code and purchase email from your order.
+          </p>
+        </div>
+
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-5 rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
+        >
+          <FormField label="Ticket code" error={errors.ticketCode?.message}>
+            <Input {...register("ticketCode")} placeholder="TCK-ABC123" disabled={isListing} />
+          </FormField>
+          <FormField label="Purchase email" error={errors.email?.message}>
+            <Input {...register("email")} type="email" placeholder="owner@example.com" disabled={isListing} />
+          </FormField>
+          <FormField label="Resale price (₦)" error={errors.resalePrice?.message}>
+            <Input {...register("resalePrice")} type="number" min="1200" placeholder="Minimum ₦1,200" disabled={isListing} />
+          </FormField>
+          <FormField label="Bank" error={errors.bankCode?.message}>
+            <select
+              {...register("bankCode")}
+              disabled={isLoadingBanks || isListing}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm disabled:bg-gray-100"
+            >
+              <option value="">Choose your bank</option>
+              {banks?.map((bank: Bank) => (
+                <option key={bank.code} value={bank.code}>{bank.name}</option>
+              ))}
+            </select>
+          </FormField>
+          <FormField label="Account number" error={errors.accountNumber?.message}>
+            <Input {...register("accountNumber")} inputMode="numeric" maxLength={10} placeholder="10-digit account number" disabled={isListing} />
+          </FormField>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <Button type="button" variant="outline" onClick={handleVerifyAccount} disabled={isListing || isVerifyingAccount}>
+              {isVerifyingAccount ? "Verifying..." : "Verify account"}
+            </Button>
+            {resolvedAccount && (
+              <p className="text-sm text-green-700">
+                {resolvedAccount.accountName} confirmed for {maskAccountNumber(resolvedAccount.accountNumber)}
+              </p>
+            )}
+          </div>
+
+          <Button type="submit" className="w-full bg-[#1E88E5] text-white hover:bg-blue-600" disabled={isListing || !resolvedAccount}>
+            {isListing ? "Listing ticket..." : "List ticket"}
+          </Button>
+        </form>
+      </section>
+    </main>
+  );
+}
+
+function FormField({ label, error, children }: { label: string; error?: string; children: ReactNode }) {
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-gray-900">{label}</label>
+      {children}
+      {error && <p className="text-xs text-red-600">{error}</p>}
+    </div>
+  );
+}
