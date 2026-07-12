@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -94,6 +95,12 @@ export default function ResalePage() {
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Find tickets from verified sellers at great prices
           </p>
+          <Button
+            asChild
+            className="mt-6 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
+          >
+            <Link href="/resale/list">List a ticket</Link>
+          </Button>
         </motion.div>
 
         {/* Search */}
