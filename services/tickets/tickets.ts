@@ -2,7 +2,13 @@ import axios from "../axios";
 import { buildEndpoint } from "@/services/api-config";
 import {
   BuyTicketPayload,
+  BuyResalePayload,
+  GuestResaleStatus,
+  GuestResaleStatusParams,
   ListResalePayload,
+  RemoveResalePayload,
+  ResolveAccountPayload,
+  ResolvedAccount,
   Ticket,
   TicketResponse,
   TicketResale,
@@ -11,6 +17,16 @@ import {
 import { toast } from "sonner";
 
 const API_VERSION = "v1";
+const THROTTLE_MESSAGE = "Too many attempts. Please wait a minute and try again.";
+const GUEST_PROOF_MESSAGE = "Ticket not found or email does not match.";
+
+const getApiErrorMessage = (error: any, fallback: string) => {
+  if (error.response?.status === 429) return THROTTLE_MESSAGE;
+  return error.response?.data?.message || fallback;
+};
+
+const getGuestProofErrorMessage = (error: any) =>
+  error.response?.status === 429 ? THROTTLE_MESSAGE : GUEST_PROOF_MESSAGE;
 
 // BUY a new ticket (primary)
 export const buyTicket = async (
@@ -35,9 +51,9 @@ export const buyTicket = async (
 };
 
 // BUY from resale
-export const buyResaleTicket = async (data: {
-  ticketIds: string[];
-}): Promise<TicketResponse> => {
+export const buyResaleTicket = async (
+  data: BuyResalePayload
+): Promise<TicketResponse> => {
   try {
     const res = await axios.post(
       buildEndpoint(API_VERSION, "tickets/resale/buy"),
@@ -46,8 +62,10 @@ export const buyResaleTicket = async (data: {
     toast.success(res.data.message || "Resale ticket purchased successfully");
     return res.data;
   } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message || "Failed to purchase resale ticket";
+    const errorMessage = getApiErrorMessage(
+      error,
+      "Failed to purchase resale ticket"
+    );
     toast.error(errorMessage);
     throw new Error(errorMessage);
   }
@@ -65,8 +83,26 @@ export const listTicketForResale = async (
     toast.success(res.data.message || "Ticket listed for resale successfully");
     return res.data;
   } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message || "Failed to list ticket for resale";
+    const errorMessage = "ticketCode" in data
+      ? getGuestProofErrorMessage(error)
+      : getApiErrorMessage(error, "Failed to list ticket for resale");
+    toast.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+};
+
+export const resolvePayoutAccount = async (
+  data: ResolveAccountPayload
+): Promise<ResolvedAccount> => {
+  try {
+    const res = await axios.post(
+      buildEndpoint(API_VERSION, "payment/resolve-account"),
+      data
+    );
+    toast.success("Account verified");
+    return res.data;
+  } catch (error: any) {
+    const errorMessage = getApiErrorMessage(error, "Failed to verify account");
     toast.error(errorMessage);
     throw new Error(errorMessage);
   }
@@ -135,21 +171,36 @@ export const getBoughtFromResale = async (): Promise<Ticket[]> => {
 
 // REMOVE ticket from resale
 export const removeResaleTicket = async (
-  ticketId: string
+  data: RemoveResalePayload
 ): Promise<TicketResale> => {
   try {
     const res = await axios.post(
       buildEndpoint(API_VERSION, "tickets/resale/remove"),
-      { ticketId }
+      data
     );
     toast.success(
       res.data.message || "Ticket removed from resale successfully"
     );
     return res.data;
   } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message || "Failed to remove resale ticket";
+    const errorMessage = "ticketCode" in data
+      ? getGuestProofErrorMessage(error)
+      : getApiErrorMessage(error, "Failed to remove resale ticket");
     toast.error(errorMessage);
     throw new Error(errorMessage);
+  }
+};
+
+export const getGuestResaleStatus = async (
+  params: GuestResaleStatusParams
+): Promise<GuestResaleStatus> => {
+  try {
+    const res = await axios.get(
+      buildEndpoint(API_VERSION, "tickets/resale/status"),
+      { params }
+    );
+    return res.data;
+  } catch (error: any) {
+    throw new Error(getGuestProofErrorMessage(error));
   }
 };

@@ -8,11 +8,18 @@ import {
   verifyTicket,
   getMyListings,
   getBoughtFromResale,
+  getGuestResaleStatus,
   removeResaleTicket,
+  resolvePayoutAccount,
 } from "./tickets";
 import {
   BuyTicketPayload,
+  BuyResalePayload,
+  GuestResaleStatus,
+  GuestResaleStatusParams,
   ListResalePayload,
+  RemoveResalePayload,
+  ResolveAccountPayload,
   Ticket,
   TicketResale,
 } from "@/types/tickets.type";
@@ -61,7 +68,7 @@ export const useBuyTicket = () => {
 export const useBuyResaleTicket = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { ticketIds: string[] }) => buyResaleTicket(payload),
+    mutationFn: (payload: BuyResalePayload) => buyResaleTicket(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["myTickets"] });
       queryClient.invalidateQueries({ queryKey: ["resaleListings"] });
@@ -97,17 +104,33 @@ export const useVerifyTicket = () => {
   });
 };
 
+export const useResolvePayoutAccount = () =>
+  useMutation({
+    mutationFn: (payload: ResolveAccountPayload) => resolvePayoutAccount(payload),
+  });
+
+export const useGuestResaleStatus = (
+  params: GuestResaleStatusParams,
+  enabled: boolean
+) =>
+  useQuery<GuestResaleStatus>({
+    queryKey: ["guestResaleStatus", params.ticketCode, params.email],
+    queryFn: () => getGuestResaleStatus(params),
+    enabled,
+    retry: false,
+  });
 
 // Remove resale ticket
 export const useRemoveResaleTicket = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (ticketId: string) => removeResaleTicket(ticketId),
+    mutationFn: (payload: RemoveResalePayload) => removeResaleTicket(payload),
     onSuccess: () => {
       // Invalidate relevant caches so UI updates instantly
       queryClient.invalidateQueries({ queryKey: ["resaleListings"] });
       queryClient.invalidateQueries({ queryKey: ["myResaleListings"] });
       queryClient.invalidateQueries({ queryKey: ["myTickets"] });
+      queryClient.invalidateQueries({ queryKey: ["guestResaleStatus"] });
     },
   });
 };

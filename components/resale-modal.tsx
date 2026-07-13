@@ -1,6 +1,6 @@
 "use client";
 
-import { Ticket } from "@/types/tickets.type";
+import { ResolvedAccount, Ticket } from "@/types/tickets.type";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useBankCodes } from "@/services/banks/bank.queries";
 import { Bank } from "@/types/bank.type";
+import { useEffect, useState } from "react";
+import { useResolvePayoutAccount } from "@/services/tickets/tickets.queries";
+import { toast } from "sonner";
 
 // Zod schema with your rules
 const resaleSchema = z.object({
@@ -48,6 +51,10 @@ export function ResaleModal({
   isPending,
 }: ResaleModalProps) {
   const { data: banks, isLoading, error } = useBankCodes();
+  const { mutateAsync: resolveAccount, isPending: isVerifyingAccount } =
+    useResolvePayoutAccount();
+  const [resolvedAccount, setResolvedAccount] =
+    useState<ResolvedAccount | null>(null);
 
   const {
     register,
@@ -60,29 +67,60 @@ export function ResaleModal({
   });
 
   const resalePrice = watch("resalePrice");
+  const bankCode = watch("bankCode");
+  const accountNumber = watch("accountNumber");
   const youWillReceive = resalePrice
     ? Math.round(Number(resalePrice) * 0.85)
     : 0;
 
   const isAlreadyResold = (selectedTicket?.resaleCount ?? 0) >= 1;
 
+  useEffect(() => {
+    setResolvedAccount(null);
+  }, [bankCode, accountNumber]);
+
+  const maskAccountNumber = (value: string) =>
+    value.length >= 4 ? `****${value.slice(-4)}` : value;
+
+  const handleVerifyAccount = async () => {
+    if (!bankCode || !/^\d{10}$/.test(accountNumber || "")) {
+      toast.error("Select a bank and enter a valid 10-digit account number");
+      return;
+    }
+
+    try {
+      const account = await resolveAccount({ bankCode, accountNumber });
+      setResolvedAccount(account);
+    } catch {
+      // The service presents the API error consistently with other ticket flows.
+    }
+  };
+
   const onSubmit = (data: ResaleFormData) => {
     if (isAlreadyResold) return;
+    if (!resolvedAccount) {
+      toast.error("Verify your payout account before listing this ticket");
+      return;
+    }
 
     onConfirmResale({
       resalePrice: data.resalePrice.toString(),
       bankCode: data.bankCode,
       accountNumber: data.accountNumber,
     });
+  };
+
+  const resetForm = () => {
     reset();
+    setResolvedAccount(null);
   };
 
   return (
     <Modal
       isOpen={isOpen}
-      onClose={() => {
-        onClose();
-        reset();
+        onClose={() => {
+          onClose();
+          resetForm();
       }}
       title="List Ticket for Resale"
       className="max-w-lg rounded-xl"
@@ -200,6 +238,24 @@ export function ResaleModal({
                   {errors.accountNumber.message}
                 </p>
               )}
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleVerifyAccount}
+                  disabled={
+                    isAlreadyResold || isPending || isVerifyingAccount
+                  }
+                >
+                  {isVerifyingAccount ? "Verifying..." : "Verify account"}
+                </Button>
+                {resolvedAccount && (
+                  <p className="text-xs text-green-700">
+                    {resolvedAccount.accountName} confirmed for{" "}
+                    {maskAccountNumber(resolvedAccount.accountNumber)}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Warnings */}
@@ -229,7 +285,7 @@ export function ResaleModal({
                 className="flex-1"
                 onClick={() => {
                   onClose();
-                  reset();
+                  resetForm();
                 }}
                 disabled={isPending}
               >
@@ -238,7 +294,7 @@ export function ResaleModal({
               <Button
                 type="submit"
                 className="flex-1 bg-[#1E88E5] hover:bg-blue-600 text-white font-medium rounded-full shadow-lg"
-                disabled={isPending || isAlreadyResold}
+                disabled={isPending || isAlreadyResold || !resolvedAccount}
               >
                 {isPending ? "Listing..." : "List for Sale"}
               </Button>

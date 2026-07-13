@@ -48,28 +48,21 @@ function ResetPasswordForm() {
   });
 
   const onSubmit = async (data: ResetPasswordSchema) => {
-    // ✅ Get stored reset details
+    // Email-link resets work without browser state; keep the OTP route for
+    // sessions that began in the in-app verification flow.
     const email = localStorage.getItem("resetEmail");
     const otp = localStorage.getItem("resetOtp");
 
-    if (!email || !otp) {
+    if (!token && (!email || !otp)) {
       alert("Reset session expired. Please request a new OTP.");
       router.push("/forgot-password");
       return;
     }
 
-    const payload = {
-      email,
-      otp,
-      newPassword: data.password,
-    };
-
     resetpasswordMutation.mutate(
-      {
-        email,
-        otp,
-        newPassword: data.password,
-      },
+      token
+        ? { resetToken: token, newPassword: data.password }
+        : { email: email!, otp: otp!, newPassword: data.password },
       {
         onSuccess: () => {
           // Cleanup
