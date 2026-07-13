@@ -28,6 +28,16 @@ const getApiErrorMessage = (error: any, fallback: string) => {
 const getGuestProofErrorMessage = (error: any) =>
   error.response?.status === 429 ? THROTTLE_MESSAGE : GUEST_PROOF_MESSAGE;
 
+const sanitizeListResalePayload = (
+  data: ListResalePayload
+): ListResalePayload => {
+  const { payoutDetailsEncrypted: _ignored, ...payload } =
+    data as ListResalePayload & {
+      payoutDetailsEncrypted?: unknown;
+    };
+  return payload as ListResalePayload;
+};
+
 // BUY a new ticket (primary)
 export const buyTicket = async (
   data: BuyTicketPayload
@@ -78,7 +88,7 @@ export const listTicketForResale = async (
   try {
     const res = await axios.post(
       buildEndpoint(API_VERSION, "tickets/resale/list"),
-      data
+      sanitizeListResalePayload(data)
     );
     toast.success(res.data.message || "Ticket listed for resale successfully");
     return res.data;
