@@ -440,14 +440,20 @@ function LoadingSkeleton() {
   return (
     <div className="home-theme min-h-screen" style={{ backgroundColor: "var(--home-bg)" }}>
       <div className="container mx-auto px-4 py-8">
-        <Skeleton className="h-72 w-full rounded-2xl mb-10" />
+        <Skeleton
+          className="h-72 w-full rounded-2xl mb-10"
+          style={{ backgroundColor: "var(--home-card-elevated)" }}
+        />
         <div className="grid lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8 space-y-10">
-            <Skeleton className="h-10 w-3/4" />
-            <Skeleton className="h-48 w-full" />
-            <Skeleton className="h-48 w-full" />
+            <Skeleton className="h-10 w-3/4" style={{ backgroundColor: "var(--home-card-elevated)" }} />
+            <Skeleton className="h-48 w-full" style={{ backgroundColor: "var(--home-card-elevated)" }} />
+            <Skeleton className="h-48 w-full" style={{ backgroundColor: "var(--home-card-elevated)" }} />
           </div>
-          <Skeleton className="lg:col-span-4 h-[600px] rounded-2xl" />
+          <Skeleton
+            className="lg:col-span-4 h-[600px] rounded-2xl"
+            style={{ backgroundColor: "var(--home-card-elevated)" }}
+          />
         </div>
       </div>
     </div>

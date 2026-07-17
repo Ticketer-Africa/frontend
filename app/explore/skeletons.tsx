@@ -23,35 +23,41 @@ export function EventCardSkeleton() {
       {/* Image placeholder - exact same dimensions as real image */}
       <Skeleton
         className="w-full flex-shrink-0"
-        style={{ height: `${EVENT_IMAGE_HEIGHT}px` }}
+        style={{ height: `${EVENT_IMAGE_HEIGHT}px`, backgroundColor: "var(--home-card-elevated)" }}
       />
 
       {/* Price badge placeholder */}
       <div className="flex justify-end px-4 -mt-4 mb-2 flex-shrink-0 relative z-10">
-        <Skeleton className="h-7 w-24 rounded-full" />
+        <Skeleton
+          className="h-7 w-24 rounded-full"
+          style={{ backgroundColor: "var(--home-card-elevated)" }}
+        />
       </div>
 
       {/* Content section */}
       <div className="p-6 flex flex-col space-y-2">
         {/* Title placeholder - matches min-h-[3.5rem] */}
-        <Skeleton className="h-7 w-full" />
-        <Skeleton className="h-7 w-3/4" />
+        <Skeleton className="h-7 w-full" style={{ backgroundColor: "var(--home-card-elevated)" }} />
+        <Skeleton className="h-7 w-3/4" style={{ backgroundColor: "var(--home-card-elevated)" }} />
 
         {/* Date & Location placeholder - matches min-h-[60px] */}
         <div className="space-y-2 min-h-[60px]">
-          <Skeleton className="h-5 w-3/4" />
-          <Skeleton className="h-5 w-2/3" />
+          <Skeleton className="h-5 w-3/4" style={{ backgroundColor: "var(--home-card-elevated)" }} />
+          <Skeleton className="h-5 w-2/3" style={{ backgroundColor: "var(--home-card-elevated)" }} />
         </div>
 
         {/* Tickets section placeholder - matches min-h-[100px] */}
         <div className="min-h-[100px] space-y-2">
-          <Skeleton className="h-5 w-1/3" />
-          <Skeleton className="h-5 w-full" />
-          <Skeleton className="h-5 w-1/4" />
+          <Skeleton className="h-5 w-1/3" style={{ backgroundColor: "var(--home-card-elevated)" }} />
+          <Skeleton className="h-5 w-full" style={{ backgroundColor: "var(--home-card-elevated)" }} />
+          <Skeleton className="h-5 w-1/4" style={{ backgroundColor: "var(--home-card-elevated)" }} />
         </div>
 
         {/* Button placeholder */}
-        <Skeleton className="h-11 w-full rounded-full mt-auto" />
+        <Skeleton
+          className="h-11 w-full rounded-full mt-auto"
+          style={{ backgroundColor: "var(--home-card-elevated)" }}
+        />
       </div>
     </div>
   );
@@ -90,12 +96,18 @@ export function FiltersSkeleton() {
       style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)" }}
     >
       {/* Search input skeleton */}
-      <Skeleton className="h-12 w-full rounded-xl mb-4" />
+      <Skeleton
+        className="h-12 w-full rounded-xl mb-4"
+        style={{ backgroundColor: "var(--home-card-elevated)" }}
+      />
 
       {/* Filters button row */}
       <div className="flex items-center justify-between">
-        <Skeleton className="h-10 w-24 rounded-xl" />
-        <Skeleton className="h-5 w-32" />
+        <Skeleton
+          className="h-10 w-24 rounded-xl"
+          style={{ backgroundColor: "var(--home-card-elevated)" }}
+        />
+        <Skeleton className="h-5 w-32" style={{ backgroundColor: "var(--home-card-elevated)" }} />
       </div>
     </div>
   );
