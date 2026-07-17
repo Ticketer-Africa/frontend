@@ -27,7 +27,14 @@ type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense
+      fallback={
+        <div
+          className="home-theme min-h-screen"
+          style={{ backgroundColor: "var(--home-bg)" }}
+        />
+      }
+    >
       <ResetPasswordForm />
     </Suspense>
   );
