@@ -3,16 +3,11 @@
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
-// Mirrors components/layout/header.tsx's DARK_ROUTES: only the auth pages and
-// the resale marketplace among the routes that use RouteLoader are dark-theme,
-// everything else (My Tickets, Organizer, Wallet, Settings, etc.) stays light.
-const DARK_ROUTES = [
-  "/login",
-  "/register",
-  "/forgot-password",
-  "/reset-password",
-  "/resale",
-];
+// Mirrors components/layout/header.tsx's DARK_ROUTES: only the auth pages
+// among the routes that use RouteLoader are dark-theme, everything else
+// (My Tickets, Organizer, Wallet, Settings, etc.) stays light. /resale
+// doesn't use RouteLoader — it has no loading.tsx (removed for faster nav).
+const DARK_ROUTES = ["/login", "/register", "/forgot-password", "/reset-password"];
 
 /**
  * RouteLoader - Optimized for performance
