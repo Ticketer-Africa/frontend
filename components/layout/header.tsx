@@ -19,7 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 const NAVIGATION = [
   { name: "Home", href: "/" },
   { name: "Explore", href: "/explore" },
-  { name: "Resale Market", href: "/explore" }, // TODO: point at a dedicated resale route if/when one exists
+  { name: "Resale Market", href: "/resale" },
 ] as const;
 
 // Round 2: dark theme extends beyond "/" to these public-facing pages.
@@ -32,6 +32,7 @@ const DARK_ROUTES = [
   "/register",
   "/forgot-password",
   "/reset-password",
+  "/resale",
 ];
 
 export function Header() {

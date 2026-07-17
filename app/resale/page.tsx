@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { HomeCard } from "@/components/home/home-card";
 import {
   Calendar,
   MapPin,
@@ -60,106 +60,125 @@ export default function ResalePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
-          className="text-center"
-        >
-          <div className="w-16 h-16 border-4 border-[#1E88E5] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+      <div
+        className="home-theme min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: "var(--home-bg)" }}
+      >
+        <div className="text-center">
+          <div
+            className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4"
+            style={{ borderColor: "var(--home-accent)" }}
+          ></div>
+          <h2
+            className="text-xl font-semibold mb-2"
+            style={{ color: "var(--home-text)" }}
+          >
             Loading Resale Tickets...
           </h2>
-          <p className="text-gray-600">
+          <p style={{ color: "var(--home-muted)" }}>
             Please wait while we fetch available tickets
           </p>
-        </motion.div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16">
+    <div
+      className="home-theme min-h-screen pt-16"
+      style={{ backgroundColor: "var(--home-bg)" }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-12">
+          <h1
+            className="text-4xl sm:text-5xl font-bold mb-4"
+            style={{ color: "var(--home-text)" }}
+          >
             Resale Marketplace
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p
+            className="text-xl max-w-2xl mx-auto"
+            style={{ color: "var(--home-muted)" }}
+          >
             Find tickets from verified sellers at great prices
           </p>
-          <Button
-            asChild
-            className="mt-6 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
-          >
+          <Button asChild variant="homeAccent" className="mt-6 px-6">
             <Link href="/resale/list">List a ticket</Link>
           </Button>
-        </motion.div>
+        </div>
 
         {/* Search */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="mb-8"
-        >
-          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div className="mb-8">
+          <div
+            className="rounded-2xl p-6 border"
+            style={{
+              backgroundColor: "var(--home-card)",
+              borderColor: "var(--home-border)",
+            }}
+          >
             <div className="relative">
               <Search
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#1E88E5]"
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5"
+                style={{ color: "var(--home-text-highlight)" }}
                 aria-hidden="true"
-              />{" "}
+              />
               <Input
                 type="text"
                 placeholder="Search events, locations..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-12 outline-none focus:outline-none border-[#1E88E5] rounded-full focus:ring-2 focus-visible:ring-[#1E88E5] focus:ring-[#1E88E5] focus:border-[#1E88E5]"
+                className="pl-12 h-12 rounded-full"
+                style={{
+                  backgroundColor: "var(--home-bg)",
+                  borderColor: "var(--home-border-strong)",
+                  color: "var(--home-text)",
+                }}
                 aria-label="Search events"
               />
             </div>
 
             <div className="flex items-center justify-between mt-4">
-              <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <div
+                className="flex items-center space-x-4 text-sm"
+                style={{ color: "var(--home-muted)" }}
+              >
                 <div className="flex items-center">
-                  <Shield className="w-4 h-4 mr-1 text-green-600" />
+                  <Shield
+                    className="w-4 h-4 mr-1"
+                    style={{ color: "var(--home-success)" }}
+                  />
                   <span>All sellers verified</span>
                 </div>
                 <div className="flex items-center">
-                  <TrendingDown className="w-4 h-4 mr-1 text-[#1E88E5]" />
+                  <TrendingDown
+                    className="w-4 h-4 mr-1"
+                    style={{ color: "var(--home-text-highlight)" }}
+                  />
                   <span>Best prices guaranteed</span>
                 </div>
               </div>
 
-              <p className="text-sm text-gray-600">
+              <p className="text-sm" style={{ color: "var(--home-muted)" }}>
                 {filteredTickets?.length} tickets available
               </p>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Resale Tickets Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredTickets?.map((ticket: TicketResale, index) => {
+          {filteredTickets?.map((ticket: TicketResale) => {
             const originalPrice = ticket?.ticketCategory?.price ?? 0;
             const resalePrice = ticket.resalePrice || 0;
             const savings = originalPrice - resalePrice;
             const isDiscounted = resalePrice < originalPrice;
 
             return (
-              <motion.div
+              <HomeCard
                 key={ticket.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
+                tone="card"
+                className="overflow-hidden transition-all duration-300 hover:-translate-y-2"
               >
                 <div className="relative overflow-hidden">
                   <Image
@@ -172,12 +191,21 @@ export default function ResalePage() {
 
                   {/* Price Badge */}
                   <div className="absolute top-3 right-3">
-                    <div className="bg-white rounded-full px-3 py-1 shadow text-center">
-                      <div className="text-sm font-semibold text-[#1E88E5]">
+                    <div
+                      className="rounded-full px-3 py-1 shadow text-center backdrop-blur-sm"
+                      style={{ backgroundColor: "var(--home-badge-bg)" }}
+                    >
+                      <div
+                        className="text-sm font-semibold"
+                        style={{ color: "var(--home-text-highlight)" }}
+                      >
                         {formatPrice(resalePrice)}
                       </div>
                       {isDiscounted && (
-                        <div className="text-xs text-gray-500 line-through">
+                        <div
+                          className="text-xs line-through"
+                          style={{ color: "var(--home-muted-dim)" }}
+                        >
                           {formatPrice(originalPrice)}
                         </div>
                       )}
@@ -186,7 +214,13 @@ export default function ResalePage() {
                   {/* Savings Badge */}
                   {isDiscounted && (
                     <div className="absolute top-4 left-4">
-                      <Badge className="bg-green-500 text-white flex items-center">
+                      <Badge
+                        className="flex items-center"
+                        style={{
+                          backgroundColor: "var(--home-success)",
+                          color: "var(--home-success-fg)",
+                        }}
+                      >
                         <TrendingDown className="w-3 h-3 mr-1" />
                         Save {formatPrice(savings)}
                       </Badge>
@@ -198,7 +232,11 @@ export default function ResalePage() {
                     <div className="absolute top-4 left-4">
                       <Badge
                         variant="secondary"
-                        className="bg-orange-500 text-white flex items-center"
+                        className="flex items-center"
+                        style={{
+                          backgroundColor: "var(--home-highlight-yellow)",
+                          color: "var(--home-bg)",
+                        }}
                       >
                         <TrendingUp className="w-3 h-3 mr-1" />
                         Premium
@@ -208,18 +246,24 @@ export default function ResalePage() {
                 </div>
 
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3 line-clamp-2">
+                  <h3
+                    className="text-xl font-semibold mb-3 line-clamp-2"
+                    style={{ color: "var(--home-text)" }}
+                  >
                     {ticket.event.name}
                   </h3>
 
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center text-gray-600">
+                  <div
+                    className="space-y-2 mb-4 min-h-[60px]"
+                    style={{ color: "var(--home-muted)" }}
+                  >
+                    <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
                       <span className="text-sm">
                         {formatDate(ticket.event.date)}
                       </span>
                     </div>
-                    <div className="flex items-center text-gray-600">
+                    <div className="flex items-center">
                       <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
                       <span className="text-sm line-clamp-1">
                         {ticket.event.location}
@@ -228,44 +272,76 @@ export default function ResalePage() {
                   </div>
 
                   {/* Seller Info */}
-                  <div className="flex items-center space-x-3 mb-4 p-3 bg-gray-50 rounded-lg">
+                  <div
+                    className="flex items-center space-x-3 mb-4 p-3 rounded-lg"
+                    style={{ backgroundColor: "var(--home-card-elevated)" }}
+                  >
                     <Avatar className="w-8 h-8">
                       <AvatarImage
                         src={ticket.user.profileImage ?? undefined}
                         alt={ticket.user.name}
                       ></AvatarImage>
-                      <AvatarFallback className="bg-blue-100 text-[#1E88E5] text-sm">
+                      <AvatarFallback
+                        className="text-sm"
+                        style={{
+                          backgroundColor: "var(--home-card-highlight)",
+                          color: "var(--home-text-highlight)",
+                        }}
+                      >
                         {ticket.user.profileImage ||
                           ticket?.user.name.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-gray-900 truncate">
+                      <div
+                        className="text-sm font-medium truncate"
+                        style={{ color: "var(--home-text)" }}
+                      >
                         {ticket.user.name}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div
+                        className="text-xs"
+                        style={{ color: "var(--home-muted)" }}
+                      >
                         Verified seller
                       </div>
                     </div>
-                    <Shield className="w-4 h-4 text-green-600" />
+                    <Shield
+                      className="w-4 h-4"
+                      style={{ color: "var(--home-success)" }}
+                    />
                   </div>
 
                   {/* Price Comparison */}
-                  <div className="bg-blue-50 rounded-lg p-3 mb-4">
+                  <div
+                    className="rounded-lg p-3 mb-4"
+                    style={{ backgroundColor: "var(--home-card-highlight)" }}
+                  >
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-blue-700">Resale price</span>
-                      <span className="font-semibold text-blue-900">
+                      <span style={{ color: "var(--home-muted)" }}>
+                        Resale price
+                      </span>
+                      <span
+                        className="font-semibold"
+                        style={{ color: "var(--home-text)" }}
+                      >
                         {formatPrice(resalePrice)}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-xs text-[#1E88E5] mt-1">
+                    <div
+                      className="flex items-center justify-between text-xs mt-1"
+                      style={{ color: "var(--home-muted-dim)" }}
+                    >
                       <span>Original price</span>
                       <span className={isDiscounted ? "line-through" : ""}>
                         {formatPrice(originalPrice)}
                       </span>
                     </div>
                     {isDiscounted && (
-                      <div className="text-xs text-green-600 font-medium mt-1 text-center">
+                      <div
+                        className="text-xs font-medium mt-1 text-center"
+                        style={{ color: "var(--home-success-text)" }}
+                      >
                         You save {formatPrice(savings)}!
                       </div>
                     )}
@@ -273,34 +349,39 @@ export default function ResalePage() {
 
                   <Button
                     onClick={() => handleBuyTicket(ticket)}
-                    className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full font-semibold transition-all duration-300"
+                    variant="homeAccent"
+                    className="w-full"
                     disabled={isBuyPending}
                   >
                     {isBuyPending ? "Processing..." : "Buy Now"}
                   </Button>
-                  <p className="text-xs text-gray-500 text-center mt-2">
+                  <p
+                    className="text-xs text-center mt-2"
+                    style={{ color: "var(--home-muted-dim)" }}
+                  >
                     Listed{" "}
                     {ticket?.listedAt
                       ? new Date(ticket.listedAt).toLocaleDateString()
                       : "N/A"}
                   </p>
                 </div>
-              </motion.div>
+              </HomeCard>
             );
           })}
         </div>
 
         {filteredTickets?.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-16"
-          >
-            <div className="text-6xl mb-4">🎫</div>
-            <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4" aria-hidden="true">
+              🎫
+            </div>
+            <h3
+              className="text-2xl font-semibold mb-2"
+              style={{ color: "var(--home-text)" }}
+            >
               No resale tickets found
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="mb-6" style={{ color: "var(--home-muted)" }}>
               {searchQuery
                 ? "Try adjusting your search"
                 : "Check back later for new listings"}
@@ -308,62 +389,88 @@ export default function ResalePage() {
             {searchQuery && (
               <Button
                 onClick={() => setSearchQuery("")}
-                variant="outline"
-                className="border-[#1E88E5] text-[#1E88E5] hover:bg-[#1E88E5] hover:text-white rounded-full bg-transparent"
+                variant="homeOutline"
               >
                 Clear Search
               </Button>
             )}
-          </motion.div>
+          </div>
         )}
 
         {/* Trust & Safety Info */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-16 bg-white rounded-2xl shadow-lg p-8 border border-gray-100"
-        >
-          <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+        <HomeCard tone="card" className="mt-16 p-8">
+          <h3
+            className="text-2xl font-bold mb-6 text-center"
+            style={{ color: "var(--home-text)" }}
+          >
             Safe & Secure Resale
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-6 h-6 text-green-600" />
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
+                style={{ backgroundColor: "var(--home-card-elevated)" }}
+              >
+                <Shield
+                  className="w-6 h-6"
+                  style={{ color: "var(--home-success)" }}
+                />
               </div>
-              <h4 className="font-semibold text-gray-900 mb-2">
+              <h4
+                className="font-semibold mb-2"
+                style={{ color: "var(--home-text)" }}
+              >
                 Verified Sellers
               </h4>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm" style={{ color: "var(--home-muted)" }}>
                 All sellers are verified and tickets are guaranteed authentic
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <TrendingDown className="w-6 h-6 text-[#1E88E5]" />
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
+                style={{ backgroundColor: "var(--home-card-elevated)" }}
+              >
+                <TrendingDown
+                  className="w-6 h-6"
+                  style={{ color: "var(--home-text-highlight)" }}
+                />
               </div>
-              <h4 className="font-semibold text-gray-900 mb-2">Best Prices</h4>
-              <p className="text-sm text-gray-600">
+              <h4
+                className="font-semibold mb-2"
+                style={{ color: "var(--home-text)" }}
+              >
+                Best Prices
+              </h4>
+              <p className="text-sm" style={{ color: "var(--home-muted)" }}>
                 Find tickets at or below face value from fans who can't attend
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <User className="w-6 h-6 text-[#1E88E5]" />
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
+                style={{ backgroundColor: "var(--home-card-elevated)" }}
+              >
+                <User
+                  className="w-6 h-6"
+                  style={{ color: "var(--home-text-highlight)" }}
+                />
               </div>
-              <h4 className="font-semibold text-gray-900 mb-2">
+              <h4
+                className="font-semibold mb-2"
+                style={{ color: "var(--home-text)" }}
+              >
                 Buyer Protection
               </h4>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm" style={{ color: "var(--home-muted)" }}>
                 Full refund if your event is cancelled or tickets are invalid
               </p>
             </div>
           </div>
-        </motion.div>
+        </HomeCard>
 
         <BuyResaleModal
           isOpen={isBuyModalOpen}
