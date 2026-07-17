@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,6 +26,14 @@ const resetPasswordSchema = z
 type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
 
 export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <ResetPasswordForm />
+    </Suspense>
+  );
+}
+
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token"); // resetToken from OTP step
@@ -39,27 +48,21 @@ export default function ResetPasswordPage() {
   });
 
   const onSubmit = async (data: ResetPasswordSchema) => {
+    // Email-link resets work without browser state; keep the OTP route for
+    // sessions that began in the in-app verification flow.
     const email = localStorage.getItem("resetEmail");
     const otp = localStorage.getItem("resetOtp");
 
-    if (!email || !otp) {
+    if (!token && (!email || !otp)) {
       alert("Reset session expired. Please request a new OTP.");
       router.push("/forgot-password");
       return;
     }
 
-    const payload = {
-      email,
-      otp,
-      newPassword: data.password,
-    };
-
     resetpasswordMutation.mutate(
-      {
-        email,
-        otp,
-        newPassword: data.password,
-      },
+      token
+        ? { resetToken: token, newPassword: data.password }
+        : { email: email!, otp: otp!, newPassword: data.password },
       {
         onSuccess: () => {
           localStorage.removeItem("resetEmail");

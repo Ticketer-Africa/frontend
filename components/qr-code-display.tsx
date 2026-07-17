@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
 import { Download, Share2, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { generateTicketQR, generateVerificationCode, type QRTicketData } from "@/lib/qr-utils"
@@ -98,12 +97,7 @@ export function QRCodeDisplay({ ticket, userId, showControls = true }: QRCodeDis
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-4"
-    >
+    <div className="space-y-4">
       <div className="relative">
         {showQR ? (
           <div className="bg-white p-4 rounded-lg border-2 border-dashed border-muted-foreground/25">
@@ -157,6 +151,6 @@ export function QRCodeDisplay({ ticket, userId, showControls = true }: QRCodeDis
           </div>
         </div>
       )}
-    </motion.div>
+    </div>
   )
 }

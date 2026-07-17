@@ -12,7 +12,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X, LogOut, Settings, Wallet, Calendar } from "lucide-react";
 import clsx from "clsx";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/lib/auth-context";
+import { useUser, useAuthStatus } from "@/lib/auth-context";
 import { Logo } from "./logo";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
@@ -23,7 +23,7 @@ const NAVIGATION = [
 ] as const;
 
 // Round 2: dark theme extends beyond "/" to these public-facing pages.
-// Every other route (My Tickets, Organizer, Wallet, Settings, Admin, Terms, etc.) stays light.
+// Every other route (My Tickets, Organizer, Wallet, Settings, Terms, etc.) stays light.
 const DARK_ROUTES = [
   "/",
   "/explore",
@@ -39,7 +39,8 @@ export function Header() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const pathname = usePathname();
   const isHome = DARK_ROUTES.includes(pathname) || pathname.startsWith("/events/");
-  const { user, logout } = useAuth();
+  const { user, logout } = useUser();
+  const { isLoading: authLoading } = useAuthStatus();
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -72,11 +73,6 @@ export function Header() {
             icon: Calendar,
           },
         ]
-      : [];
-
-  const adminNavigation =
-    user?.role === "ADMIN" || user?.role === "SUPERADMIN"
-      ? [{ name: "Admin Dashboard", href: "/admin/dashboard", icon: Settings }]
       : [];
 
   const isActive = useCallback(
@@ -155,7 +151,14 @@ export function Header() {
           </div>
 
           <div className="hidden items-center gap-2 md:flex">
-            {user ? (
+            {authLoading ? (
+              <div
+                className={clsx(
+                  "h-11 w-32 animate-pulse rounded-full",
+                  isHome ? "bg-[var(--home-card)]" : "bg-muted"
+                )}
+              />
+            ) : user ? (
               <>
                 <div className="relative" ref={profileRef}>
                   <Button
@@ -205,7 +208,6 @@ export function Header() {
                         {[
                           ...userNavigation,
                           ...organizerNavigation,
-                          ...adminNavigation,
                         ].map((item) => (
                           <Link
                             key={item.name}
@@ -303,7 +305,7 @@ export function Header() {
                   isHome ? "border-[var(--home-border)]" : "border-border"
                 )}
               >
-                {[...userNavigation, ...organizerNavigation, ...adminNavigation].map(
+                {[...userNavigation, ...organizerNavigation].map(
                   (item) => (
                     <Link
                       key={item.name}

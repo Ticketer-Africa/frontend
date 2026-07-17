@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
+import { useUser } from "@/lib/auth-context";
 import { useBuyTicketsV2 } from "@/services/tickets/tickets-v2.queries";
 import { useApplyDiscountCode } from "@/services/discounts/discounts.queries";
 import { BuyTicketsV2Payload, RecipientV2 } from "@/types/tickets-v2.type";
@@ -67,7 +67,7 @@ interface DiscountState {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user } = useUser();
   const { mutateAsync: buyTickets, isPending: isProcessing } = useBuyTicketsV2();
   const { mutateAsync: applyDiscount, isPending: isValidatingDiscount } = useApplyDiscountCode();
 

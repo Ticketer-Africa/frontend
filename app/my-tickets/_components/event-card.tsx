@@ -86,7 +86,7 @@ export function EventCard({
 
         <CardContent>
           <Button
-            className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+            className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
             onClick={(e) => onToggleExpand(eventId, e)}
           >
             {isExpanded ? (
@@ -109,11 +109,10 @@ export function EventCard({
             <div>
               {/* Mobile-first ticket layout */}
               <div className="space-y-3">
-                {tickets.map((ticket, ticketIndex) => (
+                {tickets.map((ticket) => (
                   <TicketItem
                     key={ticket.id}
                     ticket={ticket}
-                    index={ticketIndex}
                     onListForResale={onListForResale}
                     onRemoveFromResale={onRemoveFromResale}
                     isRemovePending={isRemovePending}

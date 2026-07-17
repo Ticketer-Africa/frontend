@@ -6,7 +6,7 @@ import {
   useWalletTransactions,
   useWalletPinStatus,
 } from "@/services/wallet/wallet.queries";
-import { useAuth } from "@/lib/auth-context";
+import { useUser, useAuthStatus } from "@/lib/auth-context";
 import { PayoutModal } from "@/components/payout-modal";
 import { TransactionDetailsModal } from "@/components/transaction-details-modal";
 import PinModal from "@/components/pin-modal";
@@ -22,7 +22,8 @@ import {
 } from "./_components";
 
 export default function WalletPage() {
-  const { user: currentUser, isLoading } = useAuth();
+  const { user: currentUser } = useUser();
+  const { isLoading } = useAuthStatus();
   const {
     data: pinStatus,
     isLoading: loadingPinStatus,
@@ -56,7 +57,7 @@ export default function WalletPage() {
   }
 
   // Auth check
-  if (!currentUser || !["ORGANIZER", "ADMIN", "SUPERADMIN"].includes(currentUser.role)) {
+  if (!currentUser || currentUser.role !== "ORGANIZER") {
     return null;
   }
 

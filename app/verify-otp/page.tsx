@@ -185,7 +185,7 @@ export default function VerifyOTPPage() {
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-[#1E88E5] hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+                className="w-full h-12 bg-[#1E88E5] hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150 disabled:opacity-50"
                 disabled={otp.length < 6 || isPending}
               >
                 {isPending ? "Verifying..." : "Verify Code"}

@@ -92,7 +92,7 @@ export function OrganizationStructuredData() {
     description:
       "Africa's leading event ticketing platform. Buy and sell event tickets effortlessly.",
     sameAs: [
-      "https://twitter.com/TicketerAfrica",
+      "https://x.com/ticketerhq",
       "https://instagram.com/ticketer.africa",
     ],
     contactPoint: {

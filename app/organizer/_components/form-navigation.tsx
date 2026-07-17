@@ -51,7 +51,7 @@ export function FormNavigation({
       {currentStep < totalSteps ? (
         <Button
           type="button"
-          className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+          className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
           onClick={onNext}
           disabled={!canProceed || isSubmitting}
         >
@@ -62,7 +62,7 @@ export function FormNavigation({
         <Button
           type="submit"
           form={formId}
-          className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+          className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
           disabled={isSubmitting || !canSubmit}
         >
           {isSubmitting ? submittingLabel : submitLabel}

@@ -25,7 +25,7 @@ export function EventCard({ event }: EventCardProps) {
 
   return (
     <div className="event-card-hover">
-      <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+      <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-150">
         <div className="relative">
           <img
             src={event.bannerUrl || "/placeholder.svg"}

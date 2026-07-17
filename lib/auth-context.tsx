@@ -1,15 +1,16 @@
 "use client";
 
-import { Logo } from "@/components/layout/logo";
 import { buildEndpoint } from "@/services/api-config";
 import Axios from "@/services/axios";
-import build from "next/dist/build";
 import { useRouter, usePathname } from "next/navigation";
 import {
   createContext,
   useContext,
   useState,
   useEffect,
+  useCallback,
+  useMemo,
+  useRef,
   type ReactNode,
 } from "react";
 
@@ -17,24 +18,31 @@ interface User {
   sub: string;
   email: string;
   name: string;
-  role: "USER" | "ORGANIZER" | "ADMIN" | "SUPERADMIN";
+  role: "USER" | "ORGANIZER";
   profileImage?: string;
   isVerified: boolean;
 }
 
-interface AuthContextType {
+interface UserContextType {
   user: User | null;
   logout: () => Promise<void>;
+}
+
+interface AuthStatusContextType {
   isLoading: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const UserContext = createContext<UserContextType | undefined>(undefined);
+const AuthStatusContext = createContext<AuthStatusContextType | undefined>(
+  undefined,
+);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
+  const fetchAttemptedRef = useRef(false);
 
   // Define public routes that don't require authentication
   const publicRoutes = [
@@ -55,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const API_VERSION = "v1";
 
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       const response = await Axios.get(buildEndpoint(API_VERSION, "auth/me"));
       const userData = response.data.user;
@@ -83,10 +91,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [pathname, router]);
 
   useEffect(() => {
-    // Don't fetch user if we're on a public route AND there's no stored user hint
+    // Re-evaluates per navigation (cheap — no network call), but the network
+    // fetch itself only ever fires once per session via fetchAttemptedRef.
+    // middleware.ts is the actual route-protection boundary; this client-side
+    // fetch only needs to happen once, to hydrate `user` for display. We can't
+    // gate on mount alone: if the app first mounts on a public route with no
+    // stored user hint, we skip the fetch — but if the visitor then navigates
+    // into a protected route with a valid session cookie the middleware let
+    // them through on, we still need to hydrate `user` at that point, or the
+    // UI stays stuck showing them as logged out until a hard reload.
+    if (fetchAttemptedRef.current) return;
+
     const isPublicRoute = publicRoutes.some((route) =>
       pathname.startsWith(route)
     );
@@ -100,10 +118,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    fetchAttemptedRef.current = true;
     fetchUser();
-  }, [pathname]); // Add pathname as dependency
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await Axios.post("/auth/logout");
     } catch (error) {
@@ -113,37 +133,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem("ticketer-user");
       router.push("/login");
     }
-  };
+  }, [router]);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center space-y-4">
-          <div className="relative">
-            <Logo
-              size="lg"
-              withText={true}
-              text="Ticketer Africa"
-              imgSrc="/logo.png"
-              className="animate-pulse-glow"
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const userValue = useMemo<UserContextType>(
+    () => ({ user, logout }),
+    [user, logout],
+  );
+
+  const statusValue = useMemo<AuthStatusContextType>(
+    () => ({ isLoading }),
+    [isLoading],
+  );
 
   return (
-    <AuthContext.Provider value={{ user, logout, isLoading }}>
-      {children}
-    </AuthContext.Provider>
+    <UserContext.Provider value={userValue}>
+      <AuthStatusContext.Provider value={statusValue}>
+        {children}
+      </AuthStatusContext.Provider>
+    </UserContext.Provider>
   );
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
+export function useUser() {
+  const context = useContext(UserContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("useUser must be used within an AuthProvider");
+  }
+  return context;
+}
+
+export function useAuthStatus() {
+  const context = useContext(AuthStatusContext);
+  if (context === undefined) {
+    throw new Error("useAuthStatus must be used within an AuthProvider");
   }
   return context;
 }

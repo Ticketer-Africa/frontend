@@ -12,7 +12,7 @@ import {
 } from "@/services/tickets/tickets.queries";
 import { ResaleModal } from "@/components/resale-modal";
 import { QRCodeDisplay } from "@/components/qr-code-display";
-import { useAuth } from "@/lib/auth-context";
+import { useUser } from "@/lib/auth-context";
 import { formatDate, formatPrice } from "@/lib/helpers";
 import { toast } from "sonner";
 import { Ticket, ListResalePayload } from "@/types/tickets.type";
@@ -23,7 +23,7 @@ export default function TicketDetailPage({
   params: { id: string };
 }) {
   const { data: userTickets, isLoading, isError } = useMyTickets();
-  const { user } = useAuth();
+  const { user } = useUser();
   const [isResaleModalOpen, setIsResaleModalOpen] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const { mutateAsync: listResale, isPending: isResalePending } =
@@ -114,7 +114,7 @@ export default function TicketDetailPage({
           </p>
           <Button
             asChild
-            className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+            className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
           >
             <Link href="/my-tickets">Back to My Tickets</Link>
           </Button>
@@ -257,7 +257,7 @@ export default function TicketDetailPage({
                     {!ticket.isUsed && (
                       <div className="space-y-3">
                         <Button
-                          className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                          className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
                           onClick={handleListForResale}
                           disabled={
                             ticket.isListed ||

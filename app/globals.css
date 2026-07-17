@@ -45,6 +45,10 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    --motion-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --motion-duration-fast: 120ms;
+    --motion-duration-standard: 160ms;
+    --motion-duration-overlay: 200ms;
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -199,118 +203,39 @@
   will-change: opacity;
 }
 
-/**
- * Explore page event cards - CSS-only animations
- * Performance: CSS animations are GPU-accelerated and don't block main thread
- * Using will-change sparingly on hover to hint browser about upcoming transform
- */
-.explore-card {
-  /* Prepare for transform without constant GPU memory usage */
-  transform: translateZ(0);
+.motion-surface {
+  transition-duration: var(--motion-duration-standard);
+  transition-property: opacity, transform;
+  transition-timing-function: var(--motion-ease-out);
 }
 
-.explore-card:hover {
-  /* Only add will-change on hover to avoid memory overhead */
-  will-change: transform;
+.motion-overlay,
+.motion-menu {
+  transition-duration: var(--motion-duration-overlay);
+  transition-property: opacity, transform;
+  transition-timing-function: var(--motion-ease-out);
+  will-change: opacity, transform;
 }
 
-/**
- * Staggered fade-in animation for event cards
- * Uses CSS only - no JavaScript required
- * Performance: GPU-accelerated, non-blocking
- */
-@keyframes explore-card-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.motion-fade-in {
+  opacity: 1;
 }
 
-.explore-card {
-  animation: explore-card-fade-in 0.4s ease-out forwards;
-  opacity: 0;
+.motion-press {
+  transition-duration: var(--motion-duration-fast);
+  transition-property: background-color, border-color, color, opacity, transform;
+  transition-timing-function: var(--motion-ease-out);
 }
 
-/* Stagger animation for first 6 cards (above fold) */
-.explore-card:nth-child(1) {
-  animation-delay: 0ms;
-}
-.explore-card:nth-child(2) {
-  animation-delay: 50ms;
-}
-.explore-card:nth-child(3) {
-  animation-delay: 100ms;
-}
-.explore-card:nth-child(4) {
-  animation-delay: 150ms;
-}
-.explore-card:nth-child(5) {
-  animation-delay: 200ms;
-}
-.explore-card:nth-child(6) {
-  animation-delay: 250ms;
-}
-
-/* Cards beyond first 6 animate instantly (below fold, lazy loaded) */
-.explore-card:nth-child(n + 7) {
-  animation-delay: 0ms;
-}
-
-/**
- * Reduced motion support
- * Accessibility: Respects user preference for reduced motion
- */
-@media (prefers-reduced-motion: reduce) {
-  .explore-card {
-    animation: none;
-    opacity: 1;
+@media (hover: hover) and (pointer: fine) {
+  .motion-hover-lift {
+    transition-duration: var(--motion-duration-standard);
+    transition-property: background-color, border-color, color, opacity, transform;
+    transition-timing-function: var(--motion-ease-out);
   }
 
-  .hero-fade-in,
-  .hero-bg-circle {
-    animation: none !important;
-    opacity: 1;
-  }
-}
-
-/* ============================================
- * HERO SECTION - CSS-only animations
- * Performance: Replaces framer-motion JavaScript animations
- * These run on compositor thread, don't block main thread
- * ============================================ */
-
-/* Floating background circles animation */
-@keyframes hero-float-1 {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(30px, -30px);
-  }
-}
-
-@keyframes hero-float-2 {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(-25px, 25px);
-  }
-}
-
-@keyframes hero-float-3 {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(20px, -20px);
+  .motion-hover-lift:hover {
+    transform: translateY(-2px);
   }
 }
 
@@ -319,8 +244,6 @@
   border-radius: 9999px;
   mix-blend-mode: multiply;
   filter: blur(40px);
-  /* GPU acceleration hint - removed after animation settles */
-  will-change: transform;
 }
 
 .hero-bg-circle-1 {
@@ -330,7 +253,6 @@
   height: 18rem;
   background-color: rgb(191 219 254); /* blue-200 */
   opacity: 0.5;
-  animation: hero-float-1 30s linear infinite;
 }
 
 .hero-bg-circle-2 {
@@ -340,7 +262,6 @@
   height: 18rem;
   background-color: rgb(219 234 254); /* blue-100 */
   opacity: 0.4;
-  animation: hero-float-2 35s linear infinite;
 }
 
 .hero-bg-circle-3 {
@@ -350,63 +271,15 @@
   height: 14rem;
   background-color: rgb(251 207 232); /* pink-200 */
   opacity: 0.4;
-  animation: hero-float-3 25s linear infinite;
-}
-
-/* Hero content fade-in animation */
-@keyframes hero-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .hero-fade-in {
-  animation: hero-fade-in 0.6s ease-out forwards;
-  opacity: 0;
-}
-
-/* Staggered delays for hero content */
-.hero-delay-1 {
-  animation-delay: 100ms;
-}
-.hero-delay-2 {
-  animation-delay: 200ms;
-}
-.hero-delay-3 {
-  animation-delay: 300ms;
-}
-.hero-delay-4 {
-  animation-delay: 500ms;
+  opacity: 1;
 }
 
 /* ============================================
  * HEADER - CSS-only animations
  * ============================================ */
-
-@keyframes header-float-1 {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(100px, -100px);
-  }
-}
-
-@keyframes header-float-2 {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(-100px, 100px);
-  }
-}
 
 .header-bg-circle {
   position: absolute;
@@ -422,7 +295,6 @@
   right: -10rem;
   width: 20rem;
   height: 20rem;
-  animation: header-float-1 20s linear infinite;
 }
 
 .header-bg-circle-2 {
@@ -430,7 +302,6 @@
   left: -10rem;
   width: 20rem;
   height: 20rem;
-  animation: header-float-2 25s linear infinite;
 }
 
 /* ============================================
@@ -438,52 +309,12 @@
  * Uses Intersection Observer via CSS (supported in modern browsers)
  * ============================================ */
 
-@keyframes section-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .section-animate {
-  animation: section-fade-in 0.6s ease-out forwards;
-  opacity: 0;
+  opacity: 1;
 }
 
-.section-delay-1 {
-  animation-delay: 100ms;
-}
-.section-delay-2 {
-  animation-delay: 200ms;
-}
-.section-delay-3 {
-  animation-delay: 300ms;
-}
-.section-delay-4 {
-  animation-delay: 400ms;
-}
-
-/* Feature cards stagger */
 .feature-card {
-  animation: section-fade-in 0.5s ease-out forwards;
-  opacity: 0;
-}
-
-.feature-card:nth-child(1) {
-  animation-delay: 0ms;
-}
-.feature-card:nth-child(2) {
-  animation-delay: 100ms;
-}
-.feature-card:nth-child(3) {
-  animation-delay: 200ms;
-}
-.feature-card:nth-child(4) {
-  animation-delay: 300ms;
+  opacity: 1;
 }
 
 /* ============================================
@@ -504,7 +335,6 @@
   right: -10rem;
   width: 20rem;
   height: 20rem;
-  animation: header-float-1 20s linear infinite;
 }
 
 .tickets-bg-circle-2 {
@@ -512,7 +342,6 @@
   left: -10rem;
   width: 20rem;
   height: 20rem;
-  animation: header-float-2 25s linear infinite;
 }
 
 /* ============================================
@@ -534,19 +363,8 @@
   animation: dropdown-fade-in 0.15s ease-out forwards;
 }
 
-@keyframes mobile-menu-slide {
-  from {
-    opacity: 0;
-    max-height: 0;
-  }
-  to {
-    opacity: 1;
-    max-height: 100vh;
-  }
-}
-
 .mobile-menu-slide-in {
-  animation: mobile-menu-slide 0.25s ease-out forwards;
+  opacity: 1;
   overflow: hidden;
 }
 
@@ -555,8 +373,7 @@
  * ============================================ */
 
 .faq-item {
-  animation: section-fade-in 0.4s ease-out forwards;
-  opacity: 0;
+  opacity: 1;
 }
 
 /* ============================================
@@ -565,49 +382,12 @@
  * ============================================ */
 
 /* Main content cards - fade in from bottom */
-@keyframes event-card-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .event-card-animate {
-  animation: event-card-fade-in 0.6s ease-out forwards;
-  opacity: 0;
-}
-
-.event-card-delay-1 {
-  animation-delay: 0.1s;
-}
-
-.event-card-delay-2 {
-  animation-delay: 0.2s;
-}
-
-/* Sidebar cards - slide in from right */
-@keyframes event-sidebar-slide-in {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  opacity: 1;
 }
 
 .event-sidebar-animate {
-  animation: event-sidebar-slide-in 0.6s ease-out forwards;
-  opacity: 0;
-}
-
-.event-sidebar-delay-1 {
-  animation-delay: 0.1s;
+  opacity: 1;
 }
 
 /* Floating cart - slide up from bottom */
@@ -623,7 +403,8 @@
 }
 
 .floating-cart-animate {
-  animation: floating-cart-slide-up 0.3s ease-out forwards;
+  animation: floating-cart-slide-up var(--motion-duration-overlay)
+    var(--motion-ease-out) forwards;
 }
 
 /* ============================================
@@ -632,105 +413,24 @@
 
 /* Background circles - CSS-only infinite animation */
 .my-tickets-bg-circle {
-  animation: my-tickets-float 20s ease-in-out infinite;
-  will-change: transform;
+  transform: translateZ(0);
 }
 
 .my-tickets-bg-circle-alt {
-  animation: my-tickets-float-alt 25s ease-in-out infinite;
-  will-change: transform;
-}
-
-@keyframes my-tickets-float {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(100px, -100px);
-  }
-}
-
-@keyframes my-tickets-float-alt {
-  0%,
-  100% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(-100px, 100px);
-  }
-}
-
-/* Ticket card animations */
-@keyframes ticket-card-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  transform: translateZ(0);
 }
 
 .ticket-card-animate {
-  animation: ticket-card-fade-in 0.6s ease-out forwards;
-  opacity: 0;
-}
-
-/* Staggered delays for ticket cards (up to 10 items) */
-.ticket-card-delay-0 {
-  animation-delay: 0s;
-}
-.ticket-card-delay-1 {
-  animation-delay: 0.1s;
-}
-.ticket-card-delay-2 {
-  animation-delay: 0.2s;
-}
-.ticket-card-delay-3 {
-  animation-delay: 0.3s;
-}
-.ticket-card-delay-4 {
-  animation-delay: 0.4s;
-}
-.ticket-card-delay-5 {
-  animation-delay: 0.5s;
-}
-.ticket-card-delay-6 {
-  animation-delay: 0.6s;
-}
-.ticket-card-delay-7 {
-  animation-delay: 0.7s;
-}
-.ticket-card-delay-8 {
-  animation-delay: 0.8s;
-}
-.ticket-card-delay-9 {
-  animation-delay: 0.9s;
-}
-
-/* Ticket item inner animations */
-@keyframes ticket-item-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  opacity: 1;
 }
 
 .ticket-item-animate {
-  animation: ticket-item-fade-in 0.3s ease-out forwards;
-  opacity: 0;
+  opacity: 1;
 }
 
 /* Expandable ticket list - CSS grid-rows animation */
 .ticket-list-expandable {
   display: grid;
-  transition: grid-template-rows 0.3s ease-out;
 }
 
 .ticket-list-expandable[data-state="closed"] {
@@ -749,19 +449,8 @@
  * Auth Form animations (login, register, etc.)
  * ============================================ */
 
-@keyframes auth-form-slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .auth-form-animate {
-  animation: auth-form-slide-up 0.8s ease-out forwards;
+  opacity: 1;
 }
 
 /* ============================================
@@ -770,12 +459,13 @@
  * ============================================ */
 
 .event-card-hover {
-  transition: transform 0.2s ease-out;
-  will-change: transform;
+  transition: transform var(--motion-duration-standard) var(--motion-ease-out);
 }
 
-.event-card-hover:hover {
-  transform: translateY(-5px);
+@media (hover: hover) and (pointer: fine) {
+  .event-card-hover:hover {
+    transform: translateY(-2px);
+  }
 }
 
 /* ============================================
@@ -783,12 +473,18 @@
  * ============================================ */
 
 .wallet-card-animate {
-  animation: event-card-fade-in 0.6s ease-out forwards;
-  opacity: 0;
+  opacity: 1;
 }
 
-.wallet-card-delay-1 {
-  animation-delay: 0.1s;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 1ms !important;
+  }
 }
 
 .wallet-card-delay-2 {

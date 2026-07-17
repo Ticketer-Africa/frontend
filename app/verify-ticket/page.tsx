@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import {
   CheckCircle,
@@ -16,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { parseTicketData, type QRTicketData } from "@/lib/qr-utils";
 import { useVerifyTicket } from "@/services/tickets/tickets.queries";
-import { useAuth } from "@/lib/auth-context";
+import { useUser } from "@/lib/auth-context";
 import { formatDate, formatPrice } from "@/lib/helpers";
 import { toast } from "sonner";
 import { useEventById } from "@/services/events/events.queries";
@@ -55,7 +54,7 @@ interface TicketVerification {
 
 export default function VerifyTicketPage() {
   const searchParams = useSearchParams();
-  const { user } = useAuth();
+  const { user } = useUser();
   const { mutateAsync: verifyTicket, isPending: isVerifying } =
     useVerifyTicket();
 
@@ -161,10 +160,7 @@ export default function VerifyTicketPage() {
   if (isVerifying) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6 }}
+        <div
           className="text-center"
         >
           <div className="w-16 h-16 border-4 border-[#1E88E5] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -174,7 +170,7 @@ export default function VerifyTicketPage() {
           <p className="text-gray-600">
             Please wait while we validate your ticket
           </p>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -215,10 +211,7 @@ export default function VerifyTicketPage() {
   if (error || !ticketData) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+        <div
           className="max-w-md w-full"
         >
           <Card className="bg-white border-red-200 shadow-lg rounded-xl">
@@ -248,7 +241,7 @@ export default function VerifyTicketPage() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -258,11 +251,7 @@ export default function VerifyTicketPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="container mx-auto max-w-2xl py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+        <div>
           <Card
             className={`bg-white shadow-lg rounded-xl ${
               verification?.isValid ? "border-green-200" : "border-red-200"
@@ -421,7 +410,7 @@ export default function VerifyTicketPage() {
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-2 pt-4 border-t">
                 <Button
-                  className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
                   onClick={handleScanNext}
                 >
                   Scan Next Ticket
@@ -462,7 +451,7 @@ export default function VerifyTicketPage() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

@@ -68,7 +68,7 @@ export function PinSetupScreen() {
         </p>
         <Button
           onClick={() => setIsPinModalOpen(true)}
-          className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+          className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
         >
           Set Wallet PIN
         </Button>

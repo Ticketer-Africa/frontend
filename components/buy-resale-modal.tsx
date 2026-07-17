@@ -1,17 +1,19 @@
 "use client";
 
-import { TicketResale } from "@/types/tickets.type";
+import { BuyResalePayload, TicketResale } from "@/types/tickets.type";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Calendar, MapPin, Shield } from "lucide-react";
 import { formatDate, formatPrice } from "@/lib/helpers";
+import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
 
 interface BuyResaleModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedTicket: TicketResale | null;
-  onConfirmBuy: (ticketId: string) => void;
+  onConfirmBuy: (payload: BuyResalePayload) => void;
   isPending: boolean;
   isAuthenticated: boolean;
 }
@@ -24,9 +26,44 @@ export function BuyResaleModal({
   isPending,
   isAuthenticated,
 }: BuyResaleModalProps) {
+  const [buyerEmail, setBuyerEmail] = useState("");
+  const [buyerName, setBuyerName] = useState("");
+  const [buyerEmailError, setBuyerEmailError] = useState("");
+
+  useEffect(() => {
+    if (!isOpen) {
+      setBuyerEmail("");
+      setBuyerName("");
+      setBuyerEmailError("");
+    }
+  }, [isOpen]);
+
+  const isValidEmail = (value: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+
   const handleSubmit = () => {
-    if (!selectedTicket?.id || !isAuthenticated) return;
-    onConfirmBuy(selectedTicket.id);
+    if (!selectedTicket?.id) return;
+
+    if (isAuthenticated) {
+      onConfirmBuy({ ticketIds: [selectedTicket.id] });
+      return;
+    }
+
+    if (!buyerEmail.trim()) {
+      setBuyerEmailError("Email address is required");
+      return;
+    }
+
+    if (!isValidEmail(buyerEmail)) {
+      setBuyerEmailError("Enter a valid email address");
+      return;
+    }
+
+    onConfirmBuy({
+      ticketIds: [selectedTicket.id],
+      buyerEmail: buyerEmail.trim().toLowerCase(),
+      ...(buyerName.trim() ? { buyerName: buyerName.trim() } : {}),
+    });
   };
 
   return (
@@ -54,6 +91,44 @@ export function BuyResaleModal({
               </div>
             </div>
           </div>
+
+          {!isAuthenticated && (
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <label
+                  htmlFor="resale-buyer-email"
+                  className="text-sm font-medium text-gray-900"
+                >
+                  Email address <span className="text-red-600">*</span>
+                </label>
+                <Input
+                  id="resale-buyer-email"
+                  type="email"
+                  value={buyerEmail}
+                  onChange={(event) => {
+                    setBuyerEmail(event.target.value);
+                    setBuyerEmailError("");
+                  }}
+                  placeholder="you@example.com"
+                  disabled={isPending}
+                />
+                {buyerEmailError && (
+                  <p className="text-xs text-red-600">{buyerEmailError}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-900">
+                  Name
+                </label>
+                <Input
+                  value={buyerName}
+                  onChange={(event) => setBuyerName(event.target.value)}
+                  placeholder="Buyer name"
+                  disabled={isPending}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Seller Info */}
           <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
@@ -92,8 +167,8 @@ export function BuyResaleModal({
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p className="text-sm text-blue-800">
               <strong>Note:</strong> By purchasing this ticket, you agree to the
-              terms of service. The ticket will be transferred to your account
-              upon successful payment.
+              terms of service. Your ticket will be available after successful
+              payment.
             </p>
           </div>
 
@@ -107,15 +182,13 @@ export function BuyResaleModal({
               Cancel
             </Button>
             <Button
-              className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
               onClick={handleSubmit}
-              disabled={!isAuthenticated || isPending || !selectedTicket}
+              disabled={isPending || !selectedTicket}
             >
               {isPending
                 ? "Processing..."
-                : isAuthenticated
-                ? "Buy Now"
-                : "Log In to Buy"}
+                : "Buy Now"}
             </Button>
           </div>
         </div>

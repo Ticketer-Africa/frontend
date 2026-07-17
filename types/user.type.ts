@@ -3,7 +3,7 @@ export interface User {
   name: string;
   email: string;
   profileImage: string | null;
-  role: "USER" | "ORGANIZER" | "ADMIN" | "SUPERADMIN";
+  role: "USER" | "ORGANIZER";
   createdAt: string;
   updatedAt: string;
 }

@@ -8,7 +8,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
+import { useUser } from "@/lib/auth-context";
 import { useEventBySlugV2 } from "@/services/events/events-v2.queries";
 import { EventV2, EventOccurrence, TicketCategoryV2 } from "@/types/events-v2.type";
 import { EventHeaderV2 } from "./_components/event-header"; // updated version below
@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 
 export default function EventPage({ params }: { params: { slug: string } }) {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user } = useUser();
   const { data: event, isLoading, error } = useEventBySlugV2(params.slug);
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -131,7 +131,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
       {/* Mobile sticky bottom bar */}
       <div
         className={cn(
-          "fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-xl transition-all duration-300 md:hidden",
+          "fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-xl transition-[background-color,color,border-color,opacity,transform] duration-150 md:hidden",
           hasSelection ? "translate-y-0 shadow-2xl" : "translate-y-full",
         )}
       >
@@ -287,7 +287,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
 
                     <div
                       className={cn(
-                        "space-y-4 transition-all duration-200",
+                        "space-y-4 transition-[background-color,color,border-color,opacity,transform] duration-200",
                         event.isRecurring &&
                         (event.occurrences ?? []).some((o) => o.isActive) &&
                         !selectedOccurrenceId
