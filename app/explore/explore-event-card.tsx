@@ -119,7 +119,7 @@ function ExploreEventCardComponent({
               </div>
             </div>
 
-            <div className="pb-2" style={{ color: "var(--home-muted)" }}>
+            <div className="min-h-[56px] pb-2" style={{ color: "var(--home-muted)" }}>
               <div className="flex items-center mb-1">
                 <Ticket
                   className="w-4 h-4 mr-2 flex-shrink-0"

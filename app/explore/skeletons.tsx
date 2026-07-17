@@ -12,8 +12,8 @@ import { EVENT_IMAGE_HEIGHT } from "./constants";
 export function EventCardSkeleton() {
   return (
     <div
-      className="rounded-2xl overflow-hidden flex flex-col"
-      style={{ backgroundColor: "var(--home-card)" }}
+      className="rounded-2xl overflow-hidden flex flex-col border"
+      style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)" }}
       /**
        * aria-hidden because this is purely decorative loading state
        * Screen readers will hear "Loading events..." from parent
@@ -34,11 +34,16 @@ export function EventCardSkeleton() {
         />
       </div>
 
-      {/* Content section */}
-      <div className="p-6 flex flex-col space-y-2">
-        {/* Title placeholder - matches min-h-[3.5rem] */}
-        <Skeleton className="h-7 w-full" style={{ backgroundColor: "var(--home-card-elevated)" }} />
-        <Skeleton className="h-7 w-3/4" style={{ backgroundColor: "var(--home-card-elevated)" }} />
+      {/* Content section - padding/layout must match explore-event-card.tsx's
+          content wrapper exactly (p-4 px-6, no gap classes) since that card
+          has no space-y between sections; only its own min-heights create
+          spacing. Any mismatch here reflows sibling cards on hydration. */}
+      <div className="p-4 px-6 flex flex-col flex-grow">
+        {/* Title placeholder - matches min-h-[2.5rem] */}
+        <div className="min-h-[2.5rem] space-y-1">
+          <Skeleton className="h-4 w-full" style={{ backgroundColor: "var(--home-card-elevated)" }} />
+          <Skeleton className="h-4 w-3/4" style={{ backgroundColor: "var(--home-card-elevated)" }} />
+        </div>
 
         {/* Date & Location placeholder - matches min-h-[60px] */}
         <div className="space-y-2 min-h-[60px]">
@@ -46,16 +51,15 @@ export function EventCardSkeleton() {
           <Skeleton className="h-5 w-2/3" style={{ backgroundColor: "var(--home-card-elevated)" }} />
         </div>
 
-        {/* Tickets section placeholder - matches min-h-[100px] */}
-        <div className="min-h-[100px] space-y-2">
+        {/* Tickets section placeholder - matches min-h-[56px] on the real card */}
+        <div className="min-h-[56px] pb-2 space-y-2">
           <Skeleton className="h-5 w-1/3" style={{ backgroundColor: "var(--home-card-elevated)" }} />
           <Skeleton className="h-5 w-full" style={{ backgroundColor: "var(--home-card-elevated)" }} />
-          <Skeleton className="h-5 w-1/4" style={{ backgroundColor: "var(--home-card-elevated)" }} />
         </div>
 
-        {/* Button placeholder */}
+        {/* Button placeholder - matches Button size="lg" (h-12) */}
         <Skeleton
-          className="h-11 w-full rounded-full mt-auto"
+          className="h-12 w-full rounded-full mt-auto"
           style={{ backgroundColor: "var(--home-card-elevated)" }}
         />
       </div>
