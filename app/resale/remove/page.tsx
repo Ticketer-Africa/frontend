@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { HomeCard } from "@/components/home/home-card";
 import { useRemoveResaleTicket } from "@/services/tickets/tickets.queries";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -31,29 +32,63 @@ export default function GuestResaleRemovePage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-10">
+    <main
+      className="home-theme min-h-screen px-4 py-10 pt-24"
+      style={{ backgroundColor: "var(--home-bg)" }}
+    >
       <section className="mx-auto max-w-xl">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Remove a resale listing</h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <h1 className="text-3xl font-bold" style={{ color: "var(--home-text)" }}>
+            Remove a resale listing
+          </h1>
+          <p className="mt-2 text-sm" style={{ color: "var(--home-muted)" }}>
             No login needed. Enter the ticket code and purchase email used for the ticket.
           </p>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-900">Ticket code</label>
-            <Input {...register("ticketCode")} placeholder="TCK-ABC123" disabled={isPending} />
-            {errors.ticketCode && <p className="text-xs text-red-600">{errors.ticketCode.message}</p>}
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-900">Purchase email</label>
-            <Input {...register("email")} type="email" placeholder="owner@example.com" disabled={isPending} />
-            {errors.email && <p className="text-xs text-red-600">{errors.email.message}</p>}
-          </div>
-          <Button type="submit" className="w-full bg-[#1E88E5] text-white hover:bg-blue-600" disabled={isPending}>
-            {isPending ? "Removing listing..." : "Remove listing"}
-          </Button>
-        </form>
+        <HomeCard tone="card" className="p-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-sm font-medium" style={{ color: "var(--home-text)" }}>
+                Ticket code
+              </label>
+              <Input
+                {...register("ticketCode")}
+                placeholder="TCK-ABC123"
+                disabled={isPending}
+                style={{
+                  backgroundColor: "var(--home-bg)",
+                  borderColor: "var(--home-border-strong)",
+                  color: "var(--home-text)",
+                }}
+              />
+              {errors.ticketCode && (
+                <p className="text-xs text-red-400">{errors.ticketCode.message}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium" style={{ color: "var(--home-text)" }}>
+                Purchase email
+              </label>
+              <Input
+                {...register("email")}
+                type="email"
+                placeholder="owner@example.com"
+                disabled={isPending}
+                style={{
+                  backgroundColor: "var(--home-bg)",
+                  borderColor: "var(--home-border-strong)",
+                  color: "var(--home-text)",
+                }}
+              />
+              {errors.email && (
+                <p className="text-xs text-red-400">{errors.email.message}</p>
+              )}
+            </div>
+            <Button type="submit" variant="homeAccent" className="w-full" disabled={isPending}>
+              {isPending ? "Removing listing..." : "Remove listing"}
+            </Button>
+          </form>
+        </HomeCard>
       </section>
     </main>
   );

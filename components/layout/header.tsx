@@ -39,7 +39,10 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const pathname = usePathname();
-  const isHome = DARK_ROUTES.includes(pathname) || pathname.startsWith("/events/");
+  const isHome =
+    DARK_ROUTES.includes(pathname) ||
+    pathname.startsWith("/events/") ||
+    pathname.startsWith("/resale/");
   const { user, logout } = useUser();
   const { isLoading: authLoading } = useAuthStatus();
   const profileRef = useRef<HTMLDivElement>(null);
