@@ -72,8 +72,7 @@ export function TicketCategoryCardV2({
             <Button
               size="icon"
               variant="ghost"
-              className="h-8 w-8"
-              style={{ color: "var(--home-text)" }}
+              className="h-8 w-8 text-[var(--home-text)] hover:bg-[var(--home-card-elevated)] hover:text-[var(--home-text-highlight)]"
               onClick={() => onQuantityChange(-1)}
               disabled={quantity <= 1}
             >
@@ -85,8 +84,7 @@ export function TicketCategoryCardV2({
             <Button
               size="icon"
               variant="ghost"
-              className="h-8 w-8"
-              style={{ color: "var(--home-text)" }}
+              className="h-8 w-8 text-[var(--home-text)] hover:bg-[var(--home-card-elevated)] hover:text-[var(--home-text-highlight)]"
               onClick={() => onQuantityChange(1)}
               disabled={quantity >= available || quantity >= 10}
             >

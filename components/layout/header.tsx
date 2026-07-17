@@ -218,17 +218,35 @@ export function Header() {
                             href={item.href}
                             className="activity-row"
                             onClick={closeProfile}
+                            style={isHome ? { borderColor: "var(--home-border)" } : undefined}
                           >
-                            <span className="activity-row-icon">
-                              <item.icon className="h-4 w-4 text-[#1E88E5]" />
+                            <span
+                              className="activity-row-icon"
+                              style={isHome ? { borderColor: "var(--home-border)" } : undefined}
+                            >
+                              <item.icon
+                                className="h-4 w-4"
+                                style={{ color: isHome ? "var(--home-text-highlight)" : "#1E88E5" }}
+                              />
                             </span>
-                            <span className="text-sm text-foreground">{item.name}</span>
+                            <span
+                              className="text-sm"
+                              style={{ color: isHome ? "var(--home-text)" : undefined }}
+                            >
+                              {item.name}
+                            </span>
                           </Link>
                         ))}
                       </div>
                       <button
                         onClick={handleLogout}
-                        className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border-2 border-input px-5 py-3 text-sm text-foreground transition-colors hover:bg-accent"
+                        className={clsx(
+                          "mt-2 flex w-full items-center justify-center gap-2 rounded-full border-2 px-5 py-3 text-sm transition-colors",
+                          isHome
+                            ? "border-[var(--home-border-strong)] hover:bg-[var(--home-card)]"
+                            : "border-input hover:bg-accent"
+                        )}
+                        style={{ color: isHome ? "var(--home-text)" : undefined }}
                       >
                         <LogOut className="h-4 w-4" />
                         Sign Out
@@ -316,20 +334,41 @@ export function Header() {
                       href={item.href}
                       className="activity-row"
                       onClick={closeMenu}
+                      style={isHome ? { borderColor: "var(--home-border)" } : undefined}
                     >
-                      <span className="activity-row-icon">
-                        <item.icon className="h-4 w-4 text-[#1E88E5]" />
+                      <span
+                        className="activity-row-icon"
+                        style={isHome ? { borderColor: "var(--home-border)" } : undefined}
+                      >
+                        <item.icon
+                          className="h-4 w-4"
+                          style={{ color: isHome ? "var(--home-text-highlight)" : "#1E88E5" }}
+                        />
                       </span>
                       <div className="flex flex-col">
-                        <span className="text-sm text-foreground">{item.name}</span>
-                        <span className="text-xs text-muted-foreground">Quick access</span>
+                        <span
+                          className="text-sm"
+                          style={{ color: isHome ? "var(--home-text)" : undefined }}
+                        >
+                          {item.name}
+                        </span>
+                        <span
+                          className="text-xs"
+                          style={{ color: isHome ? "var(--home-muted)" : undefined }}
+                        >
+                          Quick access
+                        </span>
                       </div>
                     </Link>
                   )
                 )}
                 <button
                   onClick={handleLogout}
-                  className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-input px-5 py-3 text-sm text-foreground"
+                  className={clsx(
+                    "flex w-full items-center justify-center gap-2 rounded-full border-2 px-5 py-3 text-sm",
+                    isHome ? "border-[var(--home-border-strong)]" : "border-input"
+                  )}
+                  style={{ color: isHome ? "var(--home-text)" : undefined }}
                 >
                   <LogOut className="h-4 w-4" />
                   Sign Out

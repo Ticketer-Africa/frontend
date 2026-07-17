@@ -323,7 +323,7 @@ export default function CheckoutPage() {
         style={{ borderColor: "var(--home-border)", backgroundColor: "rgba(11,14,20,0.8)" }}
       >
         <div className="container mx-auto px-4 h-14 flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.back()} className="gap-2 -ml-2" style={{ color: "var(--home-text)" }}>
+          <Button variant="ghost" size="sm" onClick={() => router.back()} className="gap-2 -ml-2 text-[var(--home-text)] hover:bg-[var(--home-card)] hover:text-[var(--home-text-highlight)]">
             <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
@@ -617,9 +617,21 @@ export default function CheckoutPage() {
                               >
                                 <SelectValue placeholder="Select an option…" />
                               </SelectTrigger>
-                              <SelectContent>
+                              {/*
+                                Select's dropdown portals to document.body, outside the
+                                .home-theme scope, so var(--home-*) tokens don't resolve
+                                here — literal hex values instead (matching --home-card /
+                                --home-border / --home-text / --home-card-highlight).
+                              */}
+                              <SelectContent className="bg-[#141b2b] border-[rgba(86,66,62,0.3)] text-[#dce2f7]">
                                 {(field.options ?? []).map((opt) => (
-                                  <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                  <SelectItem
+                                    key={opt}
+                                    value={opt}
+                                    className="focus:bg-[#232a3a] focus:text-[#ffb4a5]"
+                                  >
+                                    {opt}
+                                  </SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>

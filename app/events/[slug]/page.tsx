@@ -131,22 +131,26 @@ export default function EventPage({ params }: { params: { slug: string } }) {
       {/* Mobile sticky bottom bar */}
       <div
         className={cn(
-          "fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-xl transition-[background-color,color,border-color,opacity,transform] duration-150 md:hidden",
+          "home-theme fixed bottom-0 left-0 right-0 z-50 border-t backdrop-blur-xl transition-[background-color,color,border-color,opacity,transform] duration-150 md:hidden",
           hasSelection ? "translate-y-0 shadow-2xl" : "translate-y-full",
         )}
+        style={{
+          backgroundColor: "rgba(11,14,20,0.95)",
+          borderColor: "var(--home-border)",
+        }}
       >
         <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-sm font-medium truncate">
+            <p className="text-sm font-medium truncate" style={{ color: "var(--home-muted)" }}>
               {totalTickets} ticket{totalTickets !== 1 ? "s" : ""}
             </p>
-            <p className="text-xl font-bold tracking-tight">
+            <p className="text-xl font-bold tracking-tight" style={{ color: "var(--home-text)" }}>
               ₦{totalAmount.toLocaleString()}
             </p>
           </div>
           <Button
             size="lg"
-            variant="primary"
+            variant="homeAccent"
             className="flex-1"
             onClick={handleCheckout}
             disabled={!hasSelection}
@@ -167,7 +171,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
             <Button
               variant="ghost"
               size="sm"
-              className="gap-1.5 text-muted-foreground hover:text-foreground -ml-3"
+              className="gap-1.5 -ml-3 text-[var(--home-muted)] hover:bg-[var(--home-card)] hover:text-[var(--home-text-highlight)]"
               onClick={() => router.back()}
             >
               <ArrowLeft className="h-4 w-4" />
@@ -249,7 +253,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
                   className="rounded-2xl border overflow-hidden"
                   style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)" }}
                 >
-                  <div className="relative aspect-[3/4] bg-muted">
+                  <div className="relative aspect-[3/4]" style={{ backgroundColor: "var(--home-card-elevated)" }}>
                     {event.bannerUrl ? (
                       <Image
                         src={event.bannerUrl}
