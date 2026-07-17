@@ -91,27 +91,39 @@ export function EventsGridSkeleton() {
 
 /**
  * FiltersSkeleton - Loading state for filters section
- * Matches exact dimensions of real filter UI
+ *
+ * Structure must mirror FilterSection's real markup exactly (the outer
+ * mb-8 wrapper around an inner p-6/border card, a search row sized for
+ * both the Input and its Button, and an h-11 Filters button — Button's
+ * default size — not an arbitrary h-10) or the page reflows on hydration.
  */
 export function FiltersSkeleton() {
   return (
-    <div
-      className="rounded-2xl p-6 mb-6 border"
-      style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)" }}
-    >
-      {/* Search input skeleton */}
-      <Skeleton
-        className="h-12 w-full rounded-xl mb-4"
-        style={{ backgroundColor: "var(--home-card-elevated)" }}
-      />
+    <div className="mb-8">
+      <div
+        className="rounded-2xl p-6 border"
+        style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)" }}
+      >
+        {/* Search row skeleton - Input (flex-1) + Button, both h-12 */}
+        <div className="mb-4 flex gap-2">
+          <Skeleton
+            className="flex-1 h-12 rounded-full"
+            style={{ backgroundColor: "var(--home-card-elevated)" }}
+          />
+          <Skeleton
+            className="h-12 w-24 rounded-full shrink-0"
+            style={{ backgroundColor: "var(--home-card-elevated)" }}
+          />
+        </div>
 
-      {/* Filters button row */}
-      <div className="flex items-center justify-between">
-        <Skeleton
-          className="h-10 w-24 rounded-xl"
-          style={{ backgroundColor: "var(--home-card-elevated)" }}
-        />
-        <Skeleton className="h-5 w-32" style={{ backgroundColor: "var(--home-card-elevated)" }} />
+        {/* Filters button row - h-11 matches Button's default size */}
+        <div className="flex items-center justify-between">
+          <Skeleton
+            className="h-11 w-24 rounded-full"
+            style={{ backgroundColor: "var(--home-card-elevated)" }}
+          />
+          <Skeleton className="h-5 w-32" style={{ backgroundColor: "var(--home-card-elevated)" }} />
+        </div>
       </div>
     </div>
   );
