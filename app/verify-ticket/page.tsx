@@ -159,15 +159,22 @@ export default function VerifyTicketPage() {
 
   if (isVerifying) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div
-          className="text-center"
-        >
-          <div className="w-16 h-16 border-4 border-[#1E88E5] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+      <div
+        className="home-theme min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: "var(--home-bg)" }}
+      >
+        <div className="text-center">
+          <div
+            className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4"
+            style={{
+              borderColor: "var(--home-accent)",
+              borderTopColor: "transparent",
+            }}
+          />
+          <h2 className="text-xl font-semibold mb-2" style={{ color: "var(--home-text)" }}>
             Verifying Ticket...
           </h2>
-          <p className="text-gray-600">
+          <p style={{ color: "var(--home-muted)" }}>
             Please wait while we validate your ticket
           </p>
         </div>
@@ -179,24 +186,37 @@ export default function VerifyTicketPage() {
 
   if (mode === "camera" && !verification && !error) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4">
+      <div
+        className="home-theme min-h-screen p-4"
+        style={{ backgroundColor: "var(--home-bg)" }}
+      >
         <div className="container mx-auto max-w-md py-8 space-y-4">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">
+            <h1 className="text-2xl font-bold mb-1" style={{ color: "var(--home-text)" }}>
               Scan Ticket
             </h1>
-            <p className="text-gray-500 text-sm">
+            <p className="text-sm" style={{ color: "var(--home-muted)" }}>
               Point the camera at a ticket QR code
             </p>
           </div>
-          <QRCameraScanner onScan={handleCameraScan} active={scannerActive} />
+          <div
+            className="p-3 border shadow-xl"
+            style={{
+              backgroundColor: "var(--home-card)",
+              borderColor: "var(--home-border)",
+              borderRadius: "var(--home-radius-card-lg)",
+            }}
+          >
+            <QRCameraScanner onScan={handleCameraScan} active={scannerActive} />
+          </div>
           <div className="text-center">
             <button
               onClick={() => {
                 setScannerActive(false);
                 setMode("url-param");
               }}
-              className="text-sm text-[#1E88E5] underline"
+              className="text-sm underline"
+              style={{ color: "var(--home-text-highlight)" }}
             >
               Use URL param instead
             </button>
@@ -210,11 +230,19 @@ export default function VerifyTicketPage() {
 
   if (error || !ticketData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div
-          className="max-w-md w-full"
-        >
-          <Card className="bg-white border-red-200 shadow-lg rounded-xl">
+      <div
+        className="home-theme min-h-screen flex items-center justify-center p-4"
+        style={{ backgroundColor: "var(--home-bg)" }}
+      >
+        <div className="max-w-md w-full">
+          <Card
+            className="shadow-xl border"
+            style={{
+              backgroundColor: "var(--home-card)",
+              borderColor: "rgba(248, 113, 113, 0.45)",
+              borderRadius: "var(--home-radius-card-lg)",
+            }}
+          >
             <CardHeader className="text-center">
               <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
               <CardTitle className="text-red-600">
@@ -222,18 +250,20 @@ export default function VerifyTicketPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="text-center space-y-4">
-              <p className="text-gray-600">{error || "Invalid ticket data"}</p>
+              <p style={{ color: "var(--home-muted)" }}>{error || "Invalid ticket data"}</p>
               <div className="flex gap-2 justify-center">
                 <Button
                   variant="outline"
-                  className="bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900"
+                  className="bg-transparent hover:bg-[var(--home-card-elevated)] hover:text-[var(--home-text-highlight)]"
+                  style={{ borderColor: "var(--home-border-strong)", color: "var(--home-text)" }}
                   onClick={handleScanNext}
                 >
                   Scan Another Ticket
                 </Button>
                 <Button
                   variant="outline"
-                  className="bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900"
+                  className="bg-transparent hover:bg-[var(--home-card-elevated)] hover:text-[var(--home-text-highlight)]"
+                  style={{ borderColor: "var(--home-border-strong)", color: "var(--home-text)" }}
                   onClick={() => window.location.reload()}
                 >
                   Retry
@@ -249,13 +279,21 @@ export default function VerifyTicketPage() {
   // ─── render: verification result card ────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div
+      className="home-theme min-h-screen p-4"
+      style={{ backgroundColor: "var(--home-bg)" }}
+    >
       <div className="container mx-auto max-w-2xl py-8">
         <div>
           <Card
-            className={`bg-white shadow-lg rounded-xl ${
-              verification?.isValid ? "border-green-200" : "border-red-200"
-            }`}
+            className="shadow-xl border"
+            style={{
+              backgroundColor: "var(--home-card)",
+              borderColor: verification?.isValid
+                ? "var(--home-success)"
+                : "rgba(248, 113, 113, 0.45)",
+              borderRadius: "var(--home-radius-card-lg)",
+            }}
           >
             <CardHeader className="text-center">
               {verification?.isValid ? (
@@ -264,7 +302,7 @@ export default function VerifyTicketPage() {
                   <CardTitle className="text-green-600">
                     Ticket Valid ✓
                   </CardTitle>
-                  <p className="text-gray-600">
+                  <p style={{ color: "var(--home-muted)" }}>
                     {verification.message ||
                       "This ticket has been successfully verified"}
                   </p>
@@ -275,7 +313,7 @@ export default function VerifyTicketPage() {
                   <CardTitle className="text-red-600">
                     Invalid Ticket ✗
                   </CardTitle>
-                  <p className="text-gray-600">
+                  <p style={{ color: "var(--home-muted)" }}>
                     {verification?.message ||
                       "This ticket could not be verified"}
                   </p>
@@ -285,27 +323,33 @@ export default function VerifyTicketPage() {
 
             <CardContent className="space-y-6">
               {/* Verification Details */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center">
-                  <AlertCircle className="h-4 w-4 mr-2 text-gray-500" />
+              <div
+                className="rounded-xl p-4 border"
+                style={{
+                  backgroundColor: "var(--home-card-elevated)",
+                  borderColor: "var(--home-border-subtle)",
+                }}
+              >
+                <h3 className="font-semibold mb-3 flex items-center" style={{ color: "var(--home-text)" }}>
+                  <AlertCircle className="h-4 w-4 mr-2" style={{ color: "var(--home-muted)" }} />
                   Verification Details
                 </h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-gray-600">Ticket Code:</span>
-                    <p className="font-mono text-gray-900">
+                    <span style={{ color: "var(--home-muted)" }}>Ticket Code:</span>
+                    <p className="font-mono" style={{ color: "var(--home-text)" }}>
                       {ticketData.code || ticket?.code || "N/A"}
                     </p>
                   </div>
                   <div>
-                    <span className="text-gray-600">Event ID:</span>
-                    <p className="font-mono text-gray-900">
+                    <span style={{ color: "var(--home-muted)" }}>Event ID:</span>
+                    <p className="font-mono" style={{ color: "var(--home-text)" }}>
                       {ticketData.eventId}
                     </p>
                   </div>
                   <div>
-                    <span className="text-gray-600">Scanned At:</span>
-                    <p className="text-gray-900">
+                    <span style={{ color: "var(--home-muted)" }}>Scanned At:</span>
+                    <p style={{ color: "var(--home-text)" }}>
                       {verification?.scannedAt
                         ? new Date(verification.scannedAt).toLocaleString()
                         : "N/A"}
@@ -317,6 +361,11 @@ export default function VerifyTicketPage() {
                       variant={
                         verification?.isValid ? "default" : "destructive"
                       }
+                      className={
+                        verification?.isValid
+                          ? "bg-[var(--home-success)] text-[var(--home-success-fg)] hover:bg-[var(--home-success)]"
+                          : ""
+                      }
                     >
                       {verification?.isValid ? "Valid" : "Invalid"}
                     </Badge>
@@ -327,26 +376,27 @@ export default function VerifyTicketPage() {
               {/* Event Details */}
               {event && (
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-900">
+                  <h3 className="font-semibold" style={{ color: "var(--home-text)" }}>
                     Event Information
                   </h3>
                   <div className="flex items-start space-x-4">
                     <img
                       src={event.bannerUrl || "/placeholder.svg"}
                       alt={event.name}
-                      className="w-20 h-20 rounded-lg object-cover"
+                      className="w-20 h-20 rounded-xl object-cover border"
+                      style={{ borderColor: "var(--home-border)" }}
                     />
                     <div className="flex-1 space-y-2">
-                      <h4 className="font-semibold text-lg text-gray-900">
+                      <h4 className="font-semibold text-lg" style={{ color: "var(--home-text)" }}>
                         {event.name}
                       </h4>
-                      <div className="space-y-1 text-sm text-gray-600">
+                      <div className="space-y-1 text-sm" style={{ color: "var(--home-muted)" }}>
                         <div className="flex items-center space-x-2">
-                          <Calendar className="h-4 w-4 text-gray-500" />
+                          <Calendar className="h-4 w-4" style={{ color: "var(--home-accent)" }} />
                           <span>{formatDate(new Date(event.date))}</span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <MapPin className="h-4 w-4 text-gray-500" />
+                          <MapPin className="h-4 w-4" style={{ color: "var(--home-accent)" }} />
                           <span>{event.location}</span>
                         </div>
                       </div>
@@ -358,27 +408,27 @@ export default function VerifyTicketPage() {
               {/* Ticket Details */}
               {ticket && (
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-900 flex items-center">
-                    <Ticket className="h-4 w-4 mr-2 text-gray-500" />
+                  <h3 className="font-semibold flex items-center" style={{ color: "var(--home-text)" }}>
+                    <Ticket className="h-4 w-4 mr-2" style={{ color: "var(--home-accent)" }} />
                     Ticket Information
                   </h3>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="text-gray-600">Category:</span>
-                      <p className="font-semibold text-gray-900">
+                      <span style={{ color: "var(--home-muted)" }}>Category:</span>
+                      <p className="font-semibold" style={{ color: "var(--home-text)" }}>
                         {ticket.ticketCategory?.name || "N/A"}
                       </p>
                     </div>
                     <div>
-                      <span className="text-gray-600">Category Price:</span>
-                      <p className="font-semibold text-gray-900">
+                      <span style={{ color: "var(--home-muted)" }}>Category Price:</span>
+                      <p className="font-semibold" style={{ color: "var(--home-text)" }}>
                         {ticket.ticketCategory?.price
                           ? `${formatPrice(ticket.ticketCategory.price)}`
                           : "Free"}
                       </p>
                     </div>
                     <div>
-                      <span className="text-gray-600">Ticket Status:</span>
+                      <span style={{ color: "var(--home-muted)" }}>Ticket Status:</span>
                       <Badge
                         variant={
                           ticket.isUsed
@@ -397,8 +447,8 @@ export default function VerifyTicketPage() {
                     </div>
                     {ticket.isListed && ticket.resalePrice && (
                       <div>
-                        <span className="text-gray-600">Listed for:</span>
-                        <p className="font-semibold text-orange-600">
+                        <span style={{ color: "var(--home-muted)" }}>Listed for:</span>
+                        <p className="font-semibold" style={{ color: "var(--home-text-highlight)" }}>
                           ₦{formatPrice(ticket.resalePrice)}
                         </p>
                       </div>
@@ -408,9 +458,14 @@ export default function VerifyTicketPage() {
               )}
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap gap-2 pt-4 border-t">
+              <div className="flex flex-wrap gap-2 pt-4 border-t" style={{ borderColor: "var(--home-border)" }}>
                 <Button
-                  className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
+                  className="flex-1 px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150 hover:brightness-110"
+                  style={{
+                    backgroundColor: "var(--home-accent)",
+                    color: "var(--home-accent-fg)",
+                    borderRadius: "var(--home-radius-card)",
+                  }}
                   onClick={handleScanNext}
                 >
                   Scan Next Ticket
@@ -418,7 +473,8 @@ export default function VerifyTicketPage() {
                 {verification?.isValid && user?.role === "ORGANIZER" && (
                   <Button
                     variant="outline"
-                    className="flex-1 bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900"
+                    className="flex-1 bg-transparent hover:bg-[var(--home-card-elevated)] hover:text-[var(--home-text-highlight)]"
+                    style={{ borderColor: "var(--home-border-strong)", color: "var(--home-text)" }}
                     onClick={() => window.print()}
                   >
                     Print Verification
@@ -426,7 +482,8 @@ export default function VerifyTicketPage() {
                 )}
                 <Button
                   variant="outline"
-                  className="flex-1 bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900"
+                  className="flex-1 bg-transparent hover:bg-[var(--home-card-elevated)] hover:text-[var(--home-text-highlight)]"
+                  style={{ borderColor: "var(--home-border-strong)", color: "var(--home-text)" }}
                   onClick={() => (window.location.href = "/")}
                 >
                   Close
@@ -434,10 +491,16 @@ export default function VerifyTicketPage() {
               </div>
 
               {/* Security Notice */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div
+                className="border rounded-xl p-3"
+                style={{
+                  backgroundColor: "var(--home-card-highlight)",
+                  borderColor: "var(--home-border)",
+                }}
+              >
                 <div className="flex items-start space-x-2">
-                  <AlertCircle className="h-4 w-4 text-[#1E88E5] mt-0.5" />
-                  <div className="text-sm text-blue-800">
+                  <AlertCircle className="h-4 w-4 mt-0.5" style={{ color: "var(--home-accent)" }} />
+                  <div className="text-sm" style={{ color: "var(--home-muted)" }}>
                     <p className="font-medium">Security Notice</p>
                     <p>
                       This verification was performed at{" "}
