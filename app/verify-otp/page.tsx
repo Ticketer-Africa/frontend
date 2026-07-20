@@ -139,23 +139,54 @@ export default function VerifyOTPPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-pink-50 to-orange-50 dark:from-blue-950/20 dark:via-pink-950/20 dark:to-orange-950/20 p-4">
+    <div
+      className="home-theme min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+      style={{ backgroundColor: "var(--home-bg)" }}
+    >
       <div className="absolute inset-0 overflow-hidden">
-        <div className="my-tickets-bg-circle absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30" />
-        <div className="my-tickets-bg-circle-alt absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30" />
+        <div
+          className="my-tickets-bg-circle absolute -top-40 -right-40 w-80 h-80 rounded-full filter blur-xl opacity-20"
+          style={{ backgroundColor: "var(--home-accent)" }}
+        />
+        <div
+          className="my-tickets-bg-circle-alt absolute -bottom-40 -left-40 w-80 h-80 rounded-full filter blur-xl opacity-30"
+          style={{ backgroundColor: "var(--home-card-highlight)" }}
+        />
       </div>
 
-      <div className="auth-form-animate w-full max-w-md">
-        <Card className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/20">
+      <div className="auth-form-animate w-full max-w-md relative">
+        <Card
+          className="backdrop-blur-md shadow-2xl border"
+          style={{
+            backgroundColor: "rgba(20, 27, 43, 0.92)",
+            borderColor: "var(--home-border)",
+            borderRadius: "var(--home-radius-card-lg)",
+          }}
+        >
           <CardHeader className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-4">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-[#1E88E5] to-pink-600 flex items-center justify-center">
-                <span className="text-white font-bold text-sm">T</span>
+              <div
+                className="h-8 w-8 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: "var(--home-accent)" }}
+              >
+                <span
+                  className="font-bold text-sm"
+                  style={{ color: "var(--home-accent-fg)" }}
+                >
+                  T
+                </span>
               </div>
-              <span className="font-bold text-xl">Ticketer Africa</span>
+              <span
+                className="font-bold text-xl"
+                style={{ color: "var(--home-text)" }}
+              >
+                Ticketer Africa
+              </span>
             </div>
-            <CardTitle className="text-2xl">Verify Your Email</CardTitle>
-            <p className="text-muted-foreground">
+            <CardTitle className="text-2xl" style={{ color: "var(--home-text)" }}>
+              Verify Your Email
+            </CardTitle>
+            <p style={{ color: "var(--home-muted)" }}>
               Enter the 6-digit code sent to your email
             </p>
           </CardHeader>
@@ -170,46 +201,57 @@ export default function VerifyOTPPage() {
                   onChange={(val) => setOtp(val)}
                 >
                   <InputOTPGroup>
-                    <InputOTPSlot index={0} />
-                    <InputOTPSlot index={1} />
-                    <InputOTPSlot index={2} />
+                    <InputOTPSlot index={0} className="border-[var(--home-border-strong)] text-[var(--home-text)] bg-[var(--home-bg)]" />
+                    <InputOTPSlot index={1} className="border-[var(--home-border-strong)] text-[var(--home-text)] bg-[var(--home-bg)]" />
+                    <InputOTPSlot index={2} className="border-[var(--home-border-strong)] text-[var(--home-text)] bg-[var(--home-bg)]" />
                   </InputOTPGroup>
-                  <InputOTPSeparator />
+                  <InputOTPSeparator className="text-[var(--home-muted)]" />
                   <InputOTPGroup>
-                    <InputOTPSlot index={3} />
-                    <InputOTPSlot index={4} />
-                    <InputOTPSlot index={5} />
+                    <InputOTPSlot index={3} className="border-[var(--home-border-strong)] text-[var(--home-text)] bg-[var(--home-bg)]" />
+                    <InputOTPSlot index={4} className="border-[var(--home-border-strong)] text-[var(--home-text)] bg-[var(--home-bg)]" />
+                    <InputOTPSlot index={5} className="border-[var(--home-border-strong)] text-[var(--home-text)] bg-[var(--home-bg)]" />
                   </InputOTPGroup>
                 </InputOTP>
               </div>
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-[#1E88E5] hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150 disabled:opacity-50"
+                className="w-full h-12 font-semibold shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150 hover:brightness-110 disabled:opacity-50"
+                style={{
+                  backgroundColor: "var(--home-accent)",
+                  color: "var(--home-accent-fg)",
+                  borderRadius: "var(--home-radius-card)",
+                }}
                 disabled={otp.length < 6 || isPending}
               >
                 {isPending ? "Verifying..." : "Verify Code"}
               </Button>
 
               <div className="text-center space-y-2">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm" style={{ color: "var(--home-muted)" }}>
                   Didn&apos;t receive the code?{" "}
                   <button
                     disabled={isResending || secondsLeft > 0}
                     onClick={handleResend}
-                    className="text-[#1E88E5] hover:underline disabled:opacity-50"
+                    className="hover:underline disabled:opacity-50"
+                    style={{ color: "var(--home-text-highlight)" }}
                   >
                     Resend Code
                   </button>
                   {secondsLeft > 0 && (
-                    <span className="ml-2 text-gray-500">
+                    <span className="ml-2" style={{ color: "var(--home-muted-dim)" }}>
                       ({formatTime(secondsLeft)})
                     </span>
                   )}
                 </p>
               </div>
 
-              <Button variant="ghost" className="w-full" asChild>
+              <Button
+                variant="ghost"
+                className="w-full hover:bg-[var(--home-card-elevated)] hover:text-[var(--home-text-highlight)]"
+                style={{ color: "var(--home-muted)" }}
+                asChild
+              >
                 <Link href={loginHref}>
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Login

@@ -2,11 +2,8 @@
 
 import { ChevronDown } from "lucide-react";
 import { useState, useCallback, memo } from "react";
+import { HomeCard } from "@/components/home/home-card";
 
-/**
- * Static FAQ data - hoisted outside component
- * Performance: Prevents recreation on every render
- */
 const FAQS = [
   {
     question: "How much does it cost to use this platform?",
@@ -50,66 +47,59 @@ const FAQS = [
   },
 ] as const;
 
-/**
- * FAQItem - Memoized accordion item
- * Performance: Uses instant layout changes and opacity-only disclosure feedback.
- */
 interface FAQItemProps {
   faq: { question: string; answer: string };
+  index: number;
   isOpen: boolean;
   onToggle: () => void;
 }
 
 const FAQItem = memo(function FAQItem({
   faq,
+  index,
   isOpen,
   onToggle,
 }: FAQItemProps) {
   return (
-    <div
-      className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:border-blue-200 transition-[background-color,color,border-color,opacity,transform] faq-item"
-    >
+    <HomeCard tone="elevated" className="faq-item overflow-hidden" style={{ animationDelay: `${index * 50}ms` }}>
       <button
         onClick={onToggle}
         className="w-full flex justify-between items-center p-6 text-left"
         aria-expanded={isOpen}
       >
-        <span className="text-lg font-medium text-gray-900">
+        <span
+          className="font-['Syne'] text-lg"
+          style={{ color: "var(--home-text)" }}
+        >
           {faq.question}
         </span>
         <ChevronDown
-          className={`w-5 h-5 text-[#1E88E5] transition-transform duration-150 flex-shrink-0 ml-4 ${
+          className={`w-5 h-5 transition-transform duration-300 flex-shrink-0 ml-4 ${
             isOpen ? "rotate-180" : ""
           }`}
+          style={{ color: "var(--home-accent)" }}
           aria-hidden="true"
         />
       </button>
       <div
-        className={`grid transition-opacity duration-150 [transition-timing-function:var(--motion-ease-out)] ${
+        className={`grid transition-all duration-300 ease-in-out ${
           isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
         }`}
         aria-hidden={!isOpen}
       >
         <div className="overflow-hidden">
-          <div className="px-6 pb-6 text-gray-600 leading-relaxed">
+          <div
+            className="px-6 pb-6 font-['Hanken_Grotesk'] text-sm leading-relaxed"
+            style={{ color: "var(--home-muted)" }}
+          >
             {faq.answer}
           </div>
         </div>
       </div>
-    </div>
+    </HomeCard>
   );
 });
 
-/**
- * FAQSection - Optimized for performance
- *
- * Performance optimizations:
- * 1. Removed framer-motion and decorative entrance animations
- * 2. Removed lodash debounce - not needed for simple toggle
- * 3. Disclosure layout updates immediately while opacity provides light feedback
- * 4. Memoized FAQItem component
- * 5. Static data hoisted outside component
- */
 export function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [visibleFAQs, setVisibleFAQs] = useState(4);
@@ -123,28 +113,37 @@ export function FAQSection() {
   }, []);
 
   return (
-    <section id="faq" className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+    <section
+      id="faq"
+      className="home-theme py-20 px-4 sm:px-6 lg:px-8"
+      style={{ backgroundColor: "var(--home-bg)" }}
+    >
       <div className="max-w-4xl mx-auto">
-        {/* Section header with CSS animation */}
         <div className="section-animate text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+          <h2
+            className="font-['Syne'] font-bold text-3xl sm:text-4xl lg:text-5xl mb-4"
+            style={{ color: "var(--home-text)" }}
+          >
             Frequently Asked Questions
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Everything you need to know about using our platform for events and
-            ticket resale.
+          <p
+            className="font-['Hanken_Grotesk'] text-lg max-w-2xl mx-auto"
+            style={{ color: "var(--home-muted)" }}
+          >
+            Everything you need to know about using our platform for events
+            and ticket resale.
           </p>
         </div>
 
-        {/* FAQ items */}
         <div className="space-y-4">
           {FAQS.slice(0, visibleFAQs).map((faq, index) => (
-          <FAQItem
-            key={faq.question}
-            faq={faq}
-            isOpen={openIndex === index}
-            onToggle={() => toggleFAQ(index)}
-          />
+            <FAQItem
+              key={faq.question}
+              faq={faq}
+              index={index}
+              isOpen={openIndex === index}
+              onToggle={() => toggleFAQ(index)}
+            />
           ))}
         </div>
 
@@ -152,7 +151,12 @@ export function FAQSection() {
           <div className="text-center mt-8">
             <button
               onClick={loadMore}
-              className="px-6 py-3 bg-[#1E88E5] text-white rounded-lg hover:bg-blue-700 transition"
+              className="px-8 py-3 rounded-full font-['Hanken_Grotesk'] text-base transition-colors border"
+              style={{
+                backgroundColor: "var(--home-badge-bg)",
+                borderColor: "var(--home-border-strong)",
+                color: "var(--home-text)",
+              }}
             >
               Show More
             </button>

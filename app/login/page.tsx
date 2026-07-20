@@ -11,11 +11,10 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
 import { useLogin } from "@/services/auth/auth.queries";
-import { Logo } from "@/components/layout/logo";
+import { AuthShell } from "@/components/auth/auth-shell";
 
-// 🧠 Zod Schema
 const loginSchema = z.object({
   email: z.string().email("Enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -57,11 +56,9 @@ export default function LoginPage() {
           const returnUrl =
             searchParams.get("redirect") ?? searchParams.get("returnUrl");
 
-          // Only redirect if returnUrl exists and is not the login page
           if (returnUrl && !returnUrl.includes("/login")) {
             location.href = returnUrl;
           } else {
-            // Fallback to explore page
             location.href = "/explore";
           }
         },
@@ -70,126 +67,144 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-16">
-      {/* Animated BG Circles - CSS animations instead of framer-motion */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="my-tickets-bg-circle absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30" />
-        <div className="my-tickets-bg-circle-alt absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30" />
+    <AuthShell>
+      <div className="text-center mb-8">
+        <h1
+          className="text-3xl font-bold mb-2"
+          style={{ color: "var(--home-text)" }}
+        >
+          Welcome back
+        </h1>
+        <p style={{ color: "var(--home-muted)" }}>
+          Sign in to your account to continue
+        </p>
       </div>
 
-      <div className="auth-form-animate relative z-10 w-full max-w-md">
-        <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/20 p-8">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <Link
-              href="/"
-              className="inline-flex items-center space-x-2 mb-6 group"
-            >
-              <Logo size="sm" />
-            </Link>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Welcome back
-            </h1>
-            <p className="text-gray-600">Sign in to your account to continue</p>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <div className="space-y-2">
+          <Label
+            htmlFor="email"
+            className="text-sm font-medium px-1"
+            style={{ color: "var(--home-muted)" }}
+          >
+            Email address
+          </Label>
+          <div className="relative">
+            <Mail
+              className="absolute left-8 top-1/2 transform -translate-y-1/2 w-5 h-5"
+              style={{ color: "var(--home-muted)" }}
+            />
+            <Input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              className="pl-16 h-14 rounded-lg"
+              style={{
+                backgroundColor: "rgba(12,19,34,0.5)",
+                borderColor: "rgba(86,66,62,0.5)",
+                color: "var(--home-text)",
+              }}
+              {...register("email")}
+            />
           </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="space-y-2">
-              <Label
-                htmlFor="email"
-                className="text-sm font-medium text-gray-700"
-              >
-                Email address
-              </Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  className="pl-10 h-12 bg-white/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  {...register("email")}
-                />
-              </div>
-              {errors.email && (
-                <p className="text-sm text-red-600 flex items-center gap-1">
-                  <AlertCircle className="w-4 h-4" /> {errors.email.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label
-                htmlFor="password"
-                className="text-sm font-medium text-gray-700"
-              >
-                Password
-              </Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  className="pl-10 pr-10 h-12 bg-white/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  {...register("password")}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-sm text-red-600 flex items-center gap-1">
-                  <AlertCircle className="w-4 h-4" /> {errors.password.message}
-                </p>
-              )}
-            </div>
-
-            <div className="flex items-center justify-between">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 text-[#1E88E5] border-gray-300 rounded focus:ring-blue-500"
-                />
-                <span className="ml-2 text-sm text-gray-600">Remember me</span>
-              </label>
-              <Link
-                href="/forgot-password"
-                className="text-sm text-[#1E88E5] hover:text-blue-700 font-medium"
-              >
-                Forgot password?
-              </Link>
-            </div>
-
-            <Button
-              type="submit"
-              disabled={loginMutation.isPending}
-              className="w-full h-12 bg-[#1E88E5] hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150 disabled:opacity-50"
-            >
-              {loginMutation.isPending ? "Signing in..." : "Sign in"}
-            </Button>
-          </form>
-
-          <p className="mt-6 text-center text-sm text-gray-600">
-            Don't have an account?{" "}
-            <Link
-              href={registerHref}
-              className="text-[#1E88E5] hover:text-blue-700 font-medium"
-            >
-              Sign up
-            </Link>
-          </p>
+          {errors.email && (
+            <p className="text-sm text-red-400 flex items-center gap-1 px-1">
+              <AlertCircle className="w-4 h-4" /> {errors.email.message}
+            </p>
+          )}
         </div>
-      </div>
-    </div>
+
+        <div className="space-y-2">
+          <Label
+            htmlFor="password"
+            className="text-sm font-medium px-1"
+            style={{ color: "var(--home-muted)" }}
+          >
+            Password
+          </Label>
+          <div className="relative">
+            <Lock
+              className="absolute left-8 top-1/2 transform -translate-y-1/2 w-5 h-5"
+              style={{ color: "var(--home-muted)" }}
+            />
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              className="pl-16 pr-16 h-14 rounded-lg"
+              style={{
+                backgroundColor: "rgba(12,19,34,0.5)",
+                borderColor: "rgba(86,66,62,0.5)",
+                color: "var(--home-text)",
+              }}
+              {...register("password")}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-8 top-1/2 transform -translate-y-1/2"
+              style={{ color: "var(--home-muted)" }}
+            >
+              {showPassword ? (
+                <EyeOff className="w-5 h-5" />
+              ) : (
+                <Eye className="w-5 h-5" />
+              )}
+            </button>
+          </div>
+          {errors.password && (
+            <p className="text-sm text-red-400 flex items-center gap-1 px-1">
+              <AlertCircle className="w-4 h-4" /> {errors.password.message}
+            </p>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between px-1">
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              className="w-4 h-4 rounded"
+              style={{ accentColor: "var(--home-accent)" }}
+            />
+            <span
+              className="ml-2 text-sm"
+              style={{ color: "var(--home-muted)" }}
+            >
+              Remember me
+            </span>
+          </label>
+          <Link
+            href="/forgot-password"
+            className="text-sm font-medium hover:opacity-80"
+            style={{ color: "var(--home-text-highlight)" }}
+          >
+            Forgot password?
+          </Link>
+        </div>
+
+        <Button
+          type="submit"
+          variant="homeAccent"
+          disabled={loginMutation.isPending}
+          className="w-full h-14 rounded-lg disabled:opacity-50"
+        >
+          {loginMutation.isPending ? "Signing in..." : "Sign in"}
+        </Button>
+      </form>
+
+      <p
+        className="mt-6 text-center text-sm"
+        style={{ color: "var(--home-muted)" }}
+      >
+        Don&apos;t have an account?{" "}
+        <Link
+          href={registerHref}
+          className="font-semibold hover:opacity-80"
+          style={{ color: "var(--home-text-highlight)" }}
+        >
+          Sign up
+        </Link>
+      </p>
+    </AuthShell>
   );
 }

@@ -91,9 +91,12 @@ export default function TicketDetailPage({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div
+        className="home-theme min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: "var(--home-bg)" }}
+      >
         <div className="text-center">
-          <p className="text-lg text-gray-600 animate-pulse">
+          <p className="text-lg animate-pulse" style={{ color: "var(--home-muted)" }}>
             Loading ticket...
           </p>
         </div>
@@ -103,18 +106,25 @@ export default function TicketDetailPage({
 
   if (isError || !ticket || !event || !ticket.ticketCategory) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div
+        className="home-theme min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: "var(--home-bg)" }}
+      >
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <h1
+            className="text-2xl font-bold mb-2"
+            style={{ color: "var(--home-text)" }}
+          >
             Ticket Not Found
           </h1>
-          <p className="text-gray-600 mb-4">
-            The ticket you're looking for doesn't exist or is missing required
+          <p className="mb-4" style={{ color: "var(--home-muted)" }}>
+            The ticket you&apos;re looking for doesn&apos;t exist or is missing required
             information.
           </p>
           <Button
             asChild
-            className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
+            variant="homeAccent"
+            className="px-6"
           >
             <Link href="/my-tickets">Back to My Tickets</Link>
           </Button>
@@ -126,13 +136,15 @@ export default function TicketDetailPage({
   const originalPrice = ticket.ticketCategory.price;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div
+      className="home-theme min-h-screen"
+      style={{ backgroundColor: "var(--home-bg)" }}
+    >
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <Button
-            variant="ghost"
+            variant="homeOutline"
             asChild
-            className="text-gray-700 hover:text-[#1E88E5]"
           >
             <Link href="/my-tickets">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -143,14 +155,37 @@ export default function TicketDetailPage({
 
         <div className="max-w-4xl mx-auto">
           <div className="section-animate">
-            <Card className="bg-white rounded-xl shadow-lg border border-gray-100">
+            <Card
+              className="rounded-xl border shadow-lg"
+              style={{
+                backgroundColor: "var(--home-card)",
+                borderColor: "var(--home-border)",
+                color: "var(--home-text)",
+              }}
+            >
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <CardTitle className="text-2xl font-bold text-gray-900 mb-2">
+                    <CardTitle
+                      className="text-2xl font-bold mb-2"
+                      style={{ color: "var(--home-text)" }}
+                    >
                       {event.name}
                     </CardTitle>
-                    <Badge variant={getStatusColor(ticket)}>
+                    <Badge
+                      variant={getStatusColor(ticket)}
+                      style={{
+                        backgroundColor: ticket.isUsed
+                          ? "var(--home-card-highlight)"
+                          : ticket.isListed
+                          ? "var(--home-highlight-yellow)"
+                          : "var(--home-success)",
+                        borderColor: "var(--home-border-strong)",
+                        color: ticket.isListed
+                          ? "var(--home-bg)"
+                          : "var(--home-success-fg)",
+                      }}
+                    >
                       {getStatusText(ticket)}
                     </Badge>
                   </div>
@@ -162,25 +197,28 @@ export default function TicketDetailPage({
                   {/* Event Details */}
                   <div className="space-y-6">
                     <div>
-                      <h3 className="font-semibold text-lg text-gray-900 mb-4">
+                      <h3
+                        className="font-semibold text-lg mb-4"
+                        style={{ color: "var(--home-text)" }}
+                      >
                         Event Details
                       </h3>
                       <div className="space-y-3">
                         <div className="flex items-center space-x-3">
-                          <Calendar className="h-5 w-5 text-gray-500" />
+                          <Calendar className="h-5 w-5" style={{ color: "var(--home-text-highlight)" }} />
                           <div>
-                            <p className="font-medium text-gray-900">
+                            <p className="font-medium" style={{ color: "var(--home-text)" }}>
                               {formatDate(event.date)}
                             </p>
                           </div>
                         </div>
                         <div className="flex items-center space-x-3">
-                          <MapPin className="h-5 w-5 text-gray-500" />
-                          <p className="text-gray-900">{event.location}</p>
+                          <MapPin className="h-5 w-5" style={{ color: "var(--home-text-highlight)" }} />
+                          <p style={{ color: "var(--home-text)" }}>{event.location}</p>
                         </div>
                         <div className="flex items-center space-x-3">
-                          <Clock className="h-5 w-5 text-gray-500" />
-                          <p className="text-gray-900">
+                          <Clock className="h-5 w-5" style={{ color: "var(--home-text-highlight)" }} />
+                          <p style={{ color: "var(--home-text)" }}>
                             Doors open 30 minutes before event
                           </p>
                         </div>
@@ -188,25 +226,34 @@ export default function TicketDetailPage({
                     </div>
 
                     <div>
-                      <h3 className="font-semibold text-lg text-gray-900 mb-4">
+                      <h3
+                        className="font-semibold text-lg mb-4"
+                        style={{ color: "var(--home-text)" }}
+                      >
                         Ticket Information
                       </h3>
                       <div className="space-y-2">
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Ticket Code:</span>
-                          <code className="text-sm bg-gray-100 px-2 py-1 rounded text-gray-900">
+                          <span style={{ color: "var(--home-muted)" }}>Ticket Code:</span>
+                          <code
+                            className="text-sm px-2 py-1 rounded"
+                            style={{
+                              backgroundColor: "var(--home-card-highlight)",
+                              color: "var(--home-text)",
+                            }}
+                          >
                             {ticket.code}
                           </code>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Category:</span>
-                          <span className="font-semibold text-gray-900">
+                          <span style={{ color: "var(--home-muted)" }}>Category:</span>
+                          <span className="font-semibold" style={{ color: "var(--home-text)" }}>
                             {ticket.ticketCategory.name}
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Original Price:</span>
-                          <span className="font-semibold text-gray-900">
+                          <span style={{ color: "var(--home-muted)" }}>Original Price:</span>
+                          <span className="font-semibold" style={{ color: "var(--home-text)" }}>
                             {originalPrice > 0
                               ? `${formatPrice(originalPrice)}`
                               : "Free"}
@@ -214,8 +261,8 @@ export default function TicketDetailPage({
                         </div>
                         {ticket.isListed && ticket.resalePrice && (
                           <div className="flex justify-between">
-                            <span className="text-gray-600">Listed for:</span>
-                            <span className="font-semibold text-orange-600">
+                            <span style={{ color: "var(--home-muted)" }}>Listed for:</span>
+                            <span className="font-semibold" style={{ color: "var(--home-text-highlight)" }}>
                               {formatPrice(ticket.resalePrice)}
                             </span>
                           </div>
@@ -223,11 +270,17 @@ export default function TicketDetailPage({
                       </div>
                     </div>
 
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <h4 className="font-medium text-blue-900 mb-2">
+                    <div
+                      className="border rounded-lg p-4"
+                      style={{
+                        backgroundColor: "var(--home-card-elevated)",
+                        borderColor: "var(--home-border-strong)",
+                      }}
+                    >
+                      <h4 className="font-medium mb-2" style={{ color: "var(--home-text-highlight)" }}>
                         Important Notes
                       </h4>
-                      <ul className="text-sm text-blue-800 space-y-1">
+                      <ul className="text-sm space-y-1" style={{ color: "var(--home-muted)" }}>
                         <li>• Present this QR code at the event entrance</li>
                         <li>• Arrive 15-30 minutes before the event starts</li>
                         <li>
@@ -242,7 +295,10 @@ export default function TicketDetailPage({
                   {/* QR Code */}
                   <div className="space-y-6">
                     <div>
-                      <h3 className="font-semibold text-lg text-gray-900 mb-4">
+                      <h3
+                        className="font-semibold text-lg mb-4"
+                        style={{ color: "var(--home-text)" }}
+                      >
                         Entry QR Code
                       </h3>
                       <div className="flex justify-center">
@@ -257,7 +313,8 @@ export default function TicketDetailPage({
                     {!ticket.isUsed && (
                       <div className="space-y-3">
                         <Button
-                          className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
+                          variant="homeAccent"
+                          className="w-full px-6"
                           onClick={handleListForResale}
                           disabled={
                             ticket.isListed ||
@@ -274,8 +331,8 @@ export default function TicketDetailPage({
                             : "List for Resale"}
                         </Button>
                         <Button
-                          variant="outline"
-                          className="w-full bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900"
+                          variant="homeOutline"
+                          className="w-full"
                         >
                           <Share2 className="h-4 w-4 mr-2" />
                           Share Ticket

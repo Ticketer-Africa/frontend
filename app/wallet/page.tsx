@@ -53,7 +53,11 @@ export default function WalletPage() {
 
   // Loading states
   if (isLoading || loadingPinStatus) {
-    return <WalletLoadingScreen />;
+    return (
+      <div className="home-theme" style={{ backgroundColor: "var(--home-bg)" }}>
+        <WalletLoadingScreen />
+      </div>
+    );
   }
 
   // Auth check
@@ -63,33 +67,54 @@ export default function WalletPage() {
 
   // Pin status error
   if (errorPinStatus) {
-    return <WalletErrorScreen message="Failed to load wallet PIN status. Please try again." />;
+    return (
+      <div className="home-theme" style={{ backgroundColor: "var(--home-bg)" }}>
+        <WalletErrorScreen message="Failed to load wallet PIN status. Please try again." />
+      </div>
+    );
   }
 
   // Pin setup required
   if (!pinStatus?.hasPin) {
-    return <PinSetupScreen />;
+    return (
+      <div className="home-theme" style={{ backgroundColor: "var(--home-bg)" }}>
+        <PinSetupScreen />
+      </div>
+    );
   }
 
   // Wallet data loading
   if (loadingTransactions || loadingBalance) {
-    return <WalletDataLoadingScreen />;
+    return (
+      <div className="home-theme" style={{ backgroundColor: "var(--home-bg)" }}>
+        <WalletDataLoadingScreen />
+      </div>
+    );
   }
 
   // Wallet data error
   if (errorTransactions || errorBalance) {
-    return <WalletErrorScreen message="Failed to load wallet data. Please try again." />;
+    return (
+      <div className="home-theme" style={{ backgroundColor: "var(--home-bg)" }}>
+        <WalletErrorScreen message="Failed to load wallet data. Please try again." />
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div
+      className="home-theme min-h-screen"
+      style={{ backgroundColor: "var(--home-bg)" }}
+    >
       <div className="container mx-auto px-4 py-8">
         <div className="section-animate">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900">Wallet</h1>
-              <p className="text-gray-600 mt-1">
+              <h1 className="text-4xl font-bold" style={{ color: "var(--home-text)" }}>
+                Wallet
+              </h1>
+              <p className="mt-1" style={{ color: "var(--home-muted)" }}>
                 Manage your funds and transactions
               </p>
             </div>

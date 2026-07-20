@@ -271,7 +271,7 @@ export function ResaleModal({
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <p className="text-sm text-blue-800">
                 <strong>Note:</strong> Once listed, anyone can buy your ticket.
-                You can delist it anytime before it's sold.
+                You can delist it anytime before it&apos;s sold.
               </p>
             </div>
           </div>

@@ -9,10 +9,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, Sparkles, AlertCircle } from "lucide-react";
+import { Lock, AlertCircle } from "lucide-react";
 import { useResetPassword } from "@/services/auth/auth.queries";
+import { AuthShell } from "@/components/auth/auth-shell";
 
-// ✅ Zod Schema
 const resetPasswordSchema = z
   .object({
     password: z.string().min(6, "Password must be at least 6 characters"),
@@ -27,7 +27,14 @@ type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense
+      fallback={
+        <div
+          className="home-theme min-h-screen"
+          style={{ backgroundColor: "var(--home-bg)" }}
+        />
+      }
+    >
       <ResetPasswordForm />
     </Suspense>
   );
@@ -65,7 +72,6 @@ function ResetPasswordForm() {
         : { email: email!, otp: otp!, newPassword: data.password },
       {
         onSuccess: () => {
-          // Cleanup
           localStorage.removeItem("resetEmail");
           localStorage.removeItem("resetOtp");
 
@@ -83,86 +89,103 @@ function ResetPasswordForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-16">
-      {/* Background Circles - CSS animations */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="my-tickets-bg-circle absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30" />
-        <div className="my-tickets-bg-circle-alt absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30" />
+    <AuthShell>
+      <div className="text-center mb-8">
+        <h1
+          className="text-3xl font-bold mb-2"
+          style={{ color: "var(--home-text)" }}
+        >
+          Set New Password
+        </h1>
+        <p style={{ color: "var(--home-muted)" }}>
+          Enter your new password below to secure your account
+        </p>
       </div>
 
-      <div className="auth-form-animate relative z-10 w-full max-w-md">
-        <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/20 p-8">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center space-x-2 mb-6">
-              <Sparkles className="w-8 h-8 text-[#1E88E5]" />
-              <span className="text-2xl font-bold text-gray-900">
-                Ticketer Africa
-              </span>
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Set New Password
-            </h1>
-            <p className="text-gray-600">
-              Enter your new password below to secure your account
-            </p>
-          </div>
-
-          {/* Error messages */}
-          {errors.password && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center space-x-2">
-              <AlertCircle className="w-5 h-5 text-red-600" />
-              <p className="text-sm text-red-800">{errors.password.message}</p>
-            </div>
-          )}
-          {errors.confirmPassword && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center space-x-2">
-              <AlertCircle className="w-5 h-5 text-red-600" />
-              <p className="text-sm text-red-800">
-                {errors.confirmPassword.message}
-              </p>
-            </div>
-          )}
-
-          {/* Reset Password Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="password">New Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <Input
-                  id="password"
-                  type="password"
-                  {...register("password")}
-                  className="pl-10 h-12 bg-white/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter new password"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  {...register("confirmPassword")}
-                  className="pl-10 h-12 bg-white/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
-                  placeholder="Re-enter new password"
-                />
-              </div>
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full h-12 bg-[#1E88E5] hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
-            >
-              Reset Password
-            </Button>
-          </form>
+      {errors.password && (
+        <div
+          className="mb-4 p-3 rounded-lg flex items-center space-x-2 border"
+          style={{
+            backgroundColor: "rgba(20,27,43,0.5)",
+            borderColor: "var(--home-border-strong)",
+          }}
+        >
+          <AlertCircle className="w-5 h-5 text-red-400" />
+          <p className="text-sm text-red-400">{errors.password.message}</p>
         </div>
-      </div>
-    </div>
+      )}
+      {errors.confirmPassword && (
+        <div
+          className="mb-4 p-3 rounded-lg flex items-center space-x-2 border"
+          style={{
+            backgroundColor: "rgba(20,27,43,0.5)",
+            borderColor: "var(--home-border-strong)",
+          }}
+        >
+          <AlertCircle className="w-5 h-5 text-red-400" />
+          <p className="text-sm text-red-400">
+            {errors.confirmPassword.message}
+          </p>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <div className="space-y-2">
+          <Label htmlFor="password" className="px-1" style={{ color: "var(--home-muted)" }}>
+            New Password
+          </Label>
+          <div className="relative">
+            <Lock
+              className="absolute left-8 top-1/2 transform -translate-y-1/2 w-5 h-5"
+              style={{ color: "var(--home-muted)" }}
+            />
+            <Input
+              id="password"
+              type="password"
+              {...register("password")}
+              className="pl-16 h-14 rounded-lg"
+              style={{
+                backgroundColor: "rgba(12,19,34,0.5)",
+                borderColor: "rgba(86,66,62,0.5)",
+                color: "var(--home-text)",
+              }}
+              placeholder="Enter new password"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="confirmPassword" className="px-1" style={{ color: "var(--home-muted)" }}>
+            Confirm Password
+          </Label>
+          <div className="relative">
+            <Lock
+              className="absolute left-8 top-1/2 transform -translate-y-1/2 w-5 h-5"
+              style={{ color: "var(--home-muted)" }}
+            />
+            <Input
+              id="confirmPassword"
+              type="password"
+              {...register("confirmPassword")}
+              className="pl-16 h-14 rounded-lg"
+              style={{
+                backgroundColor: "rgba(12,19,34,0.5)",
+                borderColor: "rgba(86,66,62,0.5)",
+                color: "var(--home-text)",
+              }}
+              placeholder="Re-enter new password"
+            />
+          </div>
+        </div>
+
+        <Button
+          type="submit"
+          variant="homeAccent"
+          className="w-full h-14 rounded-lg"
+        >
+          Reset Password
+        </Button>
+      </form>
+    </AuthShell>
   );
 }

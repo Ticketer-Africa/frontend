@@ -1,82 +1,78 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Facebook,
-  Twitter,
-  Instagram,
-  Youtube,
-  Mail,
-  Phone,
-  MapPin,
-} from "lucide-react";
+import { Facebook, Instagram } from "lucide-react";
 import { Logo } from "./logo";
 
-/**
- * Static data hoisted outside component
- * Performance: Prevents recreation on every render
- */
-const SOCIAL_ICONS = [
-  { Icon: Facebook, label: "Facebook" },
-  { Icon: Twitter, label: "Twitter" },
-  { Icon: Instagram, label: "Instagram" },
-  { Icon: Youtube, label: "YouTube" },
-] as const;
-
-const QUICK_LINKS = [
-  { href: "/explore", label: "Explore Events" },
-  { href: "/organizer", label: "Create Event" },
-  { href: "/my-tickets", label: "My Tickets" },
-  { href: "/wallet", label: "Wallet" },
+const PLATFORM_LINKS = [
+  { href: "/explore", label: "Find Events" },
+  { href: "/explore", label: "Resale Market" }, // TODO: point at a dedicated resale route if/when one exists
+  { href: "/organizer/create-event", label: "Create Event" },
+  { href: "#", label: "Mobile App" }, // TODO: no mobile app route/link exists yet
 ] as const;
 
 const SUPPORT_LINKS = [
-  { href: "#faq", label: "FAQs" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "/service-agreement", label: "Service Agreement" },
+  { href: "#", label: "Help Center" }, // TODO: no help center route exists yet
+  { href: "/terms", label: "Privacy Policy" }, // TODO: no dedicated /privacy route exists yet, points at Terms of Service
+  { href: "/terms", label: "Terms of Service" },
+  { href: "mailto:ticketerafrica@gmail.com", label: "Contact Us" },
 ] as const;
 
-/**
- * Footer - Optimized for performance
- *
- * Performance optimizations:
- * 1. Removed framer-motion animations
- * 2. Static data hoisted outside component
- * 3. CSS hover effects instead of JS animations
- */
+const SOCIAL_LINKS = [
+  { Icon: Facebook, label: "Facebook", href: "#" },
+  { Icon: Instagram, label: "Instagram", href: "#" },
+] as const;
+
 export function Footer() {
   return (
-    <footer className="bg-white border-t-[1px] text-black">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Brand */}
-          <div className="space-y-4">
-            <Logo />
-            <p className="text-sm">
-              Your gateway to unforgettable experiences. Discover and book
-              amazing events worldwide.
+    <footer
+      className="home-theme border-t"
+      style={{
+        backgroundColor: "var(--home-bg)",
+        borderColor: "var(--home-border-subtle)",
+      }}
+    >
+      <div className="container mx-auto px-4 py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-16">
+          <div className="lg:col-span-2 space-y-6">
+            <Logo showImage={false} textClassName="text-[var(--home-text-highlight)]" />
+            <p
+              className="font-['Hanken_Grotesk'] text-base max-w-md"
+              style={{ color: "var(--home-muted)" }}
+            >
+              The premium destination for cultural discovery, event
+              ticketing, and unforgettable experiences across the African
+              continent.
             </p>
-            <div className="flex space-x-4">
-              {SOCIAL_ICONS.map(({ Icon, label }) => (
-                <button
+            <div className="flex gap-4">
+              {SOCIAL_LINKS.map(({ Icon, label, href }) => (
+                <a
                   key={label}
-                  className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 active:scale-[0.98] transition-[background-color,color,border-color,opacity,transform] duration-150"
+                  href={href}
+                  className="flex items-center justify-center w-10 h-10 rounded-full transition-opacity hover:opacity-80"
+                  style={{ backgroundColor: "var(--home-social-bg)" }}
                   aria-label={label}
                 >
-                  <Icon className="h-5 w-5 text-gray-600" aria-hidden="true" />
-                </button>
+                  <Icon className="h-4 w-4" style={{ color: "var(--home-text)" }} aria-hidden="true" />
+                </a>
               ))}
             </div>
           </div>
 
-          <div className="space-y-4">
-            <h3 className="font-semibold">Quick Links</h3>
-            <nav className="space-y-2 text-sm" aria-label="Quick links">
-              {QUICK_LINKS.map((link) => (
+          <div>
+            <h3
+              className="font-['Hanken_Grotesk'] font-semibold text-sm tracking-[1.4px] uppercase mb-6"
+              style={{ color: "var(--home-text)" }}
+            >
+              Platform
+            </h3>
+            <nav className="space-y-4" aria-label="Platform links">
+              {PLATFORM_LINKS.map((link, i) => (
                 <Link
-                  key={link.href}
+                  key={`${link.label}-${i}`}
                   href={link.href}
-                  className="block hover:text-[#1E88E5] transition-colors"
+                  className="block font-['Hanken_Grotesk'] text-base transition-colors hover:opacity-80"
+                  style={{ color: "var(--home-muted)" }}
                 >
                   {link.label}
                 </Link>
@@ -84,43 +80,36 @@ export function Footer() {
             </nav>
           </div>
 
-          {/* Support */}
-          <div className="space-y-4">
-            <h3 className="font-semibold">Support</h3>
-            <nav className="space-y-2 text-sm" aria-label="Support links">
-              {SUPPORT_LINKS.map((link) => (
+          <div>
+            <h3
+              className="font-['Hanken_Grotesk'] font-semibold text-sm tracking-[1.4px] uppercase mb-6"
+              style={{ color: "var(--home-text)" }}
+            >
+              Support
+            </h3>
+            <nav className="space-y-4" aria-label="Support links">
+              {SUPPORT_LINKS.map((link, i) => (
                 <Link
-                  key={link.href}
+                  key={`${link.label}-${i}`}
                   href={link.href}
-                  className="block hover:text-[#1E88E5] transition-colors"
+                  className="block font-['Hanken_Grotesk'] text-base transition-colors hover:opacity-80"
+                  style={{ color: "var(--home-muted)" }}
                 >
                   {link.label}
                 </Link>
               ))}
             </nav>
-          </div>
-
-          {/* Contact */}
-          <div className="space-y-4">
-            <h3 className="font-semibold">Contact Info</h3>
-            <address className="space-y-3 text-sm not-italic">
-              <div className="flex items-center space-x-2">
-                <Mail className="h-4 w-4" aria-hidden="true" />
-                <span className="text-sm">ticketerafrica@gmail.com</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Phone className="h-4 w-4" aria-hidden="true" />
-                <span>+234 (903) 750-4159</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <MapPin className="h-4 w-4" aria-hidden="true" />
-                <span className="text-sm">Lagos, Nigeria</span>
-              </div>
-            </address>
           </div>
         </div>
-        <div className="border-t border-gray-200 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center text-sm">
-          <p>
+
+        <div
+          className="border-t pt-8 text-center"
+          style={{ borderColor: "var(--home-border-subtle)" }}
+        >
+          <p
+            className="font-['Hanken_Grotesk'] font-semibold text-sm tracking-[0.7px]"
+            style={{ color: "var(--home-muted-dim)" }}
+          >
             © {new Date().getFullYear()} Ticketer Africa. All rights reserved.
           </p>
         </div>

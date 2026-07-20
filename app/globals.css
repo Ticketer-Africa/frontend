@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -83,6 +83,38 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+  .home-theme {
+    /* surfaces */
+    --home-bg: #0b0e14; /* page / footer / hero base — unified across the page */
+    --home-card: #141b2b;
+    --home-card-elevated: #191f2f;
+    --home-card-highlight: #232a3a;
+
+    /* borders */
+    --home-border: rgba(86, 66, 62, 0.3);
+    --home-border-subtle: rgba(86, 66, 62, 0.1);
+    --home-border-strong: #56423e;
+
+    /* text */
+    --home-text: #dce2f7;
+    --home-text-highlight: #ffb4a5;
+    --home-muted: #ddc0ba;
+    --home-muted-dim: #a48b86;
+
+    /* accent + semantic */
+    --home-accent: #e2725b;
+    --home-accent-fg: #5a0d02;
+    --home-success: #42a73b;
+    --home-success-fg: #003403;
+    --home-success-text: #92fa83;
+    --home-highlight-yellow: #f4d03f;
+    --home-social-bg: #2e3545; /* footer social icon circles — distinct from --home-border-strong */
+    --home-badge-bg: rgba(46, 53, 69, 0.3); /* eyebrow pill / Show More button translucent fill */
+
+    /* radii */
+    --home-radius-card: 16px;
+    --home-radius-card-lg: 24px;
   }
 }
 

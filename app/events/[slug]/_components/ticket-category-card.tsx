@@ -33,27 +33,30 @@ export function TicketCategoryCardV2({
   return (
     <div
       className={cn(
-        "rounded-xl border p-5 transition-[background-color,color,border-color,opacity,transform] duration-200",
-        isSelected
-          ? "border-[#1E88E5]/60 bg-[#1E88E5]/10 ring-1 ring-[#1E88E5]/30"
-          : "border-border hover:border-[#1E88E5]/40",
+        "rounded-xl border p-5 transition-all duration-200",
         outOfStock && "opacity-50 pointer-events-none",
       )}
+      style={{
+        borderColor: isSelected ? "var(--home-accent)" : "var(--home-border)",
+        backgroundColor: isSelected ? "var(--home-card-highlight)" : "var(--home-card)",
+      }}
     >
       <div className="flex justify-between items-start gap-4 mb-4">
         <div>
-          <h3 className="font-semibold text-lg">{category.name}</h3>
-          <p className="text-sm text-muted-foreground mt-1">
+          <h3 className="font-semibold text-lg" style={{ color: "var(--home-text)" }}>
+            {category.name}
+          </h3>
+          <p className="text-sm mt-1" style={{ color: "var(--home-muted)" }}>
             Admits {category.maxAdmissions}
           </p>
         </div>
 
         <div className="text-right shrink-0">
-          <div className="text-2xl font-bold tracking-tight">
+          <div className="text-2xl font-bold tracking-tight" style={{ color: "var(--home-text)" }}>
             ₦{category.displayPrice.toLocaleString()}
           </div>
           {fee > 0 && (
-            <div className="text-xs text-muted-foreground mt-0.5">
+            <div className="text-xs mt-0.5" style={{ color: "var(--home-muted)" }}>
               incl. ₦{fee.toLocaleString()} fee
             </div>
           )}
@@ -62,21 +65,26 @@ export function TicketCategoryCardV2({
 
       <div className="flex items-center justify-between">
         {isSelected && quantity > 0 ? (
-          <div className="flex items-center gap-2 bg-background border rounded-lg px-1.5 py-1">
+          <div
+            className="flex items-center gap-2 border rounded-lg px-1.5 py-1"
+            style={{ backgroundColor: "var(--home-bg)", borderColor: "var(--home-border)" }}
+          >
             <Button
               size="icon"
               variant="ghost"
-              className="h-8 w-8"
+              className="h-8 w-8 text-[var(--home-text)] hover:bg-[var(--home-card-elevated)] hover:text-[var(--home-text-highlight)]"
               onClick={() => onQuantityChange(-1)}
               disabled={quantity <= 1}
             >
               <Minus className="h-4 w-4" />
             </Button>
-            <span className="w-10 text-center font-medium">{quantity}</span>
+            <span className="w-10 text-center font-medium" style={{ color: "var(--home-text)" }}>
+              {quantity}
+            </span>
             <Button
               size="icon"
               variant="ghost"
-              className="h-8 w-8"
+              className="h-8 w-8 text-[var(--home-text)] hover:bg-[var(--home-card-elevated)] hover:text-[var(--home-text-highlight)]"
               onClick={() => onQuantityChange(1)}
               disabled={quantity >= available || quantity >= 10}
             >
@@ -88,9 +96,9 @@ export function TicketCategoryCardV2({
         )}
 
         <Button
-          variant={isSelected ? "primary" : "outline"}
+          variant={isSelected ? "homeAccent" : "homeOutline"}
           size="sm"
-          className={cn("min-w-[100px]")}
+          className="min-w-[100px]"
           onClick={onToggle}
           disabled={outOfStock}
         >

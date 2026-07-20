@@ -57,10 +57,10 @@ export default function EventDashboard() {
 
   if (eventsLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="home-theme min-h-screen flex items-center justify-center bg-[var(--home-bg)] text-[var(--home-text)]">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-[#1E88E5] mx-auto mb-4" />
-          <p className="text-lg text-muted-foreground">
+          <Loader2 className="h-12 w-12 animate-spin text-[var(--home-accent)] mx-auto mb-4" />
+          <p className="text-lg text-[var(--home-muted)]">
             Loading event details...
           </p>
         </div>
@@ -70,7 +70,7 @@ export default function EventDashboard() {
 
   if (!event) {
     return (
-      <div className="min-h-screen bg-background text-center py-8">
+      <div className="home-theme min-h-screen bg-[var(--home-bg)] text-[var(--home-text)] text-center py-8">
         Event not found
       </div>
     );
@@ -141,21 +141,21 @@ export default function EventDashboard() {
     totalTickets > 0 ? Math.round((ticketsSold / totalTickets) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="home-theme dark min-h-screen bg-[var(--home-bg)] text-[var(--home-text)]">
       <div className="container mx-auto px-4 py-8">
         <div>
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold">{event.name}</h1>
-              <p className="text-sm sm:text-base text-muted-foreground">
+              <p className="text-sm sm:text-base text-[var(--home-muted)]">
                 Welcome back, {currentUser && currentUser.name}! Managing{" "}
                 {event.name}
               </p>
             </div>
             <Button
               asChild
-              className="w-full sm:w-auto bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 py-2 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
+              className="w-full sm:w-auto border-0 bg-[var(--home-accent)] hover:bg-[#f18b76] text-[var(--home-accent-fg)] rounded-full px-6 py-2 shadow-none transition-[background-color,color,border-color,opacity,transform] duration-150 active:translate-y-px"
             >
               <Link href="/organizer">
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -167,18 +167,18 @@ export default function EventDashboard() {
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
             <div>
-              <Card>
+              <Card className="border-[var(--home-border)] bg-[var(--home-card)] text-[var(--home-text)] shadow-none">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-xs sm:text-sm font-medium">
                     Total Tickets
                   </CardTitle>
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <Calendar className="h-4 w-4 text-[var(--home-accent)]" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl sm:text-2xl font-bold">
                     {totalTickets}
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-[var(--home-muted)]">
                     Available tickets
                   </p>
                 </CardContent>
@@ -186,18 +186,18 @@ export default function EventDashboard() {
             </div>
 
             <div>
-              <Card>
+              <Card className="border-[var(--home-border)] bg-[var(--home-card)] text-[var(--home-text)] shadow-none">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-xs sm:text-sm font-medium">
                     Tickets Sold
                   </CardTitle>
-                  <Users className="h-4 w-4 text-muted-foreground" />
+                  <Users className="h-4 w-4 text-[var(--home-accent)]" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl sm:text-2xl font-bold">
                     {ticketsSold}
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-[var(--home-muted)]">
                     Out of {totalTickets}
                   </p>
                 </CardContent>
@@ -205,12 +205,12 @@ export default function EventDashboard() {
             </div>
 
             <div>
-              <Card>
+              <Card className="border-[var(--home-border)] bg-[var(--home-card)] text-[var(--home-text)] shadow-none">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-xs sm:text-sm font-medium">
                     Percentage Sold
                   </CardTitle>
-                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  <TrendingUp className="h-4 w-4 text-[var(--home-accent)]" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl sm:text-2xl font-bold">
@@ -221,12 +221,12 @@ export default function EventDashboard() {
             </div>
 
             <div>
-              <Card>
+              <Card className="border-[var(--home-border)] bg-[var(--home-card)] text-[var(--home-text)] shadow-none">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-xs sm:text-sm font-medium">
                     Net Earnings
                   </CardTitle>
-                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                  <BarChart3 className="h-4 w-4 text-[var(--home-accent)]" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl sm:text-2xl font-bold">
@@ -239,18 +239,18 @@ export default function EventDashboard() {
 
           {/* Event Details */}
           <div>
-            <Card>
+            <Card className="border-[var(--home-border)] bg-[var(--home-card)] text-[var(--home-text)] shadow-none">
               <CardHeader>
                 <CardTitle className="text-xl sm:text-2xl">
                   Event Details
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 border rounded-lg">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 border border-[var(--home-border)] bg-[var(--home-card-elevated)] rounded-2xl">
                   <img
                     src={event.bannerUrl || "/placeholder.svg"}
                     alt={event.name}
-                    className="w-32 h-32 rounded-lg object-cover"
+                    className="w-32 h-32 rounded-xl object-cover ring-1 ring-[var(--home-border)]"
                   />
                   <div className="flex-1">
                     <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 mb-1">
@@ -258,15 +258,15 @@ export default function EventDashboard() {
                         {event.name}
                       </h3>
                     </div>
-                    <p className="text-sm sm:text-base text-muted-foreground mb-2">
+                    <p className="text-sm sm:text-base text-[var(--home-muted)] mb-2">
                       {new Date(event.date).toLocaleDateString()} •{" "}
                       {event.location}
                     </p>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-sm">
-                      <span className="text-muted-foreground">
+                      <span className="text-[var(--home-muted)]">
                         {ticketsSold}/{totalTickets} sold
                       </span>
-                      <span className="text-green-600 font-medium">
+                      <span className="text-[var(--home-success-text)] font-medium">
                         {formatPrice(totalRevenue)} revenue
                       </span>
                     </div>
@@ -281,40 +281,40 @@ export default function EventDashboard() {
                       <DropdownMenuContent
                         align="end"
                         side="right"
-                        className="bg-white shadow-lg rounded-md border border-gray-200 mt-2"
+                        className="bg-[var(--home-card-highlight)] text-[var(--home-text)] shadow-lg rounded-xl border border-[var(--home-border)] mt-2 z-50"
                       >
                         <DropdownMenuItem
                           onClick={() =>
                             router.push(`/organizer/update-event/${event.id}`)
                           }
-                          className="text-sm text-gray-700 hover:bg-gray-100 rounded-md p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
+                          className="text-sm text-[var(--home-text)] hover:bg-[var(--home-card)] rounded-lg p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
                         >
                           <Edit className="mr-2 h-4 w-4" /> Update Event
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-gray-200 h-px my-1" />
+                        <DropdownMenuSeparator className="bg-[var(--home-border)] h-px my-1" />
                         <DropdownMenuItem
                           onClick={() => handleDeleteClick(event.id)}
-                          className="text-sm text-white bg-red-600 hover:bg-red-400 rounded-md p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
+                          className="text-sm text-white bg-red-700 hover:bg-red-600 rounded-lg p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
                         >
                           <Trash2 className="mr-2 h-4 w-4" /> Delete Event
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <div className="w-full sm:w-32 bg-muted rounded-full h-2 mt-2">
+                    <div className="w-full sm:w-32 bg-[var(--home-border-strong)] rounded-full h-2 mt-2">
                       <div
-                        className="bg-gradient-to-r from-[#1E88E5] to-pink-600 h-2 rounded-full"
+                        className="bg-[var(--home-accent)] h-2 rounded-full"
                         style={{
                           width: `${percentageSold}%`,
                         }}
                       />
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1 text-right">
+                    <p className="text-sm text-[var(--home-muted)] mt-1 text-right">
                       {percentageSold}% sold
                     </p>
                   </div>
                 </div>
                 <div className="mt-4">
-                  <Button asChild variant="outline">
+                  <Button asChild variant="outline" className="border-[var(--home-border-strong)] bg-transparent text-[var(--home-text)] hover:bg-[var(--home-card-highlight)] hover:text-[var(--home-text)]">
                     <Link href={`/organizer/event/${event.id}/attendees`}>
                       View Attendees
                     </Link>
@@ -322,17 +322,17 @@ export default function EventDashboard() {
                 </div>
 
                 {/* Event URL Section */}
-                <div className="mt-6 pt-6 border-t">
+                <div className="mt-6 pt-6 border-t border-[var(--home-border)]">
                   <p className="text-sm font-medium mb-3">Event URL</p>
                   <div className="flex flex-col gap-3">
-                    <p className="text-sm break-all bg-muted px-3 py-2 rounded-md font-mono">
+                    <p className="text-sm break-all bg-[var(--home-card-elevated)] text-[var(--home-muted)] px-3 py-2 rounded-xl font-mono">
                       {`${typeof window !== "undefined" ? window.location.origin : ""}/events/${event.slug}`}
                     </p>
                     <Button
                       onClick={handleCopyEventUrl}
                       variant="default"
                       size="sm"
-                      className="w-full sm:w-auto"
+                      className="w-full sm:w-auto border-0 bg-[var(--home-accent)] text-[var(--home-accent-fg)] hover:bg-[#f18b76]"
                     >
                       {copiedToClipboard ? (
                         <>
@@ -356,12 +356,12 @@ export default function EventDashboard() {
           <div
             className="mt-8"
           >
-            <Card>
+            <Card className="border-[var(--home-border)] bg-[var(--home-card)] text-[var(--home-text)] shadow-none">
               <CardHeader>
                 <CardTitle className="text-xl sm:text-2xl">Analytics</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
+                <p className="text-[var(--home-muted)]">
                   Sales trends and insights coming soon.
                 </p>
               </CardContent>
@@ -377,15 +377,15 @@ export default function EventDashboard() {
       </div>
       {/* Global Delete Confirmation Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogOverlay className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" />
-        <DialogContent className="sm:max-w-[425px] bg-white/90 p-6 sm:p-8 rounded-2xl shadow-2xl border border-gray-200 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+        <DialogOverlay className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40" />
+        <DialogContent className="sm:max-w-[425px] bg-[var(--home-card)] text-[var(--home-text)] p-6 sm:p-8 rounded-2xl shadow-2xl border border-[var(--home-border)] fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
           <DialogHeader>
-            <DialogTitle className="text-xl sm:text-2xl text-center font-semibold text-gray-900">
+            <DialogTitle className="text-xl sm:text-2xl text-center font-semibold text-[var(--home-text)]">
               Confirm Deletion
             </DialogTitle>
-            <DialogDescription className="text-sm text-gray-600">
+            <DialogDescription className="text-sm text-[var(--home-muted)]">
               Are you sure you want to delete this event?
-              <span className="block mt-2 text-red-600 font-medium">
+              <span className="block mt-2 text-red-300 font-medium">
                 This action cannot be undone.
               </span>
             </DialogDescription>
@@ -394,14 +394,14 @@ export default function EventDashboard() {
             <Button
               variant="outline"
               onClick={cancelDelete}
-              className="w-full sm:w-auto rounded-xl"
+              className="w-full sm:w-auto rounded-xl border-[var(--home-border-strong)] bg-transparent text-[var(--home-text)] hover:bg-[var(--home-card-highlight)]"
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={confirmDelete}
-              className="w-full sm:w-auto rounded-xl"
+              className="w-full sm:w-auto rounded-xl border-red-800 bg-red-700 text-white hover:bg-red-600"
             >
               Delete
             </Button>

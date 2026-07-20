@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { HomeCard } from "@/components/home/home-card";
 import { useBankCodes } from "@/services/banks/bank.queries";
 import {
   useListResale,
@@ -97,61 +98,119 @@ export default function GuestResaleListPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-10">
+    <main
+      className="home-theme min-h-screen px-4 py-10 pt-24"
+      style={{ backgroundColor: "var(--home-bg)" }}
+    >
       <section className="mx-auto max-w-xl">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold" style={{ color: "var(--home-text)" }}>
             List a ticket for resale
           </h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm" style={{ color: "var(--home-muted)" }}>
             No account needed. Use the ticket code and purchase email from your order.
           </p>
         </div>
 
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-5 rounded-lg border border-gray-200 bg-white p-6 shadow-sm"
-        >
-          <FormField label="Ticket code" error={errors.ticketCode?.message}>
-            <Input {...register("ticketCode")} placeholder="TCK-ABC123" disabled={isListing} />
-          </FormField>
-          <FormField label="Purchase email" error={errors.email?.message}>
-            <Input {...register("email")} type="email" placeholder="owner@example.com" disabled={isListing} />
-          </FormField>
-          <FormField label="Resale price (₦)" error={errors.resalePrice?.message}>
-            <Input {...register("resalePrice")} type="number" min="1200" placeholder="Minimum ₦1,200" disabled={isListing} />
-          </FormField>
-          <FormField label="Bank" error={errors.bankCode?.message}>
-            <select
-              {...register("bankCode")}
-              disabled={isLoadingBanks || isListing}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm disabled:bg-gray-100"
+        <HomeCard tone="card" className="p-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <FormField label="Ticket code" error={errors.ticketCode?.message}>
+              <Input
+                {...register("ticketCode")}
+                placeholder="TCK-ABC123"
+                disabled={isListing}
+                style={{
+                  backgroundColor: "var(--home-bg)",
+                  borderColor: "var(--home-border-strong)",
+                  color: "var(--home-text)",
+                }}
+              />
+            </FormField>
+            <FormField label="Purchase email" error={errors.email?.message}>
+              <Input
+                {...register("email")}
+                type="email"
+                placeholder="owner@example.com"
+                disabled={isListing}
+                style={{
+                  backgroundColor: "var(--home-bg)",
+                  borderColor: "var(--home-border-strong)",
+                  color: "var(--home-text)",
+                }}
+              />
+            </FormField>
+            <FormField label="Resale price (₦)" error={errors.resalePrice?.message}>
+              <Input
+                {...register("resalePrice")}
+                type="number"
+                min="1200"
+                placeholder="Minimum ₦1,200"
+                disabled={isListing}
+                style={{
+                  backgroundColor: "var(--home-bg)",
+                  borderColor: "var(--home-border-strong)",
+                  color: "var(--home-text)",
+                }}
+              />
+            </FormField>
+            <FormField label="Bank" error={errors.bankCode?.message}>
+              <select
+                {...register("bankCode")}
+                disabled={isLoadingBanks || isListing}
+                className="w-full rounded-md border px-3 py-2 text-sm disabled:opacity-50"
+                style={{
+                  backgroundColor: "var(--home-bg)",
+                  borderColor: "var(--home-border-strong)",
+                  color: "var(--home-text)",
+                }}
+              >
+                <option value="">Choose your bank</option>
+                {banks?.map((bank: Bank) => (
+                  <option key={bank.code} value={bank.code}>{bank.name}</option>
+                ))}
+              </select>
+            </FormField>
+            <FormField label="Account number" error={errors.accountNumber?.message}>
+              <Input
+                {...register("accountNumber")}
+                inputMode="numeric"
+                maxLength={10}
+                placeholder="10-digit account number"
+                disabled={isListing}
+                style={{
+                  backgroundColor: "var(--home-bg)",
+                  borderColor: "var(--home-border-strong)",
+                  color: "var(--home-text)",
+                }}
+              />
+            </FormField>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                type="button"
+                variant="homeOutline"
+                onClick={handleVerifyAccount}
+                disabled={isListing || isVerifyingAccount}
+              >
+                {isVerifyingAccount ? "Verifying..." : "Verify account"}
+              </Button>
+              {resolvedAccount && (
+                <p className="text-sm" style={{ color: "var(--home-success-text)" }}>
+                  {resolvedAccount.accountName} confirmed for {maskAccountNumber(resolvedAccount.accountNumber)}
+                </p>
+              )}
+            </div>
+
+            <Button
+              type="submit"
+              variant="homeAccent"
+              className="w-full"
+              disabled={isListing || !resolvedAccount}
             >
-              <option value="">Choose your bank</option>
-              {banks?.map((bank: Bank) => (
-                <option key={bank.code} value={bank.code}>{bank.name}</option>
-              ))}
-            </select>
-          </FormField>
-          <FormField label="Account number" error={errors.accountNumber?.message}>
-            <Input {...register("accountNumber")} inputMode="numeric" maxLength={10} placeholder="10-digit account number" disabled={isListing} />
-          </FormField>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <Button type="button" variant="outline" onClick={handleVerifyAccount} disabled={isListing || isVerifyingAccount}>
-              {isVerifyingAccount ? "Verifying..." : "Verify account"}
+              {isListing ? "Listing ticket..." : "List ticket"}
             </Button>
-            {resolvedAccount && (
-              <p className="text-sm text-green-700">
-                {resolvedAccount.accountName} confirmed for {maskAccountNumber(resolvedAccount.accountNumber)}
-              </p>
-            )}
-          </div>
-
-          <Button type="submit" className="w-full bg-[#1E88E5] text-white hover:bg-blue-600" disabled={isListing || !resolvedAccount}>
-            {isListing ? "Listing ticket..." : "List ticket"}
-          </Button>
-        </form>
+          </form>
+        </HomeCard>
       </section>
     </main>
   );
@@ -160,9 +219,9 @@ export default function GuestResaleListPage() {
 function FormField({ label, error, children }: { label: string; error?: string; children: ReactNode }) {
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium text-gray-900">{label}</label>
+      <label className="text-sm font-medium" style={{ color: "var(--home-text)" }}>{label}</label>
       {children}
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-red-400">{error}</p>}
     </div>
   );
 }
