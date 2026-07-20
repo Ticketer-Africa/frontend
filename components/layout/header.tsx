@@ -57,6 +57,11 @@ export function Header() {
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    document.body.classList.toggle("home-theme", isHome);
+    return () => document.body.classList.remove("home-theme");
+  }, [isHome]);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         profileRef.current &&
