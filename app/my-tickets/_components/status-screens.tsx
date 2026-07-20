@@ -36,7 +36,7 @@ export function EmptyTicketsState() {
         No tickets yet
       </h3>
       <p className="text-gray-600 mb-6">
-        You haven't purchased any tickets yet. Start exploring events!
+        You haven&apos;t purchased any tickets yet. Start exploring events!
       </p>
       <Button
         asChild

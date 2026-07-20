@@ -471,7 +471,7 @@ function NotFound({ router }: { router: any }) {
         <AlertCircle className="mx-auto h-16 w-16" style={{ color: "var(--home-muted)" }} />
         <h2 className="mt-6 text-2xl font-bold" style={{ color: "var(--home-text)" }}>Event not found</h2>
         <p className="mt-3" style={{ color: "var(--home-muted)" }}>
-          The event you're looking for doesn't exist or has been removed.
+          The event you&apos;re looking for doesn&apos;t exist or has been removed.
         </p>
         <Button variant="homeAccent" className="mt-8 w-full" onClick={() => router.push("/explore")}>
           Discover Events

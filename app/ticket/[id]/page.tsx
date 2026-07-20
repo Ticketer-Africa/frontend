@@ -109,7 +109,7 @@ export default function TicketDetailPage({
             Ticket Not Found
           </h1>
           <p className="text-gray-600 mb-4">
-            The ticket you're looking for doesn't exist or is missing required
+            The ticket you&apos;re looking for doesn&apos;t exist or is missing required
             information.
           </p>
           <Button

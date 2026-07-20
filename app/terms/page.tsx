@@ -85,9 +85,9 @@ export default function TermsAndConditions() {
             </h2>
             <p>
               All transactions occur in Naira (₦) and are processed through
-              Ticketer Africa's wallet system. Service fees are automatically
+              Ticketer Africa&apos;s wallet system. Service fees are automatically
               deducted for ticket sales and resale transactions. Refunds, where
-              applicable, are processed according to the organizer's refund
+              applicable, are processed according to the organizer&apos;s refund
               policy.
             </p>
           </div>

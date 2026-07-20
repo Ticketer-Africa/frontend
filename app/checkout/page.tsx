@@ -476,7 +476,7 @@ export default function CheckoutPage() {
                     <div>
                       <p className="text-sm font-medium" style={{ color: "var(--home-text)" }}>Send tickets to different recipients</p>
                       <p className="text-xs mt-0.5" style={{ color: "var(--home-muted)" }}>
-                        Assign each ticket to a specific person's name and email
+                        Assign each ticket to a specific person&apos;s name and email
                       </p>
                     </div>
                   </label>
@@ -489,7 +489,7 @@ export default function CheckoutPage() {
                       >
                         <Users className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "var(--home-accent)" }} />
                         <p className="text-xs" style={{ color: "var(--home-text-highlight)" }}>
-                          Each ticket will be sent to the recipient's email address after purchase.
+                          Each ticket will be sent to the recipient&apos;s email address after purchase.
                         </p>
                       </div>
 

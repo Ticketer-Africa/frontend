@@ -44,7 +44,7 @@ export function WhyChooseSection() {
             Why Choose Ticketer Africa?
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            We're not just another ticketing platform. We're your trusted
+            We&apos;re not just another ticketing platform. We&apos;re your trusted
             partner for unforgettable experiences.
           </p>
         </div>

@@ -445,7 +445,7 @@ export default function ResalePage() {
                 Best Prices
               </h4>
               <p className="text-sm" style={{ color: "var(--home-muted)" }}>
-                Find tickets at or below face value from fans who can't attend
+                Find tickets at or below face value from fans who can&apos;t attend
               </p>
             </div>
 
