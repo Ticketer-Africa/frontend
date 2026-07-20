@@ -14,3 +14,9 @@
 ## Scope
 
 - Modified only the two Task 1 implementation files and this required report.
+
+## Review Fix
+
+- Added the repository ESLint configuration and the matching Next.js ESLint development dependencies.
+- Escaped pre-existing JSX apostrophes reported by the new lint rule without changing rendered copy.
+- `npm run lint` now exits with code 0; it emits existing Next.js image and React hook warnings only.
