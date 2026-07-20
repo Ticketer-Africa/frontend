@@ -143,14 +143,21 @@ export default function SettingsPage() {
   if (isLoading) {
     return (
       <div
-        className="fixed inset-0 bg-gray-50 bg-opacity-90 flex items-center justify-center z-50"
+        className="home-theme fixed inset-0 flex items-center justify-center z-50"
+        style={{ backgroundColor: "var(--home-bg)", opacity: 0.9 }}
       >
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#1E88E5] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <div
+            className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4"
+            style={{ borderColor: "var(--home-accent)" }}
+          ></div>
+          <h2
+            className="text-xl font-semibold mb-2"
+            style={{ color: "var(--home-text)" }}
+          >
             Loading Authentication...
           </h2>
-          <p className="text-gray-600">
+          <p style={{ color: "var(--home-muted)" }}>
             Please wait while we verify your session
           </p>
         </div>
@@ -159,12 +166,17 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div
+      className="home-theme min-h-screen"
+      style={{ backgroundColor: "var(--home-bg)" }}
+    >
       <div className="container mx-auto px-4 py-8">
         <div>
           <div className="mb-8">
-            <h1 className="text-3xl font-bold">Settings</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-3xl font-bold" style={{ color: "var(--home-text)" }}>
+              Settings
+            </h1>
+            <p style={{ color: "var(--home-muted)" }}>
               Manage your account settings and preferences
             </p>
           </div>
@@ -172,9 +184,18 @@ export default function SettingsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Profile Overview */}
             <div>
-              <Card>
+              <Card
+                className="border"
+                style={{
+                  backgroundColor: "var(--home-card)",
+                  borderColor: "var(--home-border)",
+                  color: "var(--home-text)",
+                }}
+              >
                 <CardHeader>
-                  <CardTitle>Profile Overview</CardTitle>
+                  <CardTitle style={{ color: "var(--home-text)" }}>
+                    Profile Overview
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="text-center space-y-4">
                   <div className="relative inline-block">
@@ -188,7 +209,14 @@ export default function SettingsPage() {
                       className="w-20 h-20 rounded-full mx-auto object-cover"
                     />
                     <label htmlFor="fileUpload">
-                      <div className="absolute bottom-0 right-0 flex items-center justify-center border border-gray-300 bg-white shadow-sm rounded-full">
+                      <div
+                        className="absolute bottom-0 right-0 flex items-center justify-center border shadow-sm rounded-full"
+                        style={{
+                          backgroundColor: "var(--home-card-elevated)",
+                          borderColor: "var(--home-border-strong)",
+                          color: "var(--home-text)",
+                        }}
+                      >
                         <Camera className="h-4 w-4" />
                       </div>
                     </label>
@@ -201,10 +229,10 @@ export default function SettingsPage() {
                     />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg">
+                    <h3 className="font-semibold text-lg" style={{ color: "var(--home-text)" }}>
                       {currentUser?.name}
                     </h3>
-                    <p className="text-muted-foreground">
+                    <p style={{ color: "var(--home-muted)" }}>
                       {currentUser?.email}
                     </p>
                   </div>
@@ -215,6 +243,11 @@ export default function SettingsPage() {
                           ? "default"
                           : "secondary"
                       }
+                      style={{
+                        backgroundColor: "var(--home-card-highlight)",
+                        borderColor: "var(--home-border-strong)",
+                        color: "var(--home-text-highlight)",
+                      }}
                     >
                       <Shield className="h-3 w-3 mr-1" />
                       {currentUser?.role === "ORGANIZER"
@@ -230,10 +263,17 @@ export default function SettingsPage() {
             <div className="lg:col-span-2 space-y-6">
               {/* Profile Form */}
               <div>
-                <Card>
+                <Card
+                  className="border"
+                  style={{
+                    backgroundColor: "var(--home-card)",
+                    borderColor: "var(--home-border)",
+                    color: "var(--home-text)",
+                  }}
+                >
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
-                      <User className="h-5 w-5" />
+                      <User className="h-5 w-5" style={{ color: "var(--home-accent)" }} />
                       <span>Profile Information</span>
                     </CardTitle>
                   </CardHeader>
@@ -244,10 +284,22 @@ export default function SettingsPage() {
                     >
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <label htmlFor="name" className="text-sm font-medium">
+                          <label
+                            htmlFor="name"
+                            className="text-sm font-medium"
+                            style={{ color: "var(--home-text)" }}
+                          >
                             Full Name
                           </label>
-                          <Input id="name" {...register("name")} />
+                          <Input
+                            id="name"
+                            {...register("name")}
+                            style={{
+                              backgroundColor: "var(--home-bg)",
+                              borderColor: "var(--home-border-strong)",
+                              color: "var(--home-text)",
+                            }}
+                          />
                           {errors.name && (
                             <p className="text-sm text-red-500">
                               {errors.name.message}
@@ -256,7 +308,7 @@ export default function SettingsPage() {
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
+                        <label className="text-sm font-medium" style={{ color: "var(--home-text)" }}>
                           Account Type
                         </label>
                         <div className="flex items-center space-x-2">
@@ -266,12 +318,17 @@ export default function SettingsPage() {
                                 ? "default"
                                 : "secondary"
                             }
+                            style={{
+                              backgroundColor: "var(--home-card-highlight)",
+                              borderColor: "var(--home-border-strong)",
+                              color: "var(--home-text-highlight)",
+                            }}
                           >
                             {currentUser?.role === "ORGANIZER"
                               ? "Event Organizer"
                               : "User"}
                           </Badge>
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-sm" style={{ color: "var(--home-muted)" }}>
                             Contact support to change your account type
                           </span>
                         </div>
@@ -283,7 +340,8 @@ export default function SettingsPage() {
                           isSubmitting ||
                           !hasProfileChanges
                         }
-                        className="mt-4 sm:mt-0 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
+                        variant="homeAccent"
+                        className="mt-4 sm:mt-0 px-6"
                       >
                         Save Changes
                       </Button>
@@ -294,10 +352,17 @@ export default function SettingsPage() {
 
               {/* Change Password */}
               <div>
-                <Card>
+                <Card
+                  className="border"
+                  style={{
+                    backgroundColor: "var(--home-card)",
+                    borderColor: "var(--home-border)",
+                    color: "var(--home-text)",
+                  }}
+                >
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
-                      <Lock className="h-5 w-5" />
+                      <Lock className="h-5 w-5" style={{ color: "var(--home-accent)" }} />
                       <span>Change Password</span>
                     </CardTitle>
                   </CardHeader>
@@ -310,6 +375,7 @@ export default function SettingsPage() {
                         <label
                           htmlFor="currentPassword"
                           className="text-sm font-medium"
+                          style={{ color: "var(--home-text)" }}
                         >
                           Current Password
                         </label>
@@ -317,6 +383,11 @@ export default function SettingsPage() {
                           id="currentPassword"
                           type="password"
                           {...registerPassword("currentPassword")}
+                          style={{
+                            backgroundColor: "var(--home-bg)",
+                            borderColor: "var(--home-border-strong)",
+                            color: "var(--home-text)",
+                          }}
                         />
                         {passwordErrors.currentPassword && (
                           <p className="text-sm text-red-500">
@@ -328,6 +399,7 @@ export default function SettingsPage() {
                         <label
                           htmlFor="newPassword"
                           className="text-sm font-medium"
+                          style={{ color: "var(--home-text)" }}
                         >
                           New Password
                         </label>
@@ -335,6 +407,11 @@ export default function SettingsPage() {
                           id="newPassword"
                           type="password"
                           {...registerPassword("newPassword")}
+                          style={{
+                            backgroundColor: "var(--home-bg)",
+                            borderColor: "var(--home-border-strong)",
+                            color: "var(--home-text)",
+                          }}
                         />
                         {passwordErrors.newPassword && (
                           <p className="text-sm text-red-500">
@@ -346,6 +423,7 @@ export default function SettingsPage() {
                         <label
                           htmlFor="confirmPassword"
                           className="text-sm font-medium"
+                          style={{ color: "var(--home-text)" }}
                         >
                           Confirm New Password
                         </label>
@@ -353,6 +431,11 @@ export default function SettingsPage() {
                           id="confirmPassword"
                           type="password"
                           {...registerPassword("confirmPassword")}
+                          style={{
+                            backgroundColor: "var(--home-bg)",
+                            borderColor: "var(--home-border-strong)",
+                            color: "var(--home-text)",
+                          }}
                         />
                         {passwordErrors.confirmPassword && (
                           <p className="text-sm text-red-500">
@@ -366,8 +449,8 @@ export default function SettingsPage() {
                           changePasswordMutation.isPending ||
                           !hasPasswordChanges
                         }
-                        variant="outline"
-                        className="mt-4 sm:mt-0 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
+                        variant="homeAccent"
+                        className="mt-4 sm:mt-0 px-6"
                       >
                         Update Password
                       </Button>

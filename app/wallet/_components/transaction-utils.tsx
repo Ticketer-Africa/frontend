@@ -11,11 +11,11 @@ export const getTransactionIcon = (type: string) => {
     case "PURCHASE":
       return <TrendingDown className="h-4 w-4 text-red-500" />;
     case "RESALE":
-      return <TrendingUp className="h-4 w-4 text-green-500" />;
+      return <TrendingUp className="h-4 w-4" style={{ color: "var(--home-success)" }} />;
     case "WITHDRAW":
-      return <Download className="h-4 w-4 text-blue-500" />;
+      return <Download className="h-4 w-4" style={{ color: "var(--home-accent)" }} />;
     default:
-      return <Wallet className="h-4 w-4 text-gray-500" />;
+      return <Wallet className="h-4 w-4" style={{ color: "var(--home-muted-dim)" }} />;
   }
 };
 
