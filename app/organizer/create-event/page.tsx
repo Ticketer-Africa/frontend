@@ -193,10 +193,20 @@ export default function CreateEventPage() {
   const stepTitles = ["Event Details", "Date & Tickets", "Advanced Settings", "Review & Fees"];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+    <div className="organizer-event-form home-theme dark min-h-screen bg-[var(--home-bg)] text-[var(--home-text)]">
+      <style jsx global>{`
+        .organizer-event-form [class*="bg-gray-50"], .organizer-event-form [class*="bg-white"] { background-color: var(--home-card-elevated) !important; }
+        .organizer-event-form [class*="border-gray-"], .organizer-event-form [class*="border-dashed"] { border-color: var(--home-border) !important; }
+        .organizer-event-form [class*="text-gray-900"], .organizer-event-form [class*="text-gray-800"], .organizer-event-form [class*="text-gray-700"] { color: var(--home-text) !important; }
+        .organizer-event-form [class*="text-gray-600"], .organizer-event-form [class*="text-gray-500"] { color: var(--home-muted) !important; }
+        .organizer-event-form [class*="text-gray-400"] { color: var(--home-muted-dim) !important; }
+        .organizer-event-form input, .organizer-event-form textarea, .organizer-event-form select { border-color: var(--home-border-strong) !important; background-color: var(--home-bg) !important; color: var(--home-text) !important; }
+        .organizer-event-form [class*="bg-[#1E88E5]"] { background-color: var(--home-accent) !important; color: var(--home-accent-fg) !important; }
+        .organizer-event-form [class*="hover:border-[#1E88E5]"], .organizer-event-form [class*="hover:text-[#1E88E5]"] { --tw-border-opacity: 1; }
+      `}</style>
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
-          <Button variant="outline" className="bg-transparent" asChild disabled={isPending || isSubmitting}>
+          <Button variant="outline" className="border-[var(--home-border-strong)] bg-transparent text-[var(--home-text)] hover:bg-[var(--home-card)] hover:text-[var(--home-text)]" asChild disabled={isPending || isSubmitting}>
             <Link href="/organizer">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
@@ -204,7 +214,7 @@ export default function CreateEventPage() {
           </Button>
           <div className="text-center">
             <h1 className="text-3xl font-bold">Create Event</h1>
-            <p className="text-gray-600">Step {currentStep} of {TOTAL_STEPS}</p>
+            <p className="text-[var(--home-muted)]">Step {currentStep} of {TOTAL_STEPS}</p>
           </div>
           <div className="w-32" />
         </div>
@@ -212,7 +222,7 @@ export default function CreateEventPage() {
         <ProgressBar currentStep={currentStep} totalSteps={TOTAL_STEPS} />
 
         <div className="step-content-animate">
-          <Card className="max-w-2xl mx-auto bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/20">
+          <Card className="max-w-2xl mx-auto bg-[var(--home-card)] text-[var(--home-text)] backdrop-blur-md rounded-3xl shadow-none border border-[var(--home-border)]">
             <CardHeader>
               <CardTitle className="text-2xl">{stepTitles[currentStep - 1]}</CardTitle>
             </CardHeader>

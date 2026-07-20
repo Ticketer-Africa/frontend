@@ -40,10 +40,10 @@ import type { AttendeeStatus } from "@/services/attendees/attendees";
 type FilterType = "ALL" | "TICKET";
 
 const STATUS_VARIANT: Record<AttendeeStatus, { label: string; className: string }> = {
-  PENDING: { label: "Pending", className: "bg-amber-100 text-amber-800" },
-  CHECKED_IN: { label: "Checked in", className: "bg-green-100 text-green-800" },
-  ACTIVE: { label: "Active", className: "bg-blue-100 text-blue-800" },
-  USED: { label: "Used", className: "bg-gray-200 text-gray-700" },
+  PENDING: { label: "Pending", className: "bg-amber-400/15 text-amber-200 ring-1 ring-amber-300/30" },
+  CHECKED_IN: { label: "Checked in", className: "bg-green-400/15 text-green-200 ring-1 ring-green-300/30" },
+  ACTIVE: { label: "Active", className: "bg-[var(--home-accent)]/15 text-[var(--home-text-highlight)] ring-1 ring-[var(--home-accent)]/30" },
+  USED: { label: "Used", className: "bg-white/10 text-[var(--home-muted)] ring-1 ring-white/10" },
 };
 
 export default function AttendeesPage() {
@@ -119,16 +119,16 @@ export default function AttendeesPage() {
   }, [data, counts]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="home-theme dark min-h-screen bg-[var(--home-bg)] text-[var(--home-text)]">
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold">Attendees</h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-[var(--home-muted)]">
               {event?.name ? `Managing attendees for ${event.name}` : "Manage everyone going to this event"}
             </p>
           </div>
-          <Button asChild variant="outline" className="w-full md:w-auto rounded-full">
+          <Button asChild variant="outline" className="w-full md:w-auto rounded-full border-[var(--home-border-strong)] bg-transparent text-[var(--home-text)] hover:bg-[var(--home-card)] hover:text-[var(--home-text)]">
             <Link href={`/organizer/view-event/${eventId}`}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to event
@@ -139,9 +139,9 @@ export default function AttendeesPage() {
         {summary && (
           <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
             {summary.map((s) => (
-              <Card key={s.label}>
+              <Card key={s.label} className="border-[var(--home-border)] bg-[var(--home-card)] text-[var(--home-text)] shadow-none">
                 <CardContent className="py-4">
-                  <p className="text-xs text-muted-foreground">{s.label}</p>
+                  <p className="text-xs text-[var(--home-muted)]">{s.label}</p>
                   <p className="text-2xl font-bold">{s.value}</p>
                 </CardContent>
               </Card>
@@ -149,7 +149,7 @@ export default function AttendeesPage() {
           </div>
         )}
 
-        <Card>
+        <Card className="border-[var(--home-border)] bg-[var(--home-card)] text-[var(--home-text)] shadow-none">
           <CardHeader className="gap-4">
             <CardTitle>All attendees</CardTitle>
             <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
@@ -178,24 +178,24 @@ export default function AttendeesPage() {
               <div className="relative flex-1 max-w-sm">
                 <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  className="pl-9"
+                  className="pl-9 border-[var(--home-border-strong)] bg-[var(--home-card-elevated)] text-[var(--home-text)] placeholder:text-[var(--home-muted-dim)] focus-visible:ring-[var(--home-accent)]"
                   placeholder="Search name, email, phone, ticket code"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
               </div>
               {isFetching && !isLoading && (
-                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                <Loader2 className="h-4 w-4 animate-spin text-[var(--home-accent)]" />
               )}
             </div>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <div className="flex items-center justify-center py-16">
-                <Loader2 className="h-8 w-8 animate-spin text-[#1E88E5]" />
+                <Loader2 className="h-8 w-8 animate-spin text-[var(--home-accent)]" />
               </div>
             ) : filteredRows.length === 0 ? (
-              <div className="text-center py-16 text-muted-foreground">
+              <div className="text-center py-16 text-[var(--home-muted)]">
                 No attendees match your filters.
               </div>
             ) : (
@@ -216,12 +216,12 @@ export default function AttendeesPage() {
                       return (
                         <TableRow key={`${a.type}-${a.id}`}>
                           <TableCell className="font-medium">
-                            {a.name || <span className="text-muted-foreground italic">No name</span>}
+                            {a.name || <span className="text-[var(--home-muted)] italic">No name</span>}
                           </TableCell>
                           <TableCell className="text-sm">
                             <div>{a.email || "—"}</div>
                             {a.phone && (
-                              <div className="text-muted-foreground">{a.phone}</div>
+                              <div className="text-[var(--home-muted)]">{a.phone}</div>
                             )}
                           </TableCell>
                           <TableCell>
@@ -232,11 +232,11 @@ export default function AttendeesPage() {
                           <TableCell className="text-sm">
                             <div>
                               {a.ticketCategoryName || (
-                                <span className="text-muted-foreground">—</span>
+                                <span className="text-[var(--home-muted)]">—</span>
                               )}
                             </div>
                             {a.ticketCode && (
-                              <div className="text-muted-foreground font-mono text-xs">
+                              <div className="text-[var(--home-muted)] font-mono text-xs">
                                 {a.ticketCode}
                               </div>
                             )}
@@ -245,7 +245,7 @@ export default function AttendeesPage() {
                             {a.tableNumber ? (
                               <span className="font-medium">{a.tableNumber}</span>
                             ) : (
-                              <span className="text-muted-foreground">—</span>
+                              <span className="text-[var(--home-muted)]">—</span>
                             )}
                           </TableCell>
                         </TableRow>
@@ -258,7 +258,7 @@ export default function AttendeesPage() {
 
             {filteredRows.length > 0 && (
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4">
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-[var(--home-muted)]">
                   Showing {(currentPage - 1) * PAGE_SIZE + 1}–
                   {Math.min(currentPage * PAGE_SIZE, filteredRows.length)} of{" "}
                   {filteredRows.length}
@@ -274,7 +274,7 @@ export default function AttendeesPage() {
                       <ChevronLeft className="h-4 w-4 mr-1" />
                       Prev
                     </Button>
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-[var(--home-muted)]">
                       Page {currentPage} of {totalPages}
                     </span>
                     <Button
