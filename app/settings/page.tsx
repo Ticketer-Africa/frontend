@@ -149,7 +149,7 @@ export default function SettingsPage() {
         <div className="text-center">
           <div
             className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-            style={{ borderColor: "var(--home-accent)" }}
+            style={{ borderColor: "var(--home-accent)", borderTopColor: "transparent" }}
           ></div>
           <h2
             className="text-xl font-semibold mb-2"

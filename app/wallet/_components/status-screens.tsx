@@ -17,7 +17,7 @@ export function WalletLoadingScreen({
       <div className="text-center">
         <div
           className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-          style={{ borderColor: "var(--home-accent)" }}
+          style={{ borderColor: "var(--home-accent)", borderTopColor: "transparent" }}
         ></div>
         <h2 className="text-xl font-semibold mb-2" style={{ color: "var(--home-text)" }}>
           {message}
@@ -39,7 +39,7 @@ export function WalletDataLoadingScreen() {
       <div className="section-animate text-center">
         <div
           className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-          style={{ borderColor: "var(--home-accent)" }}
+          style={{ borderColor: "var(--home-accent)", borderTopColor: "transparent" }}
         ></div>
         <h2 className="text-xl font-semibold mb-2" style={{ color: "var(--home-text)" }}>
           Loading Wallet...
