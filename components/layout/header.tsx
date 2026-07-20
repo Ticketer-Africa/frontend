@@ -22,8 +22,6 @@ const NAVIGATION = [
   { name: "Resale Market", href: "/resale" },
 ] as const;
 
-// Round 2: dark theme extends beyond "/" to these public-facing pages.
-// Every other route (My Tickets, Organizer, Wallet, Settings, Terms, etc.) stays light.
 const DARK_ROUTES = [
   "/",
   "/explore",
@@ -42,7 +40,18 @@ export function Header() {
   const isHome =
     DARK_ROUTES.includes(pathname) ||
     pathname.startsWith("/events/") ||
-    pathname.startsWith("/resale/");
+    pathname.startsWith("/resale/") ||
+    pathname.startsWith("/ticket/") ||
+    pathname.startsWith("/organizer/") ||
+    [
+      "/organizer",
+      "/wallet",
+      "/settings",
+      "/verify-otp",
+      "/verify-ticket",
+      "/terms",
+      "/service-agreement",
+    ].includes(pathname);
   const { user, logout } = useUser();
   const { isLoading: authLoading } = useAuthStatus();
   const profileRef = useRef<HTMLDivElement>(null);

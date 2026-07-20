@@ -3,11 +3,16 @@
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
-// Mirrors components/layout/header.tsx's DARK_ROUTES: only the auth pages
-// among the routes that use RouteLoader are dark-theme, everything else
-// (My Tickets, Organizer, Wallet, Settings, etc.) stays light. /resale
-// doesn't use RouteLoader — it has no loading.tsx (removed for faster nav).
-const DARK_ROUTES = ["/login", "/register", "/forgot-password", "/reset-password"];
+const DARK_ROUTES = [
+  "/",
+  "/explore",
+  "/checkout",
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+  "/resale",
+];
 
 /**
  * RouteLoader - Optimized for performance
@@ -18,21 +23,36 @@ const DARK_ROUTES = ["/login", "/register", "/forgot-password", "/reset-password
  */
 export default function RouteLoader() {
   const pathname = usePathname();
-  const isDark = DARK_ROUTES.includes(pathname);
+  const isHome =
+    DARK_ROUTES.includes(pathname) ||
+    pathname.startsWith("/events/") ||
+    pathname.startsWith("/resale/") ||
+    pathname.startsWith("/ticket/") ||
+    pathname.startsWith("/organizer/") ||
+    [
+      "/organizer",
+      "/wallet",
+      "/settings",
+      "/verify-otp",
+      "/verify-ticket",
+      "/terms",
+      "/service-agreement",
+    ].includes(pathname);
 
   return (
     <div
       className={clsx(
         "section-animate fixed inset-0 flex items-center justify-center z-50",
-        isDark ? "home-theme" : "bg-gray-50 bg-opacity-90"
+        isHome ? "home-theme" : "bg-gray-50 bg-opacity-90"
       )}
-      style={isDark ? { backgroundColor: "var(--home-bg)", opacity: 0.9 } : undefined}
+      style={isHome ? { backgroundColor: "var(--home-bg)", opacity: 0.9 } : undefined}
     >
-      <div className="text-center">
+      <div className="text-center" role="status">
         <div
           className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin mx-auto mb-4"
-          style={{ borderColor: isDark ? "var(--home-accent)" : "#1E88E5" }}
+          style={{ borderColor: isHome ? "var(--home-accent)" : "#1E88E5" }}
         ></div>
+        <span className="sr-only">Loading page...</span>
       </div>
     </div>
   );
