@@ -356,7 +356,7 @@ export default function VerifyTicketPage() {
                     </p>
                   </div>
                   <div>
-                    <span className="text-gray-600">Status:</span>
+                    <span style={{ color: "var(--home-muted)" }}>Status:</span>
                     <Badge
                       variant={
                         verification?.isValid ? "default" : "destructive"
