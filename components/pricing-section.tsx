@@ -3,8 +3,18 @@
 import { Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HomeCard } from "@/components/home/home-card";
+import { useUser } from "@/lib/auth-context";
+
+const CTA_BY_ROLE = {
+  guest: { label: "Start Selling Tickets", href: "/register?intent=organizer" },
+  ORGANIZER: { label: "Create an Event", href: "/organizer/create-event" },
+  USER: { label: "Explore Events", href: "/explore" },
+} as const;
 
 export function PricingSection() {
+  const { user } = useUser();
+  const cta = CTA_BY_ROLE[user?.role ?? "guest"];
+
   return (
     <section
       id="pricing"
@@ -119,9 +129,9 @@ export function PricingSection() {
             asChild
             className="drop-shadow-[0px_0px_7.5px_rgba(226,114,91,0.2)]"
           >
-            <a href="/register?intent=organizer">
+            <a href={cta.href}>
               <Ticket className="mr-2 w-4 h-4" />
-              Start Selling Tickets
+              {cta.label}
             </a>
           </Button>
         </div>

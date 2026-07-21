@@ -4,9 +4,18 @@ import { Button } from "@/components/ui/button";
 import { EmberParticles } from "@/components/ember-particles";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/lib/auth-context";
+
+const CTA_BY_ROLE = {
+  guest: { label: "Become an Organizer", href: "/register?intent=organizer" },
+  ORGANIZER: { label: "Create an Event", href: "/organizer/create-event" },
+  USER: { label: "Explore Events", href: "/explore" },
+} as const;
 
 export function HeroSection() {
   const router = useRouter();
+  const { user } = useUser();
+  const cta = CTA_BY_ROLE[user?.role ?? "guest"];
 
   return (
     <section
@@ -54,9 +63,9 @@ export function HeroSection() {
             variant="homeAccent"
             size="lg"
             className="drop-shadow-[0px_0px_7.5px_rgba(226,114,91,0.2)]"
-            onClick={() => router.push("/register?intent=organizer")}
+            onClick={() => router.push(cta.href)}
           >
-            Become an Organizer
+            {cta.label}
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </div>
