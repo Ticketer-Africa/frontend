@@ -308,7 +308,9 @@ export function Header() {
           <div
             className={clsx(
               "mobile-menu-slide-in border-t py-4 md:hidden",
-              isHome ? "border-[var(--home-border)]" : "border-border"
+              isHome
+                ? "border-[var(--home-border)] bg-[var(--home-bg)]"
+                : "border-border bg-background"
             )}
           >
             <nav className="space-y-2">
