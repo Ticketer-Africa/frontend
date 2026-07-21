@@ -162,7 +162,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
       </div>
 
       <div
-        className="home-theme min-h-screen pb-32 md:pb-0"
+        className="home-theme min-h-screen pt-16 pb-32 md:pb-0"
         style={{ backgroundColor: "var(--home-bg)" }}
       >
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -442,7 +442,7 @@ function OccurrenceSelector({
 
 function LoadingSkeleton() {
   return (
-    <div className="home-theme min-h-screen" style={{ backgroundColor: "var(--home-bg)" }}>
+    <div className="home-theme min-h-screen pt-16" style={{ backgroundColor: "var(--home-bg)" }}>
       <div className="container mx-auto px-4 py-8">
         <Skeleton
           className="h-72 w-full rounded-2xl mb-10"

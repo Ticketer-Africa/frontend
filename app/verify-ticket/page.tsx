@@ -187,7 +187,7 @@ export default function VerifyTicketPage() {
   if (mode === "camera" && !verification && !error) {
     return (
       <div
-        className="home-theme min-h-screen p-4"
+        className="home-theme min-h-screen px-4 pb-4 pt-16"
         style={{ backgroundColor: "var(--home-bg)" }}
       >
         <div className="container mx-auto max-w-md py-8 space-y-4">
@@ -280,7 +280,7 @@ export default function VerifyTicketPage() {
 
   return (
     <div
-      className="home-theme min-h-screen p-4"
+      className="home-theme min-h-screen px-4 pb-4 pt-16"
       style={{ backgroundColor: "var(--home-bg)" }}
     >
       <div className="container mx-auto max-w-2xl py-8">
