@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Eye, EyeOff, Ticket, Check } from "lucide-react";
+import { Eye, EyeOff, Lock, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -130,7 +130,7 @@ export default function RegisterPage() {
           className="flex items-center justify-center rounded-full p-3 mb-2"
           style={{ backgroundColor: "#362222" }}
         >
-          <Ticket className="w-6 h-6" style={{ color: "var(--home-accent)" }} />
+          <Lock className="w-6 h-6" style={{ color: "var(--home-accent)" }} />
         </div>
         <h1 className="text-3xl font-bold" style={{ color: "var(--home-text)" }}>
           Sign Up

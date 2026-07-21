@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { EmberParticles } from "@/components/ember-particles";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -15,7 +16,9 @@ export function HeroSection() {
           "radial-gradient(circle at 50% 0%, rgba(226,114,91,0.16), transparent 60%), var(--home-bg)",
       }}
     >
-      <div className="relative z-0 text-center max-w-5xl mx-auto w-full">
+      <EmberParticles className="z-0" />
+
+      <div className="relative z-10 text-center max-w-5xl mx-auto w-full">
         <span
           className="inline-block mb-4 px-4 py-1 rounded-full border text-sm tracking-[0.5px] font-['Hanken_Grotesk'] font-semibold backdrop-blur-[2px]"
           style={{
