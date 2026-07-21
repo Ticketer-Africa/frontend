@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="home-theme min-h-screen bg-[var(--home-bg)] px-4 py-8" aria-busy="true" aria-label="Loading organizer dashboard">
+    <div className="home-theme min-h-screen bg-[var(--home-bg)] px-4 pt-24 pb-8" aria-busy="true" aria-label="Loading organizer dashboard">
       <div className="container mx-auto space-y-8 animate-pulse">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-3">

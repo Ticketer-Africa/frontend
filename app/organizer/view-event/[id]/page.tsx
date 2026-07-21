@@ -141,7 +141,7 @@ export default function EventDashboard() {
     totalTickets > 0 ? Math.round((ticketsSold / totalTickets) * 100) : 0;
 
   return (
-    <div className="home-theme dark min-h-screen bg-[var(--home-bg)] text-[var(--home-text)]">
+    <div className="home-theme dark min-h-screen pt-16 bg-[var(--home-bg)] text-[var(--home-text)]">
       <div className="container mx-auto px-4 py-8">
         <div>
           {/* Header */}

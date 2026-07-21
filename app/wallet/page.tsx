@@ -103,7 +103,7 @@ export default function WalletPage() {
 
   return (
     <div
-      className="home-theme min-h-screen"
+      className="home-theme min-h-screen pt-16"
       style={{ backgroundColor: "var(--home-bg)" }}
     >
       <div className="container mx-auto px-4 py-8">

@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="home-theme min-h-screen bg-[var(--home-bg)] px-4 py-8" aria-busy="true" aria-label="Loading event form">
+    <div className="home-theme min-h-screen bg-[var(--home-bg)] px-4 pt-24 pb-8" aria-busy="true" aria-label="Loading event form">
       <div className="container mx-auto max-w-2xl animate-pulse">
         <div className="mb-8 flex items-center justify-between">
           <div className="h-10 w-40 rounded-full bg-[var(--home-card-highlight)]" />

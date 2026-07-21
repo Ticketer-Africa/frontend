@@ -193,7 +193,7 @@ export default function CreateEventPage() {
   const stepTitles = ["Event Details", "Date & Tickets", "Advanced Settings", "Review & Fees"];
 
   return (
-    <div className="organizer-event-form home-theme dark min-h-screen bg-[var(--home-bg)] text-[var(--home-text)]">
+    <div className="organizer-event-form home-theme dark min-h-screen pt-16 bg-[var(--home-bg)] text-[var(--home-text)]">
       <style jsx global>{`
         .organizer-event-form [class*="bg-gray-50"], .organizer-event-form [class*="bg-white"] { background-color: var(--home-card-elevated) !important; }
         .organizer-event-form [class*="border-gray-"], .organizer-event-form [class*="border-dashed"] { border-color: var(--home-border) !important; }
