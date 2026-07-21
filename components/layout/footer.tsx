@@ -6,7 +6,6 @@ import { Logo } from "./logo";
 
 const PLATFORM_LINKS = [
   { href: "/explore", label: "Find Events" },
-  { href: "/explore", label: "Resale Market" }, // TODO: point at a dedicated resale route if/when one exists
   { href: "/organizer/create-event", label: "Create Event" },
   { href: "#", label: "Mobile App" }, // TODO: no mobile app route/link exists yet
 ] as const;

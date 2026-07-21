@@ -19,7 +19,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 const NAVIGATION = [
   { name: "Home", href: "/" },
   { name: "Explore", href: "/explore" },
-  { name: "Resale Market", href: "/resale" },
 ] as const;
 
 const DARK_ROUTES = [
