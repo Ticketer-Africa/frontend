@@ -121,18 +121,11 @@ export function FAQSection() {
       <div className="max-w-4xl mx-auto">
         <div className="section-animate text-center mb-16">
           <h2
-            className="font-['Syne'] font-bold text-3xl sm:text-4xl lg:text-5xl mb-4"
+            className="font-['Syne'] font-bold text-3xl sm:text-4xl lg:text-[48px] tracking-[-1.2px]"
             style={{ color: "var(--home-text)" }}
           >
             Frequently Asked Questions
           </h2>
-          <p
-            className="font-['Hanken_Grotesk'] text-lg max-w-2xl mx-auto"
-            style={{ color: "var(--home-muted)" }}
-          >
-            Everything you need to know about using our platform for events
-            and ticket resale.
-          </p>
         </div>
 
         <div className="space-y-4">

@@ -24,24 +24,24 @@ export function PricingSection() {
       <div className="max-w-5xl mx-auto text-center">
         <div className="section-animate mb-12">
           <h2
-            className="font-['Syne'] font-bold text-3xl sm:text-4xl lg:text-5xl mb-4"
+            className="font-['Syne'] font-bold text-3xl sm:text-4xl lg:text-[48px] tracking-[-1.2px] mb-4"
             style={{ color: "var(--home-text)" }}
           >
             Simple, Transparent Pricing
           </h2>
           <p
-            className="font-['Hanken_Grotesk'] text-lg"
+            className="font-['Hanken_Grotesk'] text-base"
             style={{ color: "var(--home-muted)" }}
           >
             No subscriptions. No setup fees. You only pay when you sell.
           </p>
         </div>
 
-        <div className="section-animate section-delay-1 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="section-animate section-delay-1 grid grid-cols-1 md:grid-cols-2 gap-12 items-stretch">
           <HomeCard
             tone="highlight"
             radius="card-lg"
-            className="relative p-10"
+            className="relative p-10 flex flex-col justify-center lg:h-[292px]"
             style={{ borderWidth: 2, borderColor: "var(--home-accent)" }}
           >
             <span
@@ -85,7 +85,7 @@ export function PricingSection() {
             </p>
           </HomeCard>
 
-          <HomeCard tone="card" radius="card-lg" className="p-10">
+          <HomeCard tone="card" radius="card-lg" className="p-10 flex flex-col justify-center lg:h-[292px]">
             <h3
               className="font-['Syne'] text-2xl tracking-[0.5px] mb-2"
               style={{ color: "var(--home-text)" }}
@@ -125,12 +125,11 @@ export function PricingSection() {
         <div className="section-animate section-delay-2 mt-16">
           <Button
             variant="homeAccent"
-            size="lg"
             asChild
-            className="drop-shadow-[0px_0px_7.5px_rgba(226,114,91,0.2)]"
+            className="drop-shadow-[0px_0px_7.5px_rgba(226,114,91,0.2)] h-auto rounded-[30px] px-14 py-[18px] text-base font-medium gap-[10px]"
           >
             <a href={cta.href}>
-              <Ticket className="mr-2 w-4 h-4" />
+              <Ticket className="w-5 h-4" />
               {cta.label}
             </a>
           </Button>

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import {
   CheckCircle,
   XCircle,
@@ -54,6 +54,8 @@ interface TicketVerification {
 
 export default function VerifyTicketPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const { user } = useUser();
   const { mutateAsync: verifyTicket, isPending: isVerifying } =
     useVerifyTicket();
@@ -65,6 +67,8 @@ export default function VerifyTicketPage() {
   const [error, setError] = useState<string>("");
   const [mode, setMode] = useState<"camera" | "url-param">("camera");
   const [scannerActive, setScannerActive] = useState(false);
+  // Guards against re-verifying when we update the URL ourselves after a camera scan.
+  const skipNextSearchParamsEffect = useRef(false);
 
   const { data: event } = useEventById(ticketData?.eventId || "");
 
@@ -115,17 +119,23 @@ export default function VerifyTicketPage() {
 
   const handleCameraScan = (rawText: string) => {
     setScannerActive(false);
+
+    let dataParam = rawText;
     try {
       const url = new URL(rawText);
-      const dataParam = url.searchParams.get("data");
-      if (dataParam) {
-        handleVerify(dataParam);
-        return;
-      }
+      dataParam = url.searchParams.get("data") || rawText;
     } catch {
       // rawText is not a URL — treat it as the raw data string
     }
-    handleVerify(rawText);
+
+    // Keep the URL in sync with the most recently scanned ticket, without
+    // re-triggering the searchParams-driven verification effect below.
+    skipNextSearchParamsEffect.current = true;
+    router.replace(`${pathname}?data=${encodeURIComponent(dataParam)}`, {
+      scroll: false,
+    });
+
+    handleVerify(dataParam);
   };
 
   // ─── scan-next reset ──────────────────────────────────────────────────────
@@ -136,11 +146,17 @@ export default function VerifyTicketPage() {
     setError("");
     setMode("camera");
     setScannerActive(true);
+    skipNextSearchParamsEffect.current = true;
+    router.replace(pathname, { scroll: false });
   };
 
   // ─── URL-param mode on mount ──────────────────────────────────────────────
 
   useEffect(() => {
+    if (skipNextSearchParamsEffect.current) {
+      skipNextSearchParamsEffect.current = false;
+      return;
+    }
     const dataParam = searchParams.get("data");
     if (dataParam) {
       setMode("url-param");

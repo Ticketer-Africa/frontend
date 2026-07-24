@@ -40,7 +40,7 @@ export function HeroSection() {
         </span>
 
         <h1
-          className="font-['Syne'] font-extrabold text-4xl sm:text-5xl lg:text-7xl mb-6 leading-tight tracking-[-1.2px]"
+          className="font-['Syne'] font-extrabold text-4xl sm:text-5xl lg:text-[72px] mb-6 leading-tight lg:leading-[80px] tracking-[-1.2px]"
           style={{ color: "var(--home-text)" }}
         >
           Buy. Sell. Enjoy
@@ -51,7 +51,7 @@ export function HeroSection() {
         </h1>
 
         <p
-          className="font-['Hanken_Grotesk'] text-lg sm:text-xl mb-10 max-w-3xl mx-auto leading-relaxed tracking-[0.5px]"
+          className="font-['Hanken_Grotesk'] text-lg mb-10 max-w-3xl mx-auto leading-normal tracking-[0.5px]"
           style={{ color: "var(--home-muted)" }}
         >
           Discover the continent&apos;s most exclusive curated experiences, buy
@@ -61,12 +61,11 @@ export function HeroSection() {
         <div className="flex justify-center items-center px-2">
           <Button
             variant="homeAccent"
-            size="lg"
-            className="drop-shadow-[0px_0px_7.5px_rgba(226,114,91,0.2)]"
+            className="drop-shadow-[0px_0px_7.5px_rgba(226,114,91,0.2)] h-auto rounded-[30px] px-8 py-[18px] text-base font-bold gap-[10px] w-full sm:w-[349px]"
             onClick={() => router.push(cta.href)}
           >
             {cta.label}
-            <ArrowRight className="ml-2 w-4 h-4" />
+            <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
       </div>

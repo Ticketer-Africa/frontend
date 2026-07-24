@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { usePriceRange } from "@/services/events/events.queries";
 import { useAllEventsV2 } from "@/services/events/events-v2.queries";
 import { EventV2 } from "@/types/events-v2.type";
+import { Footer } from "@/components/layout/footer";
 
 // Local components - code split for better tree shaking
 import { FilterSection } from "./filter-section";
@@ -484,6 +485,8 @@ export default function EventsPage() {
           <PaginationControls meta={meta} onPageChange={handlePageChange} />
         )}
       </div>
+
+      <Footer />
     </div>
   );
 }

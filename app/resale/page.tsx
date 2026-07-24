@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { HomeCard } from "@/components/home/home-card";
+import { Footer } from "@/components/layout/footer";
 import {
   Calendar,
   MapPin,
@@ -484,6 +485,8 @@ export default function ResalePage() {
           isAuthenticated={!!user}
         />
       </div>
+
+      <Footer />
     </div>
   );
 }

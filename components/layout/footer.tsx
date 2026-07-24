@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Facebook, Instagram } from "lucide-react";
 import { Logo } from "./logo";
 
 const PLATFORM_LINKS = [
   { href: "/explore", label: "Find Events" },
+  { href: "/resale", label: "Resale Market" },
   { href: "/organizer/create-event", label: "Create Event" },
   { href: "#", label: "Mobile App" }, // TODO: no mobile app route/link exists yet
 ] as const;
@@ -22,7 +24,17 @@ const SOCIAL_LINKS = [
   { Icon: Instagram, label: "Instagram", href: "#" },
 ] as const;
 
+// Pages whose content uses the "px-4 sm:px-6 lg:px-8" outer-padding-then-
+// centered-max-width layout (same as the homepage sections), so the footer
+// must match it there to keep side margins aligned. Other pages that render
+// Footer still use the plain "container" layout for their own content, so
+// the footer matches that instead.
+const WIDE_LAYOUT_ROUTES = ["/", "/explore", "/resale", "/terms", "/service-agreement"];
+
 export function Footer() {
+  const pathname = usePathname();
+  const useWideLayout = WIDE_LAYOUT_ROUTES.includes(pathname);
+
   return (
     <footer
       className="home-theme border-t"
@@ -31,12 +43,17 @@ export function Footer() {
         borderColor: "var(--home-border-subtle)",
       }}
     >
-      <div className="container mx-auto px-4 py-16">
+      <div className={useWideLayout ? "px-4 sm:px-6 lg:px-8 py-16" : "container mx-auto px-4 py-16"}>
+        <div className={useWideLayout ? "max-w-7xl mx-auto" : undefined}>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-16">
           <div className="lg:col-span-2 space-y-6">
-            <Logo showImage={false} textClassName="text-[var(--home-text-highlight)]" />
+            <Logo
+              showImage={false}
+              textClassName="text-[var(--home-text-highlight)] font-['Syne']"
+              size="lg"
+            />
             <p
-              className="font-['Hanken_Grotesk'] text-base max-w-md"
+              className="font-['Hanken_Grotesk'] text-base max-w-[384px]"
               style={{ color: "var(--home-muted)" }}
             >
               The premium destination for cultural discovery, event
@@ -111,6 +128,7 @@ export function Footer() {
           >
             © {new Date().getFullYear()} Ticketer Africa. All rights reserved.
           </p>
+        </div>
         </div>
       </div>
     </footer>

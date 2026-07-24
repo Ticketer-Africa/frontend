@@ -53,7 +53,7 @@ const EventCard = memo(function EventCard({
 
         <div className="absolute bottom-6 left-6 right-6">
           <h3
-            className="font-['Syne'] font-bold text-2xl sm:text-3xl mb-2 line-clamp-2"
+            className="font-['Syne'] font-bold text-2xl sm:text-[32px] mb-2 line-clamp-2"
             style={{ color: "var(--home-text)" }}
           >
             {truncateText(event.name, 8)}
@@ -93,7 +93,7 @@ export function EventsSection() {
         <div className="section-animate flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <h2
-              className="font-['Syne'] font-bold text-3xl sm:text-4xl"
+              className="font-['Syne'] font-bold text-3xl sm:text-[32px] tracking-[-1.2px]"
               style={{ color: "var(--home-text)" }}
             >
               Trending Events

@@ -1,8 +1,10 @@
+import { Footer } from "@/components/layout/footer";
+
 export default function TermsAndConditions() {
   return (
+    <div className="home-theme min-h-screen" style={{ backgroundColor: "var(--home-bg)" }}>
     <section
-      className="home-theme min-h-screen px-4 py-16 sm:px-6 sm:py-20 lg:px-8"
-      style={{ backgroundColor: "var(--home-bg)" }}
+      className="px-4 py-16 sm:px-6 sm:py-20 lg:px-8"
     >
       <div className="mx-auto max-w-4xl">
         {/* Header */}
@@ -202,5 +204,7 @@ export default function TermsAndConditions() {
         </div>
       </div>
     </section>
+      <Footer />
+    </div>
   );
 }

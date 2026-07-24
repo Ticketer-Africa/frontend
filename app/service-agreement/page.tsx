@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Footer } from "@/components/layout/footer";
 
 const sections = [
   {
@@ -117,9 +118,9 @@ const sections = [
 
 export default function ServiceAgreementPage() {
   return (
+    <div className="home-theme min-h-screen" style={{ backgroundColor: "var(--home-bg)" }}>
     <main
-      className="home-theme min-h-screen px-4 py-16 sm:px-6 lg:px-8"
-      style={{ backgroundColor: "var(--home-bg)" }}
+      className="px-4 py-16 sm:px-6 lg:px-8"
     >
       <div className="mx-auto max-w-4xl">
         <div className="rounded-2xl border border-[var(--home-border)] bg-[var(--home-card)] p-6 shadow-sm sm:p-10">
@@ -180,5 +181,7 @@ export default function ServiceAgreementPage() {
         </div>
       </div>
     </main>
+      <Footer />
+    </div>
   );
 }

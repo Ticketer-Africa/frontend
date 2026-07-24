@@ -134,18 +134,23 @@ export function Header() {
           : "sticky border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/90"
       )}
     >
-      <div className="container mx-auto px-4">
+      <div className={isHome ? "px-4 sm:px-6 lg:px-8" : "container mx-auto px-4"}>
+        <div className={isHome ? "max-w-7xl mx-auto" : undefined}>
         <div className="grid h-[60px] grid-cols-[auto_1fr_auto] items-center gap-4">
           <Link href="/" className="flex items-center">
             <Logo
               size="md"
               showImage={!isHome}
-              textClassName={isHome ? "text-[var(--home-text-highlight)]" : undefined}
+              textClassName={
+                isHome
+                  ? "text-[var(--home-text-highlight)] font-['Syne'] tracking-[-0.8px]"
+                  : undefined
+              }
             />
           </Link>
 
           <div className="hidden min-w-0 items-center justify-center gap-4 md:flex">
-            <nav className="flex items-center gap-2">
+            <nav className="flex items-center gap-8">
               {navItems.map((item) => (
                 <Link
                   key={item.name}
@@ -153,9 +158,12 @@ export function Header() {
                   className={clsx(
                     "inline-flex h-11 items-center rounded-full px-4 text-sm transition-colors",
                     isHome
-                      ? isActive(item.href)
-                        ? "text-[var(--home-text-highlight)]"
-                        : "text-[var(--home-muted)] hover:text-[var(--home-text-highlight)]"
+                      ? clsx(
+                          "font-['Hanken_Grotesk'] font-semibold text-base tracking-[0.5px]",
+                          isActive(item.href)
+                            ? "text-[var(--home-text-highlight)]"
+                            : "text-[var(--home-muted)] hover:text-[var(--home-text-highlight)]"
+                        )
                       : isActive(item.href)
                         ? "bg-primary/10 text-[#1E88E5]"
                         : "text-muted-foreground hover:text-[#1E88E5]"
@@ -272,7 +280,7 @@ export function Header() {
               <Button
                 variant="homeAccent"
                 asChild
-                className="border"
+                className="border h-auto rounded-[20px] px-8 py-3 text-base tracking-[0.5px]"
                 style={{ borderColor: "var(--home-accent-fg)" }}
               >
                 <Link href="/login">Sign In</Link>
@@ -418,6 +426,7 @@ export function Header() {
             )}
           </div>
         )}
+        </div>
       </div>
     </header>
   );
