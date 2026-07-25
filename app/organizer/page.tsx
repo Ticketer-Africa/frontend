@@ -11,6 +11,7 @@ import {
   MoreVertical,
   Edit,
   Loader2,
+  QrCode,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -210,15 +211,27 @@ export default function OrganizerDashboard() {
                 Welcome back, {currentUser && currentUser.name}!
               </p>
             </div>
-            <Button
-              asChild
-              className="w-full sm:w-auto border-0 bg-[var(--home-accent)] hover:bg-[#f18b76] text-[var(--home-accent-fg)] rounded-full px-6 py-2 shadow-none transition-[background-color,color,border-color,opacity,transform] duration-150 active:translate-y-px"
-            >
-              <Link href="/organizer/create-event">
-                <Plus className="h-4 w-4 mr-2" />
-                Create New Event
-              </Link>
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              <Button
+                asChild
+                variant="outline"
+                className="w-full sm:w-auto border-[var(--home-border-strong)] bg-transparent text-[var(--home-text)] rounded-full px-6 py-2 shadow-none hover:bg-[var(--home-card)]"
+              >
+                <Link href="/verify-ticket">
+                  <QrCode className="h-4 w-4 mr-2" />
+                  Scan Ticket
+                </Link>
+              </Button>
+              <Button
+                asChild
+                className="w-full sm:w-auto border-0 bg-[var(--home-accent)] hover:bg-[#f18b76] text-[var(--home-accent-fg)] rounded-full px-6 py-2 shadow-none transition-[background-color,color,border-color,opacity,transform] duration-150 active:translate-y-px"
+              >
+                <Link href="/organizer/create-event">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create New Event
+                </Link>
+              </Button>
+            </div>
           </div>
 
           {/* Stats Cards */}
