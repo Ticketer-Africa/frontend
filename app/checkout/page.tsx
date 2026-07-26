@@ -316,7 +316,7 @@ export default function CheckoutPage() {
   const total = Math.max(0, subtotal - discountAmount);
 
   return (
-    <div className="home-theme min-h-screen" style={{ backgroundColor: "var(--home-bg)" }}>
+    <div className="home-theme min-h-screen pt-16" style={{ backgroundColor: "var(--home-bg)" }}>
       {/* Top bar */}
       <div
         className="border-b backdrop-blur sticky top-[60px] z-40"
