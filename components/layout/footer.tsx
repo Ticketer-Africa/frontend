@@ -8,10 +8,8 @@ import { InstagramIcon, NewTwitterIcon } from "@hugeicons/core-free-icons";
 
 const PLATFORM_LINKS = [
   { href: "/explore", label: "Find Events" },
-  { href: "/resale", label: "Resale Market" },
   { href: "/for-organisers", label: "For Organisers" },
   { href: "/organizer/create-event", label: "Create Event" },
-  { href: "#", label: "Mobile App" }, // TODO: no mobile app route/link exists yet
 ] as const;
 
 const SUPPORT_LINKS = [

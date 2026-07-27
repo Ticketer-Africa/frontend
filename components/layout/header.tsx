@@ -195,7 +195,7 @@ export function Header() {
                   <Button
                     variant="outline"
                     className={clsx(
-                      "h-11 gap-2 px-4",
+                      "h-11 gap-2 px-4 rounded-[20px]",
                       isHome && "border-[var(--home-border-strong)] bg-transparent text-[var(--home-text)]"
                     )}
                     onClick={toggleProfile}
@@ -287,17 +287,17 @@ export function Header() {
               <Button
                 variant="homeAccent"
                 asChild
-                className="border h-auto rounded-[20px] px-8 py-3 text-base tracking-[0.5px]"
+                className="border h-auto rounded-[20px] px-8 py-3 text-base leading-[16px] tracking-[0.5px]"
                 style={{ borderColor: "var(--home-accent-fg)" }}
               >
                 <Link href="/login">Sign In</Link>
               </Button>
             ) : (
               <>
-                <Button variant="outline" asChild>
+                <Button variant="outline" asChild className="rounded-[20px]">
                   <Link href="/login">Sign In</Link>
                 </Button>
-                <Button variant="primary" asChild>
+                <Button variant="primary" asChild className="rounded-[20px]">
                   <Link href="/register">Sign Up</Link>
                 </Button>
               </>
@@ -410,7 +410,7 @@ export function Header() {
                 <Button
                   variant="homeAccent"
                   asChild
-                  className="w-full h-auto border rounded-[20px] px-8 py-3 text-base tracking-[0.5px]"
+                  className="w-full h-auto border rounded-[20px] px-8 py-3 text-base leading-[16px] tracking-[0.5px]"
                   style={{ borderColor: "var(--home-accent-fg)" }}
                 >
                   <Link href="/login" onClick={closeMenu}>
@@ -420,12 +420,12 @@ export function Header() {
               </div>
             ) : (
               <div className="mt-3 grid grid-cols-2 gap-2 border-t border-border pt-3">
-                <Button variant="outline" asChild>
+                <Button variant="outline" asChild className="rounded-[20px]">
                   <Link href="/login" onClick={closeMenu}>
                     Sign In
                   </Link>
                 </Button>
-                <Button variant="primary" asChild>
+                <Button variant="primary" asChild className="rounded-[20px]">
                   <Link href="/register" onClick={closeMenu}>
                     Sign Up
                   </Link>
