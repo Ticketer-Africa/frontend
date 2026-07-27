@@ -9,9 +9,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, AlertCircle } from "lucide-react";
 import { useResetPassword } from "@/services/auth/auth.queries";
 import { AuthShell } from "@/components/auth/auth-shell";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Alert01Icon, SquareLock01Icon } from "@hugeicons/core-free-icons";
 
 const resetPasswordSchema = z
   .object({
@@ -110,7 +111,7 @@ function ResetPasswordForm() {
             borderColor: "var(--home-border-strong)",
           }}
         >
-          <AlertCircle className="w-5 h-5 text-red-400" />
+          <HugeiconsIcon icon={Alert01Icon} className="w-5 h-5 text-red-400" />
           <p className="text-sm text-red-400">{errors.password.message}</p>
         </div>
       )}
@@ -122,7 +123,7 @@ function ResetPasswordForm() {
             borderColor: "var(--home-border-strong)",
           }}
         >
-          <AlertCircle className="w-5 h-5 text-red-400" />
+          <HugeiconsIcon icon={Alert01Icon} className="w-5 h-5 text-red-400" />
           <p className="text-sm text-red-400">
             {errors.confirmPassword.message}
           </p>
@@ -135,7 +136,7 @@ function ResetPasswordForm() {
             New Password
           </Label>
           <div className="relative">
-            <Lock
+            <HugeiconsIcon icon={SquareLock01Icon}
               className="absolute left-8 top-1/2 transform -translate-y-1/2 w-5 h-5"
               style={{ color: "var(--home-muted)" }}
             />
@@ -159,7 +160,7 @@ function ResetPasswordForm() {
             Confirm Password
           </Label>
           <div className="relative">
-            <Lock
+            <HugeiconsIcon icon={SquareLock01Icon}
               className="absolute left-8 top-1/2 transform -translate-y-1/2 w-5 h-5"
               style={{ color: "var(--home-muted)" }}
             />

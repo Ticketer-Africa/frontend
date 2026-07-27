@@ -1,10 +1,11 @@
 "use client";
 
 import { memo } from "react";
-import { Wallet, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/helpers";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Download02Icon, Wallet01Icon } from "@hugeicons/core-free-icons";
 
 interface BalanceCardProps {
   balance: number;
@@ -29,7 +30,7 @@ export const BalanceCard = memo(function BalanceCard({
       >
         <CardHeader>
           <CardTitle className="flex items-center space-x-2" style={{ color: "var(--home-text)" }}>
-            <Wallet className="h-5 w-5" style={{ color: "var(--home-accent)" }} />
+            <HugeiconsIcon icon={Wallet01Icon} className="h-5 w-5" style={{ color: "var(--home-accent)" }} />
             <span>Available Balance</span>
           </CardTitle>
         </CardHeader>
@@ -45,7 +46,7 @@ export const BalanceCard = memo(function BalanceCard({
                 onClick={onRequestPayout}
                 disabled={balance <= 0}
               >
-                <Download className="h-4 w-4 mr-2" />
+                <HugeiconsIcon icon={Download02Icon} className="h-4 w-4 mr-2" />
                 Request Payout
               </Button>
               <Button

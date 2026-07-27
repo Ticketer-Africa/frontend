@@ -4,7 +4,6 @@ import type React from "react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -13,6 +12,8 @@ import {
   InputOTPSlot,
   InputOTPSeparator,
 } from "@/components/ui/input-otp";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { toast } from "sonner";
 import { useVerifyOtp, useResendOtp } from "@/services/auth/auth.queries";
@@ -253,7 +254,7 @@ export default function VerifyOTPPage() {
                 asChild
               >
                 <Link href={loginHref}>
-                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  <HugeiconsIcon icon={ArrowLeft01Icon} className="h-4 w-4 mr-2" />
                   Back to Login
                 </Link>
               </Button>

@@ -2,7 +2,8 @@
 
 import { memo } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 
 interface PaginationMeta {
   currentPage: number;
@@ -53,7 +54,7 @@ function PaginationControlsComponent({
         className="flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Go to previous page"
       >
-        <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+        <HugeiconsIcon icon={ArrowLeft01Icon} className="w-4 h-4" aria-hidden="true" />
         Previous
       </Button>
 
@@ -75,7 +76,7 @@ function PaginationControlsComponent({
         aria-label="Go to next page"
       >
         Next
-        <ChevronRight className="w-4 h-4" aria-hidden="true" />
+        <HugeiconsIcon icon={ArrowRight01Icon} className="w-4 h-4" aria-hidden="true" />
       </Button>
     </nav>
   );

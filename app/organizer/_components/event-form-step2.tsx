@@ -4,13 +4,14 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-time-picker";
-import { Trash2, Plus } from "lucide-react";
 import {
   UseFormRegister,
   FieldErrors,
   UseFormWatch,
   UseFormSetValue,
 } from "react-hook-form";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Add01Icon, Delete02Icon } from "@hugeicons/core-free-icons";
 import { EventFormData, TicketCategory } from "./event-form-schema";
 
 interface Step2Props {
@@ -99,7 +100,7 @@ export function EventFormStep2({
                   disabled={isDisabled}
                   className="flex items-center gap-1 text-xs text-red-500 hover:text-red-700 transition-colors"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
+                  <HugeiconsIcon icon={Delete02Icon} className="h-3.5 w-3.5" />
                   Remove
                 </button>
               )}
@@ -177,7 +178,7 @@ export function EventFormStep2({
           disabled={isDisabled}
           className="w-full py-3 rounded-xl border-2 border-dashed border-gray-200 text-sm text-gray-500 hover:border-[#1E88E5] hover:text-[#1E88E5] transition-colors flex items-center justify-center gap-2"
         >
-          <Plus className="h-4 w-4" />
+          <HugeiconsIcon icon={Add01Icon} className="h-4 w-4" />
           Add Another Category
         </button>
       </div>

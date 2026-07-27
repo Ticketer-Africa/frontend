@@ -1,5 +1,6 @@
 import React from "react";
 import clsx from "clsx";
+import { cn } from "@/lib/utils";
 
 type LogoProps = {
   size?: "sm" | "md" | "lg" | number; // pre-defined or custom number (in rem)
@@ -52,10 +53,10 @@ export const Logo: React.FC<LogoProps> = ({
       )}
       {withText && (
         <span
-          className={clsx(
+          className={cn(
             "font-bold",
-            textClassName ?? "text-[#1E88E5]",
-            fontClasses
+            fontClasses,
+            textClassName ?? "text-[#1E88E5]"
           )}
         >
           {text}

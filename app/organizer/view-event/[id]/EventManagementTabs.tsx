@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Send, Tag } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -14,6 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Loading03Icon, Sent02Icon, Tag01Icon } from "@hugeicons/core-free-icons";
 import { Textarea } from "@/components/ui/textarea";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { useToast } from "@/hooks/use-toast";
@@ -106,11 +107,11 @@ export default function EventManagementTabs({ eventId }: EventManagementTabsProp
         <Tabs defaultValue="discounts">
           <TabsList className="mb-6">
             <TabsTrigger value="discounts" className="flex items-center gap-1">
-              <Tag className="h-4 w-4" />
+              <HugeiconsIcon icon={Tag01Icon} className="h-4 w-4" />
               Discount Codes
             </TabsTrigger>
             <TabsTrigger value="messaging" className="flex items-center gap-1">
-              <Send className="h-4 w-4" />
+              <HugeiconsIcon icon={Sent02Icon} className="h-4 w-4" />
               Messaging
             </TabsTrigger>
           </TabsList>
@@ -190,7 +191,7 @@ export default function EventManagementTabs({ eventId }: EventManagementTabsProp
                   className="bg-[#1E88E5] hover:bg-blue-500 text-white"
                 >
                   {creatingDiscount ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <HugeiconsIcon icon={Loading03Icon} className="h-4 w-4 mr-2 animate-spin" />
                   ) : null}
                   Create Discount Code
                 </Button>
@@ -199,7 +200,7 @@ export default function EventManagementTabs({ eventId }: EventManagementTabsProp
 
             {discountsLoading ? (
               <div className="flex justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-[#1E88E5]" />
+                <HugeiconsIcon icon={Loading03Icon} className="h-6 w-6 animate-spin text-[#1E88E5]" />
               </div>
             ) : discounts && discounts.length > 0 ? (
               <div className="overflow-x-auto">
@@ -294,9 +295,9 @@ export default function EventManagementTabs({ eventId }: EventManagementTabsProp
                 className="bg-[#1E88E5] hover:bg-blue-500 text-white"
               >
                 {sendingMessage ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <HugeiconsIcon icon={Loading03Icon} className="h-4 w-4 mr-2 animate-spin" />
                 ) : (
-                  <Send className="h-4 w-4 mr-2" />
+                  <HugeiconsIcon icon={Sent02Icon} className="h-4 w-4 mr-2" />
                 )}
                 {messageForm.scheduledFor ? "Schedule Message" : "Send Now"}
               </Button>

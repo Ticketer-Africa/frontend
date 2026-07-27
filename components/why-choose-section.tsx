@@ -1,32 +1,33 @@
 "use client";
 
-import { Shield, Zap, Heart, Award } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Award01Icon, FavouriteIcon, FlashIcon, Shield01Icon } from "@hugeicons/core-free-icons";
 
 const benefits = [
   {
-    icon: Shield,
+    icon: Shield01Icon,
     title: "Verified & Secure",
     description:
       "All tickets are verified and transactions are protected with bank-level security.",
     color: "text-green-600",
   },
   {
-    icon: Zap,
+    icon: FlashIcon,
     title: "Lightning Fast",
     description:
       "Get your tickets instantly with our optimized checkout process.",
     color: "text-yellow-600",
   },
   {
-    icon: Heart,
+    icon: FavouriteIcon,
     title: "Customer First",
     description:
       "24/7 support and hassle-free refunds ensure your satisfaction.",
     color: "text-red-600",
   },
   {
-    icon: Award,
+    icon: Award01Icon,
     title: "Best Prices",
     description:
       "Compare prices and find the best deals with our price guarantee.",
@@ -59,7 +60,7 @@ export function WhyChooseSection() {
                 <div
                   className={`w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center group-hover:scale-[1.02] transition-transform duration-150 shadow-lg`}
                 >
-                  <benefit.icon className={`w-8 h-8 ${benefit.color}`} />
+                  <HugeiconsIcon icon={benefit.icon} className={`w-8 h-8 ${benefit.color}`} />
                 </div>
               </div>
 

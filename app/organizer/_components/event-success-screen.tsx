@@ -1,8 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
 import Link from "next/link";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Tick01Icon } from "@hugeicons/core-free-icons";
 
 interface SuccessScreenProps {
   eventName: string;
@@ -29,7 +30,7 @@ export function EventSuccessScreen({
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4">
       <div className="text-center max-w-md mx-auto p-8 event-success-animate">
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <Check className="h-10 w-10 text-green-600" />
+          <HugeiconsIcon icon={Tick01Icon} className="h-10 w-10 text-green-600" />
         </div>
         <h1 className="text-3xl font-bold mb-4">{title}</h1>
         <p className="text-gray-600 mb-6">{displayMessage}</p>

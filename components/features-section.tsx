@@ -1,12 +1,13 @@
 "use client";
 
 import { memo } from "react";
-import { Ticket, RefreshCw, BarChart3, CreditCard } from "lucide-react";
 import { HomeCard } from "@/components/home/home-card";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ChartBarLineIcon, CreditCardIcon, Refresh01Icon, Ticket01Icon } from "@hugeicons/core-free-icons";
 
 const FEATURES = [
   {
-    icon: Ticket,
+    icon: Ticket01Icon,
     title: "Buy Tickets Easily",
     description:
       "Browse and purchase tickets for your favorite events with just a few clicks in a seamless journey.",
@@ -15,7 +16,7 @@ const FEATURES = [
     isNew: false,
   },
   {
-    icon: RefreshCw,
+    icon: Refresh01Icon,
     title: "Resell Tickets Securely",
     description:
       "Can't make it? Safely resell your tickets through our verified peer-to-peer marketplace.",
@@ -24,7 +25,7 @@ const FEATURES = [
     isNew: true,
   },
   {
-    icon: BarChart3,
+    icon: ChartBarLineIcon,
     title: "Organizer Dashboard",
     description:
       "Comprehensive tools for event management and instant payouts, built for organizers of any size.",
@@ -33,7 +34,7 @@ const FEATURES = [
     isNew: false,
   },
   {
-    icon: CreditCard,
+    icon: CreditCardIcon,
     title: "Secure Payments",
     description:
       "Lightning-fast checkout with bank-level encryption for all your transactions across the continent.",
@@ -52,8 +53,6 @@ const FeatureCard = memo(function FeatureCard({
   feature,
   index,
 }: FeatureCardProps) {
-  const Icon = feature.icon;
-
   return (
     <HomeCard
       className="relative p-8 feature-card lg:aspect-square lg:size-[292px]"
@@ -72,7 +71,7 @@ const FeatureCard = memo(function FeatureCard({
         className="w-12 h-12 rounded-xl flex items-center justify-center mb-10"
         style={{ backgroundColor: feature.iconBg }}
       >
-        <Icon className="w-5 h-5" style={{ color: feature.iconColor }} aria-hidden="true" />
+        <HugeiconsIcon icon={feature.icon} className="w-5 h-5" style={{ color: feature.iconColor }} aria-hidden="true" />
       </div>
 
       <h3

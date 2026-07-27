@@ -2,17 +2,6 @@
 
 import { memo, useCallback, useMemo, useState } from "react";
 import Link from "next/link";
-import {
-  Plus,
-  Calendar,
-  Users,
-  BarChart3,
-  Trash2,
-  MoreVertical,
-  Edit,
-  Loader2,
-  QrCode,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/helpers";
@@ -29,6 +18,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Add01Icon, Calendar01Icon, ChartBarLineIcon, Delete02Icon, Loading03Icon, MoreVerticalIcon, PencilEdit02Icon, QrCode01Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
 import {
   Dialog,
   DialogContent,
@@ -86,7 +77,7 @@ const EventRow = memo(function EventRow({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8">
-              <MoreVertical className="h-4 w-4" />
+              <HugeiconsIcon icon={MoreVerticalIcon} className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -98,14 +89,14 @@ const EventRow = memo(function EventRow({
               onClick={() => onEdit(event.id)}
               className="text-sm text-[var(--home-text)] hover:bg-[var(--home-card)] rounded-lg p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
             >
-              <Edit className="mr-2 h-4 w-4" /> Update Event
+              <HugeiconsIcon icon={PencilEdit02Icon} className="mr-2 h-4 w-4" /> Update Event
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-[var(--home-border)] h-px my-1" />
             <DropdownMenuItem
               onClick={() => onDeleteClick(event.id)}
               className="text-sm text-white bg-red-700 hover:bg-red-600 rounded-lg p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
             >
-              <Trash2 className="mr-2 h-4 w-4" /> Delete Event
+              <HugeiconsIcon icon={Delete02Icon} className="mr-2 h-4 w-4" /> Delete Event
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -192,7 +183,7 @@ export default function OrganizerDashboard() {
     return (
       <div className="home-theme min-h-screen flex items-center justify-center bg-[var(--home-bg)] text-[var(--home-text)]">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-[var(--home-accent)] mx-auto mb-4" />
+          <HugeiconsIcon icon={Loading03Icon} className="h-12 w-12 animate-spin text-[var(--home-accent)] mx-auto mb-4" />
           <p className="text-lg text-[var(--home-muted)]">Loading dashboard...</p>
         </div>
       </div>
@@ -218,7 +209,7 @@ export default function OrganizerDashboard() {
                 className="w-full sm:w-auto border-[var(--home-border-strong)] bg-transparent text-[var(--home-text)] rounded-full px-6 py-2 shadow-none hover:bg-[var(--home-card)]"
               >
                 <Link href="/verify-ticket">
-                  <QrCode className="h-4 w-4 mr-2" />
+                  <HugeiconsIcon icon={QrCode01Icon} className="h-4 w-4 mr-2" />
                   Scan Ticket
                 </Link>
               </Button>
@@ -227,7 +218,7 @@ export default function OrganizerDashboard() {
                 className="w-full sm:w-auto border-0 bg-[var(--home-accent)] hover:bg-[#f18b76] text-[var(--home-accent-fg)] rounded-full px-6 py-2 shadow-none transition-[background-color,color,border-color,opacity,transform] duration-150 active:translate-y-px"
               >
                 <Link href="/organizer/create-event">
-                  <Plus className="h-4 w-4 mr-2" />
+                  <HugeiconsIcon icon={Add01Icon} className="h-4 w-4 mr-2" />
                   Create New Event
                 </Link>
               </Button>
@@ -242,7 +233,7 @@ export default function OrganizerDashboard() {
                   <CardTitle className="text-xs sm:text-sm font-medium">
                     Total Events
                   </CardTitle>
-                  <Calendar className="h-4 w-4 text-[var(--home-accent)]" />
+                  <HugeiconsIcon icon={Calendar01Icon} className="h-4 w-4 text-[var(--home-accent)]" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl sm:text-2xl font-bold">
@@ -259,7 +250,7 @@ export default function OrganizerDashboard() {
                   <CardTitle className="text-xs sm:text-sm font-medium">
                     Tickets Sold
                   </CardTitle>
-                  <Users className="h-4 w-4 text-[var(--home-accent)]" />
+                  <HugeiconsIcon icon={UserGroupIcon} className="h-4 w-4 text-[var(--home-accent)]" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl sm:text-2xl font-bold">
@@ -278,7 +269,7 @@ export default function OrganizerDashboard() {
                   <CardTitle className="text-xs sm:text-sm font-medium">
                     Net Earnings
                   </CardTitle>
-                  <BarChart3 className="h-4 w-4 text-[var(--home-accent)]" />
+                  <HugeiconsIcon icon={ChartBarLineIcon} className="h-4 w-4 text-[var(--home-accent)]" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl sm:text-2xl font-bold">
@@ -311,7 +302,7 @@ export default function OrganizerDashboard() {
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <Calendar className="h-12 w-12 text-[var(--home-accent)] mx-auto mb-4" />
+                    <HugeiconsIcon icon={Calendar01Icon} className="h-12 w-12 text-[var(--home-accent)] mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">No events yet</h3>
                     <p className="text-[var(--home-muted)] mb-4">
                       Create your first event to start selling tickets and
@@ -319,7 +310,7 @@ export default function OrganizerDashboard() {
                     </p>
                     <Button asChild className="border-0 bg-[var(--home-accent)] text-[var(--home-accent-fg)] hover:bg-[#f18b76]">
                       <Link href="/organizer/create-event">
-                        <Plus className="h-4 w-4 mr-2" />
+                        <HugeiconsIcon icon={Add01Icon} className="h-4 w-4 mr-2" />
                         Create Your First Event
                       </Link>
                     </Button>

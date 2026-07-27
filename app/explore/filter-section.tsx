@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
-import { Search, SlidersHorizontal } from "lucide-react";
 import { formatPrice } from "@/lib/helpers";
 import { CATEGORIES, PRICE_SLIDER_STEP } from "./constants";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { FilterHorizontalIcon, Search01Icon } from "@hugeicons/core-free-icons";
 
 interface FilterSectionProps {
   // Search
@@ -106,7 +107,7 @@ function FilterSectionComponent({
         {/* Search input */}
         <form onSubmit={handleSearchSubmit} className="mb-4 flex gap-2">
           <div className="relative flex-1">
-            <Search
+            <HugeiconsIcon icon={Search01Icon}
               className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5"
               style={{ color: "var(--home-text-highlight)" }}
               aria-hidden="true"
@@ -149,7 +150,7 @@ function FilterSectionComponent({
             aria-expanded={showFilters}
             aria-controls="filter-panel"
           >
-            <SlidersHorizontal className="w-4 h-4" aria-hidden="true" />
+            <HugeiconsIcon icon={FilterHorizontalIcon} className="w-4 h-4" aria-hidden="true" />
             <span>Filters</span>
             {activeFilterCount > 0 && (
               <Badge
@@ -283,7 +284,7 @@ function FilterSectionComponent({
                   variant="homeAccent"
                   className="flex-1 h-10"
                 >
-                  <SlidersHorizontal
+                  <HugeiconsIcon icon={FilterHorizontalIcon}
                     className="w-4 h-4 mr-2"
                     aria-hidden="true"
                   />

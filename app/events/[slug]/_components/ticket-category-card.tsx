@@ -1,8 +1,9 @@
 // _components/ticket-category-card-v3.tsx
 import { TicketCategoryV2 } from "@/types/events-v2.type";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Add01Icon, MinusSignIcon, UserGroupIcon } from "@hugeicons/core-free-icons";
 
 type Props = {
   category: TicketCategoryV2;
@@ -76,7 +77,7 @@ export function TicketCategoryCardV2({
               onClick={() => onQuantityChange(-1)}
               disabled={quantity <= 1}
             >
-              <Minus className="h-4 w-4" />
+              <HugeiconsIcon icon={MinusSignIcon} className="h-4 w-4" />
             </Button>
             <span className="w-10 text-center font-medium" style={{ color: "var(--home-text)" }}>
               {quantity}
@@ -88,7 +89,7 @@ export function TicketCategoryCardV2({
               onClick={() => onQuantityChange(1)}
               disabled={quantity >= available || quantity >= 10}
             >
-              <Plus className="h-4 w-4" />
+              <HugeiconsIcon icon={Add01Icon} className="h-4 w-4" />
             </Button>
           </div>
         ) : (

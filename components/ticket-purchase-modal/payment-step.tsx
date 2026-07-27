@@ -2,10 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Lock } from "lucide-react";
 import { formatPrice } from "@/lib/helpers";
 import { TicketResale } from "@/types/tickets.type";
 import { Event } from "./types";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { SquareLock01Icon } from "@hugeicons/core-free-icons";
 
 interface PaymentStepProps {
   event: Event;
@@ -59,7 +60,7 @@ export function PaymentStep({
       </div>
 
       <div className="flex items-center space-x-2 text-sm text-gray-600">
-        <Lock className="w-4 h-4" />
+        <HugeiconsIcon icon={SquareLock01Icon} className="w-4 h-4" />
         <span>Your payment information is secure and encrypted</span>
       </div>
 

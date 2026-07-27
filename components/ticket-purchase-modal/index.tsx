@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { X } from "lucide-react";
 import { useUser } from "@/lib/auth-context";
 import { useBuyTicket } from "@/services/tickets/tickets.queries";
 import { toast } from "sonner";
@@ -12,6 +11,8 @@ import { QuantityStep } from "./quantity-step";
 import { AuthStep } from "./auth-step";
 import { PaymentStep } from "./payment-step";
 import { SuccessStep } from "./success-step";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 
 export function TicketPurchaseModal({
   event,
@@ -136,7 +137,7 @@ export function TicketPurchaseModal({
             onClick={resetModal}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5 text-gray-500" />
           </button>
         </div>
 

@@ -1,13 +1,14 @@
 "use client";
 
 import { memo, useMemo, useState, useCallback } from "react";
-import { Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import type { Transaction } from "./types";
 import { TransactionItem } from "./transaction-item";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Wallet01Icon } from "@hugeicons/core-free-icons";
 
 interface TransactionHistoryProps {
   transactions: Transaction[];
@@ -160,7 +161,7 @@ const EmptyTransactions = memo(function EmptyTransactions({
 }: EmptyTransactionsProps) {
   return (
     <div className="text-center py-12">
-      <Wallet className="h-12 w-12 mx-auto mb-4" style={{ color: "var(--home-muted-dim)" }} />
+      <HugeiconsIcon icon={Wallet01Icon} className="h-12 w-12 mx-auto mb-4" style={{ color: "var(--home-muted-dim)" }} />
       <h3 className="text-xl font-semibold mb-2" style={{ color: "var(--home-text)" }}>
         No transactions found
       </h3>

@@ -9,21 +9,14 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { HomeCard } from "@/components/home/home-card";
 import { Footer } from "@/components/layout/footer";
-import {
-  Calendar,
-  MapPin,
-  Search,
-  TrendingDown,
-  TrendingUp,
-  User,
-  Shield,
-} from "lucide-react";
 import { formatPrice, formatDate } from "@/lib/helpers";
 import { useUser } from "@/lib/auth-context";
 import {
   useResaleListings,
   useBuyResaleTicket,
 } from "@/services/tickets/tickets.queries";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Calendar01Icon, ChartDownIcon, ChartUpIcon, Location01Icon, Search01Icon, Shield01Icon, UserIcon } from "@hugeicons/core-free-icons";
 import { BuyResaleModal } from "@/components/buy-resale-modal";
 import { BuyResalePayload, TicketResale } from "@/types/tickets.type";
 
@@ -119,7 +112,7 @@ export default function ResalePage() {
             }}
           >
             <div className="relative">
-              <Search
+              <HugeiconsIcon icon={Search01Icon}
                 className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5"
                 style={{ color: "var(--home-text-highlight)" }}
                 aria-hidden="true"
@@ -145,14 +138,14 @@ export default function ResalePage() {
                 style={{ color: "var(--home-muted)" }}
               >
                 <div className="flex items-center">
-                  <Shield
+                  <HugeiconsIcon icon={Shield01Icon}
                     className="w-4 h-4 mr-1"
                     style={{ color: "var(--home-success)" }}
                   />
                   <span>All sellers verified</span>
                 </div>
                 <div className="flex items-center">
-                  <TrendingDown
+                  <HugeiconsIcon icon={ChartDownIcon}
                     className="w-4 h-4 mr-1"
                     style={{ color: "var(--home-text-highlight)" }}
                   />
@@ -222,7 +215,7 @@ export default function ResalePage() {
                           color: "var(--home-success-fg)",
                         }}
                       >
-                        <TrendingDown className="w-3 h-3 mr-1" />
+                        <HugeiconsIcon icon={ChartDownIcon} className="w-3 h-3 mr-1" />
                         Save {formatPrice(savings)}
                       </Badge>
                     </div>
@@ -239,7 +232,7 @@ export default function ResalePage() {
                           color: "var(--home-bg)",
                         }}
                       >
-                        <TrendingUp className="w-3 h-3 mr-1" />
+                        <HugeiconsIcon icon={ChartUpIcon} className="w-3 h-3 mr-1" />
                         Premium
                       </Badge>
                     </div>
@@ -259,13 +252,13 @@ export default function ResalePage() {
                     style={{ color: "var(--home-muted)" }}
                   >
                     <div className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
+                      <HugeiconsIcon icon={Calendar01Icon} className="w-4 h-4 mr-2 flex-shrink-0" />
                       <span className="text-sm">
                         {formatDate(ticket.event.date)}
                       </span>
                     </div>
                     <div className="flex items-center">
-                      <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
+                      <HugeiconsIcon icon={Location01Icon} className="w-4 h-4 mr-2 flex-shrink-0" />
                       <span className="text-sm line-clamp-1">
                         {ticket.event.location}
                       </span>
@@ -307,7 +300,7 @@ export default function ResalePage() {
                         Verified seller
                       </div>
                     </div>
-                    <Shield
+                    <HugeiconsIcon icon={Shield01Icon}
                       className="w-4 h-4"
                       style={{ color: "var(--home-success)" }}
                     />
@@ -413,7 +406,7 @@ export default function ResalePage() {
                 className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
                 style={{ backgroundColor: "var(--home-card-elevated)" }}
               >
-                <Shield
+                <HugeiconsIcon icon={Shield01Icon}
                   className="w-6 h-6"
                   style={{ color: "var(--home-success)" }}
                 />
@@ -434,7 +427,7 @@ export default function ResalePage() {
                 className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
                 style={{ backgroundColor: "var(--home-card-elevated)" }}
               >
-                <TrendingDown
+                <HugeiconsIcon icon={ChartDownIcon}
                   className="w-6 h-6"
                   style={{ color: "var(--home-text-highlight)" }}
                 />
@@ -455,7 +448,7 @@ export default function ResalePage() {
                 className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
                 style={{ backgroundColor: "var(--home-card-elevated)" }}
               >
-                <User
+                <HugeiconsIcon icon={UserIcon}
                   className="w-6 h-6"
                   style={{ color: "var(--home-text-highlight)" }}
                 />

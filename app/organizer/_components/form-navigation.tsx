@@ -1,7 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 
 interface FormNavigationProps {
   currentStep: number;
@@ -44,7 +45,7 @@ export function FormNavigation({
         onClick={onPrevious}
         disabled={currentStep === 1 || isSubmitting}
       >
-        <ArrowLeft className="h-4 w-4 mr-2" />
+        <HugeiconsIcon icon={ArrowLeft01Icon} className="h-4 w-4 mr-2" />
         Previous
       </Button>
 
@@ -56,7 +57,7 @@ export function FormNavigation({
           disabled={!canProceed || isSubmitting}
         >
           Next
-          <ArrowRight className="h-4 w-4 ml-2" />
+          <HugeiconsIcon icon={ArrowRight01Icon} className="h-4 w-4 ml-2" />
         </Button>
       ) : (
         <Button

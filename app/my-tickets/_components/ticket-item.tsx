@@ -1,12 +1,13 @@
 "use client";
 
 import { memo } from "react";
-import { Ticket as TicketIcon, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Ticket } from "@/types/tickets.type";
 import { formatPrice } from "@/lib/helpers";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Delete02Icon, Ticket01Icon } from "@hugeicons/core-free-icons";
 
 /**
  * Helper functions hoisted outside component
@@ -52,7 +53,7 @@ export const TicketItem = memo(function TicketItem({
       {/* Mobile-optimized layout */}
       <div className="flex items-start space-x-3">
         <div className="bg-blue-100 p-2 rounded-lg flex-shrink-0">
-          <TicketIcon className="h-5 w-5 text-[#1E88E5]" />
+          <HugeiconsIcon icon={Ticket01Icon} className="h-5 w-5 text-[#1E88E5]" />
         </div>
         <div className="flex-1 min-w-0">
           {/* Header row */}
@@ -112,7 +113,7 @@ export const TicketItem = memo(function TicketItem({
                     className="p-0 rounded-full bg-transparent hover:bg-transparent"
                     title="Remove from resale"
                   >
-                    <Trash2 className="w-4 h-4 text-red-600 hover:text-red-700 transition-colors" />
+                    <HugeiconsIcon icon={Delete02Icon} className="w-4 h-4 text-red-600 hover:text-red-700 transition-colors" />
                   </Button>
                 </div>
               )}

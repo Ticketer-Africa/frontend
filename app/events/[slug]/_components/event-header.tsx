@@ -1,5 +1,6 @@
-import { Calendar, MapPin } from "lucide-react";
 import { EventV2 } from "@/types/events-v2.type";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Calendar01Icon, Location01Icon } from "@hugeicons/core-free-icons";
 
 type Props = { event: EventV2 };
 
@@ -33,12 +34,12 @@ export function EventHeaderV2({ event }: Props) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Meta
-          icon={<Calendar className="h-5 w-5" style={{ color: "var(--home-accent)" }} />}
+          icon={<HugeiconsIcon icon={Calendar01Icon} className="h-5 w-5" style={{ color: "var(--home-accent)" }} />}
           label="Date & Time"
           value={`${dateStr} • ${timeStr}`}
         />
         <Meta
-          icon={<MapPin className="h-5 w-5" style={{ color: "var(--home-accent)" }} />}
+          icon={<HugeiconsIcon icon={Location01Icon} className="h-5 w-5" style={{ color: "var(--home-accent)" }} />}
           label="Location"
           value={event.location}
         />

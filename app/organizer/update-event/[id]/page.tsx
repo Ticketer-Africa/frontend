@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import { useUpdateEventV2 } from "@/services/events/events-v2.queries";
@@ -21,6 +20,8 @@ import {
   UpdateEventFormData,
   DEFAULT_FORM_VALUES,
 } from "../../_components/event-form-schema";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { isStep1Valid, isStep2Valid } from "../../_components/event-form-validation";
 import { ProgressBar } from "../../_components/progress-bar";
 import { EventFormStep1 } from "../../_components/event-form-step1";
@@ -255,7 +256,7 @@ export default function UpdateEventPage() {
         <div className="flex items-center justify-between mb-8">
           <Button variant="outline" className="border-[var(--home-border-strong)] bg-transparent text-[var(--home-text)] hover:bg-[var(--home-card)] hover:text-[var(--home-text)]" asChild disabled={isPending || isSubmitting}>
             <Link href="/organizer">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <HugeiconsIcon icon={ArrowLeft01Icon} className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Link>
           </Button>

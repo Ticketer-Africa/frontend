@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarIcon } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Calendar01Icon } from "@hugeicons/core-free-icons";
 
 interface DateTimePickerProps {
   value: string;
@@ -47,7 +48,7 @@ export function DateTimePicker({
               !selectedDate && "text-muted-foreground"
             )}
           >
-            <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+            <HugeiconsIcon icon={Calendar01Icon} className="mr-2 h-3.5 w-3.5" />
             {selectedDate ? format(selectedDate, "dd MMM yyyy") : placeholder}
           </Button>
         </PopoverTrigger>
@@ -107,7 +108,7 @@ export function DatePicker({
             className
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
+          <HugeiconsIcon icon={Calendar01Icon} className="mr-2 h-4 w-4" />
           {selectedDate ? format(selectedDate, "PPP") : placeholder}
         </Button>
       </PopoverTrigger>

@@ -9,9 +9,10 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, AlertCircle } from "lucide-react";
 import { useForgotPassword } from "@/services/auth/auth.queries";
 import { AuthShell } from "@/components/auth/auth-shell";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Alert01Icon, Mail01Icon } from "@hugeicons/core-free-icons";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Enter a valid email address"),
@@ -72,7 +73,7 @@ export default function ForgotPasswordPage() {
             borderColor: "var(--home-border-strong)",
           }}
         >
-          <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+          <HugeiconsIcon icon={Alert01Icon} className="w-5 h-5 text-red-400 flex-shrink-0" />
           <p className="text-sm text-red-400">{errors.email.message}</p>
         </div>
       )}
@@ -87,7 +88,7 @@ export default function ForgotPasswordPage() {
             Email address
           </Label>
           <div className="relative">
-            <Mail
+            <HugeiconsIcon icon={Mail01Icon}
               className="absolute left-8 top-1/2 transform -translate-y-1/2 w-5 h-5"
               style={{ color: "var(--home-muted)" }}
             />

@@ -1,13 +1,14 @@
 "use client";
 
 import { memo } from "react";
-import { Calendar } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAllEvents } from "@/services/events/events.queries";
 import { Event } from "@/types/events.type";
 import { truncateText } from "@/utils/trauncate";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Calendar01Icon } from "@hugeicons/core-free-icons";
 
 interface EventCardProps {
   event: Event;
@@ -63,7 +64,7 @@ const EventCard = memo(function EventCard({
             className="flex items-center gap-3 text-base font-['Hanken_Grotesk'] font-semibold"
             style={{ color: "var(--home-text)" }}
           >
-            <Calendar className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
+            <HugeiconsIcon icon={Calendar01Icon} className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
             <span className="line-clamp-1">{formattedDate}</span>
           </div>
         </div>

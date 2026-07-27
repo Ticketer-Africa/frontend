@@ -4,10 +4,11 @@ import { BuyResalePayload, TicketResale } from "@/types/tickets.type";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Calendar, MapPin, Shield, X } from "lucide-react";
 import { formatDate, formatPrice } from "@/lib/helpers";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Calendar01Icon, Cancel01Icon, Location01Icon, Shield01Icon } from "@hugeicons/core-free-icons";
 
 interface BuyResaleModalProps {
   isOpen: boolean;
@@ -89,7 +90,7 @@ export function BuyResaleModal({
                 aria-label="Close"
                 style={{ color: "var(--home-muted)" }}
               >
-                <X className="h-5 w-5" />
+                <HugeiconsIcon icon={Cancel01Icon} className="h-5 w-5" />
               </button>
             </div>
 
@@ -106,11 +107,11 @@ export function BuyResaleModal({
                 style={{ color: "var(--home-muted)" }}
               >
                 <div className="flex items-center space-x-2">
-                  <Calendar className="h-4 w-4" />
+                  <HugeiconsIcon icon={Calendar01Icon} className="h-4 w-4" />
                   <span>{formatDate(selectedTicket.event.date)}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <MapPin className="h-4 w-4" />
+                  <HugeiconsIcon icon={Location01Icon} className="h-4 w-4" />
                   <span>{selectedTicket.event.location}</span>
                 </div>
               </div>
@@ -195,7 +196,7 @@ export function BuyResaleModal({
                   Verified seller
                 </div>
               </div>
-              <Shield
+              <HugeiconsIcon icon={Shield01Icon}
                 className="w-4 h-4"
                 style={{ color: "var(--home-success)" }}
               />

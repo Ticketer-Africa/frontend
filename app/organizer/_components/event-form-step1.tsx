@@ -3,13 +3,14 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ImagePlus } from "lucide-react";
 import {
   UseFormRegister,
   FieldErrors,
   UseFormWatch,
   UseFormSetValue,
 } from "react-hook-form";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ImageAdd02Icon } from "@hugeicons/core-free-icons";
 import { EventFormData, EVENT_CATEGORIES } from "./event-form-schema";
 
 interface Step1Props {
@@ -105,7 +106,7 @@ export function EventFormStep1({
             </div>
           ) : (
             <div className="py-10 flex flex-col items-center gap-3 text-gray-400">
-              <ImagePlus className="h-10 w-10" />
+              <HugeiconsIcon icon={ImageAdd02Icon} className="h-10 w-10" />
               <div className="text-center">
                 <p className="text-sm font-medium text-gray-600">Click to upload banner</p>
                 <p className="text-xs">PNG, JPG, or WebP, up to 10MB</p>

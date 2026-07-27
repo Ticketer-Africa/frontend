@@ -9,6 +9,8 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Alert01Icon } from "@hugeicons/core-free-icons";
 import { Label } from "@/components/ui/label";
 import { useSetWalletPin } from "@/services/wallet/wallet.queries";
 import { useQueryClient } from "@tanstack/react-query";
@@ -19,7 +21,6 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { AlertCircle } from "lucide-react";
 
 interface PinModalProps {
   isOpen: boolean;
@@ -104,7 +105,7 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
                 </InputOTP>
                 {oldPinError && (
                   <p className="text-xs text-red-600 flex items-center gap-1">
-                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <HugeiconsIcon icon={Alert01Icon} className="w-3.5 h-3.5 shrink-0" />
                     {oldPinError}
                   </p>
                 )}
@@ -136,7 +137,7 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
               </InputOTP>
               {newPinError && (
                 <p className="text-xs text-red-600 flex items-center gap-1">
-                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <HugeiconsIcon icon={Alert01Icon} className="w-3.5 h-3.5 shrink-0" />
                   {newPinError}
                 </p>
               )}

@@ -15,9 +15,10 @@ import { EventHeaderV2 } from "./_components/event-header"; // updated version b
 import { TicketCategoryCardV2 } from "./_components/ticket-category-card"; // improved version below
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, ArrowLeft, ShoppingBag, Ticket } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Alert01Icon, ArrowLeft01Icon, ShoppingBag01Icon, Ticket01Icon } from "@hugeicons/core-free-icons";
 
 export default function EventPage({ params }: { params: { slug: string } }) {
   const router = useRouter();
@@ -155,7 +156,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
             onClick={handleCheckout}
             disabled={!hasSelection}
           >
-            <ShoppingBag className="mr-2 h-5 w-5" />
+            <HugeiconsIcon icon={ShoppingBag01Icon} className="mr-2 h-5 w-5" />
             Checkout
           </Button>
         </div>
@@ -174,7 +175,7 @@ export default function EventPage({ params }: { params: { slug: string } }) {
               className="gap-1.5 -ml-3 text-[var(--home-muted)] hover:bg-[var(--home-card)] hover:text-[var(--home-text-highlight)]"
               onClick={() => router.back()}
             >
-              <ArrowLeft className="h-4 w-4" />
+              <HugeiconsIcon icon={ArrowLeft01Icon} className="h-4 w-4" />
               Back
             </Button>
           </div>
@@ -468,7 +469,7 @@ function NotFound({ router }: { router: any }) {
   return (
     <div className="home-theme min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: "var(--home-bg)" }}>
       <div className="max-w-md text-center">
-        <AlertCircle className="mx-auto h-16 w-16" style={{ color: "var(--home-muted)" }} />
+        <HugeiconsIcon icon={Alert01Icon} className="mx-auto h-16 w-16" style={{ color: "var(--home-muted)" }} />
         <h2 className="mt-6 text-2xl font-bold" style={{ color: "var(--home-text)" }}>Event not found</h2>
         <p className="mt-3" style={{ color: "var(--home-muted)" }}>
           The event you&apos;re looking for doesn&apos;t exist or has been removed.

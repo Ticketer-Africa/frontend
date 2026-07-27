@@ -2,14 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import {
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  Calendar,
-  MapPin,
-  Ticket,
-} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,6 +12,8 @@ import { formatDate, formatPrice } from "@/lib/helpers";
 import { toast } from "sonner";
 import { useEventById } from "@/services/events/events.queries";
 import { QRCameraScanner } from "./QRCameraScanner";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Alert01Icon, Calendar01Icon, CancelCircleIcon, CheckmarkCircle01Icon, Location01Icon, Ticket01Icon } from "@hugeicons/core-free-icons";
 
 interface TicketCategory {
   name: string;
@@ -260,7 +254,7 @@ export default function VerifyTicketPage() {
             }}
           >
             <CardHeader className="text-center">
-              <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+              <HugeiconsIcon icon={CancelCircleIcon} className="h-16 w-16 text-red-500 mx-auto mb-4" />
               <CardTitle className="text-red-600">
                 Verification Failed
               </CardTitle>
@@ -314,7 +308,7 @@ export default function VerifyTicketPage() {
             <CardHeader className="text-center">
               {verification?.isValid ? (
                 <>
-                  <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                  <HugeiconsIcon icon={CheckmarkCircle01Icon} className="h-16 w-16 text-green-500 mx-auto mb-4" />
                   <CardTitle className="text-green-600">
                     Ticket Valid ✓
                   </CardTitle>
@@ -325,7 +319,7 @@ export default function VerifyTicketPage() {
                 </>
               ) : (
                 <>
-                  <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+                  <HugeiconsIcon icon={CancelCircleIcon} className="h-16 w-16 text-red-500 mx-auto mb-4" />
                   <CardTitle className="text-red-600">
                     Invalid Ticket ✗
                   </CardTitle>
@@ -347,7 +341,7 @@ export default function VerifyTicketPage() {
                 }}
               >
                 <h3 className="font-semibold mb-3 flex items-center" style={{ color: "var(--home-text)" }}>
-                  <AlertCircle className="h-4 w-4 mr-2" style={{ color: "var(--home-muted)" }} />
+                  <HugeiconsIcon icon={Alert01Icon} className="h-4 w-4 mr-2" style={{ color: "var(--home-muted)" }} />
                   Verification Details
                 </h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
@@ -408,11 +402,11 @@ export default function VerifyTicketPage() {
                       </h4>
                       <div className="space-y-1 text-sm" style={{ color: "var(--home-muted)" }}>
                         <div className="flex items-center space-x-2">
-                          <Calendar className="h-4 w-4" style={{ color: "var(--home-accent)" }} />
+                          <HugeiconsIcon icon={Calendar01Icon} className="h-4 w-4" style={{ color: "var(--home-accent)" }} />
                           <span>{formatDate(new Date(event.date))}</span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <MapPin className="h-4 w-4" style={{ color: "var(--home-accent)" }} />
+                          <HugeiconsIcon icon={Location01Icon} className="h-4 w-4" style={{ color: "var(--home-accent)" }} />
                           <span>{event.location}</span>
                         </div>
                       </div>
@@ -425,7 +419,7 @@ export default function VerifyTicketPage() {
               {ticket && (
                 <div className="space-y-4">
                   <h3 className="font-semibold flex items-center" style={{ color: "var(--home-text)" }}>
-                    <Ticket className="h-4 w-4 mr-2" style={{ color: "var(--home-accent)" }} />
+                    <HugeiconsIcon icon={Ticket01Icon} className="h-4 w-4 mr-2" style={{ color: "var(--home-accent)" }} />
                     Ticket Information
                   </h3>
                   <div className="grid grid-cols-2 gap-4 text-sm">
@@ -515,7 +509,7 @@ export default function VerifyTicketPage() {
                 }}
               >
                 <div className="flex items-start space-x-2">
-                  <AlertCircle className="h-4 w-4 mt-0.5" style={{ color: "var(--home-accent)" }} />
+                  <HugeiconsIcon icon={Alert01Icon} className="h-4 w-4 mt-0.5" style={{ color: "var(--home-accent)" }} />
                   <div className="text-sm" style={{ color: "var(--home-muted)" }}>
                     <p className="font-medium">Security Notice</p>
                     <p>

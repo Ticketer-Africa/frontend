@@ -1,9 +1,10 @@
 "use client";
 
-import { Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HomeCard } from "@/components/home/home-card";
 import { useUser } from "@/lib/auth-context";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Ticket01Icon } from "@hugeicons/core-free-icons";
 
 const CTA_BY_ROLE = {
   guest: { label: "Start Selling Tickets", href: "/register?intent=organizer" },
@@ -129,7 +130,7 @@ export function PricingSection() {
             className="drop-shadow-[0px_0px_7.5px_rgba(226,114,91,0.2)] h-auto rounded-[30px] px-14 py-[18px] text-base font-medium gap-[10px]"
           >
             <a href={cta.href}>
-              <Ticket className="w-5 h-4" />
+              <HugeiconsIcon icon={Ticket01Icon} className="w-5 h-4" />
               {cta.label}
             </a>
           </Button>

@@ -1,4 +1,3 @@
-import { Ticket as TicketIcon } from "lucide-react";
 import { Event } from "./events.type";
 import { User } from "./user.type";
 

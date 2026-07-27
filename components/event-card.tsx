@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Calendar, MapPin, Users, Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Event } from "@/types/events.type";
 import { formatDate, formatPrice, formatTime } from "@/lib/helpers";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Calendar01Icon, Location01Icon, StarIcon, UserGroupIcon } from "@hugeicons/core-free-icons";
 
 interface EventCardProps {
   event: Event;
@@ -55,17 +56,17 @@ export function EventCard({ event }: EventCardProps) {
 
             <div className="space-y-2">
               <div className="flex items-center text-sm text-muted-foreground">
-                <Calendar className="h-4 w-4 mr-2" />
+                <HugeiconsIcon icon={Calendar01Icon} className="h-4 w-4 mr-2" />
                 <span>
                   {formatDate(event.date)} at {formatTime(event.date)}
                 </span>
               </div>
               <div className="flex items-center text-sm text-muted-foreground">
-                <MapPin className="h-4 w-4 mr-2" />
+                <HugeiconsIcon icon={Location01Icon} className="h-4 w-4 mr-2" />
                 <span className="line-clamp-1">{event.location}</span>
               </div>
               <div className="flex items-center text-sm text-muted-foreground">
-                <Users className="h-4 w-4 mr-2" />
+                <HugeiconsIcon icon={UserGroupIcon} className="h-4 w-4 mr-2" />
                 <span>{availableTickets} tickets available</span>
               </div>
             </div>
@@ -78,7 +79,7 @@ export function EventCard({ event }: EventCardProps) {
                   {formatPrice(event.price)}
                 </div>
                 <div className="flex items-center text-sm text-muted-foreground">
-                  <Star className="h-3 w-3 mr-1 fill-current text-yellow-500" />
+                  <HugeiconsIcon icon={StarIcon} className="h-3 w-3 mr-1 fill-current text-yellow-500" />
                   <span>4.8 (124 reviews)</span>
                 </div>
               </div>

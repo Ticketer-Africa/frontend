@@ -1,19 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Calendar,
-  Users,
-  TrendingUp,
-  BarChart3,
-  Trash2,
-  MoreVertical,
-  Edit,
-  ArrowLeft,
-  Loader2,
-  Copy,
-  Check,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/lib/auth-context";
@@ -30,6 +17,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft01Icon, Calendar01Icon, ChartBarLineIcon, ChartUpIcon, Copy01Icon, Delete02Icon, Loading03Icon, MoreVerticalIcon, PencilEdit02Icon, Tick01Icon, UserGroupIcon } from "@hugeicons/core-free-icons";
 import {
   Dialog,
   DialogContent,
@@ -59,7 +48,7 @@ export default function EventDashboard() {
     return (
       <div className="home-theme min-h-screen flex items-center justify-center bg-[var(--home-bg)] text-[var(--home-text)]">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-[var(--home-accent)] mx-auto mb-4" />
+          <HugeiconsIcon icon={Loading03Icon} className="h-12 w-12 animate-spin text-[var(--home-accent)] mx-auto mb-4" />
           <p className="text-lg text-[var(--home-muted)]">
             Loading event details...
           </p>
@@ -158,7 +147,7 @@ export default function EventDashboard() {
               className="w-full sm:w-auto border-0 bg-[var(--home-accent)] hover:bg-[#f18b76] text-[var(--home-accent-fg)] rounded-full px-6 py-2 shadow-none transition-[background-color,color,border-color,opacity,transform] duration-150 active:translate-y-px"
             >
               <Link href="/organizer">
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <HugeiconsIcon icon={ArrowLeft01Icon} className="h-4 w-4 mr-2" />
                 Back to Dashboard
               </Link>
             </Button>
@@ -172,7 +161,7 @@ export default function EventDashboard() {
                   <CardTitle className="text-xs sm:text-sm font-medium">
                     Total Tickets
                   </CardTitle>
-                  <Calendar className="h-4 w-4 text-[var(--home-accent)]" />
+                  <HugeiconsIcon icon={Calendar01Icon} className="h-4 w-4 text-[var(--home-accent)]" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl sm:text-2xl font-bold">
@@ -191,7 +180,7 @@ export default function EventDashboard() {
                   <CardTitle className="text-xs sm:text-sm font-medium">
                     Tickets Sold
                   </CardTitle>
-                  <Users className="h-4 w-4 text-[var(--home-accent)]" />
+                  <HugeiconsIcon icon={UserGroupIcon} className="h-4 w-4 text-[var(--home-accent)]" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl sm:text-2xl font-bold">
@@ -210,7 +199,7 @@ export default function EventDashboard() {
                   <CardTitle className="text-xs sm:text-sm font-medium">
                     Percentage Sold
                   </CardTitle>
-                  <TrendingUp className="h-4 w-4 text-[var(--home-accent)]" />
+                  <HugeiconsIcon icon={ChartUpIcon} className="h-4 w-4 text-[var(--home-accent)]" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl sm:text-2xl font-bold">
@@ -226,7 +215,7 @@ export default function EventDashboard() {
                   <CardTitle className="text-xs sm:text-sm font-medium">
                     Net Earnings
                   </CardTitle>
-                  <BarChart3 className="h-4 w-4 text-[var(--home-accent)]" />
+                  <HugeiconsIcon icon={ChartBarLineIcon} className="h-4 w-4 text-[var(--home-accent)]" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl sm:text-2xl font-bold">
@@ -275,7 +264,7 @@ export default function EventDashboard() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreVertical className="h-4 w-4" />
+                          <HugeiconsIcon icon={MoreVerticalIcon} className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
@@ -289,14 +278,14 @@ export default function EventDashboard() {
                           }
                           className="text-sm text-[var(--home-text)] hover:bg-[var(--home-card)] rounded-lg p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
                         >
-                          <Edit className="mr-2 h-4 w-4" /> Update Event
+                          <HugeiconsIcon icon={PencilEdit02Icon} className="mr-2 h-4 w-4" /> Update Event
                         </DropdownMenuItem>
                         <DropdownMenuSeparator className="bg-[var(--home-border)] h-px my-1" />
                         <DropdownMenuItem
                           onClick={() => handleDeleteClick(event.id)}
                           className="text-sm text-white bg-red-700 hover:bg-red-600 rounded-lg p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
                         >
-                          <Trash2 className="mr-2 h-4 w-4" /> Delete Event
+                          <HugeiconsIcon icon={Delete02Icon} className="mr-2 h-4 w-4" /> Delete Event
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -336,12 +325,12 @@ export default function EventDashboard() {
                     >
                       {copiedToClipboard ? (
                         <>
-                          <Check className="h-4 w-4 mr-2" />
+                          <HugeiconsIcon icon={Tick01Icon} className="h-4 w-4 mr-2" />
                           Copied!
                         </>
                       ) : (
                         <>
-                          <Copy className="h-4 w-4 mr-2" />
+                          <HugeiconsIcon icon={Copy01Icon} className="h-4 w-4 mr-2" />
                           Copy URL
                         </>
                       )}

@@ -1,8 +1,9 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
 import { useState, useCallback, memo } from "react";
 import { HomeCard } from "@/components/home/home-card";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 
 const FAQS = [
   {
@@ -33,7 +34,7 @@ const FAQS = [
   {
     question: "When will I receive my payouts?",
     answer:
-      "Payouts are processed within 7 business days after your event ends or a resale is confirmed.",
+      "Payouts aren't on a fixed schedule. Request a payout from your wallet whenever you need it, and it's processed from there.",
   },
   {
     question: "Are there fees for selling resale tickets?",
@@ -73,7 +74,7 @@ const FAQItem = memo(function FAQItem({
         >
           {faq.question}
         </span>
-        <ChevronDown
+        <HugeiconsIcon icon={ArrowDown01Icon}
           className={`w-5 h-5 transition-transform duration-300 flex-shrink-0 ml-4 ${
             isOpen ? "rotate-180" : ""
           }`}

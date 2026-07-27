@@ -13,6 +13,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Alert01Icon, ArrowLeft01Icon, ArrowRight01Icon, Cancel01Icon, CheckmarkCircle02Icon, Loading03Icon, Mail01Icon, ShoppingCart01Icon, SparklesIcon, Tag01Icon, Ticket01Icon, UserGroupIcon, UserIcon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,21 +29,6 @@ import {
 } from "@/components/ui/select";
 import { EventCustomField } from "@/types/events-v2.type";
 import { toast } from "sonner";
-import {
-  AlertCircle,
-  Loader2,
-  ArrowLeft,
-  Users,
-  CheckCircle2,
-  Ticket,
-  ShoppingCart,
-  Tag,
-  X,
-  ChevronRight,
-  User,
-  Mail,
-  Sparkles,
-} from "lucide-react";
 
 interface CheckoutData {
   eventId: string;
@@ -255,7 +242,7 @@ export default function CheckoutPage() {
     return (
       <div className="home-theme min-h-screen flex items-center justify-center" style={{ backgroundColor: "var(--home-bg)" }}>
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-10 h-10 animate-spin" style={{ color: "var(--home-accent)" }} />
+          <HugeiconsIcon icon={Loading03Icon} className="w-10 h-10 animate-spin" style={{ color: "var(--home-accent)" }} />
           <p className="text-sm" style={{ color: "var(--home-muted)" }}>Loading checkout…</p>
         </div>
       </div>
@@ -271,7 +258,7 @@ export default function CheckoutPage() {
             className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
             style={{ backgroundColor: "var(--home-card)" }}
           >
-            <ShoppingCart className="w-10 h-10" style={{ color: "var(--home-accent)" }} />
+            <HugeiconsIcon icon={ShoppingCart01Icon} className="w-10 h-10" style={{ color: "var(--home-accent)" }} />
           </div>
           <h1 className="text-2xl font-bold mb-2" style={{ color: "var(--home-text)" }}>No event selected for checkout</h1>
           <p className="mb-8" style={{ color: "var(--home-muted)" }}>
@@ -279,7 +266,7 @@ export default function CheckoutPage() {
           </p>
           <Button variant="homeAccent" size="lg" className="w-full" onClick={() => router.push("/explore")}>
             Explore Events
-            <ChevronRight className="w-4 h-4 ml-1" />
+            <HugeiconsIcon icon={ArrowRight01Icon} className="w-4 h-4 ml-1" />
           </Button>
         </div>
       </div>
@@ -295,7 +282,7 @@ export default function CheckoutPage() {
             className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
             style={{ backgroundColor: "rgba(66,167,59,0.1)" }}
           >
-            <CheckCircle2 className="w-10 h-10" style={{ color: "var(--home-success)" }} />
+            <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-10 h-10" style={{ color: "var(--home-success)" }} />
           </div>
           <h1 className="text-2xl font-bold mb-2" style={{ color: "var(--home-text)" }}>Tickets Claimed!</h1>
           <p className="mb-8" style={{ color: "var(--home-muted)" }}>
@@ -324,12 +311,12 @@ export default function CheckoutPage() {
       >
         <div className="container mx-auto px-4 h-14 flex items-center gap-4">
           <Button variant="ghost" size="sm" onClick={() => router.back()} className="gap-2 -ml-2 text-[var(--home-text)] hover:bg-[var(--home-card)] hover:text-[var(--home-text-highlight)]">
-            <ArrowLeft className="h-4 w-4" />
+            <HugeiconsIcon icon={ArrowLeft01Icon} className="h-4 w-4" />
             Back
           </Button>
           <div className="h-4 w-px" style={{ backgroundColor: "var(--home-border-strong)" }} />
           <div className="flex items-center gap-2 min-w-0">
-            <ShoppingCart className="h-4 w-4 shrink-0" style={{ color: "var(--home-accent)" }} />
+            <HugeiconsIcon icon={ShoppingCart01Icon} className="h-4 w-4 shrink-0" style={{ color: "var(--home-accent)" }} />
             <span className="text-sm font-medium truncate" style={{ color: "var(--home-text)" }}>{checkoutData.eventName}</span>
           </div>
           <div className="ml-auto">
@@ -381,14 +368,14 @@ export default function CheckoutPage() {
                       <p className="text-sm font-medium truncate" style={{ color: "var(--home-text)" }}>{user.name}</p>
                       <p className="text-xs truncate" style={{ color: "var(--home-muted)" }}>{user.email}</p>
                     </div>
-                    <CheckCircle2 className="w-4 h-4 ml-auto shrink-0" style={{ color: "var(--home-accent)" }} />
+                    <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4 ml-auto shrink-0" style={{ color: "var(--home-accent)" }} />
                   </div>
                 ) : (
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1.5">
                         <Label htmlFor="buyer-name" className="text-sm font-medium flex items-center gap-1.5" style={{ color: "var(--home-muted)" }}>
-                          <User className="w-3.5 h-3.5" />
+                          <HugeiconsIcon icon={UserIcon} className="w-3.5 h-3.5" />
                           Your Name
                           <span className="text-xs font-normal">(optional)</span>
                         </Label>
@@ -403,7 +390,7 @@ export default function CheckoutPage() {
                       </div>
                       <div className="space-y-1.5">
                         <Label htmlFor="buyer-email" className="text-sm font-medium flex items-center gap-1.5" style={{ color: "var(--home-muted)" }}>
-                          <Mail className="w-3.5 h-3.5" />
+                          <HugeiconsIcon icon={Mail01Icon} className="w-3.5 h-3.5" />
                           Email Address
                           <span className="text-red-400 ml-0.5">*</span>
                         </Label>
@@ -422,7 +409,7 @@ export default function CheckoutPage() {
                         />
                         {validationErrors["buyerEmail"] && (
                           <p className="text-xs text-red-400 flex items-center gap-1">
-                            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                            <HugeiconsIcon icon={Alert01Icon} className="w-3.5 h-3.5 shrink-0" />
                             {validationErrors["buyerEmail"]}
                           </p>
                         )}
@@ -487,7 +474,7 @@ export default function CheckoutPage() {
                         className="flex items-start gap-2 p-3 rounded-xl border"
                         style={{ backgroundColor: "var(--home-card-highlight)", borderColor: "var(--home-border)" }}
                       >
-                        <Users className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "var(--home-accent)" }} />
+                        <HugeiconsIcon icon={UserGroupIcon} className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "var(--home-accent)" }} />
                         <p className="text-xs" style={{ color: "var(--home-text-highlight)" }}>
                           Each ticket will be sent to the recipient&apos;s email address after purchase.
                         </p>
@@ -496,7 +483,7 @@ export default function CheckoutPage() {
                       {checkoutData.tickets.map((ticket) => (
                         <div key={ticket.ticketCategoryId}>
                           <div className="flex items-center gap-2 mb-3">
-                            <Ticket className="w-4 h-4" style={{ color: "var(--home-muted)" }} />
+                            <HugeiconsIcon icon={Ticket01Icon} className="w-4 h-4" style={{ color: "var(--home-muted)" }} />
                             <span className="text-sm font-semibold" style={{ color: "var(--home-text)" }}>{ticket.ticketCategoryName}</span>
                             <Badge variant="secondary" className="text-xs ml-auto" style={{ backgroundColor: "var(--home-card)", color: "var(--home-muted)" }}>
                               {ticket.quantity} ticket{ticket.quantity !== 1 ? "s" : ""}
@@ -552,7 +539,7 @@ export default function CheckoutPage() {
                                   </div>
                                   {hasError && (
                                     <p className="mt-2 text-xs text-red-400 flex items-center gap-1">
-                                      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                                      <HugeiconsIcon icon={Alert01Icon} className="w-3.5 h-3.5 shrink-0" />
                                       {validationErrors[key]}
                                     </p>
                                   )}
@@ -647,7 +634,7 @@ export default function CheckoutPage() {
                           )}
                           {hasError && (
                             <p className="text-xs text-red-400 flex items-center gap-1">
-                              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                              <HugeiconsIcon icon={Alert01Icon} className="w-3.5 h-3.5 shrink-0" />
                               {validationErrors[errKey]}
                             </p>
                           )}
@@ -667,7 +654,7 @@ export default function CheckoutPage() {
             <Card className="overflow-hidden" style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)" }}>
               <CardHeader className="border-b pb-4" style={{ borderColor: "var(--home-border)", backgroundColor: "var(--home-card-elevated)" }}>
                 <CardTitle className="text-base flex items-center gap-2" style={{ color: "var(--home-text)" }}>
-                  <ShoppingCart className="w-4 h-4" style={{ color: "var(--home-accent)" }} />
+                  <HugeiconsIcon icon={ShoppingCart01Icon} className="w-4 h-4" style={{ color: "var(--home-accent)" }} />
                   Order Summary
                 </CardTitle>
               </CardHeader>
@@ -716,7 +703,7 @@ export default function CheckoutPage() {
                 {/* Discount code */}
                 <div className="border-t pt-4" style={{ borderColor: "var(--home-border)" }}>
                   <Label className="text-xs font-medium flex items-center gap-1.5 mb-2" style={{ color: "var(--home-muted)" }}>
-                    <Tag className="w-3.5 h-3.5" />
+                    <HugeiconsIcon icon={Tag01Icon} className="w-3.5 h-3.5" />
                     Discount Code
                   </Label>
                   {discountState.appliedDiscount ? (
@@ -724,7 +711,7 @@ export default function CheckoutPage() {
                       className="flex items-center gap-2 p-3 rounded-xl border"
                       style={{ backgroundColor: "rgba(66,167,59,0.1)", borderColor: "var(--home-success)" }}
                     >
-                      <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: "var(--home-success)" }} />
+                      <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4 shrink-0" style={{ color: "var(--home-success)" }} />
                       <div className="min-w-0 flex-1">
                         <p className="text-xs font-semibold" style={{ color: "var(--home-success-text)" }}>{discountState.appliedDiscount.code}</p>
                         <p className="text-xs" style={{ color: "var(--home-success-text)" }}>
@@ -738,7 +725,7 @@ export default function CheckoutPage() {
                         className="transition-colors"
                         style={{ color: "var(--home-muted)" }}
                       >
-                        <X className="w-4 h-4" />
+                        <HugeiconsIcon icon={Cancel01Icon} className="w-4 h-4" />
                       </button>
                     </div>
                   ) : (
@@ -758,7 +745,7 @@ export default function CheckoutPage() {
                         disabled={isValidatingDiscount || !discountCode.trim()}
                         className="shrink-0 px-4"
                       >
-                        {isValidatingDiscount ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Apply"}
+                        {isValidatingDiscount ? <HugeiconsIcon icon={Loading03Icon} className="w-3.5 h-3.5 animate-spin" /> : "Apply"}
                       </Button>
                     </div>
                   )}
@@ -774,12 +761,12 @@ export default function CheckoutPage() {
                 >
                   {isSubmitting || isProcessing ? (
                     <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      <HugeiconsIcon icon={Loading03Icon} className="w-4 h-4 mr-2 animate-spin" />
                       Processing…
                     </>
                   ) : (
                     <>
-                      <Sparkles className="w-4 h-4 mr-2" />
+                      <HugeiconsIcon icon={SparklesIcon} className="w-4 h-4 mr-2" />
                       Complete Purchase
                     </>
                   )}
@@ -796,12 +783,12 @@ export default function CheckoutPage() {
               <CardContent className="p-5 space-y-3">
                 <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--home-muted)" }}>What happens next?</p>
                 {[
-                  { icon: Ticket, title: "Instant ticket delivery", desc: "Tickets sent to your email immediately" },
-                  { icon: CheckCircle2, title: "QR code included", desc: "Scan at the venue for entry" },
-                ].map(({ icon: Icon, title, desc }) => (
+                  { icon: Ticket01Icon, title: "Instant ticket delivery", desc: "Tickets sent to your email immediately" },
+                  { icon: CheckmarkCircle02Icon, title: "QR code included", desc: "Scan at the venue for entry" },
+                ].map(({ icon, title, desc }) => (
                   <div key={title} className="flex items-start gap-3">
                     <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: "var(--home-card-highlight)" }}>
-                      <Icon className="w-3.5 h-3.5" style={{ color: "var(--home-accent)" }} />
+                      <HugeiconsIcon icon={icon} className="w-3.5 h-3.5" style={{ color: "var(--home-accent)" }} />
                     </div>
                     <div>
                       <p className="text-xs font-medium" style={{ color: "var(--home-text)" }}>{title}</p>

@@ -2,9 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { EmberParticles } from "@/components/ember-particles";
-import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/lib/auth-context";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 
 const CTA_BY_ROLE = {
   guest: { label: "Become an Organizer", href: "/register?intent=organizer" },
@@ -65,7 +66,7 @@ export function HeroSection() {
             onClick={() => router.push(cta.href)}
           >
             {cta.label}
-            <ArrowRight className="w-4 h-4" />
+            <HugeiconsIcon icon={ArrowRight01Icon} className="w-4 h-4" />
           </Button>
         </div>
       </div>

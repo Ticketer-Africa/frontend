@@ -2,8 +2,9 @@
 
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
-import { Calendar, Ticket } from "lucide-react";
 import { formatPrice, formatDate } from "@/lib/helpers";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Calendar01Icon, Ticket01Icon } from "@hugeicons/core-free-icons";
 
 interface Transaction {
   id: string;
@@ -103,7 +104,7 @@ export function TransactionDetailsModal({
             </h3>
             <div className="space-y-2 text-sm text-gray-600">
               <div className="flex items-center space-x-2">
-                <Calendar className="h-4 w-4" />
+                <HugeiconsIcon icon={Calendar01Icon} className="h-4 w-4" />
                 <span>{transaction.event.name}</span>
               </div>
             </div>
@@ -122,7 +123,7 @@ export function TransactionDetailsModal({
                   key={ticket.id}
                   className="flex items-center space-x-2 text-sm text-gray-600"
                 >
-                  <Ticket className="h-4 w-4" />
+                  <HugeiconsIcon icon={Ticket01Icon} className="h-4 w-4" />
                   <span>
                     {ticket.code} - {ticket.event.name}
                   </span>

@@ -3,7 +3,6 @@
 import { memo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Calendar, MapPin, Ticket } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { HomeCard } from "@/components/home/home-card";
@@ -11,6 +10,8 @@ import { formatPrice, formatDate, formatTime } from "@/lib/helpers";
 import { EventV2 } from "@/types/events-v2.type";
 import { getTicketStats } from "./utils";
 import { EVENT_IMAGE_WIDTH, EVENT_IMAGE_HEIGHT } from "./constants";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Calendar01Icon, Location01Icon, Ticket01Icon } from "@hugeicons/core-free-icons";
 
 interface ExploreEventCardProps {
   event: EventV2;
@@ -102,7 +103,7 @@ function ExploreEventCardComponent({
               style={{ color: "var(--home-muted)" }}
             >
               <div className="flex items-center">
-                <Calendar
+                <HugeiconsIcon icon={Calendar01Icon}
                   className="w-4 h-4 mr-2 flex-shrink-0"
                   aria-hidden="true"
                 />
@@ -111,7 +112,7 @@ function ExploreEventCardComponent({
                 </span>
               </div>
               <div className="flex items-center">
-                <MapPin
+                <HugeiconsIcon icon={Location01Icon}
                   className="w-4 h-4 mr-2 flex-shrink-0"
                   aria-hidden="true"
                 />
@@ -121,7 +122,7 @@ function ExploreEventCardComponent({
 
             <div className="min-h-[56px] pb-2" style={{ color: "var(--home-muted)" }}>
               <div className="flex items-center mb-1">
-                <Ticket
+                <HugeiconsIcon icon={Ticket01Icon}
                   className="w-4 h-4 mr-2 flex-shrink-0"
                   aria-hidden="true"
                 />

@@ -1,10 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 
 interface ModalProps {
   isOpen: boolean;
@@ -64,7 +65,7 @@ export function Modal({
                 <div className="flex items-center justify-between p-6 border-b">
                   <h2 className="text-lg font-semibold">{title}</h2>
                   <Button variant="ghost" size="icon" onClick={onClose}>
-                    <X className="h-4 w-4" />
+                    <HugeiconsIcon icon={Cancel01Icon} className="h-4 w-4" />
                   </Button>
                 </div>
               )}

@@ -12,6 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Alert01Icon } from "@hugeicons/core-free-icons";
 import {
   InputOTP,
   InputOTPGroup,
@@ -23,7 +25,6 @@ import { formatPrice } from "@/lib/helpers";
 import { useUser } from "@/lib/auth-context";
 import { useBankCodes } from "@/services/banks/bank.queries";
 import { Bank } from "@/types/bank.type";
-import { AlertCircle } from "lucide-react";
 
 const createWithdrawPayloadSchema = (availableBalance: number) =>
   z.object({
@@ -56,7 +57,7 @@ function FieldError({ message }: { message?: string }) {
   if (!message) return null;
   return (
     <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
-      <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+      <HugeiconsIcon icon={Alert01Icon} className="w-3.5 h-3.5 shrink-0" />
       {message}
     </p>
   );
@@ -224,7 +225,7 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 w-full">
               <p className="text-sm text-blue-800 text-center">
-                <strong>Note:</strong> Payouts are processed within 3–5 business days. Ensure your bank details are correct to avoid delays.
+                <strong>Note:</strong> Payout requests are processed as soon as they&apos;re received. Ensure your bank details are correct to avoid delays.
               </p>
             </div>
 
@@ -260,7 +261,7 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
               </InputOTP>
               {pinError && (
                 <p className="text-xs text-red-600 flex items-center gap-1">
-                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <HugeiconsIcon icon={Alert01Icon} className="w-3.5 h-3.5 shrink-0" />
                   {pinError}
                 </p>
               )}

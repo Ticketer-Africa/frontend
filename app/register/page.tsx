@@ -7,13 +7,14 @@ import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Eye, EyeOff, Lock, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useRegister } from "@/services/auth/auth.queries";
 import { toast } from "sonner";
 import { AuthShell } from "@/components/auth/auth-shell";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { EyeIcon, EyeOffIcon, SquareLock01Icon, Tick01Icon } from "@hugeicons/core-free-icons";
 
 const registerSchema = z
   .object({
@@ -130,7 +131,7 @@ export default function RegisterPage() {
           className="flex items-center justify-center rounded-full p-3 mb-2"
           style={{ backgroundColor: "#362222" }}
         >
-          <Lock className="w-6 h-6" style={{ color: "var(--home-accent)" }} />
+          <HugeiconsIcon icon={SquareLock01Icon} className="w-6 h-6" style={{ color: "var(--home-accent)" }} />
         </div>
         <h1 className="text-3xl font-bold" style={{ color: "var(--home-text)" }}>
           Sign Up
@@ -255,9 +256,9 @@ export default function RegisterPage() {
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
+                    <HugeiconsIcon icon={EyeOffIcon} className="h-4 w-4" />
                   ) : (
-                    <Eye className="h-4 w-4" />
+                    <HugeiconsIcon icon={EyeIcon} className="h-4 w-4" />
                   )}
                 </button>
               </div>
@@ -298,9 +299,9 @@ export default function RegisterPage() {
                   }
                 >
                   {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4" />
+                    <HugeiconsIcon icon={EyeOffIcon} className="h-4 w-4" />
                   ) : (
-                    <Eye className="h-4 w-4" />
+                    <HugeiconsIcon icon={EyeIcon} className="h-4 w-4" />
                   )}
                 </button>
               </div>
@@ -330,7 +331,7 @@ export default function RegisterPage() {
                           border: met ? "none" : "1px solid var(--home-border-strong)",
                         }}
                       >
-                        {met && <Check className="w-2.5 h-2.5" style={{ color: "var(--home-success-fg)" }} />}
+                        {met && <HugeiconsIcon icon={Tick01Icon} className="w-2.5 h-2.5" style={{ color: "var(--home-success-fg)" }} />}
                       </span>
                       <span
                         className="text-sm font-semibold"

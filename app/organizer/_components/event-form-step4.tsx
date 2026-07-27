@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { UseFormWatch, UseFormSetValue, UseFormRegister, FieldErrors } from "react-hook-form";
-import { Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { EventFormData, OccurrenceFormData, CustomFieldFormData } from "./event-form-schema";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Add01Icon, ArrowDown01Icon, ArrowUp01Icon, Delete02Icon } from "@hugeicons/core-free-icons";
 
 interface Step4Props {
   watch: UseFormWatch<EventFormData>;
@@ -159,7 +160,7 @@ export function EventFormStep4({ watch, setValue, register, errors, isDisabled }
                   disabled={isDisabled}
                   className="text-xs text-red-400 hover:text-red-600 flex items-center gap-1"
                 >
-                  <Trash2 className="h-3.5 w-3.5" /> Remove
+                  <HugeiconsIcon icon={Delete02Icon} className="h-3.5 w-3.5" /> Remove
                 </button>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -209,7 +210,7 @@ export function EventFormStep4({ watch, setValue, register, errors, isDisabled }
             disabled={isDisabled}
             className="w-full py-3 rounded-xl border-2 border-dashed border-gray-200 text-sm text-gray-500 hover:border-[#1E88E5] hover:text-[#1E88E5] transition-colors flex items-center justify-center gap-2"
           >
-            <Plus className="h-4 w-4" /> Add Occurrence
+            <HugeiconsIcon icon={Add01Icon} className="h-4 w-4" /> Add Occurrence
           </button>
         </div>
       </Section>
@@ -237,7 +238,7 @@ export function EventFormStep4({ watch, setValue, register, errors, isDisabled }
                     disabled={isDisabled || i === 0}
                     className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
                   >
-                    <ChevronUp className="h-4 w-4" />
+                    <HugeiconsIcon icon={ArrowUp01Icon} className="h-4 w-4" />
                   </button>
                   <button
                     type="button"
@@ -245,7 +246,7 @@ export function EventFormStep4({ watch, setValue, register, errors, isDisabled }
                     disabled={isDisabled || i === customFields.length - 1}
                     className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
                   >
-                    <ChevronDown className="h-4 w-4" />
+                    <HugeiconsIcon icon={ArrowDown01Icon} className="h-4 w-4" />
                   </button>
                   <button
                     type="button"
@@ -253,7 +254,7 @@ export function EventFormStep4({ watch, setValue, register, errors, isDisabled }
                     disabled={isDisabled}
                     className="text-xs text-red-400 hover:text-red-600 flex items-center gap-1"
                   >
-                    <Trash2 className="h-3.5 w-3.5" /> Remove
+                    <HugeiconsIcon icon={Delete02Icon} className="h-3.5 w-3.5" /> Remove
                   </button>
                 </div>
               </div>
@@ -348,7 +349,7 @@ export function EventFormStep4({ watch, setValue, register, errors, isDisabled }
             disabled={isDisabled}
             className="w-full py-3 rounded-xl border-2 border-dashed border-gray-200 text-sm text-gray-500 hover:border-[#1E88E5] hover:text-[#1E88E5] transition-colors flex items-center justify-center gap-2"
           >
-            <Plus className="h-4 w-4" /> Add Field
+            <HugeiconsIcon icon={Add01Icon} className="h-4 w-4" /> Add Field
           </button>
         </div>
       </Section>

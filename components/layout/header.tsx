@@ -7,9 +7,10 @@ import {
   memo,
   useCallback,
 } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Calendar01Icon, Cancel01Icon, DashboardSquare01Icon, Logout03Icon, Menu01Icon, Settings01Icon, Wallet01Icon } from "@hugeicons/core-free-icons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, LogOut, Settings, Wallet, Calendar } from "lucide-react";
 import clsx from "clsx";
 import { Button } from "@/components/ui/button";
 import { useUser, useAuthStatus } from "@/lib/auth-context";
@@ -19,6 +20,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 const NAVIGATION = [
   { name: "Home", href: "/" },
   { name: "Explore", href: "/explore" },
+  { name: "For Organisers", href: "/for-organisers" },
 ] as const;
 
 const DARK_ROUTES = [
@@ -30,6 +32,7 @@ const DARK_ROUTES = [
   "/forgot-password",
   "/reset-password",
   "/resale",
+  "/for-organisers",
 ];
 
 export function Header() {
@@ -75,19 +78,19 @@ export function Header() {
 
   const userNavigation = user
     ? [
-        { name: "Settings", href: "/settings", icon: Settings },
+        { name: "Settings", href: "/settings", icon: Settings01Icon },
       ]
     : [];
 
   const organizerNavigation =
     user?.role === "ORGANIZER"
       ? [
-          { name: "Dashboard", href: "/organizer", icon: Calendar },
-          { name: "Wallet", href: "/wallet", icon: Wallet },
+          { name: "Dashboard", href: "/organizer", icon: DashboardSquare01Icon },
+          { name: "Wallet", href: "/wallet", icon: Wallet01Icon },
           {
             name: "Create Event",
             href: "/organizer/create-event",
-            icon: Calendar,
+            icon: Calendar01Icon,
           },
         ]
       : [];
@@ -143,7 +146,7 @@ export function Header() {
               showImage={!isHome}
               textClassName={
                 isHome
-                  ? "text-[var(--home-text-highlight)] font-['Syne'] tracking-[-0.8px]"
+                  ? "text-[var(--home-text-highlight)] font-['Syne'] text-[28px] tracking-[-0.8px]"
                   : undefined
               }
             />
@@ -156,7 +159,7 @@ export function Header() {
                   key={item.name}
                   href={item.href}
                   className={clsx(
-                    "inline-flex h-11 items-center rounded-full px-4 text-sm transition-colors",
+                    "inline-flex h-11 items-center text-sm transition-colors",
                     isHome
                       ? clsx(
                           "font-['Hanken_Grotesk'] font-semibold text-base tracking-[0.5px]",
@@ -164,9 +167,12 @@ export function Header() {
                             ? "text-[var(--home-text-highlight)]"
                             : "text-[var(--home-muted)] hover:text-[var(--home-text-highlight)]"
                         )
-                      : isActive(item.href)
-                        ? "bg-primary/10 text-[#1E88E5]"
-                        : "text-muted-foreground hover:text-[#1E88E5]"
+                      : clsx(
+                          "rounded-full px-4",
+                          isActive(item.href)
+                            ? "bg-primary/10 text-[#1E88E5]"
+                            : "text-muted-foreground hover:text-[#1E88E5]"
+                        )
                   )}
                 >
                   {item.name}
@@ -245,7 +251,8 @@ export function Header() {
                               className="activity-row-icon"
                               style={isHome ? { borderColor: "var(--home-border)" } : undefined}
                             >
-                              <item.icon
+                              <HugeiconsIcon
+                                icon={item.icon}
                                 className="h-4 w-4"
                                 style={{ color: isHome ? "var(--home-text-highlight)" : "#1E88E5" }}
                               />
@@ -269,7 +276,7 @@ export function Header() {
                         )}
                         style={{ color: isHome ? "var(--home-text)" : undefined }}
                       >
-                        <LogOut className="h-4 w-4" />
+                        <HugeiconsIcon icon={Logout03Icon} className="h-4 w-4" />
                         Sign Out
                       </button>
                     </div>
@@ -308,7 +315,7 @@ export function Header() {
             aria-expanded={isMenuOpen}
             aria-label="Toggle navigation menu"
           >
-            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {isMenuOpen ? <HugeiconsIcon icon={Cancel01Icon} className="h-5 w-5" /> : <HugeiconsIcon icon={Menu01Icon} className="h-5 w-5" />}
           </Button>
         </div>
 
@@ -363,7 +370,8 @@ export function Header() {
                         className="activity-row-icon"
                         style={isHome ? { borderColor: "var(--home-border)" } : undefined}
                       >
-                        <item.icon
+                        <HugeiconsIcon
+                          icon={item.icon}
                           className="h-4 w-4"
                           style={{ color: isHome ? "var(--home-text-highlight)" : "#1E88E5" }}
                         />
@@ -393,7 +401,7 @@ export function Header() {
                   )}
                   style={{ color: isHome ? "var(--home-text)" : undefined }}
                 >
-                  <LogOut className="h-4 w-4" />
+                  <HugeiconsIcon icon={Logout03Icon} className="h-4 w-4" />
                   Sign Out
                 </button>
               </div>
@@ -402,7 +410,7 @@ export function Header() {
                 <Button
                   variant="homeAccent"
                   asChild
-                  className="w-full border"
+                  className="w-full h-auto border rounded-[20px] px-8 py-3 text-base tracking-[0.5px]"
                   style={{ borderColor: "var(--home-accent-fg)" }}
                 >
                   <Link href="/login" onClick={closeMenu}>

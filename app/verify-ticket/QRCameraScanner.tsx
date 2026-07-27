@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
-import { Camera, CameraOff } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Camera01Icon, CameraOff01Icon } from "@hugeicons/core-free-icons";
 
 interface QRCameraScannerProps {
   onScan: (rawText: string) => void;
@@ -88,7 +89,7 @@ export function QRCameraScanner({ onScan, active }: QRCameraScannerProps) {
   if (permissionDenied) {
     return (
       <div className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-xl border border-gray-200 space-y-4">
-        <CameraOff className="h-12 w-12 text-gray-400" />
+        <HugeiconsIcon icon={CameraOff01Icon} className="h-12 w-12 text-gray-400" />
         <p className="text-gray-700 font-medium text-center">
           Camera access denied
         </p>
@@ -121,7 +122,7 @@ export function QRCameraScanner({ onScan, active }: QRCameraScannerProps) {
       )}
       <div className="mt-2 flex justify-center">
         <div className="bg-gray-800 text-white text-xs px-3 py-1 rounded-full flex items-center gap-1">
-          <Camera className="h-3 w-3" />
+          <HugeiconsIcon icon={Camera01Icon} className="h-3 w-3" />
           Point at ticket QR code
         </div>
       </div>

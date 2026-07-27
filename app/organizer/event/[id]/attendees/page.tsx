@@ -3,13 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import {
-  ArrowLeft,
-  ChevronLeft,
-  ChevronRight,
-  Loader2,
-  Search,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,6 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft01Icon, ArrowRight01Icon, Loading03Icon, Search01Icon } from "@hugeicons/core-free-icons";
 import {
   Table,
   TableBody,
@@ -130,7 +125,7 @@ export default function AttendeesPage() {
           </div>
           <Button asChild variant="outline" className="w-full md:w-auto rounded-full border-[var(--home-border-strong)] bg-transparent text-[var(--home-text)] hover:bg-[var(--home-card)] hover:text-[var(--home-text)]">
             <Link href={`/organizer/view-event/${eventId}`}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <HugeiconsIcon icon={ArrowLeft01Icon} className="h-4 w-4 mr-2" />
               Back to event
             </Link>
           </Button>
@@ -176,7 +171,7 @@ export default function AttendeesPage() {
                 </Select>
               )}
               <div className="relative flex-1 max-w-sm">
-                <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <HugeiconsIcon icon={Search01Icon} className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   className="pl-9 border-[var(--home-border-strong)] bg-[var(--home-card-elevated)] text-[var(--home-text)] placeholder:text-[var(--home-muted-dim)] focus-visible:ring-[var(--home-accent)]"
                   placeholder="Search name, email, phone, ticket code"
@@ -185,14 +180,14 @@ export default function AttendeesPage() {
                 />
               </div>
               {isFetching && !isLoading && (
-                <Loader2 className="h-4 w-4 animate-spin text-[var(--home-accent)]" />
+                <HugeiconsIcon icon={Loading03Icon} className="h-4 w-4 animate-spin text-[var(--home-accent)]" />
               )}
             </div>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <div className="flex items-center justify-center py-16">
-                <Loader2 className="h-8 w-8 animate-spin text-[var(--home-accent)]" />
+                <HugeiconsIcon icon={Loading03Icon} className="h-8 w-8 animate-spin text-[var(--home-accent)]" />
               </div>
             ) : filteredRows.length === 0 ? (
               <div className="text-center py-16 text-[var(--home-muted)]">
@@ -271,7 +266,7 @@ export default function AttendeesPage() {
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage <= 1}
                     >
-                      <ChevronLeft className="h-4 w-4 mr-1" />
+                      <HugeiconsIcon icon={ArrowLeft01Icon} className="h-4 w-4 mr-1" />
                       Prev
                     </Button>
                     <span className="text-sm text-[var(--home-muted)]">
@@ -286,7 +281,7 @@ export default function AttendeesPage() {
                       disabled={currentPage >= totalPages}
                     >
                       Next
-                      <ChevronRight className="h-4 w-4 ml-1" />
+                      <HugeiconsIcon icon={ArrowRight01Icon} className="h-4 w-4 ml-1" />
                     </Button>
                   </div>
                 )}

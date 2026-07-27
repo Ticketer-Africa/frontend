@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, Share2, Calendar, MapPin, Clock } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +9,8 @@ import {
   useMyTickets,
   useListResale,
 } from "@/services/tickets/tickets.queries";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft01Icon, Calendar01Icon, Clock01Icon, Location01Icon, Share08Icon } from "@hugeicons/core-free-icons";
 import { ResaleModal } from "@/components/resale-modal";
 import { QRCodeDisplay } from "@/components/qr-code-display";
 import { useUser } from "@/lib/auth-context";
@@ -147,7 +148,7 @@ export default function TicketDetailPage({
             asChild
           >
             <Link href="/my-tickets">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <HugeiconsIcon icon={ArrowLeft01Icon} className="h-4 w-4 mr-2" />
               Back to My Tickets
             </Link>
           </Button>
@@ -205,7 +206,7 @@ export default function TicketDetailPage({
                       </h3>
                       <div className="space-y-3">
                         <div className="flex items-center space-x-3">
-                          <Calendar className="h-5 w-5" style={{ color: "var(--home-text-highlight)" }} />
+                          <HugeiconsIcon icon={Calendar01Icon} className="h-5 w-5" style={{ color: "var(--home-text-highlight)" }} />
                           <div>
                             <p className="font-medium" style={{ color: "var(--home-text)" }}>
                               {formatDate(event.date)}
@@ -213,11 +214,11 @@ export default function TicketDetailPage({
                           </div>
                         </div>
                         <div className="flex items-center space-x-3">
-                          <MapPin className="h-5 w-5" style={{ color: "var(--home-text-highlight)" }} />
+                          <HugeiconsIcon icon={Location01Icon} className="h-5 w-5" style={{ color: "var(--home-text-highlight)" }} />
                           <p style={{ color: "var(--home-text)" }}>{event.location}</p>
                         </div>
                         <div className="flex items-center space-x-3">
-                          <Clock className="h-5 w-5" style={{ color: "var(--home-text-highlight)" }} />
+                          <HugeiconsIcon icon={Clock01Icon} className="h-5 w-5" style={{ color: "var(--home-text-highlight)" }} />
                           <p style={{ color: "var(--home-text)" }}>
                             Doors open 30 minutes before event
                           </p>
@@ -334,7 +335,7 @@ export default function TicketDetailPage({
                           variant="homeOutline"
                           className="w-full"
                         >
-                          <Share2 className="h-4 w-4 mr-2" />
+                          <HugeiconsIcon icon={Share08Icon} className="h-4 w-4 mr-2" />
                           Share Ticket
                         </Button>
                       </div>

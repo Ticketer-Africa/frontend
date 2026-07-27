@@ -13,6 +13,7 @@ import { EventsGrid } from "./events-grid";
 import { EventsGridSkeleton } from "./skeletons";
 import { PaginationControls } from "./pagination-controls";
 import { EmptyState } from "./empty-state";
+// import { FeaturedExperiencesSection } from "./featured-experiences-section"; // enable once a featured-events source exists
 
 // Utils and constants
 import { extractLocations, filterEvents } from "./utils";
@@ -377,7 +378,7 @@ export default function EventsPage() {
          */}
         <header className="text-center mb-12">
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 leading-[1.05]"
+            className="font-['Syne'] text-5xl sm:text-6xl lg:text-[72px] font-extrabold tracking-[-1.2px] mb-4 leading-[1.05] lg:leading-[80px]"
             style={{ color: "var(--home-text)" }}
           >
             Discover Amazing
@@ -385,7 +386,7 @@ export default function EventsPage() {
             Events
           </h1>
           <p
-            className="text-lg max-w-2xl mx-auto"
+            className="font-['Hanken_Grotesk'] text-lg max-w-2xl mx-auto tracking-[0.5px]"
             style={{ color: "var(--home-muted)" }}
           >
             Find and book tickets for the best events happening near you across the continent.
@@ -421,6 +422,13 @@ export default function EventsPage() {
           onClearFilters={handleClearFilters}
           resultsCount={filteredEvents.length}
         />
+
+        {/*
+         * Featured Experiences - per Explore page Figma (node 173:1268), a
+         * curated horizontal row above the main grid. Disabled until events
+         * have a "featured" flag/source to select from.
+         */}
+        {/* <FeaturedExperiencesSection events={featuredEvents} /> */}
 
         {/*
          * Quick category pills - direct-apply shortcut for a curated

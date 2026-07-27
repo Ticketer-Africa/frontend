@@ -2,7 +2,6 @@
 
 import type React from "react";
 import { useEffect, useState, useMemo } from "react";
-import { User, Lock, Camera, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +15,8 @@ import { useRouter } from "next/navigation";
 import { useChangePassword } from "@/services/auth/auth.queries";
 import { uploadImageToS3 } from "@/services/uploads/images";
 import { toast } from "sonner";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Camera01Icon, Shield01Icon, SquareLock01Icon, UserIcon } from "@hugeicons/core-free-icons";
 
 const profileSchema = z.object({
   name: z.string().min(2, { message: "Name is too short" }),
@@ -217,7 +218,7 @@ export default function SettingsPage() {
                           color: "var(--home-text)",
                         }}
                       >
-                        <Camera className="h-4 w-4" />
+                        <HugeiconsIcon icon={Camera01Icon} className="h-4 w-4" />
                       </div>
                     </label>
                     <input
@@ -249,7 +250,7 @@ export default function SettingsPage() {
                         color: "var(--home-text-highlight)",
                       }}
                     >
-                      <Shield className="h-3 w-3 mr-1" />
+                      <HugeiconsIcon icon={Shield01Icon} className="h-3 w-3 mr-1" />
                       {currentUser?.role === "ORGANIZER"
                         ? "Event Organizer"
                         : "User"}
@@ -273,7 +274,7 @@ export default function SettingsPage() {
                 >
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
-                      <User className="h-5 w-5" style={{ color: "var(--home-accent)" }} />
+                      <HugeiconsIcon icon={UserIcon} className="h-5 w-5" style={{ color: "var(--home-accent)" }} />
                       <span>Profile Information</span>
                     </CardTitle>
                   </CardHeader>
@@ -362,7 +363,7 @@ export default function SettingsPage() {
                 >
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
-                      <Lock className="h-5 w-5" style={{ color: "var(--home-accent)" }} />
+                      <HugeiconsIcon icon={SquareLock01Icon} className="h-5 w-5" style={{ color: "var(--home-accent)" }} />
                       <span>Change Password</span>
                     </CardTitle>
                   </CardHeader>

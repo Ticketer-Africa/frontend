@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Facebook, Instagram } from "lucide-react";
 import { Logo } from "./logo";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { InstagramIcon, NewTwitterIcon } from "@hugeicons/core-free-icons";
 
 const PLATFORM_LINKS = [
   { href: "/explore", label: "Find Events" },
   { href: "/resale", label: "Resale Market" },
+  { href: "/for-organisers", label: "For Organisers" },
   { href: "/organizer/create-event", label: "Create Event" },
   { href: "#", label: "Mobile App" }, // TODO: no mobile app route/link exists yet
 ] as const;
@@ -20,8 +22,8 @@ const SUPPORT_LINKS = [
 ] as const;
 
 const SOCIAL_LINKS = [
-  { Icon: Facebook, label: "Facebook", href: "#" },
-  { Icon: Instagram, label: "Instagram", href: "#" },
+  { Icon: NewTwitterIcon, label: "X (Twitter)", href: "https://x.com/TicketerAfrica" },
+  { Icon: InstagramIcon, label: "Instagram", href: "https://instagram.com/ticketer.africa" },
 ] as const;
 
 // Pages whose content uses the "px-4 sm:px-6 lg:px-8" outer-padding-then-
@@ -29,7 +31,7 @@ const SOCIAL_LINKS = [
 // must match it there to keep side margins aligned. Other pages that render
 // Footer still use the plain "container" layout for their own content, so
 // the footer matches that instead.
-const WIDE_LAYOUT_ROUTES = ["/", "/explore", "/resale", "/terms", "/service-agreement"];
+const WIDE_LAYOUT_ROUTES = ["/", "/explore", "/resale", "/terms", "/service-agreement", "/for-organisers"];
 
 export function Footer() {
   const pathname = usePathname();
@@ -65,11 +67,13 @@ export function Footer() {
                 <a
                   key={label}
                   href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center justify-center w-10 h-10 rounded-full transition-opacity hover:opacity-80"
                   style={{ backgroundColor: "var(--home-social-bg)" }}
                   aria-label={label}
                 >
-                  <Icon className="h-4 w-4" style={{ color: "var(--home-text)" }} aria-hidden="true" />
+                  <HugeiconsIcon icon={Icon} className="h-4 w-4" style={{ color: "var(--home-text)" }} aria-hidden="true" />
                 </a>
               ))}
             </div>

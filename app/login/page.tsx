@@ -11,9 +11,10 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
 import { useLogin } from "@/services/auth/auth.queries";
 import { AuthShell } from "@/components/auth/auth-shell";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Alert01Icon, EyeIcon, EyeOffIcon, Mail01Icon, SquareLock01Icon } from "@hugeicons/core-free-icons";
 
 const loginSchema = z.object({
   email: z.string().email("Enter a valid email address"),
@@ -90,7 +91,7 @@ export default function LoginPage() {
             Email address
           </Label>
           <div className="relative">
-            <Mail
+            <HugeiconsIcon icon={Mail01Icon}
               className="absolute left-8 top-1/2 transform -translate-y-1/2 w-5 h-5"
               style={{ color: "var(--home-muted)" }}
             />
@@ -109,7 +110,7 @@ export default function LoginPage() {
           </div>
           {errors.email && (
             <p className="text-sm text-red-400 flex items-center gap-1 px-1">
-              <AlertCircle className="w-4 h-4" /> {errors.email.message}
+              <HugeiconsIcon icon={Alert01Icon} className="w-4 h-4" /> {errors.email.message}
             </p>
           )}
         </div>
@@ -123,7 +124,7 @@ export default function LoginPage() {
             Password
           </Label>
           <div className="relative">
-            <Lock
+            <HugeiconsIcon icon={SquareLock01Icon}
               className="absolute left-8 top-1/2 transform -translate-y-1/2 w-5 h-5"
               style={{ color: "var(--home-muted)" }}
             />
@@ -146,15 +147,15 @@ export default function LoginPage() {
               style={{ color: "var(--home-muted)" }}
             >
               {showPassword ? (
-                <EyeOff className="w-5 h-5" />
+                <HugeiconsIcon icon={EyeOffIcon} className="w-5 h-5" />
               ) : (
-                <Eye className="w-5 h-5" />
+                <HugeiconsIcon icon={EyeIcon} className="w-5 h-5" />
               )}
             </button>
           </div>
           {errors.password && (
             <p className="text-sm text-red-400 flex items-center gap-1 px-1">
-              <AlertCircle className="w-4 h-4" /> {errors.password.message}
+              <HugeiconsIcon icon={Alert01Icon} className="w-4 h-4" /> {errors.password.message}
             </p>
           )}
         </div>
