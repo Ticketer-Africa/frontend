@@ -59,6 +59,14 @@ const OrganiserCommunitySection = dynamic(
   { ssr: false, loading: () => <SectionSkeleton height="h-[420px]" /> }
 );
 
+const OrganiserPayoutsSection = dynamic(
+  () =>
+    import("@/components/for-organisers/organiser-payouts-section").then(
+      (m) => ({ default: m.OrganiserPayoutsSection })
+    ),
+  { ssr: false, loading: () => <SectionSkeleton height="h-[360px]" /> }
+);
+
 const OrganiserFAQSection = dynamic(
   () =>
     import("@/components/for-organisers/organiser-faq-section").then(
@@ -84,6 +92,7 @@ export default function ForOrganisersPage() {
       <OrganiserCheckinSection />
       <OrganiserAttendeeSection />
       <OrganiserCommunitySection />
+      <OrganiserPayoutsSection />
       <OrganiserFAQSection />
       <OrganiserFinalCTASection />
       <Footer />
