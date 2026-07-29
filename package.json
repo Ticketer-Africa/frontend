@@ -9,7 +9,8 @@
     "lint": "next lint",
     "start": "next start",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "generate:layout-previews": "node scripts/generate-layout-previews.mjs"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "latest",
@@ -87,6 +88,7 @@
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.16",
     "jsdom": "^29.1.1",
+    "playwright": "^1.62.0",
     "postcss": "^8.5",
     "tailwindcss": "^3.4.17",
     "typescript": "^5",
