@@ -138,7 +138,7 @@ export function ResaleModal({
                 {selectedTicket.event.name}
               </h3>
               <p className="text-sm text-gray-600">
-                {selectedTicket.event.location}
+                {selectedTicket.event.venueName}
               </p>
               <p className="text-sm text-gray-600">
                 {formatDate(selectedTicket.event.date)}

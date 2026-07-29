@@ -63,7 +63,7 @@ export function EventCard({ event }: EventCardProps) {
               </div>
               <div className="flex items-center text-sm text-muted-foreground">
                 <HugeiconsIcon icon={Location01Icon} className="h-4 w-4 mr-2" />
-                <span className="line-clamp-1">{event.location}</span>
+                <span className="line-clamp-1">{event.venueName}</span>
               </div>
               <div className="flex items-center text-sm text-muted-foreground">
                 <HugeiconsIcon icon={UserGroupIcon} className="h-4 w-4 mr-2" />

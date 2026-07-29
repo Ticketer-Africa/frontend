@@ -108,7 +108,7 @@ export interface GuestResaleStatus {
   event?: {
     name?: string;
     date?: string;
-    location?: string;
+    venueName?: string;
   };
 }
 

@@ -112,7 +112,7 @@ export function BuyResaleModal({
                 </div>
                 <div className="flex items-center space-x-2">
                   <HugeiconsIcon icon={Location01Icon} className="h-4 w-4" />
-                  <span>{selectedTicket.event.location}</span>
+                  <span>{selectedTicket.event.venueName}</span>
                 </div>
               </div>
             </div>

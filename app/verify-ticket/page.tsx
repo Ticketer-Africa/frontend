@@ -407,7 +407,7 @@ export default function VerifyTicketPage() {
                         </div>
                         <div className="flex items-center space-x-2">
                           <HugeiconsIcon icon={Location01Icon} className="h-4 w-4" style={{ color: "var(--home-accent)" }} />
-                          <span>{event.location}</span>
+                          <span>{event.venueName}</span>
                         </div>
                       </div>
                     </div>
