@@ -116,7 +116,7 @@ function ExploreEventCardComponent({
                   className="w-4 h-4 mr-2 flex-shrink-0"
                   aria-hidden="true"
                 />
-                <span className="line-clamp-1">{event.location}</span>
+                <span className="line-clamp-1">{event.venueName}</span>
               </div>
             </div>
 

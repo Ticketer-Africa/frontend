@@ -41,7 +41,7 @@ export function EventHeaderV2({ event }: Props) {
         <Meta
           icon={<HugeiconsIcon icon={Location01Icon} className="h-5 w-5" style={{ color: "var(--home-accent)" }} />}
           label="Location"
-          value={event.location}
+          value={event.venueName || "Venue to be announced"}
         />
       </div>
     </div>

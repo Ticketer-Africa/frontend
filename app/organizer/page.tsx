@@ -62,7 +62,7 @@ const EventRow = memo(function EventRow({
           <h3 className="font-semibold text-sm sm:text-base">{event.name}</h3>
         </div>
         <p className="text-xs sm:text-sm text-[var(--home-muted)] mb-1 sm:mb-2">
-          {new Date(event.date).toLocaleDateString()} • {event.location}
+          {new Date(event.date).toLocaleDateString()} • {event.venueName}
         </p>
         <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-xs sm:text-sm">
           <span className="text-[var(--home-muted)]">

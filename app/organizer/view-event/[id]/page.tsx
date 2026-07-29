@@ -249,7 +249,7 @@ export default function EventDashboard() {
                     </div>
                     <p className="text-sm sm:text-base text-[var(--home-muted)] mb-2">
                       {new Date(event.date).toLocaleDateString()} •{" "}
-                      {event.location}
+                      {event.venueName}
                     </p>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-sm">
                       <span className="text-[var(--home-muted)]">
