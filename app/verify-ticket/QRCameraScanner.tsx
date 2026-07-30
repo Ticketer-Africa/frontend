@@ -12,6 +12,19 @@ interface QRCameraScannerProps {
 
 const SCANNER_ELEMENT_ID = "qr-camera-scanner-region";
 
+/**
+ * Html5Qrcode.stop() throws synchronously (not a rejected promise) when the
+ * scanner isn't in a running/paused state — e.g. if start() hasn't resolved
+ * yet. That bypasses .catch() entirely and crashes the app, so guard it.
+ */
+function safeStop(scanner: Html5Qrcode): Promise<void> {
+  try {
+    return scanner.stop().catch(() => {});
+  } catch {
+    return Promise.resolve();
+  }
+}
+
 export function QRCameraScanner({ onScan, active }: QRCameraScannerProps) {
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const [permissionDenied, setPermissionDenied] = useState(false);
@@ -20,12 +33,9 @@ export function QRCameraScanner({ onScan, active }: QRCameraScannerProps) {
   useEffect(() => {
     if (!active) {
       if (scannerRef.current) {
-        scannerRef.current
-          .stop()
-          .catch(() => {})
-          .finally(() => {
-            scannerRef.current = null;
-          });
+        safeStop(scannerRef.current).finally(() => {
+          scannerRef.current = null;
+        });
       }
       return;
     }
@@ -46,13 +56,10 @@ export function QRCameraScanner({ onScan, active }: QRCameraScannerProps) {
           (decodedText) => {
             if (!cancelled) {
               cancelled = true;
-              scanner
-                .stop()
-                .catch(() => {})
-                .finally(() => {
-                  scannerRef.current = null;
-                  onScan(decodedText);
-                });
+              safeStop(scanner).finally(() => {
+                scannerRef.current = null;
+                onScan(decodedText);
+              });
             }
           },
           () => {
@@ -76,12 +83,9 @@ export function QRCameraScanner({ onScan, active }: QRCameraScannerProps) {
     return () => {
       cancelled = true;
       if (scannerRef.current) {
-        scannerRef.current
-          .stop()
-          .catch(() => {})
-          .finally(() => {
-            scannerRef.current = null;
-          });
+        safeStop(scannerRef.current).finally(() => {
+          scannerRef.current = null;
+        });
       }
     };
   }, [active, onScan]);
