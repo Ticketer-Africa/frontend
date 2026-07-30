@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { TicketCategoryCardV2 } from "@/app/events/[slug]/_components/ticket-category-card";
 import { useTicketSelection } from "@/app/events/_shared/use-ticket-selection";
 import { useEventCheckout } from "@/app/events/_shared/use-event-checkout";
@@ -23,13 +24,22 @@ export function TicketFirstLayout({ event, mode }: Props) {
 
   return (
     <div className="home-theme min-h-screen pt-16" style={{ backgroundColor: "var(--home-bg)" }}>
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
-        <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--home-accent)" }}>
-          {event.category}
-        </p>
-        <h1 className="text-2xl font-bold mt-1" style={{ color: "var(--home-text)" }}>
-          {event.name} · {eventDate.toLocaleDateString("en-NG", { month: "short", day: "numeric" })}, {event.venueName}
-        </h1>
+      <div className="container mx-auto px-4 pt-8 pb-8 max-w-3xl">
+        <div className="relative h-[260px] w-full rounded-2xl overflow-hidden">
+          <Image src={event.bannerUrl} alt={event.name} fill className="object-cover" priority />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+          <div className="absolute bottom-6 left-8 right-8">
+            <span
+              className="inline-block text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full mb-2"
+              style={{ backgroundColor: "var(--home-highlight-yellow)", color: "#111" }}
+            >
+              {event.category}
+            </span>
+            <h1 className="text-2xl font-bold text-white">
+              {event.name} · {eventDate.toLocaleDateString("en-NG", { month: "short", day: "numeric" })}, {event.venueName}
+            </h1>
+          </div>
+        </div>
 
         <section className="mt-8">
           <h2 className="text-xl font-bold mb-4" style={{ color: "var(--home-text)" }}>

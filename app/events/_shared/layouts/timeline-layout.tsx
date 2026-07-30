@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useTicketSelection } from "@/app/events/_shared/use-ticket-selection";
 import { useEventCheckout } from "@/app/events/_shared/use-event-checkout";
 import { Button } from "@/components/ui/button";
@@ -19,16 +20,29 @@ export function TimelineLayout({ event, mode }: Props) {
     event.ticketCategories,
   );
   const fromPrice = Math.min(...event.ticketCategories.map((c) => c.displayPrice));
+  const eventDate = new Date(event.date);
 
   return (
     <div className="home-theme min-h-screen pt-16 pb-28" style={{ backgroundColor: "var(--home-bg)" }}>
-      <div className="container mx-auto px-4 py-8">
-        <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--home-accent)" }}>
-          {event.category}
-        </p>
-        <h1 className="text-3xl font-bold mt-1" style={{ color: "var(--home-text)" }}>{event.name}</h1>
-        <p className="mt-1" style={{ color: "var(--home-muted)" }}>{event.venueName}</p>
+      <div className="relative h-[360px] w-full overflow-hidden">
+        <Image src={event.bannerUrl} alt={event.name} fill className="object-cover" priority />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent" />
+        <div className="absolute bottom-8 left-0 right-0 container mx-auto px-4">
+          <span
+            className="inline-block text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full mb-3"
+            style={{ backgroundColor: "var(--home-highlight-yellow)", color: "#111" }}
+          >
+            {event.category}
+          </span>
+          <h1 className="text-4xl font-bold text-white">{event.name}</h1>
+          <p className="text-white/80 mt-2">
+            {eventDate.toLocaleDateString("en-NG", { month: "long", day: "numeric", year: "numeric" })}
+            {" · "}{event.venueName}
+          </p>
+        </div>
+      </div>
 
+      <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-8">
           <section>
             <h2 className="text-xl font-bold mb-4" style={{ color: "var(--home-text)" }}>Full Show Timeline</h2>
