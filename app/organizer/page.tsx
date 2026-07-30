@@ -6,6 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/helpers";
 import { getEventTicketStats } from "@/lib/event-stats";
+import {
+  EVENT_STATUS_BADGE_CLASS,
+  EVENT_STATUS_LABEL,
+  getEventStatus,
+} from "@/lib/event-status";
 import { useUser } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { useDeleteEvent } from "@/services/events/events.queries";
@@ -29,9 +34,8 @@ import {
 } from "@radix-ui/react-dialog";
 import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
 
-const EventRow = memo(function EventRow({
+const EventCard = memo(function EventCard({
   event,
-  index,
   onNavigate,
   onEdit,
   onDeleteClick,
@@ -46,69 +50,81 @@ const EventRow = memo(function EventRow({
     () => getEventTicketStats(event.ticketCategories),
     [event.ticketCategories],
   );
+  const status = getEventStatus(event);
 
   return (
     <div
-      className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 border border-[var(--home-border)] bg-[var(--home-card-elevated)] rounded-2xl hover:bg-[var(--home-card-highlight)] transition-colors cursor-pointer"
+      className="flex flex-col border border-[var(--home-border)] bg-[var(--home-card-elevated)] rounded-2xl overflow-hidden hover:bg-[var(--home-card-highlight)] transition-colors cursor-pointer"
       onClick={() => onNavigate(event.id)}
     >
-      <img
-        src={event.bannerUrl || "/placeholder.svg"}
-        alt={event.name}
-        className="w-16 h-16 rounded-xl object-cover ring-1 ring-[var(--home-border)]"
-      />
-      <div className="flex-1 w-full sm:w-auto">
-        <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 mb-1">
-          <h3 className="font-semibold text-sm sm:text-base">{event.name}</h3>
-        </div>
-        <p className="text-xs sm:text-sm text-[var(--home-muted)] mb-1 sm:mb-2">
-          {new Date(event.date).toLocaleDateString()} • {event.venueName}
-        </p>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-xs sm:text-sm">
-          <span className="text-[var(--home-muted)]">
-            {stats.sold}/{stats.total} sold
-          </span>
-          <span className="text-[var(--home-success-text)] font-medium">
-            {formatPrice(stats.revenue).toLocaleString()} revenue
-          </span>
-        </div>
-      </div>
-      <div className="flex flex-col items-end w-full sm:w-auto">
+      <div className="relative aspect-video">
+        <img
+          src={event.bannerUrl || "/placeholder.svg"}
+          alt={event.name}
+          className="w-full h-full object-cover"
+        />
+        <span
+          className={`absolute top-3 left-3 px-2 py-1 rounded text-xs font-medium ${EVENT_STATUS_BADGE_CLASS[status]}`}
+        >
+          {EVENT_STATUS_LABEL[status]}
+        </span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 h-8 w-8 bg-black/40 hover:bg-black/60 text-white"
+              onClick={(e) => e.stopPropagation()}
+            >
               <HugeiconsIcon icon={MoreVerticalIcon} className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            side="right"
+            side="bottom"
             className="bg-[var(--home-card-highlight)] text-[var(--home-text)] shadow-lg rounded-xl border border-[var(--home-border)] mt-2 z-50"
           >
             <DropdownMenuItem
-              onClick={() => onEdit(event.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(event.id);
+              }}
               className="text-sm text-[var(--home-text)] hover:bg-[var(--home-card)] rounded-lg p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
             >
               <HugeiconsIcon icon={PencilEdit02Icon} className="mr-2 h-4 w-4" /> Update Event
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-[var(--home-border)] h-px my-1" />
             <DropdownMenuItem
-              onClick={() => onDeleteClick(event.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDeleteClick(event.id);
+              }}
               className="text-sm text-white bg-red-700 hover:bg-red-600 rounded-lg p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
             >
               <HugeiconsIcon icon={Delete02Icon} className="mr-2 h-4 w-4" /> Delete Event
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <div className="w-full sm:w-24 bg-[var(--home-border-strong)] rounded-full h-2 mt-2">
+      </div>
+      <div className="flex flex-col gap-2 p-3 sm:p-4">
+        <h3 className="font-semibold text-sm sm:text-base">{event.name}</h3>
+        <p className="text-xs sm:text-sm text-[var(--home-muted)]">
+          {new Date(event.date).toLocaleDateString()} • {event.venueName}
+        </p>
+        <div className="flex items-center justify-between text-xs sm:text-sm">
+          <span className="text-[var(--home-muted)]">
+            {stats.sold}/{stats.total} sold
+          </span>
+          <span className="text-[var(--home-success-text)] font-medium">
+            {formatPrice(stats.revenue)} revenue
+          </span>
+        </div>
+        <div className="w-full bg-[var(--home-border-strong)] rounded-full h-2 mt-1">
           <div
             className="bg-[var(--home-accent)] h-2 rounded-full"
             style={{ width: `${stats.percentSold}%` }}
           />
         </div>
-        <p className="text-xs sm:text-sm text-[var(--home-muted)] mt-1 text-right">
-          {stats.percentSold}% sold
-        </p>
       </div>
     </div>
   );
@@ -132,15 +148,18 @@ export default function OrganizerDashboard() {
   const dashboardStats = useMemo(() => {
     let totalTicketsSold = 0;
     let totalRevenue = 0;
+    let activeEvents = 0;
     for (const event of organizerEvents) {
       const stats = getEventTicketStats(event.ticketCategories);
       totalTicketsSold += stats.sold;
       totalRevenue += stats.revenue;
+      if (getEventStatus(event) === "LIVE") activeEvents += 1;
     }
     return {
       totalEvents: organizerEvents.length,
       totalTicketsSold,
       totalRevenue,
+      activeEvents,
     };
   }, [organizerEvents]);
 
@@ -284,13 +303,18 @@ export default function OrganizerDashboard() {
           <div>
             <Card className="border-[var(--home-border)] bg-[var(--home-card)] text-[var(--home-text)] shadow-none">
               <CardHeader>
-                <CardTitle className="text-xl sm:text-2xl">Your Events</CardTitle>
+                <div className="flex items-center gap-2">
+                  <CardTitle className="text-xl sm:text-2xl">Your Events</CardTitle>
+                  <span className="text-xs sm:text-sm text-[var(--home-muted)]">
+                    {dashboardStats.activeEvents} active
+                  </span>
+                </div>
               </CardHeader>
               <CardContent>
                 {organizerEvents.length > 0 ? (
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     {organizerEvents.map((event: EventV2, index: number) => (
-                      <EventRow
+                      <EventCard
                         key={event.id}
                         event={event}
                         index={index}
