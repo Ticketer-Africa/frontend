@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { EditorialLayout } from "./editorial-layout";
 import { buildDummyEventLayoutViewModel } from "@/lib/dummy-event-fixture";
 
@@ -22,5 +22,18 @@ describe("EditorialLayout", () => {
 
     const link = screen.getByText(event.relatedEvents[0].name).closest("a");
     expect(link).toHaveAttribute("href", `/events/${event.relatedEvents[0].slug}`);
+  });
+
+  it("opens a ticket selection modal instead of checking out directly", () => {
+    const event = buildDummyEventLayoutViewModel("EDITORIAL");
+    render(<EditorialLayout event={event} mode="preview" />);
+
+    expect(screen.queryByText("Select Your Tickets")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("Buy Tickets"));
+
+    expect(screen.getByText("Select Your Tickets")).toBeInTheDocument();
+    expect(screen.getByText(event.ticketCategories[0].name)).toBeInTheDocument();
+    expect(screen.getByText("Select a ticket to continue")).toBeDisabled();
   });
 });

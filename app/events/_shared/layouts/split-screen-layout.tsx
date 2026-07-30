@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { useTicketSelection } from "@/app/events/_shared/use-ticket-selection";
 import { useEventCheckout } from "@/app/events/_shared/use-event-checkout";
+import { TicketCategoryCardV2 } from "@/app/events/[slug]/_components/ticket-category-card";
 import { Button } from "@/components/ui/button";
 import { EventLayoutViewModel } from "@/types/event-layout.type";
 import { cn } from "@/lib/utils";
@@ -85,15 +86,29 @@ export function SplitScreenLayout({ event, mode }: Props) {
 
         <div className="mt-auto pt-6 border-t space-y-3" style={{ borderColor: "var(--home-border)" }}>
           {event.ticketCategories.map((category) => (
-            <div key={category.id} className="flex items-center justify-between">
-              <span style={{ color: "var(--home-text)" }}>{category.name}</span>
-              <span className="font-semibold" style={{ color: "var(--home-text)" }}>
-                ₦{category.displayPrice.toLocaleString()}
-              </span>
-            </div>
+            <TicketCategoryCardV2
+              key={category.id}
+              category={category}
+              isSelected={selection.selected.has(category.id)}
+              quantity={selection.quantities[category.id] ?? 0}
+              onToggle={() => selection.toggleCategory(category)}
+              onQuantityChange={(delta) =>
+                selection.updateQuantity(category.id, (q) => q + delta)
+              }
+              feeMode={event.feeMode}
+              primaryFeeBps={event.primaryFeeBps}
+            />
           ))}
-          <Button size="lg" variant="homeAccent" className="w-full" onClick={handleCheckout}>
-            Buy Tickets
+          <Button
+            size="lg"
+            variant="homeAccent"
+            className="w-full"
+            disabled={!selection.hasSelection}
+            onClick={handleCheckout}
+          >
+            {selection.hasSelection
+              ? `Buy Tickets · ₦${selection.totalAmount.toLocaleString()}`
+              : "Select a ticket to continue"}
           </Button>
           <div className="flex items-center gap-4 text-xs pt-1" style={{ color: "var(--home-muted)" }}>
             <span>Verified Organizer</span>

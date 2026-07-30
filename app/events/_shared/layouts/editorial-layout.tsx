@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTicketSelection } from "@/app/events/_shared/use-ticket-selection";
 import { useEventCheckout } from "@/app/events/_shared/use-event-checkout";
+import { TicketCategoryCardV2 } from "@/app/events/[slug]/_components/ticket-category-card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { EventLayoutViewModel } from "@/types/event-layout.type";
 
 interface Props {
@@ -13,6 +16,7 @@ interface Props {
 }
 
 export function EditorialLayout({ event, mode }: Props) {
+  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const selection = useTicketSelection(event.ticketCategories);
   const { handleCheckout } = useEventCheckout(
     event,
@@ -113,12 +117,50 @@ export function EditorialLayout({ event, mode }: Props) {
               <span style={{ color: "var(--home-muted)" }}>From</span>
               <span className="font-semibold" style={{ color: "var(--home-text)" }}>₦{fromPrice.toLocaleString()}</span>
             </div>
-            <Button size="lg" variant="homeAccent" className="w-full mt-2" onClick={handleCheckout}>
+            <Button size="lg" variant="homeAccent" className="w-full mt-2" onClick={() => setIsTicketModalOpen(true)}>
               Buy Tickets
             </Button>
           </div>
         </aside>
       </div>
+
+      <Dialog open={isTicketModalOpen} onOpenChange={setIsTicketModalOpen}>
+        <DialogContent
+          className="dark max-w-md"
+          style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)", color: "var(--home-text)" }}
+        >
+          <DialogHeader>
+            <DialogTitle style={{ color: "var(--home-text)" }}>Select Your Tickets</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {event.ticketCategories.map((category) => (
+              <TicketCategoryCardV2
+                key={category.id}
+                category={category}
+                isSelected={selection.selected.has(category.id)}
+                quantity={selection.quantities[category.id] ?? 0}
+                onToggle={() => selection.toggleCategory(category)}
+                onQuantityChange={(delta) =>
+                  selection.updateQuantity(category.id, (q) => q + delta)
+                }
+                feeMode={event.feeMode}
+                primaryFeeBps={event.primaryFeeBps}
+              />
+            ))}
+          </div>
+          <Button
+            size="lg"
+            variant="homeAccent"
+            className="w-full"
+            disabled={!selection.hasSelection}
+            onClick={handleCheckout}
+          >
+            {selection.hasSelection
+              ? `Buy Tickets · ₦${selection.totalAmount.toLocaleString()}`
+              : "Select a ticket to continue"}
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

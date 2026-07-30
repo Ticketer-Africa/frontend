@@ -23,4 +23,15 @@ describe("SplitScreenLayout", () => {
     expect(screen.getByText("Verified Organizer")).toBeInTheDocument();
     expect(screen.getByText("Secure Payment")).toBeInTheDocument();
   });
+
+  it("requires selecting a ticket category before it can be bought", () => {
+    const event = buildDummyEventLayoutViewModel("SPLIT_SCREEN");
+    render(<SplitScreenLayout event={event} mode="preview" />);
+
+    expect(screen.getByText("Select a ticket to continue")).toBeDisabled();
+
+    fireEvent.click(screen.getAllByText("Select")[0]);
+
+    expect(screen.getByText(/Buy Tickets ·/)).not.toBeDisabled();
+  });
 });
