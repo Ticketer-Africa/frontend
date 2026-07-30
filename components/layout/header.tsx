@@ -45,6 +45,7 @@ export function Header() {
     pathname.startsWith("/resale/") ||
     pathname.startsWith("/ticket/") ||
     pathname.startsWith("/organizer/") ||
+    pathname.startsWith("/dev/layout-previews/") ||
     [
       "/organizer",
       "/wallet",

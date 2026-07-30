@@ -92,7 +92,7 @@ export function FeaturedExperiencesSection({ events }: FeaturedExperiencesSectio
                     className="font-['Hanken_Grotesk'] text-base truncate"
                     style={{ color: "var(--home-muted)" }}
                   >
-                    {event.location}
+                    {event.venueName}
                     {lowestPrice > 0 ? ` · From ${lowestPrice}` : ""}
                   </span>
                 </div>

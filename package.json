@@ -7,7 +7,10 @@
     "check:motion": "node scripts/check-motion-performance.mjs",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "generate:layout-previews": "node scripts/generate-layout-previews.mjs"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "latest",
@@ -74,14 +77,21 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
     "@types/lodash": "^4.17.20",
     "@types/node": "^22",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@vitejs/plugin-react": "^6.0.4",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.16",
+    "jsdom": "^29.1.1",
+    "playwright": "^1.62.0",
     "postcss": "^8.5",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }

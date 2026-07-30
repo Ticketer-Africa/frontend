@@ -4,9 +4,10 @@ export function extractLocations(events: EventV2[]): string[] {
   const locationSet = new Set<string>();
 
   for (const event of events) {
-    if (!event.location) continue;
-    const parts = event.location.split(",");
-    const loc = parts.length > 1 ? parts[1].trim() : event.location.trim();
+    const address = event.venueAddress || event.venueName;
+    if (!address) continue;
+    const parts = address.split(",");
+    const loc = parts.length > 1 ? parts[1].trim() : address.trim();
     if (loc) locationSet.add(loc);
   }
 
@@ -24,7 +25,8 @@ export function filterEvents(
 
   return events.filter((event) => {
     const matchesLocation =
-      !selectedLocation || event.location.includes(selectedLocation);
+      !selectedLocation ||
+      (event.venueAddress || event.venueName || "").includes(selectedLocation);
     const matchesCategory =
       !selectedCategory ||
       event.category.toLowerCase() === selectedCategory.toLowerCase();

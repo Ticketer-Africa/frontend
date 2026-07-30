@@ -215,7 +215,7 @@ export default function TicketDetailPage({
                         </div>
                         <div className="flex items-center space-x-3">
                           <HugeiconsIcon icon={Location01Icon} className="h-5 w-5" style={{ color: "var(--home-text-highlight)" }} />
-                          <p style={{ color: "var(--home-text)" }}>{event.location}</p>
+                          <p style={{ color: "var(--home-text)" }}>{event.venueName}</p>
                         </div>
                         <div className="flex items-center space-x-3">
                           <HugeiconsIcon icon={Clock01Icon} className="h-5 w-5" style={{ color: "var(--home-text-highlight)" }} />

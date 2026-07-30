@@ -26,7 +26,7 @@ export interface Event {
   name: string;
   description: string;
   price: number;
-  location: string;
+  venueName: string;
   date: Date;
   category: string;
   bannerUrl: string;

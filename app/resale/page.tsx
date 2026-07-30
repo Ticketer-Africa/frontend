@@ -34,7 +34,7 @@ export default function ResalePage() {
   const filteredTickets = resaleTickets?.filter(
     (ticket) =>
       ticket?.event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ticket?.event.location?.toLowerCase().includes(searchQuery.toLowerCase()),
+      ticket?.event.venueName?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleBuyTicket = (ticket: TicketResale) => {
@@ -260,7 +260,7 @@ export default function ResalePage() {
                     <div className="flex items-center">
                       <HugeiconsIcon icon={Location01Icon} className="w-4 h-4 mr-2 flex-shrink-0" />
                       <span className="text-sm line-clamp-1">
-                        {ticket.event.location}
+                        {ticket.event.venueName}
                       </span>
                     </div>
                   </div>

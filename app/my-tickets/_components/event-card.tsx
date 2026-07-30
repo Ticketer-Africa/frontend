@@ -63,7 +63,7 @@ export function EventCard({
                 </div>
                 <div className="flex items-center space-x-2">
                   <HugeiconsIcon icon={Location01Icon} className="h-4 w-4 text-gray-500" />
-                  <span className="line-clamp-1">{event.location}</span>
+                  <span className="line-clamp-1">{event.venueName}</span>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2 mt-3">
