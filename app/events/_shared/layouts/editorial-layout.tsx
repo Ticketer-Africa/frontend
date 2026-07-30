@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useTicketSelection } from "@/app/events/_shared/use-ticket-selection";
 import { useEventCheckout } from "@/app/events/_shared/use-event-checkout";
 import { Button } from "@/components/ui/button";
@@ -67,7 +68,12 @@ export function EditorialLayout({ event, mode }: Props) {
               <h2 className="text-xl font-bold mb-4" style={{ color: "var(--home-text)" }}>You Might Also Like</h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {event.relatedEvents.map((related) => (
-                  <div key={related.id} className="rounded-xl border overflow-hidden" style={{ borderColor: "var(--home-border)" }}>
+                  <Link
+                    key={related.id}
+                    href={`/events/${related.slug}`}
+                    className="rounded-xl border overflow-hidden block"
+                    style={{ borderColor: "var(--home-border)" }}
+                  >
                     <div className="relative h-28">
                       <Image src={related.bannerUrl} alt={related.name} fill className="object-cover" />
                     </div>
@@ -76,7 +82,7 @@ export function EditorialLayout({ event, mode }: Props) {
                       <p className="font-medium" style={{ color: "var(--home-text)" }}>{related.name}</p>
                       <p className="text-xs mt-1" style={{ color: "var(--home-muted)" }}>From ₦{related.fromPrice.toLocaleString()}</p>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </section>

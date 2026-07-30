@@ -15,4 +15,12 @@ describe("EditorialLayout", () => {
     expect(screen.getByText("You Might Also Like")).toBeInTheDocument();
     expect(screen.getByText(event.relatedEvents[0].name)).toBeInTheDocument();
   });
+
+  it("links each related event to its own event page", () => {
+    const event = buildDummyEventLayoutViewModel("EDITORIAL");
+    render(<EditorialLayout event={event} mode="preview" />);
+
+    const link = screen.getByText(event.relatedEvents[0].name).closest("a");
+    expect(link).toHaveAttribute("href", `/events/${event.relatedEvents[0].slug}`);
+  });
 });
