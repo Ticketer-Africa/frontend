@@ -319,7 +319,7 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
                   register={register} errors={errors} watch={watch} setValue={setValue}
                   ticketCategories={ticketCategories} isDisabled={isSubmitting}
                   onAddCategory={handleAddCategory} onRemoveCategory={handleRemoveCategory}
-                  existingTicketCategories={initialEvent?.ticketCategories?.map(() => ({}))}
+                  existingTicketCategories={initialEvent?.ticketCategories?.map((cat) => ({ soldTickets: cat.minted }))}
                 />
               )}
               {currentStep === 5 && (
