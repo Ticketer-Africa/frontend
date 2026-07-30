@@ -277,6 +277,16 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
 
   return (
     <div className="organizer-event-form home-theme dark min-h-screen pt-16 bg-[var(--home-bg)] text-[var(--home-text)]">
+      <style jsx global>{`
+        .organizer-event-form [class*="bg-gray-50"], .organizer-event-form [class*="bg-white"] { background-color: var(--home-card-elevated) !important; }
+        .organizer-event-form [class*="border-gray-"], .organizer-event-form [class*="border-dashed"] { border-color: var(--home-border) !important; }
+        .organizer-event-form [class*="text-gray-900"], .organizer-event-form [class*="text-gray-800"], .organizer-event-form [class*="text-gray-700"] { color: var(--home-text) !important; }
+        .organizer-event-form [class*="text-gray-600"], .organizer-event-form [class*="text-gray-500"] { color: var(--home-muted) !important; }
+        .organizer-event-form [class*="text-gray-400"] { color: var(--home-muted-dim) !important; }
+        .organizer-event-form input, .organizer-event-form textarea, .organizer-event-form select { border-color: var(--home-border-strong) !important; background-color: var(--home-bg) !important; color: var(--home-text) !important; }
+        .organizer-event-form [class*="bg-[#1E88E5]"] { background-color: var(--home-accent) !important; color: var(--home-accent-fg) !important; }
+        .organizer-event-form [class*="hover:border-[#1E88E5]"], .organizer-event-form [class*="hover:text-[#1E88E5]"] { --tw-border-opacity: 1; }
+      `}</style>
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <Button variant="outline" className="bg-transparent" asChild disabled={isSubmitting}>
