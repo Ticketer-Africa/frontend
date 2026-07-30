@@ -52,7 +52,8 @@ export function FormNavigation({
       {currentStep < totalSteps ? (
         <Button
           type="button"
-          className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
+          className="rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150 hover:opacity-90"
+          style={{ backgroundColor: "var(--home-accent)", color: "var(--home-accent-fg)" }}
           onClick={onNext}
           disabled={!canProceed || isSubmitting}
         >
@@ -63,7 +64,8 @@ export function FormNavigation({
         <Button
           type="submit"
           form={formId}
-          className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
+          className="rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150 hover:opacity-90"
+          style={{ backgroundColor: "var(--home-accent)", color: "var(--home-accent-fg)" }}
           disabled={isSubmitting || !canSubmit}
         >
           {isSubmitting ? submittingLabel : submitLabel}

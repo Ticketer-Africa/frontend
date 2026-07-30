@@ -11,7 +11,7 @@ import { useToggleEventStatus } from "@/services/events/events.queries";
 import { uploadImageToS3 } from "@/services/uploads/images";
 import { EventV2 } from "@/types/events-v2.type";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 
@@ -22,7 +22,7 @@ import {
   DEFAULT_FORM_VALUES,
 } from "./event-form-schema";
 import { isStep1Valid } from "./event-form-validation";
-import { ProgressBar } from "./progress-bar";
+import { StepRail } from "./step-rail";
 import { FormNavigation } from "./form-navigation";
 import { EventFormStepLayout } from "./event-form-step-layout";
 import { EventFormStep1 } from "./event-form-step1";
@@ -287,31 +287,37 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
         .organizer-event-form [class*="bg-[#1E88E5]"] { background-color: var(--home-accent) !important; color: var(--home-accent-fg) !important; }
         .organizer-event-form [class*="hover:border-[#1E88E5]"], .organizer-event-form [class*="hover:text-[#1E88E5]"] { --tw-border-opacity: 1; }
       `}</style>
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <Button variant="outline" className="bg-transparent" asChild disabled={isSubmitting}>
+      <div className="max-w-[1200px] mx-auto px-4 md:px-10 py-8 md:pb-24 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-8 md:gap-14">
+        <div className="flex flex-col gap-4 md:contents">
+          <Button variant="outline" className="bg-transparent w-fit md:order-last" asChild disabled={isSubmitting}>
             <Link href="/organizer">
               <HugeiconsIcon icon={ArrowLeft01Icon} className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Link>
           </Button>
-          <div className="text-center">
-            <h1 className="text-3xl font-bold">{mode === "create" ? "Create Event" : "Update Event"}</h1>
-            <p className="text-[var(--home-muted)]">Step {currentStep} of {TOTAL_STEPS}</p>
+          <div className="md:order-first">
+            <StepRail
+              title={mode === "create" ? "Create Event" : "Update Event"}
+              currentStep={currentStep}
+              labels={STEP_LABELS}
+              onStepClick={setCurrentStep}
+            />
           </div>
-          <div className="w-32" />
         </div>
 
-        <ProgressBar currentStep={currentStep} totalSteps={TOTAL_STEPS} labels={STEP_LABELS} />
-
-        <Card className="max-w-2xl mx-auto bg-[var(--home-card)] text-[var(--home-text)] rounded-3xl shadow-none border border-[var(--home-border)]">
-          <CardHeader>
-            <CardTitle className="text-2xl">
+        <div className="flex flex-col gap-8 min-w-0">
+          <div className="flex flex-col gap-1.5">
+            <h1 className="text-2xl md:text-[26px] font-bold" style={{ color: "var(--home-text)" }}>
               {currentStep === 6 && layout ? `${layout.replace("_", " ")} Details` : STEP_LABELS[currentStep - 1]}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <form id="event-wizard-form">
+            </h1>
+            <p className="text-sm" style={{ color: "var(--home-muted)" }}>
+              Step {currentStep} of {TOTAL_STEPS}
+            </p>
+          </div>
+
+          <Card className="bg-[var(--home-card)] text-[var(--home-text)] rounded-3xl shadow-none border border-[var(--home-border)]">
+            <CardContent className="space-y-6 pt-6">
+              <form id="event-wizard-form">
               {currentStep === 1 && (
                 <EventFormStepLayout value={layout} onChange={(v) => setValue("layout", v)} />
               )}
@@ -375,8 +381,9 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
                 </div>
               )}
             </form>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
