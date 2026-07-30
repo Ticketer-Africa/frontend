@@ -1,9 +1,13 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { useTicketSelection } from "@/app/events/_shared/use-ticket-selection";
 import { useEventCheckout } from "@/app/events/_shared/use-event-checkout";
+import { TicketCategoryCardV2 } from "@/app/events/[slug]/_components/ticket-category-card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { EventLayoutViewModel } from "@/types/event-layout.type";
 
 interface Props {
@@ -12,6 +16,7 @@ interface Props {
 }
 
 export function TimelineLayout({ event, mode }: Props) {
+  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const selection = useTicketSelection(event.ticketCategories);
   const { handleCheckout } = useEventCheckout(
     event,
@@ -76,6 +81,31 @@ export function TimelineLayout({ event, mode }: Props) {
             </div>
           </section>
         </div>
+
+        {event.relatedEvents.length > 0 && (
+          <section className="mt-12">
+            <h2 className="text-xl font-bold mb-4" style={{ color: "var(--home-text)" }}>More Events</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {event.relatedEvents.map((related) => (
+                <Link
+                  key={related.id}
+                  href={`/events/${related.slug}`}
+                  className="rounded-xl border overflow-hidden block"
+                  style={{ borderColor: "var(--home-border)" }}
+                >
+                  <div className="relative h-28">
+                    <Image src={related.bannerUrl} alt={related.name} fill className="object-cover" />
+                  </div>
+                  <div className="p-3">
+                    <p className="text-xs uppercase" style={{ color: "var(--home-accent)" }}>{related.category}</p>
+                    <p className="font-medium" style={{ color: "var(--home-text)" }}>{related.name}</p>
+                    <p className="text-xs mt-1" style={{ color: "var(--home-muted)" }}>From ₦{related.fromPrice.toLocaleString()}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
 
       <div
@@ -87,11 +117,49 @@ export function TimelineLayout({ event, mode }: Props) {
             <p className="text-xs" style={{ color: "var(--home-muted)" }}>Tickets from</p>
             <p className="text-xl font-bold" style={{ color: "var(--home-text)" }}>₦{fromPrice.toLocaleString()}</p>
           </div>
-          <Button size="lg" variant="homeAccent" onClick={handleCheckout}>
+          <Button size="lg" variant="homeAccent" onClick={() => setIsTicketModalOpen(true)}>
             Buy Tickets
           </Button>
         </div>
       </div>
+
+      <Dialog open={isTicketModalOpen} onOpenChange={setIsTicketModalOpen}>
+        <DialogContent
+          className="dark max-w-md"
+          style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)", color: "var(--home-text)" }}
+        >
+          <DialogHeader>
+            <DialogTitle style={{ color: "var(--home-text)" }}>Select Your Tickets</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {event.ticketCategories.map((category) => (
+              <TicketCategoryCardV2
+                key={category.id}
+                category={category}
+                isSelected={selection.selected.has(category.id)}
+                quantity={selection.quantities[category.id] ?? 0}
+                onToggle={() => selection.toggleCategory(category)}
+                onQuantityChange={(delta) =>
+                  selection.updateQuantity(category.id, (q) => q + delta)
+                }
+                feeMode={event.feeMode}
+                primaryFeeBps={event.primaryFeeBps}
+              />
+            ))}
+          </div>
+          <Button
+            size="lg"
+            variant="homeAccent"
+            className="w-full"
+            disabled={!selection.hasSelection}
+            onClick={handleCheckout}
+          >
+            {selection.hasSelection
+              ? `Buy Tickets · ₦${selection.totalAmount.toLocaleString()}`
+              : "Select a ticket to continue"}
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

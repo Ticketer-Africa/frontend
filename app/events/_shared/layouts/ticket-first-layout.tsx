@@ -41,7 +41,48 @@ export function TicketFirstLayout({ event, mode }: Props) {
           </div>
         </div>
 
-        <section className="mt-8">
+        <section
+          className="mt-6 rounded-2xl border p-5"
+          style={{ borderColor: "var(--home-border)", backgroundColor: "var(--home-card)" }}
+        >
+          <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+            <div>
+              <dt style={{ color: "var(--home-muted)" }}>Date</dt>
+              <dd className="font-medium" style={{ color: "var(--home-text)" }}>
+                {eventDate.toLocaleDateString("en-NG", { month: "long", day: "numeric", year: "numeric" })}
+              </dd>
+            </div>
+            <div>
+              <dt style={{ color: "var(--home-muted)" }}>Time</dt>
+              <dd className="font-medium" style={{ color: "var(--home-text)" }}>
+                {eventDate.toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" })}
+              </dd>
+            </div>
+            {event.doorsOpenAt && (
+              <div>
+                <dt style={{ color: "var(--home-muted)" }}>Doors</dt>
+                <dd className="font-medium" style={{ color: "var(--home-text)" }}>
+                  {new Date(event.doorsOpenAt).toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" })}
+                </dd>
+              </div>
+            )}
+            <div>
+              <dt style={{ color: "var(--home-muted)" }}>Venue</dt>
+              <dd className="font-medium" style={{ color: "var(--home-text)" }}>{event.venueName}</dd>
+              {event.venueAddress && (
+                <dd className="text-xs mt-0.5" style={{ color: "var(--home-muted)" }}>{event.venueAddress}</dd>
+              )}
+            </div>
+          </dl>
+
+          {event.description && (
+            <p className="mt-5 text-sm leading-relaxed" style={{ color: "var(--home-muted)" }}>
+              {event.description}
+            </p>
+          )}
+        </section>
+
+        <section className="mt-10">
           <h2 className="text-xl font-bold mb-4" style={{ color: "var(--home-text)" }}>
             Select Your Tickets
           </h2>

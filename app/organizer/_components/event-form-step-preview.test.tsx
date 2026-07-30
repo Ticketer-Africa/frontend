@@ -35,7 +35,7 @@ function buildFormState(): EventFormData {
 }
 
 describe("EventFormStepPreview", () => {
-  it("renders the chosen layout live with the current form data", () => {
+  it("renders a summary of the current form data, not the live buyer page", () => {
     render(
       <EventFormStepPreview
         formState={buildFormState()}
@@ -45,6 +45,25 @@ describe("EventFormStepPreview", () => {
         onSaveDraft={vi.fn()}
       />,
     );
+
+    expect(screen.getByText("Afro Nation Live")).toBeInTheDocument();
+    expect(screen.getByText("Eko Atlantic")).toBeInTheDocument();
+    expect(screen.getByText(/Ticket-First/)).toBeInTheDocument();
+    expect(screen.queryByText("Select Your Tickets")).not.toBeInTheDocument();
+  });
+
+  it("opens the live buyer preview when 'View as Buyer' is clicked", () => {
+    render(
+      <EventFormStepPreview
+        formState={buildFormState()}
+        bannerPreviewUrl={undefined}
+        isSubmitting={false}
+        onPublish={vi.fn()}
+        onSaveDraft={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByText("View as Buyer"));
 
     expect(screen.getByText("Select Your Tickets")).toBeInTheDocument();
     expect(screen.getByText("Refunds?")).toBeInTheDocument();

@@ -42,16 +42,22 @@ export default function Providers({ children }: { children: ReactNode }) {
       <AuthProvider>
         {children}
         <Toaster
-          theme="light"
-          className="border border-gray-200 shadow-lg rounded-lg"
+          theme="dark"
+          className="shadow-lg rounded-lg"
           toastOptions={{
+            unstyled: false,
+            style: {
+              background: "var(--home-card-elevated)",
+              border: "1px solid var(--home-border)",
+            },
             classNames: {
-              toast: "bg-white text-gray-900 border border-gray-200 rounded-lg",
-              success: "bg-green-50 text-green-800 border-green-200",
-              error: "bg-red-50 text-red-800 border-red-200",
+              toast: "rounded-lg text-[var(--home-text)]",
+              success: "!text-[var(--home-success-text)]",
+              error: "!text-red-400",
               actionButton:
-                "bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-4 py-1",
-              cancelButton: "bg-gray-100 text-gray-900 rounded-full px-4 py-1",
+                "bg-[var(--home-accent)] text-[var(--home-accent-fg)] rounded-full px-4 py-1",
+              cancelButton:
+                "bg-[var(--home-card-highlight)] text-[var(--home-muted)] rounded-full px-4 py-1",
             },
           }}
         />
