@@ -3,20 +3,14 @@
 import { Button } from "@/components/ui/button";
 import { EmberParticles } from "@/components/ember-particles";
 import { useRouter } from "next/navigation";
-import { useUser } from "@/lib/auth-context";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 
-const CTA_BY_ROLE = {
-  guest: { label: "Become an Organizer", href: "/register?intent=organizer" },
-  ORGANIZER: { label: "Create an Event", href: "/organizer/create-event" },
-  USER: { label: "Explore Events", href: "/explore" },
-} as const;
+const CTA = { label: "Explore Events", href: "/explore" };
 
 export function HeroSection() {
   const router = useRouter();
-  const { user } = useUser();
-  const cta = CTA_BY_ROLE[user?.role ?? "guest"];
+  const cta = CTA;
 
   return (
     <section
