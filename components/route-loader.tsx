@@ -12,6 +12,7 @@ const DARK_ROUTES = [
   "/forgot-password",
   "/reset-password",
   "/resale",
+  "/for-organisers",
 ];
 
 /**

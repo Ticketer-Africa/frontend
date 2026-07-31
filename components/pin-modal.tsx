@@ -71,9 +71,9 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-white shadow-lg rounded-xl flex flex-col items-center p-6">
+      <DialogContent className="max-w-md bg-background shadow-lg rounded-xl flex flex-col items-center p-6">
         <DialogHeader>
-          <DialogTitle className="text-gray-900 text-center">
+          <DialogTitle className="text-foreground text-center">
             {hasPin ? "Update Wallet PIN" : "Set Wallet PIN"}
           </DialogTitle>
         </DialogHeader>
@@ -81,7 +81,7 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
           <div className="space-y-6 py-4 w-full">
             {hasPin && (
               <div className="flex flex-col items-center gap-2">
-                <Label htmlFor="oldPin" className="text-sm font-medium text-gray-900 text-center">
+                <Label htmlFor="oldPin" className="text-sm font-medium text-foreground text-center">
                   Current PIN
                 </Label>
                 <InputOTP
@@ -98,13 +98,13 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
                       <InputOTPSlot
                         key={i}
                         index={i}
-                        className={`bg-gray-50 rounded-xl w-12 h-12 text-center ${oldPinError ? "border-red-500" : "border-gray-200"}`}
+                        className={`bg-muted rounded-xl w-12 h-12 text-center ${oldPinError ? "border-red-500" : "border-border"}`}
                       />
                     ))}
                   </InputOTPGroup>
                 </InputOTP>
                 {oldPinError && (
-                  <p className="text-xs text-red-600 flex items-center gap-1">
+                  <p className="text-xs text-red-400 flex items-center gap-1">
                     <HugeiconsIcon icon={Alert01Icon} className="w-3.5 h-3.5 shrink-0" />
                     {oldPinError}
                   </p>
@@ -113,7 +113,7 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
             )}
 
             <div className="flex flex-col items-center gap-2">
-              <Label htmlFor="newPin" className="text-sm font-medium text-gray-900 text-center">
+              <Label htmlFor="newPin" className="text-sm font-medium text-foreground text-center">
                 New PIN
               </Label>
               <InputOTP
@@ -130,21 +130,21 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
                     <InputOTPSlot
                       key={i}
                       index={i}
-                      className={`bg-gray-50 rounded-xl w-12 h-12 text-center ${newPinError ? "border-red-500" : "border-gray-200"}`}
+                      className={`bg-muted rounded-xl w-12 h-12 text-center ${newPinError ? "border-red-500" : "border-border"}`}
                     />
                   ))}
                 </InputOTPGroup>
               </InputOTP>
               {newPinError && (
-                <p className="text-xs text-red-600 flex items-center gap-1">
+                <p className="text-xs text-red-400 flex items-center gap-1">
                   <HugeiconsIcon icon={Alert01Icon} className="w-3.5 h-3.5 shrink-0" />
                   {newPinError}
                 </p>
               )}
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <p className="text-sm text-blue-800 text-center">
+            <div className="bg-accent border border-border rounded-lg p-3">
+              <p className="text-sm text-accent-foreground text-center">
                 <strong>Note:</strong> Your PIN must be a 4-digit number. Keep it secure and do not share it with anyone.
               </p>
             </div>
@@ -154,7 +154,7 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
             <Button
               type="button"
               variant="outline"
-              className="flex-1 bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900 rounded-xl"
+              className="flex-1 bg-transparent border-border hover:bg-accent text-foreground rounded-xl"
               onClick={onClose}
               disabled={isPending}
             >

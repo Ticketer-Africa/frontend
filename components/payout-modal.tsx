@@ -56,7 +56,7 @@ const emptyForm = { amount: 0, account_number: "", bank_code: "", narration: "",
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
   return (
-    <p className="mt-1 text-xs text-red-600 flex items-center gap-1">
+    <p className="mt-1 text-xs text-red-400 flex items-center gap-1">
       <HugeiconsIcon icon={Alert01Icon} className="w-3.5 h-3.5 shrink-0" />
       {message}
     </p>
@@ -147,32 +147,32 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
       isOpen={isOpen}
       onClose={handleClose}
       title={step === "details" ? "Request Payout" : "Enter PIN"}
-      className="max-w-md bg-white shadow-lg rounded-xl flex flex-col items-center p-6"
+      className="max-w-md bg-background shadow-lg rounded-xl flex flex-col items-center p-6"
     >
       <div className="w-full flex flex-col items-center space-y-5">
         {step === "details" ? (
           <>
             <div className="w-full">
-              <p className="text-sm text-gray-600">Available Balance</p>
-              <p className="text-2xl font-bold text-gray-900">{formatPrice(availableBalance)}</p>
+              <p className="text-sm text-muted-foreground">Available Balance</p>
+              <p className="text-2xl font-bold text-foreground">{formatPrice(availableBalance)}</p>
             </div>
 
             <div className="w-full">
-              <label className="block text-sm font-medium text-gray-900 mb-1">Payout Amount</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Payout Amount</label>
               <Input
                 type="number"
                 name="amount"
                 value={formData.amount || ""}
                 onChange={handleInputChange}
                 placeholder="Enter amount"
-                className={`bg-gray-50 border-gray-200 rounded-xl ${fieldErrors.amount ? "border-red-500" : ""}`}
+                className={`bg-muted border-border rounded-xl ${fieldErrors.amount ? "border-red-500" : ""}`}
                 disabled={isPending}
               />
               <FieldError message={fieldErrors.amount} />
             </div>
 
             <div className="w-full">
-              <label className="block text-sm font-medium text-gray-900 mb-1">Bank</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Bank</label>
               <Select
                 value={formData.bank_code}
                 onValueChange={(value) => {
@@ -181,7 +181,7 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
                 }}
                 disabled={isPending}
               >
-                <SelectTrigger className={`bg-gray-50 border-gray-200 rounded-xl ${fieldErrors.bank_code ? "border-red-500" : ""}`}>
+                <SelectTrigger className={`bg-muted border-border rounded-xl ${fieldErrors.bank_code ? "border-red-500" : ""}`}>
                   <SelectValue placeholder="Select a bank" />
                 </SelectTrigger>
                 <SelectContent>
@@ -194,7 +194,7 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
             </div>
 
             <div className="w-full">
-              <label className="block text-sm font-medium text-gray-900 mb-1">Account Number</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Account Number</label>
               <Input
                 type="text"
                 name="account_number"
@@ -202,15 +202,15 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
                 onChange={handleInputChange}
                 placeholder="10-digit account number"
                 maxLength={10}
-                className={`bg-gray-50 border-gray-200 rounded-xl ${fieldErrors.account_number ? "border-red-500" : ""}`}
+                className={`bg-muted border-border rounded-xl ${fieldErrors.account_number ? "border-red-500" : ""}`}
                 disabled={isPending}
               />
               <FieldError message={fieldErrors.account_number} />
             </div>
 
             <div className="w-full">
-              <label className="block text-sm font-medium text-gray-900 mb-1">
-                Narration <span className="text-gray-400 font-normal">(optional)</span>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Narration <span className="text-muted-foreground font-normal">(optional)</span>
               </label>
               <Input
                 type="text"
@@ -218,19 +218,19 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
                 value={formData.narration}
                 onChange={handleInputChange}
                 placeholder="e.g. Event proceeds"
-                className="bg-gray-50 border-gray-200 rounded-xl"
+                className="bg-muted border-border rounded-xl"
                 disabled={isPending}
               />
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 w-full">
-              <p className="text-sm text-blue-800 text-center">
+            <div className="bg-accent border border-border rounded-lg p-3 w-full">
+              <p className="text-sm text-accent-foreground text-center">
                 <strong>Note:</strong> Payout requests are processed as soon as they&apos;re received. Ensure your bank details are correct to avoid delays.
               </p>
             </div>
 
             <div className="flex space-x-2 w-full">
-              <Button variant="outline" className="flex-1 bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900 rounded-xl" onClick={handleClose} disabled={isPending}>
+              <Button variant="outline" className="flex-1 bg-transparent border-border hover:bg-accent text-foreground rounded-xl" onClick={handleClose} disabled={isPending}>
                 Cancel
               </Button>
               <Button className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150" onClick={handleDetailsSubmit} disabled={isPending}>
@@ -241,7 +241,7 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
         ) : (
           <>
             <div className="flex flex-col items-center gap-2 w-full">
-              <label htmlFor="pin" className="text-sm font-medium text-gray-900 text-center">
+              <label htmlFor="pin" className="text-sm font-medium text-foreground text-center">
                 Enter Your PIN
               </label>
               <InputOTP
@@ -255,26 +255,26 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
               >
                 <InputOTPGroup className="flex justify-center gap-2">
                   {[0, 1, 2, 3].map((i) => (
-                    <InputOTPSlot key={i} index={i} className={`bg-gray-50 border-gray-200 rounded-xl w-12 h-12 text-center ${pinError ? "border-red-500" : ""}`} />
+                    <InputOTPSlot key={i} index={i} className={`bg-muted border-border rounded-xl w-12 h-12 text-center ${pinError ? "border-red-500" : ""}`} />
                   ))}
                 </InputOTPGroup>
               </InputOTP>
               {pinError && (
-                <p className="text-xs text-red-600 flex items-center gap-1">
+                <p className="text-xs text-red-400 flex items-center gap-1">
                   <HugeiconsIcon icon={Alert01Icon} className="w-3.5 h-3.5 shrink-0" />
                   {pinError}
                 </p>
               )}
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 w-full">
-              <p className="text-sm text-blue-800 text-center">
+            <div className="bg-accent border border-border rounded-lg p-3 w-full">
+              <p className="text-sm text-accent-foreground text-center">
                 <strong>Note:</strong> Enter your 4-digit PIN to confirm the payout request.
               </p>
             </div>
 
             <div className="flex space-x-2 w-full">
-              <Button variant="outline" className="flex-1 bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900 rounded-xl" onClick={() => { setStep("details"); setFormData((prev) => ({ ...prev, pin: "" })); setPinError(""); }} disabled={isPending}>
+              <Button variant="outline" className="flex-1 bg-transparent border-border hover:bg-accent text-foreground rounded-xl" onClick={() => { setStep("details"); setFormData((prev) => ({ ...prev, pin: "" })); setPinError(""); }} disabled={isPending}>
                 Back
               </Button>
               <Button className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150" onClick={handlePinSubmit} disabled={isPending || !formData.pin}>

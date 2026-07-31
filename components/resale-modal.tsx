@@ -134,28 +134,28 @@ export function ResaleModal({
           <div className="flex-1 overflow-y-auto px-6 pt-4 pb-6 space-y-3">
             {/* Event Info */}
             <div className="space-y-1">
-              <h3 className="font-bold text-lg text-gray-900">
+              <h3 className="font-bold text-lg text-foreground">
                 {selectedTicket.event.name}
               </h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 {selectedTicket.event.venueName}
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 {formatDate(selectedTicket.event.date)}
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Ticket #{selectedTicket.code}
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Category: {selectedTicket.ticketCategory?.name}
               </p>
             </div>
 
             {/* Original Price */}
-            <div className="border rounded-xl p-4 bg-gray-50">
+            <div className="border border-border rounded-xl p-4 bg-muted">
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Original Price:</span>
-                <span className="font-semibold">
+                <span className="text-sm text-muted-foreground">Original Price:</span>
+                <span className="font-semibold text-foreground">
                   {selectedTicket.ticketCategory &&
                   selectedTicket?.ticketCategory?.price > 0
                     ? formatPrice(selectedTicket?.ticketCategory.price)
@@ -166,8 +166,8 @@ export function ResaleModal({
 
             {/* Resale Price */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-900">
-                Resale Price (₦) <span className="text-red-600">*</span>
+              <label className="text-sm font-medium text-foreground">
+                Resale Price (₦) <span className="text-red-400">*</span>
               </label>
               <Input
                 {...register("resalePrice")}
@@ -177,14 +177,14 @@ export function ResaleModal({
                 className="text-base"
               />
               {errors.resalePrice && (
-                <p className="text-xs text-red-600">
+                <p className="text-xs text-red-400">
                   {errors.resalePrice.message}
                 </p>
               )}
               {Number(resalePrice) >= 1200 && (
-                <p className="text-xs text-gray-600">
+                <p className="text-xs text-muted-foreground">
                   You’ll receive{" "}
-                  <span className="font-semibold text-gray-900">
+                  <span className="font-semibold text-foreground">
                     {formatPrice(youWillReceive)}
                   </span>{" "}
                   after 15% service fee
@@ -194,13 +194,13 @@ export function ResaleModal({
 
             {/* Bank Select */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-900">
-                Select Bank <span className="text-red-600">*</span>
+              <label className="text-sm font-medium text-foreground">
+                Select Bank <span className="text-red-400">*</span>
               </label>
               <select
                 {...register("bankCode")}
                 disabled={isLoading || isAlreadyResold || isPending}
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm disabled:bg-gray-100"
+                className="w-full border border-input bg-background text-foreground rounded-lg px-4 py-3 text-sm disabled:bg-muted"
               >
                 <option value="">-- Choose your bank --</option>
                 {banks?.map((bank: Bank) => (
@@ -210,22 +210,22 @@ export function ResaleModal({
                 ))}
               </select>
               {errors.bankCode && (
-                <p className="text-xs text-red-600">
+                <p className="text-xs text-red-400">
                   {errors.bankCode.message}
                 </p>
               )}
               {isLoading && (
-                <p className="text-xs text-gray-500">Loading banks...</p>
+                <p className="text-xs text-muted-foreground">Loading banks...</p>
               )}
               {error && (
-                <p className="text-xs text-red-600">Failed to load banks</p>
+                <p className="text-xs text-red-400">Failed to load banks</p>
               )}
             </div>
 
             {/* Account Number */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-900">
-                Account Number <span className="text-red-600">*</span>
+              <label className="text-sm font-medium text-foreground">
+                Account Number <span className="text-red-400">*</span>
               </label>
               <Input
                 {...register("accountNumber")}
@@ -234,7 +234,7 @@ export function ResaleModal({
                 disabled={isAlreadyResold || isPending}
               />
               {errors.accountNumber && (
-                <p className="text-xs text-red-600">
+                <p className="text-xs text-red-400">
                   {errors.accountNumber.message}
                 </p>
               )}
@@ -250,7 +250,7 @@ export function ResaleModal({
                   {isVerifyingAccount ? "Verifying..." : "Verify account"}
                 </Button>
                 {resolvedAccount && (
-                  <p className="text-xs text-green-700">
+                  <p className="text-xs text-green-400">
                     {resolvedAccount.accountName} confirmed for{" "}
                     {maskAccountNumber(resolvedAccount.accountNumber)}
                   </p>
@@ -260,16 +260,16 @@ export function ResaleModal({
 
             {/* Warnings */}
             {isAlreadyResold && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <p className="text-sm text-red-800 font-medium">
+              <div className="bg-destructive/10 border border-destructive/40 rounded-lg p-4">
+                <p className="text-sm text-red-400 font-medium">
                   This ticket has already been resold once and cannot be listed
                   again.
                 </p>
               </div>
             )}
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800">
+            <div className="bg-accent border border-border rounded-lg p-4">
+              <p className="text-sm text-accent-foreground">
                 <strong>Note:</strong> Once listed, anyone can buy your ticket.
                 You can delist it anytime before it&apos;s sold.
               </p>
@@ -277,7 +277,7 @@ export function ResaleModal({
           </div>
 
           {/* Fixed Bottom Actions */}
-          <div className="border-t border-gray-200 px-6 py-4 bg-white sticky bottom-0">
+          <div className="border-t border-border px-6 py-4 bg-background sticky bottom-0">
             <div className="flex gap-3">
               <Button
                 type="button"

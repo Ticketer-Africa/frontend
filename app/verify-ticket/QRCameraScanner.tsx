@@ -92,18 +92,18 @@ export function QRCameraScanner({ onScan, active }: QRCameraScannerProps) {
 
   if (permissionDenied) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-xl border border-gray-200 space-y-4">
-        <HugeiconsIcon icon={CameraOff01Icon} className="h-12 w-12 text-gray-400" />
-        <p className="text-gray-700 font-medium text-center">
+      <div className="flex flex-col items-center justify-center p-8 bg-[var(--home-card-elevated)] rounded-xl border border-[var(--home-border)] space-y-4">
+        <HugeiconsIcon icon={CameraOff01Icon} className="h-12 w-12 text-[var(--home-muted-dim)]" />
+        <p className="text-[var(--home-text)] font-medium text-center">
           Camera access denied
         </p>
-        <p className="text-sm text-gray-500 text-center max-w-xs">
+        <p className="text-sm text-[var(--home-muted)] text-center max-w-xs">
           Allow camera access in your browser settings, then refresh the page to
           scan tickets.
         </p>
         <button
           onClick={() => window.location.reload()}
-          className="text-sm text-[#1E88E5] underline"
+          className="text-sm text-[var(--home-text-highlight)] underline"
         >
           Retry
         </button>
