@@ -22,12 +22,16 @@ export function useEventCheckout(
 
   const handleCheckout = () => {
     if (mode === "preview") {
-      toast.error("This is a preview — publish your event to sell tickets");
+      toast.error("Preview mode", {
+        description: "Publish your event to sell tickets.",
+      });
       return;
     }
 
     if (selection.selected.size === 0) {
-      toast.error("Please select at least one ticket type");
+      toast.error("No tickets selected", {
+        description: "Please select at least one ticket type to continue.",
+      });
       return;
     }
 

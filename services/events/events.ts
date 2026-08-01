@@ -78,12 +78,14 @@ export const createEvent = async (formData: FormData) => {
         },
       }
     );
-    toast.success(res.data.message || "Event created successfully");
+    toast.success("Event created", {
+      description: res.data.message || "Your event has been saved.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to create event";
-    toast.error(errorMessage);
+    toast.error("Event creation failed", { description: errorMessage });
     console.log(errorMessage);
     throw new Error(errorMessage);
   }
@@ -96,12 +98,14 @@ export const deleteEvent = async (eventId: string) => {
       buildEndpoint(API_VERSION, `events/${eventId}`)
     );
     console.log("everything is fineee");
-    toast.success(res.data.message) || "Event deleted successfully";
+    toast.success("Event deleted", {
+      description: res.data.message || "The event has been removed.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage =
       error.response?.data.message || "Failed to delete event";
-    toast.error(errorMessage);
+    toast.error("Deletion failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };
@@ -118,13 +122,15 @@ export const updateEvent = async (eventId: string, formData: FormData) => {
         },
       }
     );
-    toast.success(res.data.message || "Event updated successfully");
+    toast.success("Event updated", {
+      description: res.data.message || "Your changes have been saved.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to update event";
     console.error("Update error:", errorMessage, error.response?.data);
-    toast.error(errorMessage);
+    toast.error("Update failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };
@@ -135,12 +141,14 @@ export const toggleEventStatus = async (eventId: string) => {
     const res = await axios.patch(
       buildEndpoint(API_VERSION, `events/${eventId}/toggle-status`)
     );
-    toast.success(res.data.message || "Event status toggled successfully");
+    toast.success("Event status updated", {
+      description: res.data.message || "The event visibility has been changed.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to toggle event status";
-    toast.error(errorMessage);
+    toast.error("Status update failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };

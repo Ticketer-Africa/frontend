@@ -60,10 +60,14 @@ export default function VerifyOTPPage() {
         }
       } catch (e) {
         console.error("Failed to parse otpPayload:", e);
-        toast.error("Invalid OTP session. Please try again.");
+        toast.error("Invalid OTP session", {
+          description: "We couldn't read your verification details. Please try again.",
+        });
       }
     } else {
-      toast.error("No OTP session found. Please register again.");
+      toast.error("No OTP session found", {
+        description: "Please register again to receive a new verification code.",
+      });
       const registerParams = new URLSearchParams();
       if (intent === "organizer") {
         registerParams.set("intent", "organizer");
@@ -100,13 +104,17 @@ export default function VerifyOTPPage() {
     const result = otpSchema.safeParse({ email, otp });
 
     if (!result.success) {
-      toast.error(result.error.issues[0].message);
+      toast.error("Invalid code", {
+        description: result.error.issues[0].message,
+      });
       return;
     }
 
     verifyOtp(result.data, {
       onSuccess: () => {
-        toast.success("OTP verified Sucessfully!");
+        toast.success("OTP verified", {
+          description: "Your code has been confirmed successfully.",
+        });
         const context = otpPayload?.context;
         localStorage.removeItem("otpPayload");
         // const role = user?.role || "user";
@@ -119,16 +127,19 @@ export default function VerifyOTPPage() {
         }
       },
       onError: (err: any) => {
-        toast.error(
-          err?.response?.data?.message || "Failed to verify OTP. Try again."
-        );
+        toast.error("Verification failed", {
+          description:
+            err?.response?.data?.message || "Failed to verify OTP. Please try again.",
+        });
       },
     });
   };
 
   const handleResend = () => {
     if (!otpPayload) {
-      toast.error("Missing OTP details");
+      toast.error("Missing OTP details", {
+        description: "We couldn't find your verification session. Please register again.",
+      });
       return;
     }
     resendOtp(otpPayload, {

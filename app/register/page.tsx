@@ -119,8 +119,8 @@ export default function RegisterPage() {
       );
     } catch (err: any) {
       const msg =
-        err?.response?.data?.message ?? "Something went wrong, try again";
-      toast.error(msg);
+        err?.response?.data?.message ?? "Please check your details and try again.";
+      toast.error("Registration failed", { description: msg });
     }
   };
 

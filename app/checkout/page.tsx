@@ -186,9 +186,14 @@ export default function CheckoutPage() {
         amount: totalAmount > 0 ? totalAmount : undefined,
       });
       setDiscountState({ appliedDiscount: discount, isValidating: false });
-      toast.success(`Discount applied!`);
+      toast.success("Discount applied", {
+        description: "The discount has been applied to your order total.",
+      });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to apply discount code");
+      toast.error("Discount code failed", {
+        description:
+          error instanceof Error ? error.message : "Please check the code and try again.",
+      });
     }
   }, [discountCode, checkoutData, applyDiscount]);
 
@@ -228,7 +233,9 @@ export default function CheckoutPage() {
         setPurchaseSuccess(true);
       }
     } catch (error: any) {
-      toast.error(error.message || "Purchase failed. Please try again.");
+      toast.error("Purchase failed", {
+        description: error.message || "Please try again.",
+      });
     } finally {
       setIsSubmitting(false);
     }

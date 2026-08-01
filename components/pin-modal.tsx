@@ -57,7 +57,11 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
 
     try {
       await mutateAsync(payload);
-      toast.success(hasPin ? "PIN updated successfully" : "PIN set successfully");
+      toast.success(hasPin ? "PIN updated" : "PIN set", {
+        description: hasPin
+          ? "Your wallet PIN has been updated."
+          : "Your wallet PIN has been set up.",
+      });
       queryClient.invalidateQueries({ queryKey: ["wallet-pin-status"] });
       setNewPin("");
       setOldPin("");
@@ -65,7 +69,9 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
       setOldPinError("");
       onClose();
     } catch (error: any) {
-      toast.error(error?.message || "Failed to update PIN. Please try again.");
+      toast.error("PIN update failed", {
+        description: error?.message || "Please try again.",
+      });
     }
   };
 

@@ -21,11 +21,13 @@ export const register = async (dto: RegisterDto): Promise<BasicResponse> => {
       buildEndpoint(API_VERSION, "auth/register"),
       dto
     );
-    toast.success(res.data.message || "Registration successful");
+    toast.success("Registration successful", {
+      description: res.data.message || "Check your email for a verification code.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage = error.response?.data?.message || "Failed to register";
-    toast.error(errorMessage);
+    toast.error("Registration failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };
@@ -34,11 +36,13 @@ export const register = async (dto: RegisterDto): Promise<BasicResponse> => {
 export const login = async (dto: LoginDto): Promise<AuthResponse> => {
   try {
     const res = await axios.post(buildEndpoint(API_VERSION, "auth/login"), dto);
-    toast.success(res.data.message || "Login successful");
+    toast.success("Login successful", {
+      description: res.data.message || "Welcome back.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage = error.response?.data?.message || "Failed to login";
-    toast.error(errorMessage);
+    toast.error("Login failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };
@@ -50,12 +54,14 @@ export const verifyOtp = async (dto: VerifyOtpDto): Promise<BasicResponse> => {
       buildEndpoint(API_VERSION, "auth/verify-otp"),
       dto
     );
-    toast.success(res.data.message || "OTP verified successfully");
+    toast.success("OTP verified", {
+      description: res.data.message || "Your code has been confirmed successfully.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to verify OTP";
-    toast.error(errorMessage);
+    toast.error("Verification failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };
@@ -67,12 +73,14 @@ export const resendOtp = async (dto: ResendOtpDto): Promise<BasicResponse> => {
       buildEndpoint(API_VERSION, "auth/resend-otp"),
       dto
     );
-    toast.success(res.data.message || "OTP resent successfully");
+    toast.success("OTP resent", {
+      description: res.data.message || "A new code has been sent to your email.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to resend OTP";
-    toast.error(errorMessage);
+    toast.error("Resend failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };
@@ -86,12 +94,14 @@ export const forgotPassword = async (
       buildEndpoint(API_VERSION, "auth/forgot-password"),
       dto
     );
-    toast.success(res.data.message || "Password reset link sent successfully");
+    toast.success("Reset link sent", {
+      description: res.data.message || "Check your email for a password reset link.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to send password reset link";
-    toast.error(errorMessage);
+    toast.error("Reset link failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };
@@ -105,12 +115,14 @@ export const resetPassword = async (
       buildEndpoint(API_VERSION, "auth/reset-password"),
       dto
     );
-    toast.success(res.data.message || "Password reset successfully");
+    toast.success("Password reset", {
+      description: res.data.message || "You can now log in with your new password.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to reset password";
-    toast.error(errorMessage);
+    toast.error("Reset failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };
@@ -124,12 +136,14 @@ export const changePassword = async (
       buildEndpoint(API_VERSION, "auth/change-password"),
       dto
     );
-    toast.success(res.data.message || "Password changed successfully");
+    toast.success("Password changed", {
+      description: res.data.message || "Your password has been updated.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to change password";
-    toast.error(errorMessage);
+    toast.error("Password change failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };

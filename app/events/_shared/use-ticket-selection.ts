@@ -39,7 +39,9 @@ export function useTicketSelection(ticketCategories: TicketCategoryV2[]) {
         .reduce((sum, [, qty]) => sum + qty, 0);
 
       if (otherTotal + next > 10) {
-        toast.error("Maximum 10 tickets per purchase");
+        toast.error("Ticket limit reached", {
+          description: "You can select up to 10 tickets per purchase.",
+        });
         return prev;
       }
 

@@ -84,7 +84,9 @@ export function ResaleModal({
 
   const handleVerifyAccount = async () => {
     if (!bankCode || !/^\d{10}$/.test(accountNumber || "")) {
-      toast.error("Select a bank and enter a valid 10-digit account number");
+      toast.error("Incomplete payout details", {
+        description: "Select a bank and enter a valid 10-digit account number.",
+      });
       return;
     }
 
@@ -99,7 +101,9 @@ export function ResaleModal({
   const onSubmit = (data: ResaleFormData) => {
     if (isAlreadyResold) return;
     if (!resolvedAccount) {
-      toast.error("Verify your payout account before listing this ticket");
+      toast.error("Payout account not verified", {
+        description: "Verify your payout account before listing this ticket.",
+      });
       return;
     }
 

@@ -74,7 +74,9 @@ export default function VerifyTicketPage() {
       const parsedData = parseTicketData(dataParam);
       if (!parsedData || !parsedData.eventId) {
         setError("Invalid ticket data");
-        toast.error("Invalid ticket data");
+        toast.error("Invalid ticket data", {
+          description: "The scanned QR code could not be read. Please try again.",
+        });
         return;
       }
 
@@ -105,7 +107,9 @@ export default function VerifyTicketPage() {
       });
     } catch (err: any) {
       setError(err?.message || "Verification failed. Please try again.");
-      toast.error(err?.message || "Verification failed. Please try again.");
+      toast.error("Verification failed", {
+        description: err?.message || "Please try again.",
+      });
     }
   };
 

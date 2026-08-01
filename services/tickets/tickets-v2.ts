@@ -24,12 +24,14 @@ export const buyTicketsV2 = async (
     const res = await axios.post(endpoint, data, {
       headers: { "x-client-page": window.location.href },
     });
-    toast.success(res.data.message || "Ticket purchased successfully");
+    toast.success("Ticket purchased", {
+      description: res.data.message || "Your ticket has been added to your account.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to purchase ticket";
-    toast.error(errorMessage);
+    toast.error("Purchase failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };

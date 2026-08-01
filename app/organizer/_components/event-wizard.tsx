@@ -241,7 +241,9 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
 
       setIsSubmitted(true);
     } catch (error: any) {
-      toast.error(error?.message || `Event ${mode === "create" ? "creation" : "update"} failed`);
+      toast.error(`Event ${mode === "create" ? "creation" : "update"} failed`, {
+        description: error?.message || "Please review the details and try again.",
+      });
     }
   };
 

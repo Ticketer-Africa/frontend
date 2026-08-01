@@ -77,7 +77,9 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
 
   const handleDetailsSubmit = () => {
     if (!user) {
-      toast.error("You must be logged in to request a payout");
+      toast.error("Login required", {
+        description: "You must be logged in to request a payout.",
+      });
       return;
     }
 
@@ -120,11 +122,15 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
         name: user!.name,
         narration: formData.narration || undefined,
       });
-      toast.success("Payout request submitted! Redirecting to checkout…");
+      toast.success("Payout request submitted", {
+        description: "Redirecting you to checkout…",
+      });
       window.location.href = response.checkoutUrl;
       handleClose();
     } catch (error: any) {
-      toast.error(error?.message || "Failed to submit payout request. Please try again.");
+      toast.error("Payout request failed", {
+        description: error?.message || "Please try again.",
+      });
     }
   };
 

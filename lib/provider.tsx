@@ -41,26 +41,7 @@ export default function Providers({ children }: { children: ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         {children}
-        <Toaster
-          theme="dark"
-          className="shadow-lg rounded-lg"
-          toastOptions={{
-            unstyled: false,
-            style: {
-              background: "var(--home-card-elevated)",
-              border: "1px solid var(--home-border)",
-            },
-            classNames: {
-              toast: "rounded-lg text-[var(--home-text)]",
-              success: "!text-[var(--home-success-text)]",
-              error: "!text-red-400",
-              actionButton:
-                "bg-[var(--home-accent)] text-[var(--home-accent-fg)] rounded-full px-4 py-1",
-              cancelButton:
-                "bg-[var(--home-card-highlight)] text-[var(--home-muted)] rounded-full px-4 py-1",
-            },
-          }}
-        />
+        <Toaster />
       </AuthProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

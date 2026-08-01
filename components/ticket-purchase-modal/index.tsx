@@ -50,11 +50,15 @@ export function TicketPurchaseModal({
 
         // Can't exceed 10 per category or 10 total
         if (newQty > 10) {
-          toast.error("Maximum 10 tickets per category");
+          toast.error("Ticket limit reached", {
+            description: "You can select up to 10 tickets per category.",
+          });
           return prev;
         }
         if (currentTotal - currentQty + newQty > 10) {
-          toast.error("Maximum 10 tickets per purchase");
+          toast.error("Ticket limit reached", {
+            description: "You can select up to 10 tickets per purchase.",
+          });
           return prev;
         }
 
@@ -74,7 +78,9 @@ export function TicketPurchaseModal({
 
   const handlePurchase = async () => {
     if (!ticketCategories && !resaleTicket) {
-      toast.error("Please select a ticket category or resale ticket.");
+      toast.error("No ticket selected", {
+        description: "Please select a ticket category or resale ticket.",
+      });
       return;
     }
 
@@ -103,7 +109,9 @@ export function TicketPurchaseModal({
       }
     } catch (err: any) {
       console.error("Purchase failed:", err);
-      toast.error(err.message || "Purchase failed. Try again.");
+      toast.error("Purchase failed", {
+        description: err.message || "Please try again.",
+      });
     }
   };
 

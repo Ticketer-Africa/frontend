@@ -119,7 +119,9 @@ export default function SettingsPage() {
         },
       });
     } catch (error: any) {
-      toast.error(error?.message || "Profile update failed");
+      toast.error("Profile update failed", {
+        description: error?.message || "Please try again.",
+      });
     }
   };
 

@@ -48,9 +48,9 @@ export default function TicketDetailPage({
   const handleListForResale = () => {
     if (!ticket) return;
     if (ticket.resaleCount >= 1) {
-      toast.error(
-        "This ticket has already been resold once and cannot be listed again."
-      );
+      toast.error("Resale not allowed", {
+        description: "This ticket has already been resold once and cannot be listed again.",
+      });
       return;
     }
     setSelectedTicket(ticket);
@@ -63,7 +63,9 @@ export default function TicketDetailPage({
     accountNumber: string;
   }) => {
     if (!selectedTicket) {
-      toast.error("No ticket selected");
+      toast.error("No ticket selected", {
+        description: "Select a ticket before confirming the resale listing.",
+      });
       return;
     }
 
@@ -77,16 +79,22 @@ export default function TicketDetailPage({
     try {
       await listResale(resalePayload, {
         onSuccess: () => {
-          toast.success("Ticket listed for resale successfully!");
+          toast.success("Ticket listed for resale", {
+            description: "Your ticket is now visible to other buyers.",
+          });
           setIsResaleModalOpen(false);
           setSelectedTicket(null);
         },
         onError: (error) => {
-          toast.error(error.message || "Failed to list ticket for resale.");
+          toast.error("Listing failed", {
+            description: error.message || "Failed to list ticket for resale.",
+          });
         },
       });
     } catch (err: any) {
-      toast.error(err.message || "Failed to list ticket for resale.");
+      toast.error("Listing failed", {
+        description: err.message || "Failed to list ticket for resale.",
+      });
     }
   };
 
