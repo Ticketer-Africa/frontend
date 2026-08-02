@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { usePriceRange } from "@/services/events/events.queries";
 import { useAllEventsV2 } from "@/services/events/events-v2.queries";
 import { EventV2 } from "@/types/events-v2.type";
+import { Footer } from "@/components/layout/footer";
 
 // Local components - code split for better tree shaking
 import { FilterSection } from "./filter-section";
@@ -12,6 +13,7 @@ import { EventsGrid } from "./events-grid";
 import { EventsGridSkeleton } from "./skeletons";
 import { PaginationControls } from "./pagination-controls";
 import { EmptyState } from "./empty-state";
+// import { FeaturedExperiencesSection } from "./featured-experiences-section"; // enable once a featured-events source exists
 
 // Utils and constants
 import { extractLocations, filterEvents } from "./utils";
@@ -19,6 +21,12 @@ import {
   DEFAULT_MIN_PRICE,
   DEFAULT_MAX_PRICE,
 } from "./constants";
+
+/**
+ * Curated subset of CATEGORIES shown as quick-access pills above the grid.
+ * "All" clears the category filter; each pill sets it directly (no Apply step).
+ */
+const QUICK_CATEGORIES = ["Music", "Concert", "Festival", "Party", "Networking"];
 
 /**
  * EventsPage - Optimized explore page for discovering events
@@ -332,6 +340,12 @@ export default function EventsPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
+  const handleQuickCategorySelect = useCallback((category: string) => {
+    setTempCategory(category);
+    setSelectedCategory(category);
+    setCurrentPage(1);
+  }, []);
+
   // ─────────────────────────────────────────────────────────────────────────────
   // RENDER
   // ─────────────────────────────────────────────────────────────────────────────
@@ -353,18 +367,29 @@ export default function EventsPage() {
   const isRefetching = isFetching && !!response;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 pt-16">
+    <div
+      className="home-theme min-h-screen pt-16"
+      style={{ backgroundColor: "var(--home-bg)" }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/*
          * Header - renders immediately without animation
          * Performance: No JS animation delay, text is LCP candidate
          */}
         <header className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
-            Discover Amazing Events
+          <h1
+            className="font-['Syne'] text-5xl sm:text-6xl lg:text-[72px] font-extrabold tracking-[-1.2px] mb-4 leading-[1.05] lg:leading-[80px]"
+            style={{ color: "var(--home-text)" }}
+          >
+            Discover Amazing
+            <br />
+            Events
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Find and book tickets for the best events happening near you
+          <p
+            className="font-['Hanken_Grotesk'] text-lg max-w-2xl mx-auto tracking-[0.5px]"
+            style={{ color: "var(--home-muted)" }}
+          >
+            Find and book tickets for the best events happening near you across the continent.
           </p>
         </header>
 
@@ -399,6 +424,52 @@ export default function EventsPage() {
         />
 
         {/*
+         * Featured Experiences - per Explore page Figma (node 173:1268), a
+         * curated horizontal row above the main grid. Disabled until events
+         * have a "featured" flag/source to select from.
+         */}
+        {/* <FeaturedExperiencesSection events={featuredEvents} /> */}
+
+        {/*
+         * Quick category pills - direct-apply shortcut for a curated
+         * subset of CATEGORIES, distinct from the full Location/Price/
+         * Category panel toggled by the "Filters" button above.
+         */}
+        <div
+          className="flex gap-4 items-center overflow-x-auto pb-2 mb-8"
+          role="group"
+          aria-label="Quick category filters"
+        >
+          <button
+            type="button"
+            onClick={() => handleQuickCategorySelect("")}
+            className="px-8 py-3 rounded-full text-sm font-semibold whitespace-nowrap transition-colors shrink-0"
+            style={
+              selectedCategory === ""
+                ? { backgroundColor: "var(--home-accent)", color: "var(--home-accent-fg)" }
+                : { backgroundColor: "var(--home-card-elevated)", color: "var(--home-muted)", border: "1px solid var(--home-border)" }
+            }
+          >
+            All
+          </button>
+          {QUICK_CATEGORIES.map((category) => (
+            <button
+              key={category}
+              type="button"
+              onClick={() => handleQuickCategorySelect(category)}
+              className="px-8 py-3 rounded-full text-sm font-semibold whitespace-nowrap transition-colors shrink-0"
+              style={
+                selectedCategory === category
+                  ? { backgroundColor: "var(--home-accent)", color: "var(--home-accent-fg)" }
+                  : { backgroundColor: "var(--home-card-elevated)", color: "var(--home-muted)", border: "1px solid var(--home-border)" }
+              }
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
+        {/*
          * Events grid - shows skeleton only on first load
          * Performance:
          * - Skeleton cards match exact card dimensions
@@ -422,6 +493,8 @@ export default function EventsPage() {
           <PaginationControls meta={meta} onPageChange={handlePageChange} />
         )}
       </div>
+
+      <Footer />
     </div>
   );
 }

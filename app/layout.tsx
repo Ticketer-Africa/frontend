@@ -87,7 +87,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1E88E5",
+  themeColor: "#E2725B",
 };
 
 export default function RootLayout({
@@ -96,7 +96,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    // Ticketer Africa is a dark-only product (no light/dark toggle exists —
+    // see components/theme-provider.tsx, which is unused). Applying `dark`
+    // globally makes shared Radix-portaled primitives (Select, Popover,
+    // Dialog, DropdownMenu, Tooltip, Sheet, Command, Toast, Avatar
+    // fallback) resolve the dark token values in app/globals.css instead of
+    // the shadcn light-mode defaults, since portals attach under <body>
+    // rather than under any page-local `.home-theme` wrapper.
+    <html lang="en" className="dark">
       {/*
        * Performance: Structured data moved to head via JSON-LD script tags
        * This prevents them from being in the render tree and blocking paint

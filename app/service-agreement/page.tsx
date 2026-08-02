@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Footer } from "@/components/layout/footer";
 
 const sections = [
   {
@@ -117,14 +118,23 @@ const sections = [
 
 export default function ServiceAgreementPage() {
   return (
-    <main className="bg-gray-50 min-h-screen py-16 px-4 sm:px-6 lg:px-8">
+    <div className="home-theme min-h-screen" style={{ backgroundColor: "var(--home-bg)" }}>
+    <main
+      className="px-4 py-16 sm:px-6 lg:px-8"
+    >
       <div className="mx-auto max-w-4xl">
-        <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6 sm:p-10">
-          <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 leading-tight">
+        <div className="rounded-2xl border border-[var(--home-border)] bg-[var(--home-card)] p-6 shadow-sm sm:p-10">
+          <h1
+            className="text-2xl font-bold leading-tight sm:text-4xl"
+            style={{ color: "var(--home-text)" }}
+          >
             EVENT HOSTING AND TICKETING PLATFORM AGREEMENT
           </h1>
 
-          <p className="mt-6 text-gray-700 leading-7">
+          <p
+            className="mt-6 leading-7"
+            style={{ color: "var(--home-muted)" }}
+          >
             This Event Hosting and Ticketing Platform Agreement
             (&quot;Agreement&quot;) is entered into by and between Ticketer
             Africa Ltd (&quot;Ticketer&quot; or the &quot;Platform&quot;), and
@@ -133,13 +143,19 @@ export default function ServiceAgreementPage() {
             of the Ticketer digital ticketing platform and related services.
           </p>
 
-          <div className="mt-8 space-y-8">
+          <div className="mt-8 divide-y divide-[var(--home-border)]">
             {sections.map((section) => (
-              <section key={section.title}>
-                <h2 className="text-xl font-semibold text-gray-900">
+              <section key={section.title} className="py-8 first:pt-0 last:pb-0">
+                <h2
+                  className="text-xl font-semibold"
+                  style={{ color: "var(--home-text)" }}
+                >
                   {section.title}
                 </h2>
-                <ul className="mt-3 space-y-2 text-gray-700 leading-7">
+                <ul
+                  className="mt-3 space-y-2 leading-7"
+                  style={{ color: "var(--home-muted)" }}
+                >
                   {section.items.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
@@ -148,9 +164,16 @@ export default function ServiceAgreementPage() {
             ))}
           </div>
 
-          <div className="mt-10 border-t border-gray-200 pt-6 text-sm text-gray-600">
+          <div
+            className="mt-10 border-t border-[var(--home-border)] pt-6 text-sm"
+            style={{ color: "var(--home-muted)" }}
+          >
             To continue registration, return to{" "}
-            <Link href="/register" className="text-[#1E88E5] hover:underline">
+            <Link
+              href="/register"
+              className="hover:underline"
+              style={{ color: "var(--home-text-highlight)" }}
+            >
               Create Account
             </Link>{" "}
             and accept this agreement.
@@ -158,5 +181,7 @@ export default function ServiceAgreementPage() {
         </div>
       </div>
     </main>
+      <Footer />
+    </div>
   );
 }

@@ -1,10 +1,11 @@
 "use client";
 
 import { memo } from "react";
-import { Wallet, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/helpers";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Download02Icon, Wallet01Icon } from "@hugeicons/core-free-icons";
 
 interface BalanceCardProps {
   balance: number;
@@ -19,30 +20,38 @@ export const BalanceCard = memo(function BalanceCard({
 }: BalanceCardProps) {
   return (
     <div className="wallet-card-animate">
-      <Card className="bg-white rounded-xl shadow-lg border border-gray-100">
+      <Card
+        className="rounded-xl shadow-lg border"
+        style={{
+          backgroundColor: "var(--home-card)",
+          borderColor: "var(--home-border)",
+          color: "var(--home-text)",
+        }}
+      >
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-gray-900">
-            <Wallet className="h-5 w-5 text-[#1E88E5]" />
+          <CardTitle className="flex items-center space-x-2" style={{ color: "var(--home-text)" }}>
+            <HugeiconsIcon icon={Wallet01Icon} className="h-5 w-5" style={{ color: "var(--home-accent)" }} />
             <span>Available Balance</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <p className="text-4xl font-bold text-gray-900">
+            <p className="text-4xl font-bold" style={{ color: "var(--home-text)" }}>
               {formatPrice(balance)}
             </p>
             <div className="space-y-2">
               <Button
-                className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
+                variant="homeAccent"
+                className="w-full px-6"
                 onClick={onRequestPayout}
                 disabled={balance <= 0}
               >
-                <Download className="h-4 w-4 mr-2" />
+                <HugeiconsIcon icon={Download02Icon} className="h-4 w-4 mr-2" />
                 Request Payout
               </Button>
               <Button
-                variant="outline"
-                className="w-full border-gray-300 hover:bg-gray-100 text-gray-900 rounded-full px-6"
+                variant="homeOutline"
+                className="w-full px-6"
                 onClick={onChangePin}
               >
                 Change PIN

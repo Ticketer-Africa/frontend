@@ -17,10 +17,28 @@ const Slider = React.forwardRef<
     )}
     {...props}
   >
-    <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-gray-200">
-      <SliderPrimitive.Range className="absolute h-full bg-[#1E88E5]" />
+    {/*
+      This component's only consumer (app/explore/filter-section.tsx) is
+      always rendered inside the .home-theme scope, so these var(--home-*)
+      tokens resolve correctly — unlike a portaled component, this renders
+      inline in the tree.
+    */}
+    <SliderPrimitive.Track
+      className="relative h-2 w-full grow overflow-hidden rounded-full"
+      style={{ backgroundColor: "var(--home-card-elevated)" }}
+    >
+      <SliderPrimitive.Range
+        className="absolute h-full"
+        style={{ backgroundColor: "var(--home-accent)" }}
+      />
     </SliderPrimitive.Track>
-    <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border-2 border-[#1E88E5] bg-white ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E88E5] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" />
+    <SliderPrimitive.Thumb
+      className="block h-5 w-5 rounded-full border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+      style={{
+        borderColor: "var(--home-accent)",
+        backgroundColor: "var(--home-text)",
+      }}
+    />
   </SliderPrimitive.Root>
 ));
 Slider.displayName = SliderPrimitive.Root.displayName;

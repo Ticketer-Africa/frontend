@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Html5Qrcode } from "html5-qrcode";
-import { Camera, CameraOff } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Camera01Icon, CameraOff01Icon } from "@hugeicons/core-free-icons";
 
 interface QRCameraScannerProps {
   onScan: (rawText: string) => void;
@@ -10,6 +11,19 @@ interface QRCameraScannerProps {
 }
 
 const SCANNER_ELEMENT_ID = "qr-camera-scanner-region";
+
+/**
+ * Html5Qrcode.stop() throws synchronously (not a rejected promise) when the
+ * scanner isn't in a running/paused state — e.g. if start() hasn't resolved
+ * yet. That bypasses .catch() entirely and crashes the app, so guard it.
+ */
+function safeStop(scanner: Html5Qrcode): Promise<void> {
+  try {
+    return scanner.stop().catch(() => {});
+  } catch {
+    return Promise.resolve();
+  }
+}
 
 export function QRCameraScanner({ onScan, active }: QRCameraScannerProps) {
   const scannerRef = useRef<Html5Qrcode | null>(null);
@@ -19,12 +33,9 @@ export function QRCameraScanner({ onScan, active }: QRCameraScannerProps) {
   useEffect(() => {
     if (!active) {
       if (scannerRef.current) {
-        scannerRef.current
-          .stop()
-          .catch(() => {})
-          .finally(() => {
-            scannerRef.current = null;
-          });
+        safeStop(scannerRef.current).finally(() => {
+          scannerRef.current = null;
+        });
       }
       return;
     }
@@ -45,13 +56,10 @@ export function QRCameraScanner({ onScan, active }: QRCameraScannerProps) {
           (decodedText) => {
             if (!cancelled) {
               cancelled = true;
-              scanner
-                .stop()
-                .catch(() => {})
-                .finally(() => {
-                  scannerRef.current = null;
-                  onScan(decodedText);
-                });
+              safeStop(scanner).finally(() => {
+                scannerRef.current = null;
+                onScan(decodedText);
+              });
             }
           },
           () => {
@@ -75,30 +83,27 @@ export function QRCameraScanner({ onScan, active }: QRCameraScannerProps) {
     return () => {
       cancelled = true;
       if (scannerRef.current) {
-        scannerRef.current
-          .stop()
-          .catch(() => {})
-          .finally(() => {
-            scannerRef.current = null;
-          });
+        safeStop(scannerRef.current).finally(() => {
+          scannerRef.current = null;
+        });
       }
     };
   }, [active, onScan]);
 
   if (permissionDenied) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-xl border border-gray-200 space-y-4">
-        <CameraOff className="h-12 w-12 text-gray-400" />
-        <p className="text-gray-700 font-medium text-center">
+      <div className="flex flex-col items-center justify-center p-8 bg-[var(--home-card-elevated)] rounded-xl border border-[var(--home-border)] space-y-4">
+        <HugeiconsIcon icon={CameraOff01Icon} className="h-12 w-12 text-[var(--home-muted-dim)]" />
+        <p className="text-[var(--home-text)] font-medium text-center">
           Camera access denied
         </p>
-        <p className="text-sm text-gray-500 text-center max-w-xs">
+        <p className="text-sm text-[var(--home-muted)] text-center max-w-xs">
           Allow camera access in your browser settings, then refresh the page to
           scan tickets.
         </p>
         <button
           onClick={() => window.location.reload()}
-          className="text-sm text-[#1E88E5] underline"
+          className="text-sm text-[var(--home-text-highlight)] underline"
         >
           Retry
         </button>
@@ -121,7 +126,7 @@ export function QRCameraScanner({ onScan, active }: QRCameraScannerProps) {
       )}
       <div className="mt-2 flex justify-center">
         <div className="bg-gray-800 text-white text-xs px-3 py-1 rounded-full flex items-center gap-1">
-          <Camera className="h-3 w-3" />
+          <HugeiconsIcon icon={Camera01Icon} className="h-3 w-3" />
           Point at ticket QR code
         </div>
       </div>

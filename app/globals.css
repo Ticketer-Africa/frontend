@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -51,38 +51,79 @@
     --motion-duration-overlay: 200ms;
   }
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    /*
+     * Ticketer Africa is a dark-only product: every route opts into the
+     * `.home-theme` navy/rust palette (see below). These tokens are that
+     * same palette re-expressed as the shadcn HSL variables so shared Radix
+     * primitives that portal to <body> (Select, Popover, Dialog,
+     * DropdownMenu, Tooltip, Sheet, Command, Toast, Avatar fallback, etc.)
+     * resolve to the correct dark colors instead of the shadcn light-mode
+     * defaults. Values derived from the .home-theme hex tokens.
+     */
+    --background: 220 29% 6.1%; /* home-bg #0b0e14 */
+    --foreground: 227 62.8% 91.6%; /* home-text #dce2f7 */
+    --card: 222 36.5% 12.4%; /* home-card #141b2b */
+    --card-foreground: 227 62.8% 91.6%; /* home-text */
+    --popover: 224 30.6% 14.1%; /* home-card-elevated #191f2f */
+    --popover-foreground: 227 62.8% 91.6%; /* home-text */
+    --primary: 10 69.9% 62.2%; /* home-accent #e2725b */
+    --primary-foreground: 7 95.7% 18%; /* home-accent-fg #5a0d02 */
+    --secondary: 222 24.7% 18.2%; /* home-card-highlight #232a3a */
+    --secondary-foreground: 227 62.8% 91.6%; /* home-text */
+    --muted: 224 30.6% 14.1%; /* home-card-elevated */
+    --muted-foreground: 10 34% 79.8%; /* home-muted #ddc0ba */
+    --accent: 222 24.7% 18.2%; /* home-card-highlight */
+    --accent-foreground: 227 62.8% 91.6%; /* home-text */
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    --border: 10 16.2% 29%; /* home-border-strong #56423e */
+    --input: 10 16.2% 29%; /* home-border-strong */
+    --ring: 10 69.9% 62.2%; /* home-accent */
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 220 29% 6.1%; /* home-bg */
+    --sidebar-foreground: 227 62.8% 91.6%; /* home-text */
+    --sidebar-primary: 10 69.9% 62.2%; /* home-accent */
+    --sidebar-primary-foreground: 7 95.7% 18%; /* home-accent-fg */
+    --sidebar-accent: 222 24.7% 18.2%; /* home-card-highlight */
+    --sidebar-accent-foreground: 227 62.8% 91.6%; /* home-text */
+    --sidebar-border: 10 16.2% 29%; /* home-border-strong */
+    --sidebar-ring: 10 69.9% 62.2%; /* home-accent */
+  }
+  .home-theme {
+    /* surfaces */
+    --home-bg: #0b0e14; /* page / footer / hero base — unified across the page */
+    --home-card: #141b2b;
+    --home-card-elevated: #191f2f;
+    --home-card-highlight: #232a3a;
+
+    /* borders */
+    --home-border: rgba(86, 66, 62, 0.3);
+    --home-border-subtle: rgba(86, 66, 62, 0.1);
+    --home-border-strong: #56423e;
+
+    /* text */
+    --home-text: #dce2f7;
+    --home-text-highlight: #ffb4a5;
+    --home-muted: #ddc0ba;
+    --home-muted-dim: #a48b86;
+
+    /* accent + semantic */
+    --home-accent: #e2725b;
+    --home-accent-fg: #5a0d02;
+    --home-success: #42a73b;
+    --home-success-fg: #003403;
+    --home-success-text: #92fa83;
+    --home-highlight-yellow: #f4d03f;
+    --home-social-bg: #2e3545; /* footer social icon circles — distinct from --home-border-strong */
+    --home-badge-bg: rgba(46, 53, 69, 0.3); /* eyebrow pill / Show More button translucent fill */
+
+    /* radii */
+    --home-radius-card: 16px;
+    --home-radius-card-lg: 24px;
   }
 }
 
@@ -310,6 +351,47 @@
   left: -10rem;
   width: 20rem;
   height: 20rem;
+}
+
+/* ============================================
+ * Hero ember particles — rising drift, matching the Figma
+ * "Stars=Injection" loop (duplicated particles are offset
+ * ~587px upward between copies, confirming embers rise).
+ * ============================================ */
+
+.ember-particle {
+  position: absolute;
+  bottom: -10px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(226, 114, 91, 1) 0%,
+    rgba(235, 161, 77, 0.9) 50%,
+    rgba(244, 208, 63, 0.8) 100%
+  );
+  box-shadow: 0 0 5px 0 #e2725b;
+  filter: blur(0.5px);
+  animation-name: ember-rise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes ember-rise {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--ember-drift, 0px), -760px, 0);
+    opacity: 0;
+  }
 }
 
 /* ============================================

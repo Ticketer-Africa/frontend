@@ -50,12 +50,14 @@ export const buyTicket = async (
         headers: { "x-client-page": window.location.href },
       }
     );
-    toast.success(res.data.message || "Ticket purchased successfully");
+    toast.success("Ticket purchased", {
+      description: res.data.message || "Your ticket has been added to your account.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to purchase ticket";
-    toast.error(errorMessage);
+    toast.error("Purchase failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };
@@ -69,14 +71,16 @@ export const buyResaleTicket = async (
       buildEndpoint(API_VERSION, "tickets/resale/buy"),
       data
     );
-    toast.success(res.data.message || "Resale ticket purchased successfully");
+    toast.success("Resale ticket purchased", {
+      description: res.data.message || "Your ticket has been added to your account.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage = getApiErrorMessage(
       error,
       "Failed to purchase resale ticket"
     );
-    toast.error(errorMessage);
+    toast.error("Purchase failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };
@@ -90,13 +94,15 @@ export const listTicketForResale = async (
       buildEndpoint(API_VERSION, "tickets/resale/list"),
       sanitizeListResalePayload(data)
     );
-    toast.success(res.data.message || "Ticket listed for resale successfully");
+    toast.success("Ticket listed for resale", {
+      description: res.data.message || "Your ticket is now visible to other buyers.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage = "ticketCode" in data
       ? getGuestProofErrorMessage(error)
       : getApiErrorMessage(error, "Failed to list ticket for resale");
-    toast.error(errorMessage);
+    toast.error("Listing failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };
@@ -109,11 +115,13 @@ export const resolvePayoutAccount = async (
       buildEndpoint(API_VERSION, "payment/resolve-account"),
       data
     );
-    toast.success("Account verified");
+    toast.success("Account verified", {
+      description: "Your payout account details have been confirmed.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage = getApiErrorMessage(error, "Failed to verify account");
-    toast.error(errorMessage);
+    toast.error("Account verification failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };
@@ -156,12 +164,14 @@ export const verifyTicket = async (data: {
       buildEndpoint(API_VERSION, "tickets/verify"),
       data
     );
-    toast.success(res.data.message || "Ticket verified successfully");
+    toast.success("Ticket verified", {
+      description: res.data.message || "This ticket is valid.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to verify ticket";
-    toast.error(errorMessage);
+    toast.error("Verification failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };
@@ -188,15 +198,15 @@ export const removeResaleTicket = async (
       buildEndpoint(API_VERSION, "tickets/resale/remove"),
       data
     );
-    toast.success(
-      res.data.message || "Ticket removed from resale successfully"
-    );
+    toast.success("Listing removed", {
+      description: res.data.message || "Your ticket is no longer listed for resale.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage = "ticketCode" in data
       ? getGuestProofErrorMessage(error)
       : getApiErrorMessage(error, "Failed to remove resale ticket");
-    toast.error(errorMessage);
+    toast.error("Removal failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };

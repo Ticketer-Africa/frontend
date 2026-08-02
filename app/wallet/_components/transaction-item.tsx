@@ -20,20 +20,24 @@ export const TransactionItem = memo(function TransactionItem({
 }: TransactionItemProps) {
   return (
     <div
-      className="transaction-item-animate flex items-center justify-between p-4 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer"
+      className="transaction-item-animate flex items-center justify-between p-4 border rounded-xl transition-colors cursor-pointer"
+      style={{
+        backgroundColor: "var(--home-card-elevated)",
+        borderColor: "var(--home-border)",
+      }}
       onClick={onClick}
     >
       <div className="flex items-center space-x-4">
         {getTransactionIcon(transaction.type)}
         <div>
-          <p className="font-medium text-gray-900 capitalize">
+          <p className="font-medium capitalize" style={{ color: "var(--home-text)" }}>
             {transaction.type.toLowerCase()}
           </p>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm" style={{ color: "var(--home-muted)" }}>
             {transaction.event?.name || "Payout Request"}
           </p>
           {transaction.buyer && (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm" style={{ color: "var(--home-muted-dim)" }}>
               Buyer: {transaction.buyer.name}
             </p>
           )}
@@ -49,13 +53,17 @@ export const TransactionItem = memo(function TransactionItem({
       </div>
       <div className="text-right">
         <p
-          className={`font-semibold ${
-            transaction.type === "RESALE" ? "text-green-600" : "text-black"
-          }`}
+          className="font-semibold"
+          style={{
+            color:
+              transaction.type === "RESALE"
+                ? "var(--home-success-text)"
+                : "var(--home-text)",
+          }}
         >
           {formatAmount(transaction.amount, transaction.type)}
         </p>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm" style={{ color: "var(--home-muted-dim)" }}>
           {new Date(transaction.createdAt).toLocaleDateString()}
         </p>
       </div>

@@ -1,22 +1,15 @@
 "use client";
 
 import { memo } from "react";
-import { MapPin } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAllEvents } from "@/services/events/events.queries";
 import { Event } from "@/types/events.type";
 import { truncateText } from "@/utils/trauncate";
-import { Button } from "@/components/ui/button";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Calendar01Icon } from "@hugeicons/core-free-icons";
 
-/**
- * EventCard - Memoized to prevent unnecessary re-renders
- *
- * Performance optimizations:
- * - Explicit image dimensions prevent CLS (224px = h-56)
- * - priority={true} for first card (likely LCP element)
- * - Decorative entrance animation removed for faster first paint
- */
 interface EventCardProps {
   event: Event;
   index: number;
@@ -28,13 +21,19 @@ const EventCard = memo(function EventCard({
   index,
   onClick,
 }: EventCardProps) {
+  const formattedDate = new Date(event.date).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
   return (
     <article
       onClick={onClick}
       className="cursor-pointer group section-animate"
+      style={{ animationDelay: `${index * 100}ms` }}
     >
-      <div className="relative h-80 rounded-2xl overflow-hidden shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150 motion-hover-lift">
-        {/* Full-card background image */}
+      <div className="relative h-[514px] rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-2">
         <Image
           src={event.bannerUrl || "/placeholder.svg"}
           alt={event.name}
@@ -42,27 +41,31 @@ const EventCard = memo(function EventCard({
           priority={index === 0}
           loading={index === 0 ? undefined : "lazy"}
           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-cover group-hover:scale-[1.02] transition-transform duration-150"
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
 
-        {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to top, var(--home-bg) 0%, rgba(11,14,20,0) 50%)",
+          }}
+        />
 
-        {/* Text content positioned at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
-          <h3 className="text-lg font-semibold group-hover:text-blue-300 transition-colors line-clamp-2 mb-2">
-            {event.name}
+        <div className="absolute bottom-6 left-6 right-6">
+          <h3
+            className="font-['Syne'] font-bold text-2xl sm:text-[32px] mb-2 line-clamp-2"
+            style={{ color: "var(--home-text)" }}
+          >
+            {truncateText(event.name, 8)}
           </h3>
 
-          <p className="text-gray-200 text-sm line-clamp-2 mb-3">
-            {truncateText(event.description, 10)}
-          </p>
-
-          <div className="flex items-center text-gray-200 text-sm">
-            <MapPin className="w-4 h-4 mr-2 flex-shrink-0" aria-hidden="true" />
-            <span className="line-clamp-1">
-              {truncateText(event.location, 5)}
-            </span>
+          <div
+            className="flex items-center gap-3 text-base font-['Hanken_Grotesk'] font-semibold"
+            style={{ color: "var(--home-text)" }}
+          >
+            <HugeiconsIcon icon={Calendar01Icon} className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
+            <span className="line-clamp-1">{formattedDate}</span>
           </div>
         </div>
       </div>
@@ -70,20 +73,10 @@ const EventCard = memo(function EventCard({
   );
 });
 
-/**
- * EventsSection - Homepage upcoming events
- *
- * Performance optimizations:
- * 1. Removed framer-motion and decorative entrance animations
- * 2. Memoized EventCard component
- * 3. Explicit image dimensions for CLS prevention
- * 4. Lazy loading for non-critical images
- */
 export function EventsSection() {
   const router = useRouter();
   const { data: response } = useAllEvents();
 
-  // Handle both array and paginated response formats
   const events: Event[] = Array.isArray(response)
     ? response
     : response?.data ?? [];
@@ -93,20 +86,35 @@ export function EventsSection() {
   };
 
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+    <section
+      className="home-theme py-16 px-4 sm:px-6 lg:px-8"
+      style={{ backgroundColor: "var(--home-bg)" }}
+    >
       <div className="max-w-7xl mx-auto">
-        {/* Section header */}
-        <div className="section-animate text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-3">
-            Upcoming Events
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover amazing events happening near you.
-          </p>
+        <div className="section-animate flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <h2
+              className="font-['Syne'] font-bold text-3xl sm:text-[32px] tracking-[-1.2px]"
+              style={{ color: "var(--home-text)" }}
+            >
+              Trending Events
+            </h2>
+            <span
+              className="hidden sm:block w-12 h-[2px]"
+              style={{ backgroundColor: "var(--home-text-highlight)" }}
+              aria-hidden="true"
+            />
+          </div>
+          <Link
+            href="/explore"
+            className="font-['Hanken_Grotesk'] text-base font-semibold border-b pb-1.5"
+            style={{ color: "var(--home-text-highlight)", borderColor: "var(--home-text-highlight)" }}
+          >
+            View All
+          </Link>
         </div>
 
-        {/* Events grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.slice(0, 3).map((event, index) => (
             <EventCard
               key={event.id}
@@ -115,17 +123,6 @@ export function EventsSection() {
               onClick={() => handleEventClick(event.slug)}
             />
           ))}
-        </div>
-
-        {/* CTA Button */}
-        <div className="text-center section-animate section-delay-4">
-          <Button
-            size="lg"
-            onClick={() => router.push("/explore")}
-            className="bg-[#1E88E5] hover:bg-blue-500 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
-          >
-            Explore More Events
-          </Button>
         </div>
       </div>
     </section>

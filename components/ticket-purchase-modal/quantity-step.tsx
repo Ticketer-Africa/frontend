@@ -3,7 +3,6 @@
 import { memo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Plus, Minus, Info } from "lucide-react";
 import { formatDate, formatPrice, formatTime } from "@/lib/helpers";
 import {
   Tooltip,
@@ -11,6 +10,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Add01Icon, InformationCircleIcon, MinusSignIcon } from "@hugeicons/core-free-icons";
 import { TicketCategory } from "@/app/events/[id]/_components/ticket-cards";
 import { TicketResale } from "@/types/tickets.type";
 import { Event } from "./types";
@@ -59,7 +60,7 @@ const CategoryQuantityRow = memo(function CategoryQuantityRow({
           disabled={quantity <= 0}
           className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
         >
-          <Minus className="w-4 h-4" />
+          <HugeiconsIcon icon={MinusSignIcon} className="w-4 h-4" />
         </Button>
         <div className="text-2xl font-bold text-gray-900 w-12 text-center">
           {quantity}
@@ -74,7 +75,7 @@ const CategoryQuantityRow = memo(function CategoryQuantityRow({
           }
           className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
         >
-          <Plus className="w-4 h-4" />
+          <HugeiconsIcon icon={Add01Icon} className="w-4 h-4" />
         </Button>
       </div>
       <p className="text-xs text-gray-500 text-center mt-2">
@@ -120,7 +121,7 @@ export function QuantityStep({
               disabled={(quantities[resaleTicket.id] || 1) <= 1}
               className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
             >
-              <Minus className="w-4 h-4" />
+              <HugeiconsIcon icon={MinusSignIcon} className="w-4 h-4" />
             </Button>
             <div className="text-2xl font-bold text-gray-900 w-12 text-center">
               {quantities[resaleTicket.id] || 1}
@@ -132,7 +133,7 @@ export function QuantityStep({
               disabled={(quantities[resaleTicket.id] || 1) >= 10}
               className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
             >
-              <Plus className="w-4 h-4" />
+              <HugeiconsIcon icon={Add01Icon} className="w-4 h-4" />
             </Button>
           </div>
         </div>
@@ -171,7 +172,7 @@ export function QuantityStep({
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>
-                      <Info className="w-3 h-3 text-gray-400" />
+                      <HugeiconsIcon icon={InformationCircleIcon} className="w-3 h-3 text-gray-400" />
                     </TooltipTrigger>
                     <TooltipContent>
                       <p>Platform service fee</p>

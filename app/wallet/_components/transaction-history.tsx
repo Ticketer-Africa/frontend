@@ -1,13 +1,14 @@
 "use client";
 
 import { memo, useMemo, useState, useCallback } from "react";
-import { Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import type { Transaction } from "./types";
 import { TransactionItem } from "./transaction-item";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Wallet01Icon } from "@hugeicons/core-free-icons";
 
 interface TransactionHistoryProps {
   transactions: Transaction[];
@@ -56,9 +57,16 @@ export const TransactionHistory = memo(function TransactionHistory({
 
   return (
     <div className="wallet-card-animate wallet-card-delay-2 mt-8">
-      <Card className="bg-white rounded-xl shadow-lg border border-gray-100">
+      <Card
+        className="rounded-xl shadow-lg border"
+        style={{
+          backgroundColor: "var(--home-card)",
+          borderColor: "var(--home-border)",
+          color: "var(--home-text)",
+        }}
+      >
         <CardHeader>
-          <CardTitle className="text-2xl text-gray-900">
+          <CardTitle className="text-2xl" style={{ color: "var(--home-text)" }}>
             Transaction History
           </CardTitle>
           <div className="mt-4">
@@ -68,6 +76,11 @@ export const TransactionHistory = memo(function TransactionHistory({
               value={searchTerm}
               onChange={handleSearch}
               className="w-full max-w-md"
+              style={{
+                backgroundColor: "var(--home-bg)",
+                borderColor: "var(--home-border-strong)",
+                color: "var(--home-text)",
+              }}
             />
           </div>
         </CardHeader>
@@ -111,7 +124,7 @@ const PaginationControls = memo(function PaginationControls({
   return (
     <div className="flex items-center justify-between mt-6">
       <Button
-        variant="outline"
+        variant="homeOutline"
         disabled={currentPage === 1}
         onClick={() => onPageChange(currentPage - 1)}
       >
@@ -121,16 +134,15 @@ const PaginationControls = memo(function PaginationControls({
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
           <Button
             key={page}
-            variant={currentPage === page ? "default" : "outline"}
+            variant={currentPage === page ? "homeAccent" : "homeOutline"}
             onClick={() => onPageChange(page)}
-            className={currentPage === page ? "bg-[#1E88E5] text-white" : ""}
           >
             {page}
           </Button>
         ))}
       </div>
       <Button
-        variant="outline"
+        variant="homeOutline"
         disabled={currentPage === totalPages || totalPages === 0}
         onClick={() => onPageChange(currentPage + 1)}
       >
@@ -149,17 +161,18 @@ const EmptyTransactions = memo(function EmptyTransactions({
 }: EmptyTransactionsProps) {
   return (
     <div className="text-center py-12">
-      <Wallet className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-      <h3 className="text-xl font-semibold text-gray-900 mb-2">
+      <HugeiconsIcon icon={Wallet01Icon} className="h-12 w-12 mx-auto mb-4" style={{ color: "var(--home-muted-dim)" }} />
+      <h3 className="text-xl font-semibold mb-2" style={{ color: "var(--home-text)" }}>
         No transactions found
       </h3>
-      <p className="text-gray-600 mb-6">
+      <p className="mb-6" style={{ color: "var(--home-muted)" }}>
         {hasSearch
           ? "No transactions match your search."
           : "Your transaction history will appear here once your events generate sales."}
       </p>
       <Button
-        className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150"
+        variant="homeAccent"
+        className="px-6"
         asChild
       >
         <Link href="/explore">Explore Events</Link>

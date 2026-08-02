@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
-import { Search, SlidersHorizontal } from "lucide-react";
 import { formatPrice } from "@/lib/helpers";
 import { CATEGORIES, PRICE_SLIDER_STEP } from "./constants";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { FilterHorizontalIcon, Search01Icon } from "@hugeicons/core-free-icons";
 
 interface FilterSectionProps {
   // Search
@@ -96,26 +97,38 @@ function FilterSectionComponent({
 
   return (
     <div className="mb-8">
-      <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+      <div
+        className="rounded-2xl p-6 border"
+        style={{
+          backgroundColor: "var(--home-card)",
+          borderColor: "var(--home-border)",
+        }}
+      >
         {/* Search input */}
         <form onSubmit={handleSearchSubmit} className="mb-4 flex gap-2">
           <div className="relative flex-1">
-            <Search
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#1E88E5]"
+            <HugeiconsIcon icon={Search01Icon}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5"
+              style={{ color: "var(--home-text-highlight)" }}
               aria-hidden="true"
             />
             <Input
               type="text"
-              placeholder="Search events, locations..."
+              placeholder="Search events, locations, artists..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-12 h-12 outline-none focus:outline-none border-[#1E88E5] rounded-full focus:ring-2 focus-visible:ring-[#1E88E5] focus:ring-[#1E88E5] focus:border-[#1E88E5]"
+              className="pl-12 h-12 rounded-full"
+              style={{
+                backgroundColor: "var(--home-bg)",
+                borderColor: "var(--home-border-strong)",
+                color: "var(--home-text)",
+              }}
               aria-label="Search events"
             />
           </div>
           <Button
             type="submit"
-            variant="primary"
+            variant="homeAccent"
             className="h-12 px-5"
             disabled={!canSubmitSearch}
           >
@@ -123,7 +136,7 @@ function FilterSectionComponent({
           </Button>
         </form>
         {!canSubmitSearch && (
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="mt-1 text-xs" style={{ color: "var(--home-muted)" }}>
             Enter at least 3 letters to search.
           </p>
         )}
@@ -131,21 +144,28 @@ function FilterSectionComponent({
         {/* Filter toggle and results count */}
         <div className="flex items-center justify-between">
           <Button
-            variant="outline"
+            variant="homeOutline"
             onClick={onToggleFilters}
-            className="flex items-center space-x-2 border-gray-200 hover:bg-gray-50 rounded-xl bg-transparent"
+            className="flex items-center space-x-2"
             aria-expanded={showFilters}
             aria-controls="filter-panel"
           >
-            <SlidersHorizontal className="w-4 h-4" aria-hidden="true" />
+            <HugeiconsIcon icon={FilterHorizontalIcon} className="w-4 h-4" aria-hidden="true" />
             <span>Filters</span>
             {activeFilterCount > 0 && (
-              <Badge variant="secondary" className="ml-2">
+              <Badge
+                variant="secondary"
+                className="ml-2"
+                style={{
+                  backgroundColor: "var(--home-accent)",
+                  color: "var(--home-accent-fg)",
+                }}
+              >
                 {activeFilterCount}
               </Badge>
             )}
           </Button>
-          <p className="text-sm text-gray-600" aria-live="polite">
+          <p className="text-sm" style={{ color: "var(--home-muted)" }} aria-live="polite">
             {resultsCount} events found
           </p>
         </div>
@@ -157,10 +177,11 @@ function FilterSectionComponent({
             grid transition-opacity duration-150 [transition-timing-function:var(--motion-ease-out)]
             ${
               showFilters
-                ? "grid-rows-[1fr] opacity-100 mt-4 pt-4 border-t border-gray-200"
+                ? "grid-rows-[1fr] opacity-100 mt-4 pt-4 border-t"
                 : "grid-rows-[0fr] opacity-0 overflow-hidden"
             }
           `}
+          style={showFilters ? { borderColor: "var(--home-border)" } : undefined}
           aria-hidden={!showFilters}
         >
           <div className="min-h-0">
@@ -169,7 +190,8 @@ function FilterSectionComponent({
               <div>
                 <label
                   htmlFor="location-filter"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "var(--home-muted)" }}
                 >
                   Location
                 </label>
@@ -177,7 +199,13 @@ function FilterSectionComponent({
                   id="location-filter"
                   value={tempLocation}
                   onChange={(e) => onTempLocationChange(e.target.value)}
-                  className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full h-10 px-3 rounded-lg"
+                  style={{
+                    backgroundColor: "var(--home-bg)",
+                    borderColor: "var(--home-border)",
+                    color: "var(--home-text)",
+                    borderWidth: 1,
+                  }}
                 >
                   <option value="">All locations</option>
                   {locations.map((loc) => (
@@ -192,7 +220,8 @@ function FilterSectionComponent({
               <div>
                 <label
                   id="price-filter-label"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "var(--home-muted)" }}
                 >
                   Price Range
                 </label>
@@ -208,11 +237,11 @@ function FilterSectionComponent({
                     className="w-full"
                     aria-labelledby="price-filter-label"
                   />
-                  <div className="flex justify-between mt-2 text-sm text-gray-600">
+                  <div className="flex justify-between mt-2 text-sm" style={{ color: "var(--home-muted)" }}>
                     <span>{formatPrice(tempPriceRange[0])}</span>
                     <span>{formatPrice(tempPriceRange[1])}</span>
                   </div>
-                  <div className="mt-1 text-xs text-gray-500 text-center">
+                  <div className="mt-1 text-xs text-center" style={{ color: "var(--home-muted)" }}>
                     Range: {formatPrice(minPrice)} - {formatPrice(maxPrice)}
                   </div>
                 </div>
@@ -222,7 +251,8 @@ function FilterSectionComponent({
               <div>
                 <label
                   htmlFor="category-filter"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: "var(--home-muted)" }}
                 >
                   Category
                 </label>
@@ -230,7 +260,13 @@ function FilterSectionComponent({
                   id="category-filter"
                   value={tempCategory}
                   onChange={(e) => onTempCategoryChange(e.target.value)}
-                  className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full h-10 px-3 rounded-lg"
+                  style={{
+                    backgroundColor: "var(--home-bg)",
+                    borderColor: "var(--home-border)",
+                    color: "var(--home-text)",
+                    borderWidth: 1,
+                  }}
                 >
                   <option value="">All categories</option>
                   {CATEGORIES.map((cat) => (
@@ -245,9 +281,10 @@ function FilterSectionComponent({
               <div className="md:col-span-3 flex gap-3 pt-2">
                 <Button
                   onClick={onApplyFilters}
-                  className="flex-1 bg-[#1E88E5] hover:bg-[#1976D2] text-white rounded-xl h-10 font-medium transition-colors"
+                  variant="homeAccent"
+                  className="flex-1 h-10"
                 >
-                  <SlidersHorizontal
+                  <HugeiconsIcon icon={FilterHorizontalIcon}
                     className="w-4 h-4 mr-2"
                     aria-hidden="true"
                   />
@@ -255,8 +292,8 @@ function FilterSectionComponent({
                 </Button>
                 <Button
                   onClick={onClearFilters}
-                  variant="outline"
-                  className="px-6 border-gray-200 hover:bg-gray-50 rounded-xl h-10"
+                  variant="homeOutline"
+                  className="px-6 h-10"
                 >
                   Clear All
                 </Button>

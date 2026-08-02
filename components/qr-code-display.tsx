@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Download, Share2, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { generateTicketQR, generateVerificationCode, type QRTicketData } from "@/lib/qr-utils"
 import type { Ticket } from "@/types/tickets.type"
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Download02Icon, EyeIcon, EyeOffIcon, Share08Icon } from "@hugeicons/core-free-icons";
 
 interface QRCodeDisplayProps {
   ticket: Ticket
@@ -110,7 +111,7 @@ export function QRCodeDisplay({ ticket, userId, showControls = true }: QRCodeDis
         ) : (
           <div className="flex items-center justify-center w-48 h-48 bg-muted rounded-lg">
             <div className="text-center">
-              <EyeOff className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+              <HugeiconsIcon icon={EyeOffIcon} className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
               <p className="text-sm text-muted-foreground">QR Code Hidden</p>
             </div>
           </div>
@@ -126,7 +127,7 @@ export function QRCodeDisplay({ ticket, userId, showControls = true }: QRCodeDis
 
           <div className="flex space-x-2">
             <Button variant="outline" size="sm" onClick={() => setShowQR(!showQR)} className="flex-1 bg-transparent">
-              {showQR ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
+              {showQR ? <HugeiconsIcon icon={EyeOffIcon} className="h-4 w-4 mr-2" /> : <HugeiconsIcon icon={EyeIcon} className="h-4 w-4 mr-2" />}
               {showQR ? "Hide" : "Show"}
             </Button>
             <Button
@@ -136,11 +137,11 @@ export function QRCodeDisplay({ ticket, userId, showControls = true }: QRCodeDis
               disabled={!qrCodeUrl}
               className="bg-transparent"
             >
-              <Download className="h-4 w-4 mr-2" />
+              <HugeiconsIcon icon={Download02Icon} className="h-4 w-4 mr-2" />
               Download
             </Button>
             <Button variant="outline" size="sm" onClick={handleShare} disabled={!qrCodeUrl} className="bg-transparent">
-              <Share2 className="h-4 w-4 mr-2" />
+              <HugeiconsIcon icon={Share08Icon} className="h-4 w-4 mr-2" />
               Share
             </Button>
           </div>

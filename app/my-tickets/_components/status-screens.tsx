@@ -1,8 +1,9 @@
 "use client";
 
-import { Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Calendar01Icon } from "@hugeicons/core-free-icons";
 
 /**
  * Loading spinner for my-tickets page
@@ -30,13 +31,13 @@ export function EmptyTicketsState() {
   return (
     <div className="text-center py-12 section-animate">
       <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-        <Calendar className="h-12 w-12 text-gray-400" />
+        <HugeiconsIcon icon={Calendar01Icon} className="h-12 w-12 text-gray-400" />
       </div>
       <h3 className="text-xl font-semibold text-gray-900 mb-2">
         No tickets yet
       </h3>
       <p className="text-gray-600 mb-6">
-        You haven't purchased any tickets yet. Start exploring events!
+        You haven&apos;t purchased any tickets yet. Start exploring events!
       </p>
       <Button
         asChild

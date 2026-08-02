@@ -12,7 +12,8 @@ import { EVENT_IMAGE_HEIGHT } from "./constants";
 export function EventCardSkeleton() {
   return (
     <div
-      className="bg-white rounded-2xl overflow-hidden shadow-lg flex flex-col"
+      className="rounded-2xl overflow-hidden flex flex-col border"
+      style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)" }}
       /**
        * aria-hidden because this is purely decorative loading state
        * Screen readers will hear "Loading events..." from parent
@@ -22,35 +23,45 @@ export function EventCardSkeleton() {
       {/* Image placeholder - exact same dimensions as real image */}
       <Skeleton
         className="w-full flex-shrink-0"
-        style={{ height: `${EVENT_IMAGE_HEIGHT}px` }}
+        style={{ height: `${EVENT_IMAGE_HEIGHT}px`, backgroundColor: "var(--home-card-elevated)" }}
       />
 
       {/* Price badge placeholder */}
       <div className="flex justify-end px-4 -mt-4 mb-2 flex-shrink-0 relative z-10">
-        <Skeleton className="h-7 w-24 rounded-full" />
+        <Skeleton
+          className="h-7 w-24 rounded-full"
+          style={{ backgroundColor: "var(--home-card-elevated)" }}
+        />
       </div>
 
-      {/* Content section */}
-      <div className="p-6 flex flex-col space-y-2">
-        {/* Title placeholder - matches min-h-[3.5rem] */}
-        <Skeleton className="h-7 w-full" />
-        <Skeleton className="h-7 w-3/4" />
+      {/* Content section - padding/layout must match explore-event-card.tsx's
+          content wrapper exactly (p-4 px-6, no gap classes) since that card
+          has no space-y between sections; only its own min-heights create
+          spacing. Any mismatch here reflows sibling cards on hydration. */}
+      <div className="p-4 px-6 flex flex-col flex-grow">
+        {/* Title placeholder - matches min-h-[2.5rem] */}
+        <div className="min-h-[2.5rem] space-y-1">
+          <Skeleton className="h-4 w-full" style={{ backgroundColor: "var(--home-card-elevated)" }} />
+          <Skeleton className="h-4 w-3/4" style={{ backgroundColor: "var(--home-card-elevated)" }} />
+        </div>
 
         {/* Date & Location placeholder - matches min-h-[60px] */}
         <div className="space-y-2 min-h-[60px]">
-          <Skeleton className="h-5 w-3/4" />
-          <Skeleton className="h-5 w-2/3" />
+          <Skeleton className="h-5 w-3/4" style={{ backgroundColor: "var(--home-card-elevated)" }} />
+          <Skeleton className="h-5 w-2/3" style={{ backgroundColor: "var(--home-card-elevated)" }} />
         </div>
 
-        {/* Tickets section placeholder - matches min-h-[100px] */}
-        <div className="min-h-[100px] space-y-2">
-          <Skeleton className="h-5 w-1/3" />
-          <Skeleton className="h-5 w-full" />
-          <Skeleton className="h-5 w-1/4" />
+        {/* Tickets section placeholder - matches min-h-[56px] on the real card */}
+        <div className="min-h-[56px] pb-2 space-y-2">
+          <Skeleton className="h-5 w-1/3" style={{ backgroundColor: "var(--home-card-elevated)" }} />
+          <Skeleton className="h-5 w-full" style={{ backgroundColor: "var(--home-card-elevated)" }} />
         </div>
 
-        {/* Button placeholder */}
-        <Skeleton className="h-11 w-full rounded-full mt-auto" />
+        {/* Button placeholder - matches Button size="lg" (h-12) */}
+        <Skeleton
+          className="h-12 w-full rounded-full mt-auto"
+          style={{ backgroundColor: "var(--home-card-elevated)" }}
+        />
       </div>
     </div>
   );
@@ -80,18 +91,39 @@ export function EventsGridSkeleton() {
 
 /**
  * FiltersSkeleton - Loading state for filters section
- * Matches exact dimensions of real filter UI
+ *
+ * Structure must mirror FilterSection's real markup exactly (the outer
+ * mb-8 wrapper around an inner p-6/border card, a search row sized for
+ * both the Input and its Button, and an h-11 Filters button — Button's
+ * default size — not an arbitrary h-10) or the page reflows on hydration.
  */
 export function FiltersSkeleton() {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 border border-gray-100">
-      {/* Search input skeleton */}
-      <Skeleton className="h-12 w-full rounded-xl mb-4" />
+    <div className="mb-8">
+      <div
+        className="rounded-2xl p-6 border"
+        style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)" }}
+      >
+        {/* Search row skeleton - Input (flex-1) + Button, both h-12 */}
+        <div className="mb-4 flex gap-2">
+          <Skeleton
+            className="flex-1 h-12 rounded-full"
+            style={{ backgroundColor: "var(--home-card-elevated)" }}
+          />
+          <Skeleton
+            className="h-12 w-24 rounded-full shrink-0"
+            style={{ backgroundColor: "var(--home-card-elevated)" }}
+          />
+        </div>
 
-      {/* Filters button row */}
-      <div className="flex items-center justify-between">
-        <Skeleton className="h-10 w-24 rounded-xl" />
-        <Skeleton className="h-5 w-32" />
+        {/* Filters button row - h-11 matches Button's default size */}
+        <div className="flex items-center justify-between">
+          <Skeleton
+            className="h-11 w-24 rounded-full"
+            style={{ backgroundColor: "var(--home-card-elevated)" }}
+          />
+          <Skeleton className="h-5 w-32" style={{ backgroundColor: "var(--home-card-elevated)" }} />
+        </div>
       </div>
     </div>
   );

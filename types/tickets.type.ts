@@ -1,4 +1,3 @@
-import { Ticket as TicketIcon } from "lucide-react";
 import { Event } from "./events.type";
 import { User } from "./user.type";
 
@@ -109,7 +108,7 @@ export interface GuestResaleStatus {
   event?: {
     name?: string;
     date?: string;
-    location?: string;
+    venueName?: string;
   };
 }
 

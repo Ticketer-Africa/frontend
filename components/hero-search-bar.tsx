@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Search01Icon } from "@hugeicons/core-free-icons";
 
 /**
  * HeroSearchBar - Simple search bar for homepage
@@ -23,7 +24,7 @@ export function HeroSearchBar() {
   return (
     <div className="w-full max-w-2xl md:max-w-full mx-auto mb-8">
       <div className="relative">
-        <Search
+        <HugeiconsIcon icon={Search01Icon}
           className="absolute left-4 md:left-10 top-1/2 transform -translate-y-1/2 h-5 w-5 md:w-7 md:h-7 text-[#1E88E5]"
           aria-hidden="true"
         />

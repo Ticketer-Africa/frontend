@@ -1,6 +1,5 @@
 "use client";
 
-import { Calendar, MapPin, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +7,8 @@ import Link from "next/link";
 import { Ticket } from "@/types/tickets.type";
 import { formatDate } from "@/lib/helpers";
 import { TicketItem } from "./ticket-item";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowDown01Icon, ArrowUp01Icon, Calendar01Icon, Location01Icon } from "@hugeicons/core-free-icons";
 
 interface EventCardProps {
   eventId: string;
@@ -57,12 +58,12 @@ export function EventCard({
               </Link>
               <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-3 gap-2 text-sm text-gray-600">
                 <div className="flex items-center space-x-2">
-                  <Calendar className="h-4 w-4 text-gray-500" />
+                  <HugeiconsIcon icon={Calendar01Icon} className="h-4 w-4 text-gray-500" />
                   <span>{formatDate(event.date)}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <MapPin className="h-4 w-4 text-gray-500" />
-                  <span className="line-clamp-1">{event.location}</span>
+                  <HugeiconsIcon icon={Location01Icon} className="h-4 w-4 text-gray-500" />
+                  <span className="line-clamp-1">{event.venueName}</span>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2 mt-3">
@@ -91,11 +92,11 @@ export function EventCard({
           >
             {isExpanded ? (
               <>
-                <ChevronUp className="h-4 w-4 mr-2" /> Hide Tickets
+                <HugeiconsIcon icon={ArrowUp01Icon} className="h-4 w-4 mr-2" /> Hide Tickets
               </>
             ) : (
               <>
-                <ChevronDown className="h-4 w-4 mr-2" /> View Tickets (
+                <HugeiconsIcon icon={ArrowDown01Icon} className="h-4 w-4 mr-2" /> View Tickets (
                 {ticketCount})
               </>
             )}

@@ -28,14 +28,14 @@ export const withdrawFromWallet = async (
       buildEndpoint(API_VERSION, "wallet/withdraw"),
       data
     );
-    toast.success(
-      res.data.message || "Withdrawal request submitted successfully"
-    );
+    toast.success("Withdrawal requested", {
+      description: res.data.message || "Your withdrawal request has been submitted.",
+    });
     return res.data;
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to process withdrawal";
-    toast.error(errorMessage);
+    toast.error("Withdrawal failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };
@@ -66,7 +66,7 @@ export const setWalletPin = async (
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to update wallet PIN";
-    toast.error(errorMessage);
+    toast.error("PIN update failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };
@@ -81,7 +81,7 @@ export const checkWalletPinStatus = async (): Promise<PinStatusResponse> => {
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to check wallet PIN status";
-    toast.error(errorMessage);
+    toast.error("Couldn't check PIN status", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };

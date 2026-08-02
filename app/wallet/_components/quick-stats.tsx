@@ -29,22 +29,28 @@ export const QuickStats = memo(function QuickStats({
 
   return (
     <div className="wallet-card-animate wallet-card-delay-1 lg:col-span-2">
-      <div className="bg-white rounded-xl shadow-lg border border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-4 h-full p-6">
+      <div
+        className="rounded-xl shadow-lg border grid grid-cols-1 md:grid-cols-3 gap-4 h-full p-6"
+        style={{
+          backgroundColor: "var(--home-card)",
+          borderColor: "var(--home-border)",
+        }}
+      >
         <div className="space-y-2">
-          <p className="text-sm text-gray-600">Total Earned From Resale</p>
-          <p className="text-2xl font-bold text-green-600">
+          <p className="text-sm" style={{ color: "var(--home-muted)" }}>Total Earned From Resale</p>
+          <p className="text-2xl font-bold" style={{ color: "var(--home-success-text)" }}>
             {formatPrice(stats.totalEarned)}
           </p>
         </div>
         <div className="space-y-2">
-          <p className="text-sm text-gray-600">Total Withdrawn</p>
-          <p className="text-2xl font-bold text-[#1E88E5]">
+          <p className="text-sm" style={{ color: "var(--home-muted)" }}>Total Withdrawn</p>
+          <p className="text-2xl font-bold" style={{ color: "var(--home-text-highlight)" }}>
             {formatPrice(stats.totalWithdrawn)}
           </p>
         </div>
         <div className="space-y-2">
-          <p className="text-sm text-gray-600">Transactions</p>
-          <p className="text-2xl font-bold text-[#1E88E5]">
+          <p className="text-sm" style={{ color: "var(--home-muted)" }}>Transactions</p>
+          <p className="text-2xl font-bold" style={{ color: "var(--home-text-highlight)" }}>
             {stats.transactionCount || "0"}
           </p>
         </div>

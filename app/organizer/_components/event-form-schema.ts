@@ -10,9 +10,18 @@ export const UPPERCASE_CATEGORIES = EVENT_CATEGORIES.map((cat) =>
   cat.toUpperCase(),
 ) as unknown as [string, ...string[]];
 
+export const EVENT_LAYOUTS = [
+  "HERO_OVERLAY",
+  "SPLIT_SCREEN",
+  "EDITORIAL",
+  "TICKET_FIRST",
+  "TIMELINE",
+] as const;
+
 const ticketCategorySchema = z.object({
   id: z.string(),
   name: z.string().min(3, "Category name is required"),
+  description: z.string().max(200).optional(),
   price: z.coerce.number().min(0, "Price must be non-negative"),
   maxTickets: z.coerce.number().min(1, "At least 1 ticket is required"),
   maxAdmissions: z.coerce.number().min(1).default(1),
@@ -20,6 +29,7 @@ const ticketCategorySchema = z.object({
 
 const ticketCategorySubmissionSchema = z.object({
   name: z.string().min(3),
+  description: z.string().max(200).optional(),
   price: z.coerce.number().min(0),
   maxTickets: z.coerce.number().min(1),
   maxAdmissions: z.coerce.number().min(1).default(1),
@@ -38,6 +48,29 @@ export const customFieldSchema = z.object({
   fieldType: z.enum(["TEXT", "TEXTAREA", "SELECT", "NUMBER", "EMAIL"]),
   required: z.boolean().default(false),
   options: z.array(z.string()).optional(),
+});
+
+export const lineupArtistSchema = z.object({
+  id: z.string(),
+  name: z.string().min(1, "Artist name is required"),
+});
+
+export const faqItemSchema = z.object({
+  id: z.string(),
+  question: z.string().min(1, "Question is required"),
+  answer: z.string().min(1, "Answer is required"),
+});
+
+export const goodToKnowPointSchema = z.object({
+  id: z.string(),
+  text: z.string().min(1, "This can't be empty"),
+});
+
+export const showTimelineSlotSchema = z.object({
+  id: z.string(),
+  time: z.string().min(1, "Time is required"),
+  stage: z.string().min(1, "Stage is required"),
+  performer: z.string().min(1, "Performer is required"),
 });
 
 const bannerSchema = z
@@ -67,18 +100,49 @@ const advancedFields = {
   customFields: z.array(customFieldSchema).optional(),
 };
 
+const layoutContentFields = {
+  layout: z.enum(EVENT_LAYOUTS),
+  editorialPullQuote: z.string().max(200).optional(),
+  lineup: z.array(lineupArtistSchema).optional(),
+  faq: z.array(faqItemSchema).optional(),
+  goodToKnow: z.array(goodToKnowPointSchema).optional(),
+  timelineSlots: z.array(showTimelineSlotSchema).optional(),
+};
+
+function applyLayoutContentValidation(
+  data: { layout: string; lineup?: unknown[]; faq?: unknown[]; timelineSlots?: unknown[] },
+  ctx: z.RefinementCtx,
+) {
+  const needsLineup = ["HERO_OVERLAY", "SPLIT_SCREEN", "TIMELINE"].includes(data.layout);
+  if (needsLineup && (!data.lineup || data.lineup.length === 0)) {
+    ctx.addIssue({ code: "custom", path: ["lineup"], message: "Add at least one artist" });
+  }
+
+  const needsFaq = ["HERO_OVERLAY", "SPLIT_SCREEN", "EDITORIAL", "TICKET_FIRST"].includes(data.layout);
+  if (needsFaq && (!data.faq || data.faq.length === 0)) {
+    ctx.addIssue({ code: "custom", path: ["faq"], message: "Add at least one FAQ entry" });
+  }
+
+  if (data.layout === "TIMELINE" && (!data.timelineSlots || data.timelineSlots.length === 0)) {
+    ctx.addIssue({ code: "custom", path: ["timelineSlots"], message: "Add at least one timeline slot" });
+  }
+}
+
 export const eventFormSchema = z
   .object({
-    name: z.string().min(3, "Event name is required"),
+    name: z.string().min(3, "Event name is required").max(100, "Event name must be 100 characters or fewer"),
     description: z.string().min(10, "Description is required"),
     category: z.string().min(1, "Category is required"),
-    location: z.string().min(3, "Location is required"),
+    venueName: z.string().min(3, "Venue name is required"),
+    venueAddress: z.string().min(3, "Venue address is required"),
+    doorsOpenAt: z.string().optional(),
     date: z.string().min(1, "Date is required"),
     time: z.string().min(1, "Time is required"),
     feeMode: z.enum(["ORGANIZER", "ATTENDEE"]).default("ORGANIZER"),
     accessType: z.enum(["PUBLIC", "PRIVATE"]).default("PUBLIC"),
     ticketCategories: z.array(ticketCategorySchema).min(1, "At least one ticket category is required"),
     banner: bannerSchema,
+    ...layoutContentFields,
     ...advancedFields,
   })
   .superRefine((data, ctx) => {
@@ -95,20 +159,24 @@ export const eventFormSchema = z
         }
       });
     }
+    applyLayoutContentValidation(data, ctx);
   });
 
 export const updateEventFormSchema = z
   .object({
-    name: z.string().min(3, "Event name is required"),
+    name: z.string().min(3, "Event name is required").max(100, "Event name must be 100 characters or fewer"),
     description: z.string().min(10, "Description is required"),
     category: z.enum(UPPERCASE_CATEGORIES, { errorMap: () => ({ message: "Please select a valid category" }) }),
-    location: z.string().min(3, "Location is required"),
+    venueName: z.string().min(3, "Venue name is required"),
+    venueAddress: z.string().min(3, "Venue address is required"),
+    doorsOpenAt: z.string().optional(),
     date: z.string().min(1, "Date is required").refine((val) => new Date(val) >= new Date(), "Date cannot be in the past"),
     time: z.string().min(1, "Time is required"),
     feeMode: z.enum(["ORGANIZER", "ATTENDEE"]).default("ORGANIZER"),
     accessType: z.enum(["PUBLIC", "PRIVATE"]).default("PUBLIC"),
     ticketCategories: z.array(ticketCategorySchema).min(1, "At least one ticket category is required"),
     banner: bannerSchemaOptional,
+    ...layoutContentFields,
     ...advancedFields,
   })
   .superRefine((data, ctx) => {
@@ -125,19 +193,23 @@ export const updateEventFormSchema = z
         }
       });
     }
+    applyLayoutContentValidation(data, ctx);
   });
 
 export const eventSubmissionSchema = z.object({
-  name: z.string().min(3),
+  name: z.string().min(3).max(100),
   description: z.string().min(10),
   category: z.string().min(1),
-  location: z.string().min(3),
+  venueName: z.string().min(3),
+  venueAddress: z.string().min(3),
+  doorsOpenAt: z.string().optional(),
   date: z.string().min(1),
   time: z.string().min(1),
   feeMode: z.enum(["ORGANIZER", "ATTENDEE"]).default("ORGANIZER"),
   accessType: z.enum(["PUBLIC", "PRIVATE"]).default("PUBLIC"),
   ticketCategories: z.array(ticketCategorySubmissionSchema).min(1),
   banner: bannerSchemaOptional,
+  ...layoutContentFields,
   ...advancedFields,
 });
 
@@ -150,6 +222,7 @@ export type CustomFieldFormData = z.infer<typeof customFieldSchema>;
 export interface TicketCategory {
   id: string;
   name: string;
+  description?: string;
   price: number;
   maxTickets: number;
   maxAdmissions?: number;
@@ -159,17 +232,25 @@ export const DEFAULT_FORM_VALUES: Partial<EventFormData> = {
   name: "",
   description: "",
   category: "",
-  location: "",
+  venueName: "",
+  venueAddress: "",
+  doorsOpenAt: "",
   date: "",
   time: "20:00",
   feeMode: "ORGANIZER",
   accessType: "PUBLIC",
+  layout: undefined,
+  editorialPullQuote: "",
+  lineup: [],
+  faq: [],
+  goodToKnow: [],
+  timelineSlots: [],
   isVirtual: false,
   virtualLink: "",
   virtualLinkReleaseAt: "",
   isRecurring: false,
   occurrences: [],
   customFields: [],
-  ticketCategories: [{ id: "1", name: "Regular", price: 0, maxTickets: 1, maxAdmissions: 1 }],
+  ticketCategories: [{ id: "1", name: "Regular", description: "", price: 0, maxTickets: 1, maxAdmissions: 1 }],
   banner: undefined,
 };

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { X } from "lucide-react";
 import { useUser } from "@/lib/auth-context";
 import { useBuyTicket } from "@/services/tickets/tickets.queries";
 import { toast } from "sonner";
@@ -12,6 +11,8 @@ import { QuantityStep } from "./quantity-step";
 import { AuthStep } from "./auth-step";
 import { PaymentStep } from "./payment-step";
 import { SuccessStep } from "./success-step";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 
 export function TicketPurchaseModal({
   event,
@@ -49,11 +50,15 @@ export function TicketPurchaseModal({
 
         // Can't exceed 10 per category or 10 total
         if (newQty > 10) {
-          toast.error("Maximum 10 tickets per category");
+          toast.error("Ticket limit reached", {
+            description: "You can select up to 10 tickets per category.",
+          });
           return prev;
         }
         if (currentTotal - currentQty + newQty > 10) {
-          toast.error("Maximum 10 tickets per purchase");
+          toast.error("Ticket limit reached", {
+            description: "You can select up to 10 tickets per purchase.",
+          });
           return prev;
         }
 
@@ -73,7 +78,9 @@ export function TicketPurchaseModal({
 
   const handlePurchase = async () => {
     if (!ticketCategories && !resaleTicket) {
-      toast.error("Please select a ticket category or resale ticket.");
+      toast.error("No ticket selected", {
+        description: "Please select a ticket category or resale ticket.",
+      });
       return;
     }
 
@@ -102,7 +109,9 @@ export function TicketPurchaseModal({
       }
     } catch (err: any) {
       console.error("Purchase failed:", err);
-      toast.error(err.message || "Purchase failed. Try again.");
+      toast.error("Purchase failed", {
+        description: err.message || "Please try again.",
+      });
     }
   };
 
@@ -136,7 +145,7 @@ export function TicketPurchaseModal({
             onClick={resetModal}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5 text-gray-500" />
           </button>
         </div>
 

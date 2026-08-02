@@ -2,7 +2,8 @@
 
 import { memo } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 
 interface PaginationMeta {
   currentPage: number;
@@ -49,33 +50,33 @@ function PaginationControlsComponent({
       <Button
         onClick={handlePrevious}
         disabled={!meta.prev}
-        variant="outline"
-        className="flex items-center gap-2 rounded-full border-[#1E88E5] text-[#1E88E5] hover:bg-[#1E88E5] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed bg-transparent"
+        variant="homeOutline"
+        className="flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Go to previous page"
       >
-        <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+        <HugeiconsIcon icon={ArrowLeft01Icon} className="w-4 h-4" aria-hidden="true" />
         Previous
       </Button>
 
       <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-600">
+        <span className="text-sm" style={{ color: "var(--home-muted)" }}>
           Page {meta.currentPage} of {meta.lastPage}
         </span>
-        <span className="text-sm text-gray-400" aria-hidden="true">
+        <span className="text-sm" style={{ color: "var(--home-border-strong)" }} aria-hidden="true">
           |
         </span>
-        <span className="text-sm text-gray-600">{meta.total} total events</span>
+        <span className="text-sm" style={{ color: "var(--home-muted)" }}>{meta.total} total events</span>
       </div>
 
       <Button
         onClick={handleNext}
         disabled={!meta.next}
-        variant="outline"
-        className="flex items-center gap-2 rounded-full border-[#1E88E5] text-[#1E88E5] hover:bg-[#1E88E5] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed bg-transparent"
+        variant="homeOutline"
+        className="flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Go to next page"
       >
         Next
-        <ChevronRight className="w-4 h-4" aria-hidden="true" />
+        <HugeiconsIcon icon={ArrowRight01Icon} className="w-4 h-4" aria-hidden="true" />
       </Button>
     </nav>
   );
