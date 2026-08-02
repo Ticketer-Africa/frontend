@@ -13,7 +13,7 @@ interface Props {
 }
 
 export function TicketFirstLayout({ event, mode }: Props) {
-  const selection = useTicketSelection(event.ticketCategories);
+  const selection = useTicketSelection(event.ticketCategories, event.id);
   const { handleCheckout } = useEventCheckout(
     event,
     mode,

@@ -34,6 +34,7 @@ export function EventFormStepLayoutDetails({ layout, values, onChange, isDisable
           artists={values.lineup}
           onChange={(lineup) => onChange({ lineup })}
           isDisabled={isDisabled}
+          required
         />
       )}
 
@@ -72,6 +73,7 @@ export function EventFormStepLayoutDetails({ layout, values, onChange, isDisable
           items={values.faq}
           onChange={(faq) => onChange({ faq })}
           isDisabled={isDisabled}
+          required
         />
       )}
     </div>

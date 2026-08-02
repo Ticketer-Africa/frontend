@@ -52,10 +52,13 @@ export function FormNavigation({
       {currentStep < totalSteps ? (
         <Button
           type="button"
-          className="rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150 hover:opacity-90"
+          className={`rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150 hover:opacity-90 ${
+            !canProceed ? "opacity-50" : ""
+          }`}
           style={{ backgroundColor: "var(--home-accent)", color: "var(--home-accent-fg)" }}
           onClick={onNext}
-          disabled={!canProceed || isSubmitting}
+          disabled={isSubmitting}
+          aria-disabled={!canProceed}
         >
           Next
           <HugeiconsIcon icon={ArrowRight01Icon} className="h-4 w-4 ml-2" />

@@ -31,7 +31,6 @@ export const buyTicketsV2 = async (
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to purchase ticket";
-    toast.error("Purchase failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };

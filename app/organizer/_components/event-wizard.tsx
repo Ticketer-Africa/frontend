@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -64,10 +64,16 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
     handleSubmit,
     watch,
     setValue,
-    formState: { errors },
+    control,
+    formState: { errors, isDirty },
   } = useForm<EventFormData>({
     resolver: zodResolver(mode === "create" ? eventFormSchema : updateEventFormSchema),
     defaultValues: DEFAULT_FORM_VALUES as EventFormData,
+  });
+
+  const { append: appendTicketCategory, remove: removeTicketCategory } = useFieldArray({
+    control,
+    name: "ticketCategories",
   });
 
   useEffect(() => {
@@ -154,6 +160,16 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
     return () => URL.revokeObjectURL(url);
   }, [bannerFile, initialEvent?.bannerUrl]);
 
+  useEffect(() => {
+    if (!isDirty || isSubmitted) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isDirty, isSubmitted]);
+
   const layout = watch("layout");
   const name = watch("name");
   const description = watch("description");
@@ -162,31 +178,71 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
   const venueAddress = watch("venueAddress");
   const date = watch("date");
   const time = watch("time");
-  const ticketCategories = watch("ticketCategories") || [];
+  const ticketCategories = useWatch({ control, name: "ticketCategories" }) || [];
   const lineup = watch("lineup") || [];
   const faq = watch("faq") || [];
   const goodToKnow = watch("goodToKnow") || [];
   const timelineSlots = watch("timelineSlots") || [];
   const editorialPullQuote = watch("editorialPullQuote") || "";
 
-  const canProceed = useMemo(() => {
-    const needsLineup = ["HERO_OVERLAY", "SPLIT_SCREEN", "TIMELINE"].includes(layout ?? "");
-    const needsFaq = ["HERO_OVERLAY", "SPLIT_SCREEN", "EDITORIAL", "TICKET_FIRST"].includes(layout ?? "");
-    const detailsValid =
-      (!needsLineup || lineup.length > 0) &&
-      (!needsFaq || faq.length > 0) &&
-      (layout !== "TIMELINE" || timelineSlots.length > 0);
+  const needsLineup = ["HERO_OVERLAY", "SPLIT_SCREEN", "TIMELINE"].includes(layout ?? "");
+  const needsFaq = ["HERO_OVERLAY", "SPLIT_SCREEN", "EDITORIAL", "TICKET_FIRST"].includes(layout ?? "");
+
+  const stepBlockingReasons = useMemo(() => {
+    const basics: string[] = [];
+    if (!name) basics.push("Event name");
+    if (!description) basics.push("Description");
+    if (!category) basics.push("Category");
+    if (mode === "create" && !bannerFile) basics.push("Banner image");
+
+    const dateVenue: string[] = [];
+    if (!venueName) dateVenue.push("Venue name");
+    if (!venueAddress) dateVenue.push("Venue address");
+    if (!date) dateVenue.push("Date");
+    if (!time) dateVenue.push("Start time");
+
+    const tickets: string[] = [];
+    if (ticketCategories.length === 0) tickets.push("At least one ticket tier");
+    ticketCategories.forEach((c, i) => {
+      if (!c.name) tickets.push(`Tier ${i + 1} name`);
+      if (!(c.price >= 0)) tickets.push(`Tier ${i + 1} price`);
+      if (!(c.maxTickets >= 1)) tickets.push(`Tier ${i + 1} total tickets`);
+      const soldTickets = initialEvent?.ticketCategories?.[i]?.minted;
+      if (soldTickets && c.maxTickets < soldTickets) {
+        tickets.push(`Tier ${i + 1} total tickets (can't be less than the ${soldTickets} already sold)`);
+      }
+    });
+
+    const details: string[] = [];
+    if (needsLineup) {
+      if (lineup.length === 0) details.push("At least one lineup artist");
+      else if (lineup.some((a) => !a.name.trim())) details.push("Artist name (remove or fill in blank rows)");
+    }
+    if (needsFaq) {
+      if (faq.length === 0) details.push("At least one FAQ entry");
+      else if (faq.some((f) => !f.question.trim() || !f.answer.trim())) {
+        details.push("FAQ question/answer (remove or fill in blank rows)");
+      }
+    }
+    if (layout === "TIMELINE") {
+      if (timelineSlots.length === 0) details.push("At least one timeline slot");
+      else if (timelineSlots.some((s) => !s.time.trim() || !s.stage.trim() || !s.performer.trim())) {
+        details.push("Timeline slot details (remove or fill in blank rows)");
+      }
+    }
 
     return [
-      !!layout, // 1 Layout
-      isStep1Valid({ name, description, category, banner: bannerFile, requireBanner: mode === "create" }), // 2 Basics
-      !!venueName && !!venueAddress && !!date && !!time, // 3 Date & Venue
-      ticketCategories.length > 0 && ticketCategories.every((c) => c.name && c.price >= 0 && c.maxTickets >= 1), // 4 Tickets
-      true, // 5 Advanced Settings — no required fields
-      detailsValid, // 6 [Layout] Details
-      true, // 7 Preview — Publish/Save as Draft handle their own submission
-    ][currentStep - 1];
-  }, [layout, name, description, category, bannerFile, mode, venueName, venueAddress, date, time, ticketCategories, lineup, faq, timelineSlots, currentStep]);
+      layout ? [] : ["A layout"], // 1 Layout
+      basics, // 2 Basics
+      dateVenue, // 3 Date & Venue
+      tickets, // 4 Tickets
+      [], // 5 Advanced Settings — no required fields
+      details, // 6 [Layout] Details
+      [], // 7 Preview
+    ];
+  }, [layout, name, description, category, bannerFile, mode, venueName, venueAddress, date, time, ticketCategories, lineup, faq, timelineSlots, needsLineup, needsFaq]);
+
+  const canProceed = stepBlockingReasons[currentStep - 1].length === 0;
 
   const buildFormData = (data: EventFormData) => {
     const fullDate = new Date(`${data.date}T${data.time}`);
@@ -223,49 +279,97 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
 
   const submit = async (data: EventFormData, publish: boolean) => {
     const formData = buildFormData(data);
+    let savedEvent: EventV2;
     try {
       if (data.banner instanceof File) {
         const bannerKey = await uploadImageToS3(data.banner, "images/events");
         formData.append("bannerKey", bannerKey);
       }
 
-      const savedEvent =
+      savedEvent =
         mode === "create"
           ? await createEvent(formData)
           : await updateEvent({ eventId: eventId!, formData });
-
-      const shouldBeActive = publish;
-      if (savedEvent.isActive !== shouldBeActive) {
-        await toggleStatus(savedEvent.id);
-      }
-
-      setIsSubmitted(true);
     } catch (error: any) {
       toast.error(`Event ${mode === "create" ? "creation" : "update"} failed`, {
         description: error?.message || "Please review the details and try again.",
       });
+      return;
     }
+
+    try {
+      const shouldBeActive = publish;
+      if (savedEvent.isActive !== shouldBeActive) {
+        await toggleStatus(savedEvent.id);
+      }
+    } catch (error: any) {
+      toast.error(`Event saved, but ${publish ? "publishing" : "moving to draft"} failed`, {
+        description: error?.message || "You can change the status from the dashboard.",
+      });
+      return;
+    }
+
+    setIsSubmitted(true);
+  };
+
+  const FIELD_LABELS: Record<string, string> = {
+    name: "Event name",
+    description: "Description",
+    category: "Category",
+    banner: "Banner image",
+    venueName: "Venue name",
+    venueAddress: "Venue address",
+    date: "Date",
+    time: "Time",
+    layout: "Layout",
+    ticketCategories: "Ticket tiers",
+    lineup: "Lineup",
+    faq: "FAQ",
+    timelineSlots: "Timeline",
+  };
+
+  const onInvalidSubmit = (formErrors: typeof errors) => {
+    const fields = Object.keys(formErrors).map((key) => FIELD_LABELS[key] ?? key);
+    toast.error("Can't save event — some fields need attention", {
+      description: fields.length
+        ? `Please check: ${fields.join(", ")}`
+        : "Please review the form and try again.",
+    });
   };
 
   const handleNext = () => {
-    if (currentStep < TOTAL_STEPS && canProceed) setCurrentStep(currentStep + 1);
+    if (currentStep >= TOTAL_STEPS) return;
+    const reasons = stepBlockingReasons[currentStep - 1];
+    if (reasons.length > 0) {
+      toast.error("Can't continue yet", { description: `Please fill in: ${reasons.join(", ")}` });
+      return;
+    }
+    setCurrentStep(currentStep + 1);
   };
   const handlePrevious = () => {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) setValue("banner", file);
+    e.target.value = "";
+    if (!file) return;
+    if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) {
+      toast.error("Unsupported file type", { description: "Banner must be a PNG, JPG, or WebP image." });
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File too large", { description: "Banner image must be 10MB or smaller." });
+      return;
+    }
+    setValue("banner", file);
   };
   const handleAddCategory = () => {
-    setValue("ticketCategories", [
-      ...ticketCategories,
-      { id: crypto.randomUUID(), name: "", description: "", price: 0, maxTickets: 1, maxAdmissions: 1 },
-    ]);
+    appendTicketCategory({ id: crypto.randomUUID(), name: "", description: "", price: 0, maxTickets: 1, maxAdmissions: 1 });
   };
   const handleRemoveCategory = (id: string) => {
     if (ticketCategories.length === 1) return;
-    setValue("ticketCategories", ticketCategories.filter((cat) => cat.id !== id));
+    const index = ticketCategories.findIndex((cat) => cat.id === id);
+    if (index !== -1) removeTicketCategory(index);
   };
 
   if (isSubmitted) {
@@ -273,6 +377,11 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
       <EventSuccessScreen
         eventName={watch("name")}
         title={mode === "create" ? "Event Created!" : "Event Updated!"}
+        message={
+          mode === "create"
+            ? `Your event "${watch("name")}" has been successfully created.`
+            : `Your event "${watch("name")}" has been successfully updated.`
+        }
       />
     );
   }
@@ -292,7 +401,14 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
       <div className="max-w-[1200px] mx-auto px-4 md:px-10 py-8 md:pb-24 grid grid-cols-1 md:grid-cols-[260px_1fr] gap-8 md:gap-14">
         <div className="flex flex-col gap-4 md:contents">
           <Button variant="outline" className="bg-transparent w-fit md:order-last" asChild disabled={isSubmitting}>
-            <Link href="/organizer">
+            <Link
+              href="/organizer"
+              onClick={(e) => {
+                if (isDirty && !window.confirm("You have unsaved changes. Leave without saving?")) {
+                  e.preventDefault();
+                }
+              }}
+            >
               <HugeiconsIcon icon={ArrowLeft01Icon} className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Link>
@@ -321,7 +437,18 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
             <CardContent className="space-y-6 pt-6">
               <form id="event-wizard-form">
               {currentStep === 1 && (
-                <EventFormStepLayout value={layout} onChange={(v) => setValue("layout", v)} />
+                <EventFormStepLayout
+                  value={layout}
+                  onChange={(v) => {
+                    if (mode === "update" && initialEvent?.isActive && v !== initialEvent.layout) {
+                      const confirmed = window.confirm(
+                        "This event is live. Changing the layout changes what details are shown/collected (e.g. lineup, FAQ). Continue?",
+                      );
+                      if (!confirmed) return;
+                    }
+                    setValue("layout", v);
+                  }}
+                />
               )}
               {currentStep === 2 && (
                 <EventFormStep1
@@ -358,8 +485,8 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
                   formState={watch()}
                   bannerPreviewUrl={previewUrl ?? undefined}
                   isSubmitting={isSubmitting}
-                  onPublish={handleSubmit((data) => submit(data, true))}
-                  onSaveDraft={handleSubmit((data) => submit(data, false))}
+                  onPublish={handleSubmit((data) => submit(data, true), onInvalidSubmit)}
+                  onSaveDraft={handleSubmit((data) => submit(data, false), onInvalidSubmit)}
                 />
               )}
 

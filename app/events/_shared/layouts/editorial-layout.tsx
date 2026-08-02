@@ -17,7 +17,7 @@ interface Props {
 
 export function EditorialLayout({ event, mode }: Props) {
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
-  const selection = useTicketSelection(event.ticketCategories);
+  const selection = useTicketSelection(event.ticketCategories, event.id);
   const { handleCheckout } = useEventCheckout(
     event,
     mode,

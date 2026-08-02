@@ -130,7 +130,7 @@ function applyLayoutContentValidation(
 
 export const eventFormSchema = z
   .object({
-    name: z.string().min(3, "Event name is required"),
+    name: z.string().min(3, "Event name is required").max(100, "Event name must be 100 characters or fewer"),
     description: z.string().min(10, "Description is required"),
     category: z.string().min(1, "Category is required"),
     venueName: z.string().min(3, "Venue name is required"),
@@ -164,7 +164,7 @@ export const eventFormSchema = z
 
 export const updateEventFormSchema = z
   .object({
-    name: z.string().min(3, "Event name is required"),
+    name: z.string().min(3, "Event name is required").max(100, "Event name must be 100 characters or fewer"),
     description: z.string().min(10, "Description is required"),
     category: z.enum(UPPERCASE_CATEGORIES, { errorMap: () => ({ message: "Please select a valid category" }) }),
     venueName: z.string().min(3, "Venue name is required"),
@@ -197,7 +197,7 @@ export const updateEventFormSchema = z
   });
 
 export const eventSubmissionSchema = z.object({
-  name: z.string().min(3),
+  name: z.string().min(3).max(100),
   description: z.string().min(10),
   category: z.string().min(1),
   venueName: z.string().min(3),

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { EventLayout } from "@/types/events-v2.type";
 import { LAYOUT_META } from "@/app/events/_shared/layouts/registry";
 import { LayoutExpandModal } from "./layout-expand-modal";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 
 export function EventFormStepLayout({ value, onChange }: Props) {
   const [expandedLayout, setExpandedLayout] = useState<EventLayout | null>(null);
+  const [loadedThumbnails, setLoadedThumbnails] = useState<Record<string, boolean>>({});
 
   return (
     <div className="space-y-4">
@@ -32,7 +34,17 @@ export function EventFormStepLayout({ value, onChange }: Props) {
               )}
             >
               <div className="relative h-32 rounded-xl overflow-hidden mb-3 bg-gray-200">
-                <Image src={meta.thumbnail} alt={meta.title} fill className="object-cover" />
+                {!loadedThumbnails[layout] && <Skeleton className="absolute inset-0 rounded-xl" />}
+                <Image
+                  src={meta.thumbnail}
+                  alt={meta.title}
+                  fill
+                  className={cn(
+                    "object-cover transition-opacity duration-300",
+                    loadedThumbnails[layout] ? "opacity-100" : "opacity-0",
+                  )}
+                  onLoad={() => setLoadedThumbnails((prev) => ({ ...prev, [layout]: true }))}
+                />
               </div>
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">{meta.title}</h3>

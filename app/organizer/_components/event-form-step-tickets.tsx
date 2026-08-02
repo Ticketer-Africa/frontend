@@ -112,6 +112,12 @@ export function EventFormStepTickets({
                 {errors.ticketCategories?.[index]?.maxTickets && (
                   <p className="text-xs text-red-500">{errors.ticketCategories[index]?.maxTickets?.message}</p>
                 )}
+                {!!existingTicketCategories?.[index]?.soldTickets &&
+                  Number(category.maxTickets) < existingTicketCategories[index]!.soldTickets! && (
+                    <p className="text-xs text-red-500">
+                      Can&apos;t be less than the {existingTicketCategories[index]!.soldTickets} tickets already sold
+                    </p>
+                  )}
               </div>
               <div className="space-y-1.5">
                 <Label className="text-sm font-medium">Admissions / Ticket</Label>

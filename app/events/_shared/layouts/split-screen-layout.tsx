@@ -18,7 +18,7 @@ const TABS = ["Overview", "Lineup", "Location"] as const;
 
 export function SplitScreenLayout({ event, mode }: Props) {
   const [activeTab, setActiveTab] = useState<(typeof TABS)[number]>("Overview");
-  const selection = useTicketSelection(event.ticketCategories);
+  const selection = useTicketSelection(event.ticketCategories, event.id);
   const { handleCheckout } = useEventCheckout(
     event,
     mode,

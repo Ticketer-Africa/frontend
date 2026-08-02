@@ -13,9 +13,10 @@ interface Props {
   artists: LineupArtistFormItem[];
   onChange: (artists: LineupArtistFormItem[]) => void;
   isDisabled?: boolean;
+  required?: boolean;
 }
 
-export function LineupEditor({ artists, onChange, isDisabled }: Props) {
+export function LineupEditor({ artists, onChange, isDisabled, required }: Props) {
   const add = () => onChange([...artists, { id: crypto.randomUUID(), name: "" }]);
   const remove = (id: string) => onChange(artists.filter((a) => a.id !== id));
   const update = (id: string, name: string) =>
@@ -23,7 +24,9 @@ export function LineupEditor({ artists, onChange, isDisabled }: Props) {
 
   return (
     <div className="space-y-3">
-      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Lineup</p>
+      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+        Lineup {required && <span className="text-red-500">*</span>}
+      </p>
       {artists.map((artist) => (
         <div key={artist.id} className="flex items-center gap-2">
           <Input

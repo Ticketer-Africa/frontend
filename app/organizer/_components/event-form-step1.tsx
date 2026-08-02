@@ -44,6 +44,7 @@ export function EventFormStep1({
             id="name"
             placeholder="e.g. Afrobeats Night 2026"
             className="h-11 rounded-xl"
+            maxLength={100}
             {...register("name")}
             disabled={isDisabled}
           />

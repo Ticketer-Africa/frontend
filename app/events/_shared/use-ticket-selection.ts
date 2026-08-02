@@ -2,9 +2,28 @@ import { useState } from "react";
 import { TicketCategoryV2 } from "@/types/events-v2.type";
 import { toast } from "sonner";
 
-export function useTicketSelection(ticketCategories: TicketCategoryV2[]) {
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
+function restoreFromCheckoutData(eventId?: string) {
+  if (!eventId || typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem("checkoutData");
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (data.eventId !== eventId || !Array.isArray(data.tickets)) return null;
+    const selected = new Set<string>(data.tickets.map((t: { ticketCategoryId: string }) => t.ticketCategoryId));
+    const quantities: Record<string, number> = {};
+    data.tickets.forEach((t: { ticketCategoryId: string; quantity: number }) => {
+      quantities[t.ticketCategoryId] = t.quantity;
+    });
+    return { selected, quantities };
+  } catch {
+    return null;
+  }
+}
+
+export function useTicketSelection(ticketCategories: TicketCategoryV2[], eventId?: string) {
+  const restored = restoreFromCheckoutData(eventId);
+  const [selected, setSelected] = useState<Set<string>>(restored?.selected ?? new Set());
+  const [quantities, setQuantities] = useState<Record<string, number>>(restored?.quantities ?? {});
 
   const toggleCategory = (category: TicketCategoryV2) => {
     const id = category.id;

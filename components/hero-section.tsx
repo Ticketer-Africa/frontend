@@ -35,7 +35,7 @@ export function HeroSection() {
         </span>
 
         <h1
-          className="font-['Syne'] font-extrabold text-4xl sm:text-5xl lg:text-[72px] mb-6 leading-tight lg:leading-[80px] tracking-[-1.2px]"
+          className="font-['Syne'] font-extrabold text-3xl sm:text-5xl lg:text-[72px] mb-6 leading-tight lg:leading-[80px] tracking-[-1.2px] break-words"
           style={{ color: "var(--home-text)" }}
         >
           Buy. Sell. Enjoy

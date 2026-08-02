@@ -15,9 +15,10 @@ interface Props {
   items: FaqFormItem[];
   onChange: (items: FaqFormItem[]) => void;
   isDisabled?: boolean;
+  required?: boolean;
 }
 
-export function FaqEditor({ items, onChange, isDisabled }: Props) {
+export function FaqEditor({ items, onChange, isDisabled, required }: Props) {
   const add = () =>
     onChange([...items, { id: crypto.randomUUID(), question: "", answer: "" }]);
   const remove = (id: string) => onChange(items.filter((i) => i.id !== id));
@@ -26,7 +27,9 @@ export function FaqEditor({ items, onChange, isDisabled }: Props) {
 
   return (
     <div className="space-y-3">
-      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">FAQ</p>
+      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+        FAQ {required && <span className="text-red-500">*</span>}
+      </p>
       {items.map((item) => (
         <div key={item.id} className="bg-gray-50/70 rounded-2xl p-4 space-y-2">
           <div className="flex items-center gap-2">
