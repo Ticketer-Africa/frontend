@@ -6,48 +6,50 @@ type LogoProps = {
   size?: "sm" | "md" | "lg" | number; // pre-defined or custom number (in rem)
   withText?: boolean;
   showImage?: boolean;
+  /** Hide the wordmark text below the `sm` breakpoint, leaving just the mark. */
+  hideTextOnMobile?: boolean;
   text?: string;
   imgSrc?: string;
   className?: string;
   textClassName?: string;
 };
 
+// The mark is a square icon, so its box is always square (unlike the old
+// wide logo image this replaced) to avoid object-cover cropping it.
 const sizeMap = {
-  sm: { width: "w-10", height: "h-6", text: "text-xl" },
-  md: { width: "w-16", height: "h-10", text: "text-2xl" },
-  lg: { width: "w-24", height: "h-14", text: "text-3xl" },
+  sm: { image: "w-6 h-6", text: "text-xl" },
+  md: { image: "w-9 h-9", text: "text-2xl" },
+  lg: { image: "w-12 h-12", text: "text-3xl" },
 };
 
 export const Logo: React.FC<LogoProps> = ({
   size = "md",
   withText = true,
   showImage = true,
+  hideTextOnMobile = false,
   text = "Ticketer Africa",
   imgSrc = "/logo.png",
   className = "",
   textClassName,
 }) => {
   const isCustomSize = typeof size === "number";
-  const {
-    width,
-    height,
-    text: textSize,
-  } = typeof size === "string" ? sizeMap[size] : sizeMap.md;
+  const { image, text: textSize } =
+    typeof size === "string" ? sizeMap[size] : sizeMap.md;
 
   const imageClasses = isCustomSize
-    ? `w-[${size}rem] h-[${size * 0.625}rem]` // keep aspect ratio
-    : `${width} ${height}`;
+    ? `w-[${size * 0.625}rem] h-[${size * 0.625}rem]` // square, matches text height
+    : image;
 
   const fontClasses = isCustomSize ? `text-[${size * 0.15}rem]` : textSize;
 
   return (
     <div className={clsx("flex items-center gap-2", className)}>
       {showImage && (
-        <div className={imageClasses}>
+        <div className={clsx(imageClasses, "shrink-0")}>
           <img
             src={imgSrc}
             alt={`${text} Logo`}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
         </div>
       )}
@@ -56,6 +58,7 @@ export const Logo: React.FC<LogoProps> = ({
           className={cn(
             "font-bold",
             fontClasses,
+            hideTextOnMobile && "hidden sm:inline-block",
             textClassName ?? "text-[#E2725B]"
           )}
         >
