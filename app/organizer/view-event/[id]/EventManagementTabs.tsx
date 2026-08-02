@@ -331,7 +331,7 @@ export default function EventManagementTabs({ event }: EventManagementTabsProps)
                       !discountForm.code ||
                       !discountForm.value
                     }
-                    className="bg-[#1E88E5] hover:bg-blue-500 text-white"
+                    className="border-0 bg-[var(--home-accent)] text-[var(--home-accent-fg)] hover:bg-[#f18b76]"
                   >
                     {creatingDiscount ? (
                       <HugeiconsIcon icon={Loading03Icon} className="h-4 w-4 mr-2 animate-spin" />
@@ -438,7 +438,7 @@ export default function EventManagementTabs({ event }: EventManagementTabsProps)
                     !messageForm.subject ||
                     !messageForm.body
                   }
-                  className="bg-[#1E88E5] hover:bg-blue-500 text-white"
+                  className="border-0 bg-[var(--home-accent)] text-[var(--home-accent-fg)] hover:bg-[#f18b76]"
                 >
                   {sendingMessage ? (
                     <HugeiconsIcon icon={Loading03Icon} className="h-4 w-4 mr-2 animate-spin" />
