@@ -56,7 +56,7 @@ export const Logo: React.FC<LogoProps> = ({
           className={cn(
             "font-bold",
             fontClasses,
-            textClassName ?? "text-[#1E88E5]"
+            textClassName ?? "text-[#E2725B]"
           )}
         >
           {text}
