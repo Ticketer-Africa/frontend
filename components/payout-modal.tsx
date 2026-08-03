@@ -239,7 +239,7 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
               <Button variant="outline" className="flex-1 bg-transparent border-border hover:bg-accent text-foreground rounded-xl" onClick={handleClose} disabled={isPending}>
                 Cancel
               </Button>
-              <Button className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150" onClick={handleDetailsSubmit} disabled={isPending}>
+              <Button variant="homeAccent" className="flex-1 px-6 shadow-lg" onClick={handleDetailsSubmit} disabled={isPending}>
                 Next
               </Button>
             </div>
@@ -283,7 +283,7 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
               <Button variant="outline" className="flex-1 bg-transparent border-border hover:bg-accent text-foreground rounded-xl" onClick={() => { setStep("details"); setFormData((prev) => ({ ...prev, pin: "" })); setPinError(""); }} disabled={isPending}>
                 Back
               </Button>
-              <Button className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150" onClick={handlePinSubmit} disabled={isPending || !formData.pin}>
+              <Button variant="homeAccent" className="flex-1 px-6 shadow-lg" onClick={handlePinSubmit} disabled={isPending || !formData.pin}>
                 {isPending ? "Processing…" : "Submit"}
               </Button>
             </div>
