@@ -146,6 +146,7 @@ export function Header() {
               size="md"
               showImage
               hideTextOnMobile
+              hideImageOnDesktop
               textClassName={
                 isHome
                   ? "text-[#E2725B] font-['Syne'] text-[28px] tracking-[-0.8px]"
@@ -323,8 +324,16 @@ export function Header() {
 
         {isMenuOpen && (
           <div
+            className="fixed inset-0 top-[60px] z-40 bg-black/30 backdrop-blur-sm md:hidden"
+            onClick={closeMenu}
+            aria-hidden="true"
+          />
+        )}
+
+        {isMenuOpen && (
+          <div
             className={clsx(
-              "mobile-menu-slide-in border-t py-4 md:hidden",
+              "mobile-menu-slide-in relative z-50 border-t py-4 md:hidden",
               isHome
                 ? "border-[var(--home-border)] bg-[var(--home-bg)]"
                 : "border-border bg-background"

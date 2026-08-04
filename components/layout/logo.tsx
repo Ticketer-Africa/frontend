@@ -8,6 +8,8 @@ type LogoProps = {
   showImage?: boolean;
   /** Hide the wordmark text below the `sm` breakpoint, leaving just the mark. */
   hideTextOnMobile?: boolean;
+  /** Hide the image mark at the `md` breakpoint and up, leaving just the wordmark. */
+  hideImageOnDesktop?: boolean;
   text?: string;
   imgSrc?: string;
   className?: string;
@@ -27,6 +29,7 @@ export const Logo: React.FC<LogoProps> = ({
   withText = true,
   showImage = true,
   hideTextOnMobile = false,
+  hideImageOnDesktop = false,
   text = "Ticketer Africa",
   imgSrc = "/logo.png",
   className = "",
@@ -45,7 +48,7 @@ export const Logo: React.FC<LogoProps> = ({
   return (
     <div className={clsx("flex items-center gap-2", className)}>
       {showImage && (
-        <div className={clsx(imageClasses, "shrink-0")}>
+        <div className={clsx(imageClasses, "shrink-0", hideImageOnDesktop && "md:hidden")}>
           <img
             src={imgSrc}
             alt={`${text} Logo`}
