@@ -324,7 +324,7 @@ export function Header() {
 
         {isMenuOpen && (
           <div
-            className="fixed inset-0 top-[60px] z-40 bg-black/50 md:hidden"
+            className="fixed inset-0 top-[60px] z-40 bg-black/30 backdrop-blur-sm md:hidden"
             onClick={closeMenu}
             aria-hidden="true"
           />
