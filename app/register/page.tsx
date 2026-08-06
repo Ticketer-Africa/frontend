@@ -133,7 +133,16 @@ export default function RegisterPage() {
         >
           <HugeiconsIcon icon={SquareLock01Icon} className="w-6 h-6" style={{ color: "var(--home-accent)" }} />
         </div>
-        <h1 className="text-3xl font-bold" style={{ color: "var(--home-text)" }}>
+        <h1
+          className="flex items-center justify-center text-center"
+          style={{
+            fontFamily: "'Syne', ui-sans-serif, system-ui, sans-serif",
+            fontWeight: 700,
+            fontSize: "32px",
+            lineHeight: "38px",
+            color: "#DCE2F7",
+          }}
+        >
           Sign Up
         </h1>
         <p style={{ color: "var(--home-muted)" }}>
