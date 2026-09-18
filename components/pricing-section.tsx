@@ -91,7 +91,7 @@ export function PricingSection() {
               className="font-['Syne'] text-2xl tracking-[0.5px] mb-2"
               style={{ color: "var(--home-text)" }}
             >
-              Event Ticket Sales
+              Event Ticket Resales
             </h3>
             <p className="mb-4">
               <span
@@ -118,7 +118,7 @@ export function PricingSection() {
               className="font-['Hanken_Grotesk'] text-sm"
               style={{ color: "var(--home-muted)" }}
             >
-              Fair, simple, and built to reward creators.
+              A fair, simple way to resell tickets.
             </p>
           </HomeCard>
         </div>
