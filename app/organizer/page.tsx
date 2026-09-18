@@ -34,6 +34,8 @@ import {
 } from "@radix-ui/react-dialog";
 import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
 
+export const EVENT_CARD_MEDIA_CLASS = "relative h-48 sm:h-56 overflow-hidden";
+
 const EventCard = memo(function EventCard({
   event,
   onNavigate,
@@ -57,7 +59,7 @@ const EventCard = memo(function EventCard({
       className="flex flex-col border border-[var(--home-border)] bg-[var(--home-card-elevated)] rounded-2xl overflow-hidden hover:bg-[var(--home-card-highlight)] transition-colors cursor-pointer"
       onClick={() => onNavigate(event.id)}
     >
-      <div className="relative aspect-video">
+      <div className={EVENT_CARD_MEDIA_CLASS}>
         <img
           src={event.bannerUrl || "/placeholder.svg"}
           alt={event.name}
