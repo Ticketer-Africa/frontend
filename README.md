@@ -39,3 +39,7 @@ Any attempt to reverse engineer, replicate, or utilize these assets without prop
 ## 📌 TL;DR
 
 > Ticketer Africa owns this. It’s not yours. Don’t touch without permission.
+
+## Deployment
+
+The production deployment is triggered from the `main` branch.
