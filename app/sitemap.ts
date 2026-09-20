@@ -1,14 +1,13 @@
 // app/sitemap.ts
 import { MetadataRoute } from "next";
+import { getSitemapApiUrl } from "@/lib/sitemap-api-url";
 
 const baseUrl = "https://ticketer.africa";
 
 async function getAllEvents() {
   try {
     const response = await fetch(
-      `${
-        process.env.NEXT_PUBLIC_API_URL || "https://api.ticketer.africa"
-      }/events`,
+      `${getSitemapApiUrl()}/events`,
       {
         next: { revalidate: 3600 }, // Revalidate every hour
       }
