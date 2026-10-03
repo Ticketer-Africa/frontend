@@ -119,7 +119,7 @@ The final full desktop/mobile run passed 48 cases: 45 desktop and three mobile-e
 
 The following still need executable coverage once their concrete integrations exist; do not treat this initial suite as full MVP certification:
 
-1. Exact `expiry + 7 days` boundary, cache invalidation, Pro restoration and preservation of explicit unpublish. Current fixtures cover day six/day eight, not the exact cutoff.
+1. Cache invalidation, Pro restoration and preservation of explicit unpublish. The backend HTTP/PostgreSQL suite now checks the exact `expiry + 7 days` cutoff at one millisecond before and at the boundary.
 2. A sandbox paid purchase, authoritative payment webhook, QR issuance/check-in, purchase attribution, retry deduplication and refunds. CTA clicks are now recorded against the published site and linked edition. Current tests reach the existing event page; they do not prove payment succeeds or attribute confirmed purchases/revenue.
 3. Edition linking/unlinking persistence and publish isolation, EVENT_LIST, live cancellations/deletion, date ties/timezones, ongoing editions and sales-window transitions.
 4. Full theme/media/SEO controls; uploaded assets, schema migration, malicious input, broken media, missing assets and font loading.
