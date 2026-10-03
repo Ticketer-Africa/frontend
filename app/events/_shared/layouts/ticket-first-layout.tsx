@@ -26,7 +26,7 @@ export function TicketFirstLayout({ event, mode }: Props) {
     <div className="home-theme min-h-screen pt-16" style={{ backgroundColor: "var(--home-bg)" }}>
       <div className="container mx-auto px-4 pt-8 pb-8 max-w-3xl">
         <div className="relative h-[260px] w-full rounded-2xl overflow-hidden">
-          <Image src={event.bannerUrl} alt={event.name} fill className="object-cover" priority />
+        <Image src={event.bannerUrl || "/placeholder.jpg"} alt={event.name} fill className="object-cover" priority />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
           <div className="absolute bottom-6 left-8 right-8">
             <span

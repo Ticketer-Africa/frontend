@@ -6,6 +6,7 @@
 .es-hero{min-height:560px;display:flex;align-items:center;background-size:cover;background-position:center}
 .es-hero-inner{max-width:850px}
 .es-page h1,.es-page h2,.es-page h3{font-family:Inter,Arial,sans-serif;line-height:1.12;letter-spacing:-.015em;margin:0 0 1rem;font-weight:700}
+.es-page h1,.es-page h2,.es-page h3{overflow-wrap:anywhere}
 .es-page h1{font-size:clamp(3rem,8vw,7rem)}
 .es-page h2{font-size:clamp(2.1rem,5vw,4.4rem)}
 .es-page h3{font-size:1.35rem}

@@ -24,5 +24,6 @@ test("@policy After grace, saved branding is hidden behind an unavailable page",
   await expect(page.getByRole("heading", { name: /site unavailable/i })).toBeVisible();
   await expect(page.getByRole("heading", { name: seed.sites.expired.heading, exact: true })).toHaveCount(0);
   await page.goto(seed.events.basicPath);
-  await expect(page.getByRole("link", { name: /buy tickets|get tickets/i }).or(page.getByRole("button", { name: /buy tickets|get tickets/i })).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Select Your Tickets" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Select" }).first()).toBeVisible();
 });

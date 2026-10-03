@@ -19,7 +19,7 @@ for (const width of [360, 768, 1440]) {
     }
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(1);
-    await page.getByRole("button", { name: "What time do doors open?", exact: true }).click();
+    await page.locator("summary").filter({ hasText: "What time do doors open?" }).click();
     await expect(page.getByText("Doors open at 6 PM.", { exact: true })).toBeVisible();
   });
 }

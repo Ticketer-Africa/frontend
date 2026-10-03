@@ -41,7 +41,7 @@ export function EditorialLayout({ event, mode }: Props) {
           </p>
 
           <div className="relative h-72 w-full rounded-2xl overflow-hidden my-6">
-            <Image src={event.bannerUrl} alt={event.name} fill className="object-cover" />
+            <Image src={event.bannerUrl || "/placeholder.jpg"} alt={event.name} fill className="object-cover" />
           </div>
 
           <h2 className="text-2xl font-bold mb-3" style={{ color: "var(--home-text)" }}>The Experience</h2>
@@ -79,7 +79,7 @@ export function EditorialLayout({ event, mode }: Props) {
                     style={{ borderColor: "var(--home-border)" }}
                   >
                     <div className="relative h-28">
-                      <Image src={related.bannerUrl} alt={related.name} fill className="object-cover" />
+                      <Image src={related.bannerUrl || "/placeholder.jpg"} alt={related.name} fill className="object-cover" />
                     </div>
                     <div className="p-3">
                       <p className="text-xs uppercase" style={{ color: "var(--home-accent)" }}>{related.category}</p>

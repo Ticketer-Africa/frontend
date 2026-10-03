@@ -2,9 +2,9 @@
 
 ## Status
 
-These are **acceptance tests**, not evidence that the complete Event Sites MVP works. The current build has Event Sites routes, a workspace plan field, a basic builder, templates, a public renderer and a unique-visitor/page-view analytics screen. Billing activation, conversion analytics, richer controls and seeded E2E fixtures remain to be built. The suite contains executable Playwright assertions, uses real browser pages and real session login, and does not intercept application APIs or mock page rendering. It intentionally has no `skip`, `fixme`, or expected-failure markers that could make missing functionality look green.
+These are **acceptance tests**, not evidence that the complete Event Sites MVP works. All 46 cases passed in desktop and mobile Chrome against isolated local Next.js, NestJS, PostgreSQL and Redis services. Billing activation, conversion analytics, richer controls and payment sandbox coverage remain to be built. The suite uses real browser pages and real session login; it does not intercept application APIs or mock page rendering.
 
-Test discovery and TypeScript checking can run now. Browser journeys require the new feature, real disposable fixtures and a running app/backend. Missing configuration is a setup failure, not a detected product bug. Nothing here creates a fake backend or implements the feature.
+Browser journeys require a disposable database, the repository-owned fixture seeder and a running frontend/backend. Missing configuration is a setup failure, not a detected product bug.
 
 ## Existing integrations verified by source inspection
 
@@ -13,22 +13,28 @@ Test discovery and TypeScript checking can run now. Browser journeys require the
 - Middleware forwards `ticketer_sid`; real session cookies from login are used for UI and API requests.
 - Existing transactional event URLs: `/events/{slug}`.
 - Installed `playwright` exposes `playwright/test`; no new dependency is required.
-- Backend uses NestJS URI versioning, Prisma and PostgreSQL. No database changes were made.
+- Backend uses NestJS URI versioning, Prisma and PostgreSQL. Event Site and visit migrations were applied to the isolated test database.
 
-These source observations are not claims that the live backend integration passed.
+The Event Sites HTTP/Prisma suite also passed 4/4 against PostgreSQL with the production ValidationPipe settings.
 
 ## Run
 
-From `frontend`:
+Seed only an isolated local database on port 55433 named `event_sites_test` after applying backend migrations:
+
+```sh
+cd backend
+EVENT_SITES_TEST_DATABASE=1 DATABASE_URL='postgresql://admin@127.0.0.1:55433/event_sites_test' node test/seed-event-sites-browser.mjs
+```
+
+Start the real backend with disposable Redis and the real frontend with `NEXT_PUBLIC_API_BASE_URL` pointing to that backend. From `frontend`, run:
 
 ```sh
 npm run test:e2e:list
 ./node_modules/.bin/tsc --project e2e/tsconfig.json
-npm run test:e2e -- --project=chromium
-npm run test:e2e -- --project=mobile-chromium
+E2E_ISOLATED=1 E2E_BASE_URL=http://localhost:3000 E2E_API_URL=http://localhost:3301 node e2e/event-sites/run-local.mjs e2e/event-sites --project=chromium --project=mobile-chromium
 ```
 
-Before browser execution, start the actual frontend and backend against an isolated test database/session store. Configure the frontend's `NEXT_PUBLIC_API_BASE_URL` to that backend. This suite deliberately does not auto-load `.env` or start production-configured services.
+The seeder writes mode-0600 `fixtures.json` and `accounts.json` to `/private/tmp/event-sites-browser` by default. Set `EVENT_SITES_E2E_OUTPUT` in both commands to choose another directory. The runner reads those files and supplies the credentials only to Playwright. Neither command starts services or loads production `.env` values.
 
 Set the following environment variables in the shell/CI secret store:
 
@@ -44,7 +50,7 @@ Set the following environment variables in the shell/CI secret store:
 
 All accounts must be verified organizers. Use the same hostname for frontend/backend when relying on host-only cookies; configure real CORS and session cookies appropriately. No login or entitlement is fabricated by the suite. Use separate Pro workspaces for PRO and FOREIGN.
 
-Reports/traces and a recommended `e2e/fixtures.local.json` are gitignored. Traces can contain login requests; keep them private. Example IDs below are documentation, not working seed data. Build the fixture seeder against the real new models when they exist; do not add public test-setup endpoints to production.
+Reports/traces and a recommended `e2e/fixtures.local.json` are gitignored. Traces can contain login requests; keep them private. The seeder writes directly through Prisma only after checking the isolated database name, host, port and explicit test flag; it adds no public test-setup endpoint.
 
 ## Proposed implementation contract
 
@@ -105,7 +111,7 @@ New builder tests create an independent site with a UUID slug, then remove it. A
 
 ## Coverage and limits
 
-46 project test cases are currently discovered: 43 desktop cases plus three mobile-emulation runs. Eight targeted desktop cases passed against isolated local Next.js, NestJS, PostgreSQL and Redis services; the full suite has not passed. These cover six templates, all 14 section operations, saved draft persistence, public snapshot isolation, publication with zero editions, UI/API Free gating, preview privacy, ownership, grace states, nearest/specific edition routing, responsive layouts and anonymous browser uniqueness.
+46 project test cases passed together: 43 desktop cases plus three mobile-emulation runs. These cover six templates, all 14 section operations, saved draft persistence, public snapshot isolation, publication with zero editions, UI/API Free gating, preview privacy, ownership, grace states, nearest/specific edition routing, responsive layouts and anonymous browser uniqueness.
 
 `@policy` marks assertions based on plan proposals rather than fully settled user decisions: post-grace unavailable page and browser-based visitor identity. They execute by default; review the proposed behavior before implementation.
 

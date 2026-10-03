@@ -25,7 +25,7 @@ export function HeroOverlayLayout({ event, mode }: Props) {
   return (
     <div className="home-theme min-h-screen" style={{ backgroundColor: "var(--home-bg)" }}>
       <div className="relative h-[420px] w-full overflow-hidden">
-        <Image src={event.bannerUrl} alt={event.name} fill className="object-cover" priority />
+        <Image src={event.bannerUrl || "/placeholder.jpg"} alt={event.name} fill className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
         <div className="absolute bottom-8 left-0 right-0 container mx-auto px-4">
           <span

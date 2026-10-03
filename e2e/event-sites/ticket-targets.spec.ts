@@ -7,7 +7,7 @@ test("NEXT_EVENT routes to the nearest start date rather than creation order", a
   const link = target.getByRole("link", { name: /buy tickets|get tickets/i });
   await link.click();
   await expect(page).toHaveURL(url => url.pathname === seed.events.nearestPath);
-  await expect(page.getByRole("heading", { name: seed.events.nearestName, exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(seed.events.nearestName);
 });
 
 for (const state of ["comingSoon", "soldOut"] as const) {

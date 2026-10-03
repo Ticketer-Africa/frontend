@@ -29,7 +29,7 @@ export function SplitScreenLayout({ event, mode }: Props) {
   return (
     <div className="home-theme min-h-screen pt-16 grid grid-cols-1 lg:grid-cols-2" style={{ backgroundColor: "var(--home-bg)" }}>
       <div className="relative h-64 lg:h-auto">
-        <Image src={event.bannerUrl} alt={event.name} fill className="object-cover" priority />
+        <Image src={event.bannerUrl || "/placeholder.jpg"} alt={event.name} fill className="object-cover" priority />
       </div>
 
       <div className="p-6 lg:p-10 flex flex-col">
