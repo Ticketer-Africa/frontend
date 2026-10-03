@@ -8,11 +8,17 @@ const align = (value: unknown) => value === "center" || value === "right" ? valu
 const safeUrl = (value: unknown) => typeof value === "string" && (/^https:\/\/[^\s"'()<>\\]+$/i.test(value) || /^\/[a-zA-Z0-9/_-]+$/.test(value)) ? value : null;
 const items = (value: unknown): Record<string, unknown>[] => Array.isArray(value) ? value.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === "object" && !Array.isArray(item)) : [];
 
-function TicketAction({ target }: { target?: PublicSite["ticketTarget"] }) {
+function TicketAction({ target, primary = false }: { target?: PublicSite["ticketTarget"]; primary?: boolean }) {
   if (!target) return null;
-  if (target.state === "BUY" && target.url) return <Link className="es-button" href={target.url}>Get Tickets</Link>;
   const label = target.state === "SOLD_OUT" ? "Sold out" : target.state === "CANCELLED" ? "Cancelled" : target.state === "ENDED" ? "Event ended" : target.state === "MISSING" ? "Event unavailable" : "Coming soon";
-  return <span className="es-pill">{label}</span>;
+  const action = target.state === "BUY" && target.url
+    ? <Link className="es-button" href={target.url}>Get Tickets</Link>
+    : <span className="es-pill">{label}</span>;
+  if (!primary) return action;
+  return <div className="es-primary-target" data-testid="primary-ticket-target">
+    {target.eventName && <span className="es-target-event">{target.eventName}</span>}
+    {action}
+  </div>;
 }
 
 function Cards({ entries }: { entries: Record<string, unknown>[] }) {
@@ -27,7 +33,7 @@ function SectionContent({ section, target, editions = [] }: { section: SiteSecti
   const heading = text(c.heading);
   const body = text(c.body || c.subtitle);
   switch (section.type) {
-    case "HERO": return <div className="es-hero-inner"><p className="es-eyebrow">{text(c.eyebrow) || "An event worth showing up for"}</p><h1>{heading}</h1><p className="es-lead">{body}</p><TicketAction target={target} /></div>;
+    case "HERO": return <div className="es-hero-inner"><p className="es-eyebrow">{text(c.eyebrow) || "An event worth showing up for"}</p><h1>{heading}</h1><p className="es-lead">{body}</p><TicketAction target={target} primary /></div>;
     case "ABOUT":
     case "RICH_CONTENT": return <div className="es-copy"><h2>{heading}</h2><p>{body}</p>{safeUrl(c.imageUrl) && <img src={safeUrl(c.imageUrl)!} alt={text(c.alt) || heading} loading="lazy" />}</div>;
     case "UPCOMING_EDITIONS": return <><h2>{heading || "Upcoming editions"}</h2><p className="es-muted">{body || "See what is coming next."}</p><div className="es-grid">{editions.map(edition => <article className="es-card" key={edition.id}><p>{new Date(edition.date).toLocaleDateString()}</p><h3>{edition.name}</h3><p>{edition.venueName}</p>{edition.url ? <Link className="es-button" href={edition.url}>Get Tickets</Link> : <span className="es-pill">{edition.state === "SOLD_OUT" ? "Sold out" : "Coming soon"}</span>}</article>)}</div>{!editions.length && <TicketAction target={target} />}</>;
@@ -62,7 +68,7 @@ export function EventSiteView({ document, target, editions, preview = false }: {
         sectionStyle.color = "white";
       }
       return <section key={section.id} data-section-type={section.type} aria-label={sectionLabel(section.type)} className={`es-section es-${section.type.toLowerCase().replaceAll("_", "-")}`} style={sectionStyle}>
-        <div className="es-inner"><SectionContent section={section} target={document.ticketTarget.mode === "NO_TICKET_CTA" ? undefined : target} editions={editions} /></div>
+        <div className="es-inner"><SectionContent section={section} target={document.ticketTarget.mode === "NEXT_EVENT" || document.ticketTarget.mode === "SPECIFIC_EVENT" ? target : undefined} editions={editions} /></div>
       </section>;
     })}
   </main>;

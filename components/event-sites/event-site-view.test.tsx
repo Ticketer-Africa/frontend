@@ -34,4 +34,24 @@ describe("EventSiteView", () => {
     expect(html).toContain("&lt;img src=x onerror=alert(1)&gt;");
     expect(html).not.toContain("background-image:");
   });
+
+  it("names the selected nearest edition inside the primary ticket action", () => {
+    const changed = structuredClone(document);
+    changed.ticketTarget = { mode: "NEXT_EVENT" };
+    const html = renderToStaticMarkup(<EventSiteView document={changed} target={{ eventId: "edition-1", eventName: "Nearest Friday", state: "BUY", url: "/events/nearest-friday" }} />);
+    expect(html).toContain('data-testid="primary-ticket-target"');
+    expect(html).toContain("Nearest Friday");
+    expect(html).toContain('href="/events/nearest-friday"');
+  });
+
+  it("shows edition cards without a misleading primary action in event-list mode", () => {
+    const changed = structuredClone(document);
+    changed.ticketTarget = { mode: "EVENT_LIST" };
+    const html = renderToStaticMarkup(<EventSiteView document={changed}
+      target={{ eventId: null, eventName: null, state: "COMING_SOON", url: null }}
+      editions={[{ id: "one", name: "Friday One", date: "2026-10-10T18:00:00.000Z", venueName: "Hall", state: "BUY", url: "/events/friday-one" }]} />);
+    expect(html).toContain("Friday One");
+    expect(html).toContain('href="/events/friday-one"');
+    expect(html).not.toContain('data-testid="primary-ticket-target"');
+  });
 });

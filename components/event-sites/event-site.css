@@ -15,6 +15,8 @@
 .es-button{display:inline-flex;padding:.9rem 1.35rem;border-radius:999px;background:var(--es-accent);color:white!important;font-weight:700;text-decoration:none;min-height:44px;align-items:center}
 .es-button:hover{filter:brightness(.9)}
 .es-pill{display:inline-flex;padding:.6rem 1rem;border:1px solid currentColor;border-radius:999px}
+.es-primary-target{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-top:1.5rem}
+.es-target-event{font-size:.95rem;font-weight:650;max-width:32ch;overflow-wrap:anywhere}
 .es-muted{opacity:.7}
 .es-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:1.25rem;margin-top:2rem}
 .es-card{border:1px solid rgba(0,0,0,.15);border-radius:16px;padding:1.2rem;min-width:0}
