@@ -2,7 +2,7 @@
 
 ## Status
 
-These are **tests written ahead of implementation**, not evidence that Event Sites works. The first build slice now has Event Sites routes, a workspace plan field, a basic builder, templates and a public renderer. Billing activation, analytics, richer controls and seeded E2E fixtures remain to be built. The suite contains executable Playwright assertions, uses real browser pages and real session login, and does not intercept application APIs or mock page rendering. It intentionally has no `skip`, `fixme`, or expected-failure markers that could make missing functionality look green.
+These are **acceptance tests**, not evidence that the complete Event Sites MVP works. The current build has Event Sites routes, a workspace plan field, a basic builder, templates, a public renderer and a unique-visitor/page-view analytics screen. Billing activation, conversion analytics, richer controls and seeded E2E fixtures remain to be built. The suite contains executable Playwright assertions, uses real browser pages and real session login, and does not intercept application APIs or mock page rendering. It intentionally has no `skip`, `fixme`, or expected-failure markers that could make missing functionality look green.
 
 Test discovery and TypeScript checking can run now. Browser journeys require the new feature, real disposable fixtures and a running app/backend. Missing configuration is a setup failure, not a detected product bug. Nothing here creates a fake backend or implements the feature.
 

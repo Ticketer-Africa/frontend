@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { EventSiteView } from "@/components/event-sites/event-site-view";
 import { newSection, sectionLabel, SECTION_OPTIONS, text, type SiteDocument, type SiteRecord, type SiteSection, type SectionType } from "@/components/event-sites/model";
-import { getSite, publishSite, saveSite, unpublishSite } from "@/services/event-sites/event-sites";
+import { getSite, getSiteAnalytics, publishSite, saveSite, unpublishSite } from "@/services/event-sites/event-sites";
 import { getOrganizerEventsV2 } from "@/services/events/events-v2";
 import type { EventV2 } from "@/types/events-v2.type";
 import "../site-builder.css";
@@ -27,6 +27,7 @@ export default function EventSiteBuilder() {
   const [status, setStatus] = useState("Loading");
   const [error, setError] = useState("");
   const [events, setEvents] = useState<EventV2[]>([]);
+  const [analytics, setAnalytics] = useState<{ uniqueVisitors: number; pageViews: number } | null>(null);
   const docRef = useRef<SiteDocument | null>(null);
   const savedJsonRef = useRef("");
   const revisionRef = useRef(0);
@@ -42,6 +43,7 @@ export default function EventSiteBuilder() {
       setStatus("Saved");
     }).catch(() => { setError("Could not load this site."); setStatus("Error"); });
     getOrganizerEventsV2().then(result => setEvents(Array.isArray(result) ? result : result?.data ?? [])).catch(() => {});
+    getSiteAnalytics(id).then(setAnalytics).catch(() => {});
   }, [id]);
 
   const change = useCallback((update: (document: SiteDocument) => SiteDocument) => {
@@ -127,6 +129,7 @@ export default function EventSiteBuilder() {
   return <main className="esb-shell">
     <header className="esb-top"><Link href="/organizer/event-sites">← Event Sites</Link><strong>{document.name}</strong><span>{site?.status ?? "DRAFT"}</span><span role="status" aria-label="Save status">{status}</span>
       <button type="button" onClick={() => void persist().catch(() => {})}>Save draft</button>
+      <Link href={`/organizer/event-sites/${encodeURIComponent(id)}/analytics`}>Analytics</Link>
       {site?.status === "PUBLISHED" && <><Link href={`/e/${site.slug}`} target="_blank">View live</Link><button type="button" onClick={() => setShowUnpublish(true)}>Unpublish</button></>}
       <button className="esb-primary" type="button" onClick={() => void publish()}>Publish</button>
     </header>
@@ -138,6 +141,7 @@ export default function EventSiteBuilder() {
       </li>)}</ol><button type="button" className="esb-add" onClick={() => setLibraryOpen(true)}>Add section</button></aside>
       <div className="esb-preview-wrap"><div className="esb-preview-toolbar"><strong>Preview</strong><div>{(["desktop", "tablet", "mobile"] as const).map(option => <button key={option} type="button" aria-pressed={view === option} onClick={() => setView(option)}>{option}</button>)}</div></div><div className={`esb-preview esb-${view}`}><EventSiteView document={document} preview /></div></div>
       <aside className="esb-panel esb-settings"><h2>Settings</h2>
+        {analytics && <div className="esb-analytics" aria-label="Site analytics"><strong>Last 30 days</strong><p><b>{analytics.uniqueVisitors.toLocaleString()}</b> unique visitors · <b>{analytics.pageViews.toLocaleString()}</b> page views</p><small>Visitors are estimated from browser IDs. Preview visits are excluded.</small></div>}
         {field("Site name", document.name, value => change(doc => ({ ...doc, name: value })))}
         {field("Site slug", document.slug, value => change(doc => ({ ...doc, slug: value.toLowerCase() })))}
         {field("Page title", text(document.seo.title), value => change(doc => ({ ...doc, seo: { ...doc.seo, title: value } })))}
