@@ -59,13 +59,24 @@ export default function EventManagementTabs({ event }: EventManagementTabsProps)
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
   const [analyticsMode, setAnalyticsMode] = useState<"simple" | "advanced">("simple");
 
+  // The public GET /events/:id response doesn't include per-tier sold counts
+  // (`minted`), so take them from the organizer-only analytics endpoint.
+  const { data: analytics, isLoading: analyticsLoading } =
+    useEventAnalytics(eventId);
+
   // ── Overview derived stats ───────────────────────────────────
+  const ticketCategories = event.ticketCategories?.map((cat) => ({
+    ...cat,
+    minted:
+      analytics?.tierBreakdown.find((tier) => tier.id === cat.id)?.sold ??
+      cat.minted,
+  }));
   const totalTickets =
-    event.ticketCategories?.reduce((sum, cat) => sum + (cat.maxTickets || 0), 0) ?? 0;
+    ticketCategories?.reduce((sum, cat) => sum + (cat.maxTickets || 0), 0) ?? 0;
   const ticketsSold =
-    event.ticketCategories?.reduce((sum, cat) => sum + (cat.minted || 0), 0) ?? 0;
+    ticketCategories?.reduce((sum, cat) => sum + (cat.minted || 0), 0) ?? 0;
   const totalRevenue =
-    event.ticketCategories?.reduce(
+    ticketCategories?.reduce(
       (sum, cat) => sum + (cat.minted || 0) * (cat.price || 0),
       0,
     ) ?? 0;
@@ -118,11 +129,6 @@ export default function EventManagementTabs({ event }: EventManagementTabsProps)
       },
     );
   };
-
-  // ── Analytics state ──────────────────────────────────────────
-  const { data: analytics, isLoading: analyticsLoading } = useEventAnalytics(
-    nav === "analytics" ? eventId : "",
-  );
 
   // ── Messaging state ──────────────────────────────────────────
   const { mutate: sendMessage, isPending: sendingMessage } =
@@ -207,7 +213,7 @@ export default function EventManagementTabs({ event }: EventManagementTabsProps)
                   <span>Capacity</span>
                   <span>Sold</span>
                 </div>
-                {event.ticketCategories?.map((t) => (
+                {ticketCategories?.map((t) => (
                   <div key={t.id} className="grid grid-cols-4 py-2 border-b border-[var(--home-border)] text-sm">
                     <span className="font-semibold">{t.name}</span>
                     <span>{formatPrice(t.price)}</span>
