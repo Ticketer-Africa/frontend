@@ -26,3 +26,5 @@
 .es-analytics-grid strong{font-size:.9rem;font-weight:600}
 .es-analytics-note{font-size:.85rem;color:#666;line-height:1.5;margin:1.5rem 0 0}
 @media(max-width:480px){.es-analytics-grid{grid-template-columns:1fr}}
+.esb-preview-banner{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;padding:.75rem 1.25rem;background:#171717;color:#fff;font:14px Inter,Arial,sans-serif}
+.esb-preview-banner strong{font-weight:700}.esb-preview-banner span{color:#ddd}.esb-preview-banner a{color:#fff;margin-left:auto;text-decoration:underline}

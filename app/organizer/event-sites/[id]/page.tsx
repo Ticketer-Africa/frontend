@@ -130,6 +130,7 @@ export default function EventSiteBuilder() {
     <header className="esb-top"><Link href="/organizer/event-sites">← Event Sites</Link><strong>{document.name}</strong><span>{site?.status ?? "DRAFT"}</span><span role="status" aria-label="Save status">{status}</span>
       <button type="button" onClick={() => void persist().catch(() => {})}>Save draft</button>
       <Link href={`/organizer/event-sites/${encodeURIComponent(id)}/analytics`}>Analytics</Link>
+      <Link href={`/organizer/event-sites/${encodeURIComponent(id)}/preview`} target="_blank">Open preview</Link>
       {site?.status === "PUBLISHED" && <><Link href={`/e/${site.slug}`} target="_blank">View live</Link><button type="button" onClick={() => setShowUnpublish(true)}>Unpublish</button></>}
       <button className="esb-primary" type="button" onClick={() => void publish()}>Publish</button>
     </header>

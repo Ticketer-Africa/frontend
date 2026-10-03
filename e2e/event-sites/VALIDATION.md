@@ -1,5 +1,14 @@
 # Validation results — 2026-10-03
 
+## Continued runtime validation
+
+- A production-built local Next.js frontend and real NestJS API ran against disposable PostgreSQL and Redis. One isolated Pro organizer and one isolated Free organizer were seeded directly in that database; payment/mail provider configuration used inert test values. No payment journey was run.
+- Eight targeted Chromium cases passed: unique visitors across two browsers, Free draft persistence, Free API publish denial, zero-edition Pro publication, snapshot isolation, unpublish, owner draft preview and anonymous preview denial.
+- The Event Sites backend HTTP/Prisma/PostgreSQL suite passed 4/4 with the same global ValidationPipe settings as the running app. The frontend Vitest suite passed 50/50. E2E TypeScript compilation passed. The full 46-case Playwright suite still needs the complete disposable fixture manifest and remaining MVP features.
+- The Next.js worktree development server repeatedly recompiled and did not complete hydration during the first browser attempt; the production build completed and the selected browser cases passed. The Create Event Site button now stays disabled while site data is loading, preventing an early ineffective click.
+
+## Initial suite validation
+
 - Playwright discovery: 45 project cases in six spec files.
 - E2E TypeScript compilation: passed.
 - `git diff --check`: passed.

@@ -48,7 +48,7 @@ Reports/traces and a recommended `e2e/fixtures.local.json` are gitignored. Trace
 
 ## Proposed implementation contract
 
-The following routes, accessible names and test attributes are the acceptance contract. Several are implemented in the first build slice; analytics and some test fixture states remain future work. Keep behavioral assertions when adapting controls. Adapt them in the tests when the implementation chooses equivalent interfaces; retain the behavioral assertions.
+The following routes, accessible names and test attributes are the acceptance contract. Basic private preview and visitor reporting are implemented; some test fixture states remain future work. Keep behavioral assertions when adapting controls. Adapt them in the tests when the implementation chooses equivalent interfaces; retain the behavioral assertions.
 
 ### Routes
 
@@ -105,7 +105,7 @@ New builder tests create an independent site with a UUID slug, then remove it. A
 
 ## Coverage and limits
 
-45 project test cases are currently discovered: 42 desktop cases plus three mobile-emulation runs. They are acceptance targets and have not passed as a suite. These cover six templates, all 14 section operations, saved draft persistence, public snapshot isolation, publication with zero editions, UI/API Free gating, preview privacy, ownership, grace states, nearest/specific edition routing, responsive layouts and anonymous browser uniqueness.
+46 project test cases are currently discovered: 43 desktop cases plus three mobile-emulation runs. Eight targeted desktop cases passed against isolated local Next.js, NestJS, PostgreSQL and Redis services; the full suite has not passed. These cover six templates, all 14 section operations, saved draft persistence, public snapshot isolation, publication with zero editions, UI/API Free gating, preview privacy, ownership, grace states, nearest/specific edition routing, responsive layouts and anonymous browser uniqueness.
 
 `@policy` marks assertions based on plan proposals rather than fully settled user decisions: post-grace unavailable page and browser-based visitor identity. They execute by default; review the proposed behavior before implementation.
 

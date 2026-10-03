@@ -1,5 +1,5 @@
 import Axios from "@/services/axios";
-import type { SiteDocument, SiteRecord } from "@/components/event-sites/model";
+import type { SiteDocument, SitePreview, SiteRecord } from "@/components/event-sites/model";
 
 const root = "/v1/event-sites";
 export async function listSites(): Promise<SiteRecord[]> {
@@ -12,6 +12,10 @@ export async function createSite(name: string, slug: string): Promise<SiteRecord
 }
 export async function getSite(id: string): Promise<SiteRecord> {
   const response = await Axios.get(`${root}/${encodeURIComponent(id)}`);
+  return response.data;
+}
+export async function getSitePreview(id: string): Promise<SitePreview> {
+  const response = await Axios.get(`${root}/${encodeURIComponent(id)}/preview`);
   return response.data;
 }
 export async function saveSite(id: string, document: SiteDocument, expectedRevision: number): Promise<{ draftRevision: number }> {

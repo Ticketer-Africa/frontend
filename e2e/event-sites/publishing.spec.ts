@@ -74,6 +74,15 @@ test("An anonymous visitor cannot read a private preview", async ({ browser, bas
   } finally { await visitor.close(); }
 });
 
+test("The owner can open the latest draft preview while the public slug stays private", async ({ page, context, newSite }) => {
+  const site = await newSite("FREE");
+  await page.goto(`${builderPath(site.id)}/preview`);
+  await expect(page.getByRole("heading", { name: site.heading, exact: true })).toBeVisible();
+  await expect(page.getByText("Private draft preview")).toBeVisible();
+  const publicResponse = await context.request.get(publicPath(site.slug));
+  expect(publicResponse.status()).toBe(404);
+});
+
 test("A different organizer cannot edit or publish someone else's site", async ({ context, seed }) => {
   const id = seed.sites.published.id;
   await login(context, "PRO");

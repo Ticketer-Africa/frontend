@@ -36,7 +36,7 @@ export default function EventSitesIndex() {
   return <main style={{ maxWidth: 1100, margin: "0 auto", padding: "3rem 1rem", color: "#171717" }}>
     <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
       <div><p style={{ textTransform: "uppercase", letterSpacing: ".15em", fontSize: 12 }}>Organizer workspace</p><h1 style={{ fontSize: "clamp(2rem,4vw,3.5rem)", fontWeight: 750 }}>Event Sites</h1><p>One website for your event brand. Keep it as editions come and go.</p></div>
-      <button type="button" onClick={() => setCreating(true)} style={{ background: "#151515", color: "white", padding: ".85rem 1.2rem", borderRadius: 999 }}>Create Event Site</button>
+      <button type="button" disabled={loading} onClick={() => setCreating(true)} style={{ background: "#151515", color: "white", padding: ".85rem 1.2rem", borderRadius: 999 }}>Create Event Site</button>
     </div>
     {error && <p role="alert">{error}</p>}
     {loading ? <p>Loading sites...</p> : sites.length ? <div style={{ display: "grid", gap: 16, marginTop: 40 }}>

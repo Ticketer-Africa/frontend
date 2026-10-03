@@ -39,6 +39,10 @@ export interface PublicSite {
   editions: Array<{ id: string; name: string; date: string; venueName: string | null; state: "BUY" | "COMING_SOON" | "SOLD_OUT"; url: string | null }>;
   ticketTarget: { eventId: string | null; eventName: string | null; state: "BUY" | "COMING_SOON" | "SOLD_OUT" | "CANCELLED" | "ENDED" | "MISSING"; url: string | null };
 }
+export interface SitePreview extends SiteRecord {
+  editions: PublicSite["editions"];
+  ticketTarget: PublicSite["ticketTarget"];
+}
 export const sectionLabel = (type: SectionType) => SECTION_OPTIONS.find(item => item[0] === type)?.[1] ?? type;
 export const text = (value: unknown) => typeof value === "string" ? value : "";
 export function newSection(type: SectionType): SiteSection {
