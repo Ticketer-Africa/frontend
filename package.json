@@ -10,6 +10,8 @@
     "start": "next start",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:list": "playwright test --list",
     "generate:layout-previews": "node scripts/generate-layout-previews.mjs"
   },
   "dependencies": {

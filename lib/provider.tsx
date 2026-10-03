@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth-context";
+import { usePathname } from "next/navigation";
 
 // Configure QueryClient with caching settings
 const queryClient = new QueryClient({
@@ -37,13 +38,14 @@ const queryClient = new QueryClient({
 });
 
 export default function Providers({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         {children}
         <Toaster />
       </AuthProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {!pathname.startsWith("/e/") && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   );
 }

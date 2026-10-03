@@ -129,6 +129,8 @@ export function Header() {
   // Nav items shown: on Home, include Resale Market to match Figma; elsewhere keep the original two.
   const navItems = isHome ? NAVIGATION : NAVIGATION.slice(0, 2);
 
+  if (pathname.startsWith("/e/") || pathname.startsWith("/organizer/event-sites/")) return null;
+
   return (
     <header
       className={clsx(
