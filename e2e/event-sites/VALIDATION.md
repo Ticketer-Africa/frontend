@@ -1,12 +1,12 @@
-# Validation results — 2026-10-03
+# Validation results — 2026-10-04
 
 ## Continued runtime validation
 
-- Latest reproducible run: `backend/test/seed-event-sites-browser.mjs` created the disposable accounts/sites/editions; `frontend/e2e/event-sites/run-local.mjs` ran both Chrome projects. Result: **46/46 Playwright cases passed together** in 2.6 minutes. The backend site-list shape was corrected after the first full run exposed a client crash. An Event Site-specific unavailable page, narrow-heading wrap, and missing-event-banner fallback resolved the other runtime findings. The FAQ test now operates the native `<summary>` control, and event-page assertions match its actual heading and Select action.
+- Latest reproducible run: `backend/test/seed-event-sites-browser.mjs` created the disposable accounts/sites/editions; `frontend/e2e/event-sites/run-local.mjs` ran both Chrome projects. Final result: **48/48 Playwright cases passed together** in 2.9 minutes (45 desktop and three mobile-emulation cases). The backend site-list shape was corrected after the first full run exposed a client crash. An Event Site-specific unavailable page, narrow-heading wrap, and missing-event-banner fallback resolved the other runtime findings. The FAQ test now operates the native `<summary>` control, and event-page assertions match its actual heading and Select action.
 
 - A production-built local Next.js frontend and real NestJS API ran against disposable PostgreSQL and Redis. One isolated Pro organizer and one isolated Free organizer were seeded directly in that database; payment/mail provider configuration used inert test values. No payment journey was run.
 - Eight targeted Chromium cases passed: unique visitors across two browsers, Free draft persistence, Free API publish denial, zero-edition Pro publication, snapshot isolation, unpublish, owner draft preview and anonymous preview denial.
-- The Event Sites backend HTTP/Prisma/PostgreSQL suite passed 4/4 with the same global ValidationPipe settings as the running app. The frontend Vitest suite passed 50/50. E2E TypeScript compilation passed. The full 46-case Playwright suite still needs the complete disposable fixture manifest and remaining MVP features.
+- The Event Sites backend HTTP/Prisma/PostgreSQL suite passed 4/4 with the same global ValidationPipe settings as the running app. The E2E TypeScript check passed before the production build. The final app build succeeded. The full browser suite is green; it does not cover the incomplete paid billing and confirmed-purchase attribution integrations.
 - The Next.js worktree development server repeatedly recompiled and did not complete hydration during the first browser attempt; the production build completed and the selected browser cases passed. The Create Event Site button now stays disabled while site data is loading, preventing an early ineffective click.
 
 ## Initial suite validation
@@ -62,3 +62,11 @@ Failed assertions:
 - `app/events/_shared/layouts/timeline-layout.test.tsx` — TimelineLayout renders the show timeline in order and the lineup
 - `app/events/_shared/layouts/timeline-layout.test.tsx` — TimelineLayout suggests other events to explore
 - `app/events/_shared/layouts/timeline-layout.test.tsx` — TimelineLayout opens a ticket selection modal instead of checking out directly
+
+
+## Final continuation — ticket clicks and editor Undo
+
+- Added a public ticket-click endpoint backed by `EventSiteClick`. The API verifies a published section and linked edition, deduplicates retries by UUID click ID, and includes the 30-day click count in owner analytics. `test/event-sites.e2e-spec.ts` passed 4/4 through Nest, Prisma and PostgreSQL after both migrations were applied.
+- Ticket actions on public pages report click IDs; private preview does not. Analytics displays unique visitors, page views and ticket button clicks. Added editor Undo for recent in-memory draft edits.
+- Added browser acceptance for ticket-click analytics and Undo. The full final suite passed **48/48** desktop/mobile Playwright cases. E2E TypeScript compilation and `git diff --check` passed after reinstalling the local development dependencies. Next production build exited 0; its static sitemap fetch logged an expected network/DNS failure in the isolated environment.
+- Remaining product scope: real Pro billing/upgrade lifecycle, confirmed paid order attribution/revenue/refund metrics, full PRD media/theme/SEO customization, team roles and their end-to-end tests. A sandbox payment journey was not run. Repository-wide Nest build still reports the pre-existing payout-admin return-type error. The frontend Vitest run reports 38 failures out of 76 tests with `act(...) is not supported in production builds of React`; the focused public renderer tests passed, and the Playwright suite passed.

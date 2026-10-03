@@ -30,7 +30,7 @@ export async function unpublishSite(id: string) {
   const response = await Axios.post(`${root}/${encodeURIComponent(id)}/unpublish`);
   return response.data;
 }
-export async function getSiteAnalytics(id: string): Promise<{ windowDays: number; uniqueVisitors: number; pageViews: number }> {
+export async function getSiteAnalytics(id: string): Promise<{ windowDays: number; uniqueVisitors: number; pageViews: number; ticketCtaClicks: number }> {
   const response = await Axios.get(`${root}/${encodeURIComponent(id)}/analytics?days=30`);
   return response.data;
 }

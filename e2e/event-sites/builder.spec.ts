@@ -12,6 +12,16 @@ for (const template of templates) {
   });
 }
 
+test("Undo restores the previous draft edit", async ({ page, newSite }) => {
+  await newSite();
+  const heading = page.getByRole("textbox", { name: "Hero heading", exact: true });
+  const original = await heading.inputValue();
+  await heading.fill("A temporary headline");
+  await expect(heading).toHaveValue("A temporary headline");
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
+  await expect(heading).toHaveValue(original);
+});
+
 for (const section of sections) {
   test(`${section} can be added, duplicated, hidden and deleted without losing persisted order`, async ({ page, newSite }) => {
     await newSite();

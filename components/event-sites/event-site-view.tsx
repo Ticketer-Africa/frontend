@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
+import { TrackedTicketLink } from "./tracked-ticket-link";
 import { sectionLabel, text, type PublicSite, type SiteDocument, type SiteSection } from "./model";
 import "./event-site.css";
 
@@ -8,11 +9,11 @@ const align = (value: unknown) => value === "center" || value === "right" ? valu
 const safeUrl = (value: unknown) => typeof value === "string" && (/^https:\/\/[^\s"'()<>\\]+$/i.test(value) || /^\/[a-zA-Z0-9/_-]+$/.test(value)) ? value : null;
 const items = (value: unknown): Record<string, unknown>[] => Array.isArray(value) ? value.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === "object" && !Array.isArray(item)) : [];
 
-function TicketAction({ target, primary = false }: { target?: PublicSite["ticketTarget"]; primary?: boolean }) {
+function TicketAction({ target, primary = false, slug, sectionId }: { target?: PublicSite["ticketTarget"]; primary?: boolean; slug?: string; sectionId: string }) {
   if (!target) return null;
   const label = target.state === "SOLD_OUT" ? "Sold out" : target.state === "CANCELLED" ? "Cancelled" : target.state === "ENDED" ? "Event ended" : target.state === "MISSING" ? "Event unavailable" : "Coming soon";
   const action = target.state === "BUY" && target.url
-    ? <Link className="es-button" href={target.url}>Get Tickets</Link>
+    ? <TrackedTicketLink href={target.url} slug={slug} sectionId={sectionId} eventId={target.eventId}>Get Tickets</TrackedTicketLink>
     : <span className="es-pill">{label}</span>;
   if (!primary) return action;
   return <div className="es-primary-target" data-testid="primary-ticket-target">
@@ -28,16 +29,16 @@ function Cards({ entries }: { entries: Record<string, unknown>[] }) {
   </article>)}</div>;
 }
 
-function SectionContent({ section, target, editions = [] }: { section: SiteSection; target?: PublicSite["ticketTarget"]; editions?: PublicSite["editions"] }) {
+function SectionContent({ section, target, editions = [], slug }: { section: SiteSection; target?: PublicSite["ticketTarget"]; editions?: PublicSite["editions"]; slug?: string }) {
   const c = section.content;
   const heading = text(c.heading);
   const body = text(c.body || c.subtitle);
   switch (section.type) {
-    case "HERO": return <div className="es-hero-inner"><p className="es-eyebrow">{text(c.eyebrow) || "An event worth showing up for"}</p><h1>{heading}</h1><p className="es-lead">{body}</p><TicketAction target={target} primary /></div>;
+    case "HERO": return <div className="es-hero-inner"><p className="es-eyebrow">{text(c.eyebrow) || "An event worth showing up for"}</p><h1>{heading}</h1><p className="es-lead">{body}</p><TicketAction target={target} primary slug={slug} sectionId={section.id} /></div>;
     case "ABOUT":
     case "RICH_CONTENT": return <div className="es-copy"><h2>{heading}</h2><p>{body}</p>{safeUrl(c.imageUrl) && <img src={safeUrl(c.imageUrl)!} alt={text(c.alt) || heading} loading="lazy" />}</div>;
-    case "UPCOMING_EDITIONS": return <><h2>{heading || "Upcoming editions"}</h2><p className="es-muted">{body || "See what is coming next."}</p><div className="es-grid">{editions.map(edition => <article className="es-card" key={edition.id}><p>{new Date(edition.date).toLocaleDateString()}</p><h3>{edition.name}</h3><p>{edition.venueName}</p>{edition.url ? <Link className="es-button" href={edition.url}>Get Tickets</Link> : <span className="es-pill">{edition.state === "SOLD_OUT" ? "Sold out" : "Coming soon"}</span>}</article>)}</div>{!editions.length && <TicketAction target={target} />}</>;
-    case "TICKET_CTA": return <div className="es-cta"><h2>{heading}</h2><p>{body}</p><TicketAction target={target} /></div>;
+    case "UPCOMING_EDITIONS": return <><h2>{heading || "Upcoming editions"}</h2><p className="es-muted">{body || "See what is coming next."}</p><div className="es-grid">{editions.map(edition => <article className="es-card" key={edition.id}><p>{new Date(edition.date).toLocaleDateString()}</p><h3>{edition.name}</h3><p>{edition.venueName}</p>{edition.url ? <TrackedTicketLink href={edition.url} slug={slug} sectionId={section.id} eventId={edition.id}>Get Tickets</TrackedTicketLink> : <span className="es-pill">{edition.state === "SOLD_OUT" ? "Sold out" : "Coming soon"}</span>}</article>)}</div>{!editions.length && <TicketAction target={target} slug={slug} sectionId={section.id} />}</>;
+    case "TICKET_CTA": return <div className="es-cta"><h2>{heading}</h2><p>{body}</p><TicketAction target={target} slug={slug} sectionId={section.id} /></div>;
     case "LINEUP":
     case "SPONSORS":
     case "GALLERY": return <><h2>{heading}</h2><Cards entries={items(c.items)} />{!items(c.items).length && <p className="es-muted">{body}</p>}</>;
@@ -50,7 +51,7 @@ function SectionContent({ section, target, editions = [] }: { section: SiteSecti
   }
 }
 
-export function EventSiteView({ document, target, editions, preview = false }: { document: SiteDocument; target?: PublicSite["ticketTarget"]; editions?: PublicSite["editions"]; preview?: boolean }) {
+export function EventSiteView({ document, target, editions, preview = false, slug }: { document: SiteDocument; target?: PublicSite["ticketTarget"]; editions?: PublicSite["editions"]; preview?: boolean; slug?: string }) {
   const style: CSSProperties = {
     backgroundColor: color(document.theme.background, "#fffaf2"),
     color: color(document.theme.text, "#171717"),
@@ -68,7 +69,7 @@ export function EventSiteView({ document, target, editions, preview = false }: {
         sectionStyle.color = "white";
       }
       return <section key={section.id} data-section-type={section.type} aria-label={sectionLabel(section.type)} className={`es-section es-${section.type.toLowerCase().replaceAll("_", "-")}`} style={sectionStyle}>
-        <div className="es-inner"><SectionContent section={section} target={document.ticketTarget.mode === "NEXT_EVENT" || document.ticketTarget.mode === "SPECIFIC_EVENT" ? target : undefined} editions={editions} /></div>
+        <div className="es-inner"><SectionContent section={section} target={document.ticketTarget.mode === "NEXT_EVENT" || document.ticketTarget.mode === "SPECIFIC_EVENT" ? target : undefined} editions={editions} slug={preview ? undefined : slug} /></div>
       </section>;
     })}
   </main>;

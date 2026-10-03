@@ -26,5 +26,5 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function EventSitePage({ params }: { params: { slug: string } }) {
   const site = await loadSite(params.slug);
   if (!site) notFound();
-  return <><EventSiteView document={site.document} target={site.ticketTarget} editions={site.editions} /><VisitTracker slug={site.slug} apiBase={process.env.NEXT_PUBLIC_API_BASE_URL || ""} /></>;
+  return <><EventSiteView document={site.document} target={site.ticketTarget} editions={site.editions} slug={site.slug} /><VisitTracker slug={site.slug} apiBase={process.env.NEXT_PUBLIC_API_BASE_URL || ""} /></>;
 }

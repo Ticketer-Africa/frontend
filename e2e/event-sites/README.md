@@ -2,7 +2,7 @@
 
 ## Status
 
-These are **acceptance tests**, not evidence that the complete Event Sites MVP works. All 46 cases passed in desktop and mobile Chrome against isolated local Next.js, NestJS, PostgreSQL and Redis services. Billing activation, conversion analytics, richer controls and payment sandbox coverage remain to be built. The suite uses real browser pages and real session login; it does not intercept application APIs or mock page rendering.
+These are **acceptance tests**, not evidence that the complete Event Sites MVP works. The acceptance suite covers organizer draft/publish flows, public behavior and analytics against isolated local Next.js, NestJS, PostgreSQL and Redis services. Ticket CTA clicks are captured and reported. Billing activation, confirmed-purchase attribution, richer controls and payment sandbox coverage remain incomplete. The suite uses real browser pages and real session login; it does not intercept application APIs or mock page rendering.
 
 Browser journeys require a disposable database, the repository-owned fixture seeder and a running frontend/backend. Missing configuration is a setup failure, not a detected product bug.
 
@@ -64,6 +64,7 @@ The following routes, accessible names and test attributes are the acceptance co
 - `/e/{slug}`: published page, anonymously accessible; unpublished is HTTP 404.
 - `/v1/event-sites/{id}`: authenticated GET/PATCH/DELETE.
 - `/v1/event-sites/{id}/publish`: POST. Tests expect capability/entitlement rejection to return 403; successful UI publication must result in a successful server response. If expected-revision becomes a required request field, send the real current revision in the direct API tests rather than allowing validation errors to stand in for authorization results.
+- `/v1/public/event-sites/{slug}/click`: public POST for an actionable ticket CTA; accepts its published section ID, linked edition ID and unique click ID.
 
 Only newly created site IDs are deleted by the per-test cleanup. Seeded editions and sites are never automatically deleted. Reset/reseed the disposable installation between runs, particularly after failures before the builder returns a site ID. Future DELETE implementation must preserve independent editions/orders.
 
@@ -85,6 +86,7 @@ Only newly created site IDs are deleted by the per-test cleanup. Seeded editions
 - `data-testid="primary-ticket-target"` wraps the selected edition name and CTA/status, so other edition cards cannot satisfy primary-target assertions accidentally.
 - Actionable ticket links use accessible names Buy tickets or Get tickets and lead to the real existing transactional page.
 - Analytics values use `data-testid="unique-visitors"` and `data-testid="site-views"` and render plain integer counts for these small test fixtures.
+- Ticket-button click totals use `data-testid="ticket-cta-clicks"` and deduplicate requests by click ID.
 - FAQ fixture contains `What time do doors open?` with answer `Doors open at 6 PM.`
 
 ## Seed contract
@@ -111,17 +113,17 @@ New builder tests create an independent site with a UUID slug, then remove it. A
 
 ## Coverage and limits
 
-46 project test cases passed together: 43 desktop cases plus three mobile-emulation runs. These cover six templates, all 14 section operations, saved draft persistence, public snapshot isolation, publication with zero editions, UI/API Free gating, preview privacy, ownership, grace states, nearest/specific edition routing, responsive layouts and anonymous browser uniqueness.
+The final full desktop/mobile run passed 48 cases: 45 desktop and three mobile-emulation runs. Coverage includes click analytics, repeated-click request deduplication, and editor Undo. These cover six templates, all 14 section operations, saved draft persistence, public snapshot isolation, publication with zero editions, UI/API Free gating, preview privacy, ownership, grace states, nearest/specific edition routing, responsive layouts and anonymous browser uniqueness.
 
 `@policy` marks assertions based on plan proposals rather than fully settled user decisions: post-grace unavailable page and browser-based visitor identity. They execute by default; review the proposed behavior before implementation.
 
 The following still need executable coverage once their concrete integrations exist; do not treat this initial suite as full MVP certification:
 
 1. Exact `expiry + 7 days` boundary, cache invalidation, Pro restoration and preservation of explicit unpublish. Current fixtures cover day six/day eight, not the exact cutoff.
-2. A sandbox paid purchase, authoritative payment webhook, QR issuance/check-in, purchase attribution, retry deduplication and refunds. Current CTA tests reach the existing event page; they do not prove payment succeeds.
+2. A sandbox paid purchase, authoritative payment webhook, QR issuance/check-in, purchase attribution, retry deduplication and refunds. CTA clicks are now recorded against the published site and linked edition. Current tests reach the existing event page; they do not prove payment succeeds or attribute confirmed purchases/revenue.
 3. Edition linking/unlinking persistence and publish isolation, EVENT_LIST, live cancellations/deletion, date ties/timezones, ongoing editions and sales-window transitions.
 4. Full theme/media/SEO controls; uploaded assets, schema migration, malicious input, broken media, missing assets and font loading.
-5. Concurrent autosaves/publication, slug races, network recovery, stale revisions, undo, granular editor/operations roles and non-cascading deletion.
-6. Analytics reporting-period boundaries, unavailable storage, cookie expiry, bots, CTA counts and duplicate event ingestion.
+5. Concurrent autosaves/publication, slug races, network recovery, stale revisions, granular editor/operations roles and non-cascading deletion.
+6. Analytics reporting-period boundaries, unavailable storage, cookie expiry, bots and duplicate purchase ingestion. Click retries are deduplicated by a unique click ID.
 
 Use real framework/database/request-path integration tests for these backend guarantees. Static type checks or mocked responses cannot establish compatibility.

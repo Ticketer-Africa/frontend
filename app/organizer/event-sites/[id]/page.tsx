@@ -27,12 +27,13 @@ export default function EventSiteBuilder() {
   const [status, setStatus] = useState("Loading");
   const [error, setError] = useState("");
   const [events, setEvents] = useState<EventV2[]>([]);
-  const [analytics, setAnalytics] = useState<{ uniqueVisitors: number; pageViews: number } | null>(null);
+  const [analytics, setAnalytics] = useState<{ uniqueVisitors: number; pageViews: number; ticketCtaClicks: number } | null>(null);
   const docRef = useRef<SiteDocument | null>(null);
   const savedJsonRef = useRef("");
   const revisionRef = useRef(0);
   const pendingSave = useRef<Promise<void> | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const undoStack = useRef<SiteDocument[]>([]);
 
   useEffect(() => {
     getSite(id).then(value => {
@@ -48,11 +49,22 @@ export default function EventSiteBuilder() {
 
   const change = useCallback((update: (document: SiteDocument) => SiteDocument) => {
     if (!docRef.current) return;
-    const next = update(docRef.current);
+    const previous = docRef.current;
+    const next = update(previous);
+    if (next === previous) return;
+    undoStack.current = [...undoStack.current.slice(-49), previous];
     docRef.current = next;
     setDocument(next);
     setStatus("Unsaved changes");
   }, []);
+
+  function undo() {
+    const previous = undoStack.current.pop();
+    if (!previous) return;
+    docRef.current = previous;
+    setDocument(previous);
+    setStatus("Unsaved changes");
+  }
 
   const persist = useCallback(async () => {
     if (timer.current) clearTimeout(timer.current);
@@ -129,6 +141,7 @@ export default function EventSiteBuilder() {
   return <main className="esb-shell">
     <header className="esb-top"><Link href="/organizer/event-sites">← Event Sites</Link><strong>{document.name}</strong><span>{site?.status ?? "DRAFT"}</span><span role="status" aria-label="Save status">{status}</span>
       <button type="button" onClick={() => void persist().catch(() => {})}>Save draft</button>
+      <button type="button" onClick={undo} disabled={!undoStack.current.length}>Undo</button>
       <Link href={`/organizer/event-sites/${encodeURIComponent(id)}/analytics`}>Analytics</Link>
       <Link href={`/organizer/event-sites/${encodeURIComponent(id)}/preview`} target="_blank">Open preview</Link>
       {site?.status === "PUBLISHED" && <><Link href={`/e/${site.slug}`} target="_blank">View live</Link><button type="button" onClick={() => setShowUnpublish(true)}>Unpublish</button></>}
@@ -142,7 +155,7 @@ export default function EventSiteBuilder() {
       </li>)}</ol><button type="button" className="esb-add" onClick={() => setLibraryOpen(true)}>Add section</button></aside>
       <div className="esb-preview-wrap"><div className="esb-preview-toolbar"><strong>Preview</strong><div>{(["desktop", "tablet", "mobile"] as const).map(option => <button key={option} type="button" aria-pressed={view === option} onClick={() => setView(option)}>{option}</button>)}</div></div><div className={`esb-preview esb-${view}`}><EventSiteView document={document} preview /></div></div>
       <aside className="esb-panel esb-settings"><h2>Settings</h2>
-        {analytics && <div className="esb-analytics" aria-label="Site analytics"><strong>Last 30 days</strong><p><b>{analytics.uniqueVisitors.toLocaleString()}</b> unique visitors · <b>{analytics.pageViews.toLocaleString()}</b> page views</p><small>Visitors are estimated from browser IDs. Preview visits are excluded.</small></div>}
+        {analytics && <div className="esb-analytics" aria-label="Site analytics"><strong>Last 30 days</strong><p><b>{analytics.uniqueVisitors.toLocaleString()}</b> unique visitors · <b>{analytics.pageViews.toLocaleString()}</b> page views · <b>{analytics.ticketCtaClicks.toLocaleString()}</b> ticket clicks</p><small>Visitors are estimated from browser IDs. Preview visits are excluded.</small></div>}
         {field("Site name", document.name, value => change(doc => ({ ...doc, name: value })))}
         {field("Site slug", document.slug, value => change(doc => ({ ...doc, slug: value.toLowerCase() })))}
         {field("Page title", text(document.seo.title), value => change(doc => ({ ...doc, seo: { ...doc.seo, title: value } })))}
