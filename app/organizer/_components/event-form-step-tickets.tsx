@@ -149,29 +149,36 @@ export function EventFormStepTickets({
         </button>
       </div>
 
-      <div className="bg-gray-50/70 rounded-2xl p-5 space-y-3">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Service Fees</p>
-        <p className="text-xs text-gray-500">Who pays the platform service fees?</p>
-        <div className="flex items-center gap-1 bg-gray-200/60 p-1 rounded-xl">
+      <div className="rounded-2xl border p-5 space-y-3" style={{ backgroundColor: "var(--home-card-elevated)", borderColor: "var(--home-border)" }}>
+        <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--home-muted)" }}>Service Fees</p>
+        <p className="text-sm font-medium" style={{ color: "var(--home-text)" }}>Who pays the platform service fees?</p>
+        <div role="group" aria-label="Platform service fee payer" className="grid grid-cols-2 gap-1 rounded-xl border p-1" style={{ backgroundColor: "var(--home-bg)", borderColor: "var(--home-border-strong)" }}>
           <button
             type="button"
-            onClick={() => setValue("feeMode", "ORGANIZER")}
-            className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-medium transition-colors ${
-              feeMode === "ORGANIZER" ? "bg-[#1E88E5] text-white shadow" : "text-gray-600 hover:text-gray-900"
-            }`}
+            aria-pressed={feeMode === "ORGANIZER"}
+            disabled={isDisabled}
+            onClick={() => setValue("feeMode", "ORGANIZER", { shouldDirty: true })}
+            className="min-h-11 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--home-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+            style={{ backgroundColor: feeMode === "ORGANIZER" ? "var(--home-accent)" : "transparent", color: feeMode === "ORGANIZER" ? "var(--home-accent-fg)" : "var(--home-muted)" }}
           >
             You Pay
           </button>
           <button
             type="button"
-            onClick={() => setValue("feeMode", "ATTENDEE")}
-            className={`flex-1 py-2.5 px-3 rounded-lg text-sm font-medium transition-colors ${
-              feeMode === "ATTENDEE" ? "bg-[#1E88E5] text-white shadow" : "text-gray-600 hover:text-gray-900"
-            }`}
+            aria-pressed={feeMode === "ATTENDEE"}
+            disabled={isDisabled}
+            onClick={() => setValue("feeMode", "ATTENDEE", { shouldDirty: true })}
+            className="min-h-11 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--home-accent)] disabled:cursor-not-allowed disabled:opacity-50"
+            style={{ backgroundColor: feeMode === "ATTENDEE" ? "var(--home-accent)" : "transparent", color: feeMode === "ATTENDEE" ? "var(--home-accent-fg)" : "var(--home-muted)" }}
           >
             Attendees Pay
           </button>
         </div>
+        <p className="text-xs" style={{ color: "var(--home-muted)" }} aria-live="polite">
+          {feeMode === "ATTENDEE"
+            ? "The platform fee is added to the attendee ticket price."
+            : "The platform fee is deducted from your ticket payout."}
+        </p>
       </div>
     </div>
   );

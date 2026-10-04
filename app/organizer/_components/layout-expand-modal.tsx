@@ -5,6 +5,7 @@ import { LAYOUT_COMPONENTS } from "@/app/events/_shared/layouts/registry";
 import { buildDummyEventLayoutViewModel } from "@/lib/dummy-event-fixture";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import { createPortal } from "react-dom";
 
 interface Props {
   layout: EventLayout;
@@ -17,7 +18,7 @@ export function LayoutExpandModal({ layout, isOpen, onClose }: Props) {
 
   const Component = LAYOUT_COMPONENTS[layout];
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 bg-black/70 overflow-y-auto">
       <button
         type="button"
@@ -30,6 +31,7 @@ export function LayoutExpandModal({ layout, isOpen, onClose }: Props) {
       <div className="min-h-screen">
         <Component event={buildDummyEventLayoutViewModel(layout)} mode="preview" />
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

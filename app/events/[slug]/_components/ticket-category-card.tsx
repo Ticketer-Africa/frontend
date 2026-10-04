@@ -13,6 +13,7 @@ type Props = {
   onQuantityChange: (delta: number) => void;
   feeMode: "ORGANIZER" | "ATTENDEE";
   primaryFeeBps: number;
+  isPreview?: boolean;
 };
 
 export function TicketCategoryCardV2({
@@ -23,6 +24,7 @@ export function TicketCategoryCardV2({
   onQuantityChange,
   feeMode,
   primaryFeeBps,
+  isPreview = false,
 }: Props) {
   const available = category.maxTickets - (category.minted ?? 0);
   const outOfStock = available <= 0;
@@ -71,11 +73,12 @@ export function TicketCategoryCardV2({
             style={{ backgroundColor: "var(--home-bg)", borderColor: "var(--home-border)" }}
           >
             <Button
+              type="button"
               size="icon"
               variant="ghost"
               className="h-8 w-8 text-[var(--home-text)] hover:bg-[var(--home-card-elevated)] hover:text-[var(--home-text-highlight)]"
               onClick={() => onQuantityChange(-1)}
-              disabled={quantity <= 1}
+              disabled={isPreview || quantity <= 1}
             >
               <HugeiconsIcon icon={MinusSignIcon} className="h-4 w-4" />
             </Button>
@@ -83,11 +86,12 @@ export function TicketCategoryCardV2({
               {quantity}
             </span>
             <Button
+              type="button"
               size="icon"
               variant="ghost"
               className="h-8 w-8 text-[var(--home-text)] hover:bg-[var(--home-card-elevated)] hover:text-[var(--home-text-highlight)]"
               onClick={() => onQuantityChange(1)}
-              disabled={quantity >= available || quantity >= 10}
+              disabled={isPreview || quantity >= available || quantity >= 10}
             >
               <HugeiconsIcon icon={Add01Icon} className="h-4 w-4" />
             </Button>
@@ -97,11 +101,12 @@ export function TicketCategoryCardV2({
         )}
 
         <Button
+          type="button"
           variant={isSelected ? "homeAccent" : "homeOutline"}
           size="sm"
           className="min-w-[100px]"
           onClick={onToggle}
-          disabled={outOfStock}
+          disabled={isPreview || outOfStock}
         >
           {isSelected ? "Selected" : outOfStock ? "Sold Out" : "Select"}
         </Button>

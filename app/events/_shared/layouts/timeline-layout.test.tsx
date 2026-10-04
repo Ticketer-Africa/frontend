@@ -26,7 +26,7 @@ describe("TimelineLayout", () => {
 
   it("opens a ticket selection modal instead of checking out directly", () => {
     const event = buildDummyEventLayoutViewModel("TIMELINE");
-    render(<TimelineLayout event={event} mode="preview" />);
+    render(<TimelineLayout event={event} mode="live" />);
 
     expect(screen.queryByText("Select Your Tickets")).not.toBeInTheDocument();
 

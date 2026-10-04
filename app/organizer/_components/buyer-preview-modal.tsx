@@ -4,6 +4,7 @@ import { EventLayoutViewModel } from "@/types/event-layout.type";
 import { LAYOUT_COMPONENTS } from "@/app/events/_shared/layouts/registry";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import { createPortal } from "react-dom";
 
 interface Props {
   event: EventLayoutViewModel;
@@ -20,7 +21,7 @@ export function BuyerPreviewModal({ event, isOpen, onClose }: Props) {
 
   const LayoutComponent = LAYOUT_COMPONENTS[event.layout];
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 bg-black/70 overflow-y-auto">
       <button
         type="button"
@@ -33,6 +34,7 @@ export function BuyerPreviewModal({ event, isOpen, onClose }: Props) {
       <div className="min-h-screen">
         <LayoutComponent event={event} mode="preview" />
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

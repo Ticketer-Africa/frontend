@@ -26,7 +26,7 @@ describe("EditorialLayout", () => {
 
   it("opens a ticket selection modal instead of checking out directly", () => {
     const event = buildDummyEventLayoutViewModel("EDITORIAL");
-    render(<EditorialLayout event={event} mode="preview" />);
+    render(<EditorialLayout event={event} mode="live" />);
 
     expect(screen.queryByText("Select Your Tickets")).not.toBeInTheDocument();
 

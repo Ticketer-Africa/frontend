@@ -26,7 +26,7 @@ describe("SplitScreenLayout", () => {
 
   it("requires selecting a ticket category before it can be bought", () => {
     const event = buildDummyEventLayoutViewModel("SPLIT_SCREEN");
-    render(<SplitScreenLayout event={event} mode="preview" />);
+    render(<SplitScreenLayout event={event} mode="live" />);
 
     expect(screen.getByText("Select a ticket to continue")).toBeDisabled();
 

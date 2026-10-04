@@ -75,6 +75,7 @@ export function EditorialLayout({ event, mode }: Props) {
                   <Link
                     key={related.id}
                     href={`/events/${related.slug}`}
+                    onClick={mode === "preview" ? (event) => event.preventDefault() : undefined}
                     className="rounded-xl border overflow-hidden block"
                     style={{ borderColor: "var(--home-border)" }}
                   >
@@ -117,7 +118,7 @@ export function EditorialLayout({ event, mode }: Props) {
               <span style={{ color: "var(--home-muted)" }}>From</span>
               <span className="font-semibold" style={{ color: "var(--home-text)" }}>₦{fromPrice.toLocaleString()}</span>
             </div>
-            <Button size="lg" variant="homeAccent" className="w-full mt-2" onClick={() => setIsTicketModalOpen(true)}>
+            <Button type="button" size="lg" variant="homeAccent" className="w-full mt-2" disabled={mode === "preview"} onClick={() => setIsTicketModalOpen(true)}>
               Buy Tickets
             </Button>
           </div>
@@ -143,6 +144,7 @@ export function EditorialLayout({ event, mode }: Props) {
                 onQuantityChange={(delta) =>
                   selection.updateQuantity(category.id, (q) => q + delta)
                 }
+                isPreview={mode === "preview"}
                 feeMode={event.feeMode}
                 primaryFeeBps={event.primaryFeeBps}
               />
@@ -152,7 +154,8 @@ export function EditorialLayout({ event, mode }: Props) {
             size="lg"
             variant="homeAccent"
             className="w-full"
-            disabled={!selection.hasSelection}
+            disabled={mode === "preview" || !selection.hasSelection}
+            type="button"
             onClick={handleCheckout}
           >
             {selection.hasSelection

@@ -43,6 +43,7 @@ export function SplitScreenLayout({ event, mode }: Props) {
           {TABS.map((tab) => (
             <button
               key={tab}
+              type="button"
               role="tab"
               aria-selected={activeTab === tab}
               onClick={() => setActiveTab(tab)}
@@ -95,6 +96,7 @@ export function SplitScreenLayout({ event, mode }: Props) {
               onQuantityChange={(delta) =>
                 selection.updateQuantity(category.id, (q) => q + delta)
               }
+              isPreview={mode === "preview"}
               feeMode={event.feeMode}
               primaryFeeBps={event.primaryFeeBps}
             />
@@ -103,7 +105,8 @@ export function SplitScreenLayout({ event, mode }: Props) {
             size="lg"
             variant="homeAccent"
             className="w-full"
-            disabled={!selection.hasSelection}
+            disabled={mode === "preview" || !selection.hasSelection}
+            type="button"
             onClick={handleCheckout}
           >
             {selection.hasSelection

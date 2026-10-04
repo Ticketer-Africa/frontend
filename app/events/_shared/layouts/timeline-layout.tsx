@@ -90,6 +90,7 @@ export function TimelineLayout({ event, mode }: Props) {
                 <Link
                   key={related.id}
                   href={`/events/${related.slug}`}
+                  onClick={mode === "preview" ? (event) => event.preventDefault() : undefined}
                   className="rounded-xl border overflow-hidden block"
                   style={{ borderColor: "var(--home-border)" }}
                 >
@@ -117,7 +118,7 @@ export function TimelineLayout({ event, mode }: Props) {
             <p className="text-xs" style={{ color: "var(--home-muted)" }}>Tickets from</p>
             <p className="text-xl font-bold" style={{ color: "var(--home-text)" }}>₦{fromPrice.toLocaleString()}</p>
           </div>
-          <Button size="lg" variant="homeAccent" onClick={() => setIsTicketModalOpen(true)}>
+          <Button type="button" size="lg" variant="homeAccent" disabled={mode === "preview"} onClick={() => setIsTicketModalOpen(true)}>
             Buy Tickets
           </Button>
         </div>
@@ -142,6 +143,7 @@ export function TimelineLayout({ event, mode }: Props) {
                 onQuantityChange={(delta) =>
                   selection.updateQuantity(category.id, (q) => q + delta)
                 }
+                isPreview={mode === "preview"}
                 feeMode={event.feeMode}
                 primaryFeeBps={event.primaryFeeBps}
               />
@@ -151,7 +153,8 @@ export function TimelineLayout({ event, mode }: Props) {
             size="lg"
             variant="homeAccent"
             className="w-full"
-            disabled={!selection.hasSelection}
+            disabled={mode === "preview" || !selection.hasSelection}
+            type="button"
             onClick={handleCheckout}
           >
             {selection.hasSelection

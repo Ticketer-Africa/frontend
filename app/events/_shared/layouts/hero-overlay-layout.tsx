@@ -99,13 +99,14 @@ export function HeroOverlayLayout({ event, mode }: Props) {
                   onQuantityChange={(delta) =>
                     selection.updateQuantity(category.id, (q) => q + delta)
                   }
+                  isPreview={mode === "preview"}
                   feeMode={event.feeMode}
                   primaryFeeBps={event.primaryFeeBps}
                 />
               ))}
             </div>
             {selection.hasSelection && (
-              <Button size="lg" variant="homeAccent" className="w-full mt-5" onClick={handleCheckout}>
+              <Button type="button" size="lg" variant="homeAccent" className="w-full mt-5" disabled={mode === "preview"} onClick={handleCheckout}>
                 Buy Tickets · ₦{selection.totalAmount.toLocaleString()}
               </Button>
             )}

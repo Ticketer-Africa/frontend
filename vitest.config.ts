@@ -6,11 +6,12 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: "jsdom",
+    env: { NODE_ENV: "test" },
     setupFiles: ["./vitest.setup.ts"],
     globals: true,
     // bank.test.ts targets Node's built-in test runner (node:test), not
     // Vitest — exclude it so it isn't double-collected here.
-    exclude: ["**/node_modules/**", "services/banks/bank.test.ts"],
+    exclude: ["**/node_modules/**", ".claude/**", "services/banks/bank.test.ts"],
   },
   resolve: {
     alias: {
