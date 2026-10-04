@@ -22,6 +22,19 @@ test("Undo restores the previous draft edit", async ({ page, newSite }) => {
   await expect(heading).toHaveValue(original);
 });
 
+test("Theme fonts persist to both preview and the published page", async ({ page, newSite }) => {
+  const site = await newSite();
+  await page.getByRole("combobox", { name: "Body font", exact: true }).selectOption("DM Sans");
+  await page.getByRole("combobox", { name: "Heading font", exact: true }).selectOption("Playfair Display");
+  await saved(page);
+  await expect(preview(page).locator("h1")).toHaveCSS("font-family", /Playfair Display/);
+  await page.reload();
+  await expect(page.getByRole("combobox", { name: "Body font", exact: true })).toHaveValue("DM Sans");
+  await publish(page);
+  await page.goto(publicPath(site.slug));
+  await expect(page.getByRole("heading", { name: site.heading, exact: true })).toHaveCSS("font-family", /Playfair Display/);
+});
+
 for (const section of sections) {
   test(`${section} can be added, duplicated, hidden and deleted without losing persisted order`, async ({ page, newSite }) => {
     await newSite();

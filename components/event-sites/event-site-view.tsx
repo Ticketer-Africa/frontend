@@ -5,6 +5,11 @@ import { sectionLabel, text, type PublicSite, type SiteDocument, type SiteSectio
 import "./event-site.css";
 
 const color = (value: unknown, fallback: string) => typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value) ? value : fallback;
+const fontStack = (value: unknown, fallback: "Inter" | "Space Grotesk") => {
+  const allowed = ["Inter", "DM Sans", "Space Grotesk", "Playfair Display"];
+  const family = typeof value === "string" && allowed.includes(value) ? value : fallback;
+  return `"${family}", ${family === "Playfair Display" ? "serif" : "sans-serif"}`;
+};
 const align = (value: unknown) => value === "center" || value === "right" ? value : "left";
 const safeUrl = (value: unknown) => typeof value === "string" && (/^https:\/\/[^\s"'()<>\\]+$/i.test(value) || /^\/[a-zA-Z0-9/_-]+$/.test(value)) ? value : null;
 const items = (value: unknown): Record<string, unknown>[] => Array.isArray(value) ? value.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === "object" && !Array.isArray(item)) : [];
@@ -56,6 +61,8 @@ export function EventSiteView({ document, target, editions, preview = false, slu
     backgroundColor: color(document.theme.background, "#fffaf2"),
     color: color(document.theme.text, "#171717"),
     ["--es-accent" as string]: color(document.theme.accent, "#c74d33"),
+    ["--es-font-body" as string]: fontStack(document.theme.fontBody, "Inter"),
+    ["--es-font-heading" as string]: fontStack(document.theme.fontHeading, "Space Grotesk"),
   };
   return <main className="es-page" style={style} data-testid={preview ? "site-preview" : undefined}>
     {document.sections.filter(section => !section.hidden).map(section => {

@@ -113,7 +113,7 @@ New builder tests create an independent site with a UUID slug, then remove it. A
 
 ## Coverage and limits
 
-The final full desktop/mobile run passed 48 cases: 45 desktop and three mobile-emulation runs. Coverage includes click analytics, repeated-click request deduplication, and editor Undo. These cover six templates, all 14 section operations, saved draft persistence, public snapshot isolation, publication with zero editions, UI/API Free gating, preview privacy, ownership, grace states, nearest/specific edition routing, responsive layouts and anonymous browser uniqueness.
+The final full desktop/mobile run passed 49 cases: 46 desktop and three mobile-emulation runs. Coverage includes click analytics, repeated-click request deduplication, editor Undo, and typography persistence from preview to publication. These cover six templates, all 14 section operations, saved draft persistence, public snapshot isolation, publication with zero editions, UI/API Free gating, preview privacy, ownership, grace states, nearest/specific edition routing, responsive layouts and anonymous browser uniqueness.
 
 `@policy` marks assertions based on plan proposals rather than fully settled user decisions: post-grace unavailable page and browser-based visitor identity. They execute by default; review the proposed behavior before implementation.
 
@@ -122,7 +122,7 @@ The following still need executable coverage once their concrete integrations ex
 1. Cache invalidation, Pro restoration and preservation of explicit unpublish. The backend HTTP/PostgreSQL suite now checks the exact `expiry + 7 days` cutoff at one millisecond before and at the boundary.
 2. A sandbox paid purchase, authoritative payment webhook, QR issuance/check-in, purchase attribution, retry deduplication and refunds. CTA clicks are now recorded against the published site and linked edition. Current tests reach the existing event page; they do not prove payment succeeds or attribute confirmed purchases/revenue.
 3. Edition linking/unlinking persistence and publish isolation, EVENT_LIST, live cancellations/deletion, date ties/timezones, ongoing editions and sales-window transitions.
-4. Full theme/media/SEO controls; uploaded assets, schema migration, malicious input, broken media, missing assets and font loading.
+4. Broader theme/media/SEO controls; uploaded assets, schema migration, malicious input, broken media, missing assets and self-hosted font loading. Font family choices currently use safe system fallbacks.
 5. Concurrent autosaves/publication, slug races, network recovery, stale revisions, granular editor/operations roles and non-cascading deletion.
 6. Analytics reporting-period boundaries, unavailable storage, cookie expiry, bots and duplicate purchase ingestion. Click retries are deduplicated by a unique click ID.
 
