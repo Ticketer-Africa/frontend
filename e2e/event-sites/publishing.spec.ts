@@ -17,6 +17,35 @@ test("Free organizer cannot bypass the Pro publish gate through the API", async 
   expect(publicResponse.status()).toBe(404);
 });
 
+test("Free organizer sees the monthly Bachs upgrade after Publish and can start checkout", async ({ page, newSite }) => {
+  const site = await newSite("FREE");
+  await page.route(`**/v1/event-sites/${site.id}/billing/checkout`, async route => {
+    expect(route.request().method()).toBe("POST");
+    await route.fulfill({ status: 201, contentType: "application/json", body: JSON.stringify({ checkoutUrl: "https://checkout.bachs.io/c/e2e-upgrade" }) });
+  });
+  await page.route("https://checkout.bachs.io/c/e2e-upgrade", async route => {
+    await route.fulfill({ status: 200, contentType: "text/html", body: "<h1>Bachs checkout</h1>" });
+  });
+  await page.getByRole("button", { name: "Publish", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: /upgrade/i });
+  await expect(dialog).toContainText("$20.00/month");
+  await dialog.getByRole("button", { name: /upgrade for/i }).click();
+  await expect(page).toHaveURL("https://checkout.bachs.io/c/e2e-upgrade");
+});
+
+test("Returning from Bachs shows Pro activation but waits for an explicit Publish", async ({ page, context, newSite }) => {
+  const site = await newSite("FREE");
+  await page.route(`**/v1/event-sites/${site.id}/billing/status`, async route => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({
+      plan: "PRO", proExpiresAt: new Date(Date.now() + 30 * 86_400_000).toISOString(),
+      subscriptionStatus: "active", price: { amount: "20.00", currency: "USD", interval: "month" },
+    }) });
+  });
+  await page.goto(`${builderPath(site.id)}?billing=return`);
+  await expect(page.getByRole("status", { name: "Billing status" })).toContainText("Pro active. Click Publish");
+  expect((await context.request.get(publicPath(site.slug))).status()).toBe(404);
+});
+
 test("Pro organizer publishes a coming-soon site with no editions", async ({ page, newSite, browser, baseURL }) => {
   const site = await newSite();
   await publish(page);

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { EventSiteView } from "@/components/event-sites/event-site-view";
 import { newSection, sectionLabel, SECTION_OPTIONS, text, type PublicSite, type SiteDocument, type SiteRecord, type SiteSection, type SectionType } from "@/components/event-sites/model";
-import { confirmSiteMedia, getSite, getSiteAnalytics, publishSite, saveSite, unpublishSite } from "@/services/event-sites/event-sites";
+import { confirmSiteMedia, getSite, getSiteAnalytics, getSiteBillingStatus, startSiteProCheckout, publishSite, saveSite, unpublishSite } from "@/services/event-sites/event-sites";
 import { uploadImageToS3 } from "@/services/uploads/images";
 import { getOrganizerEventsV2 } from "@/services/events/events-v2";
 import type { EventV2 } from "@/types/events-v2.type";
@@ -49,6 +49,10 @@ export default function EventSiteBuilder() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [billingPrice, setBillingPrice] = useState("$20.00/month");
+  const [billingBusy, setBillingBusy] = useState(false);
+  const [billingError, setBillingError] = useState("");
+  const [billingNotice, setBillingNotice] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showUnpublish, setShowUnpublish] = useState(false);
   const [view, setView] = useState<"desktop" | "tablet" | "mobile">("desktop");
@@ -73,6 +77,33 @@ export default function EventSiteBuilder() {
     }).catch(() => { setError("Could not load this site."); setStatus("Error"); });
     getOrganizerEventsV2().then(result => setEvents(Array.isArray(result) ? result : result?.data ?? [])).catch(() => {});
     getSiteAnalytics(id).then(setAnalytics).catch(() => {});
+    getSiteBillingStatus(id).then(value => {
+      const symbol = value.price.currency === "USD" ? "$" : `${value.price.currency} `;
+      setBillingPrice(`${symbol}${value.price.amount}/month`);
+    }).catch(() => {});
+  }, [id]);
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("billing") !== "return") return;
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let attempts = 0;
+    const refresh = async () => {
+      try {
+        const billing = await getSiteBillingStatus(id);
+        if (stopped) return;
+        if (billing.plan === "PRO" && billing.proExpiresAt && new Date(billing.proExpiresAt).getTime() > Date.now()) {
+          setBillingNotice("Pro active. Click Publish when your draft is ready.");
+          return;
+        }
+      } catch { /* Keep the draft available while payment confirmation is pending. */ }
+      if (!stopped && ++attempts < 30) {
+        setBillingNotice("Waiting for Pro activation. Your draft is saved.");
+        timer = setTimeout(refresh, 2000);
+      }
+    };
+    void refresh();
+    return () => { stopped = true; if (timer) clearTimeout(timer); };
   }, [id]);
 
   const change = useCallback((update: (document: SiteDocument) => SiteDocument) => {
@@ -202,6 +233,7 @@ export default function EventSiteBuilder() {
       {site?.status === "PUBLISHED" && <><Link href={`/e/${site.slug}`} target="_blank">View live</Link><button type="button" onClick={() => setShowUnpublish(true)}>Unpublish</button></>}
       <button className="esb-primary" type="button" onClick={() => void publish()}>Publish</button>
     </header>
+    {billingNotice && <p className="esb-hint" role="status" aria-label="Billing status">{billingNotice}</p>}
     {error && <p className="esb-error" role="alert">{error}</p>}
     <div className="esb-main">
       <aside className="esb-panel"><h2>Sections</h2><p className="esb-hint">Drag sections to reorder, or use the arrow buttons.</p><ol aria-label="Sections" className="esb-section-list">{document.sections.map((section, index) => <li key={section.id} data-section-id={section.id} draggable onDragStart={event => event.dataTransfer.setData("text/plain", section.id)} onDragOver={event => event.preventDefault()} onDrop={event => { event.preventDefault(); dropSection(event.dataTransfer.getData("text/plain"), section.id); }}>
@@ -249,6 +281,6 @@ export default function EventSiteBuilder() {
     {libraryOpen && <div className="esb-modal-backdrop"><div role="dialog" aria-modal="true" aria-label="Section library" className="esb-modal"><h2>Add a section</h2><div className="esb-library">{SECTION_OPTIONS.map(([type, label]) => <button key={type} type="button" onClick={() => { const section = newSection(type as SectionType); change(doc => ({ ...doc, sections: [...doc.sections, section] })); setSelectedId(section.id); setLibraryOpen(false); }}>{label}</button>)}</div><button onClick={() => setLibraryOpen(false)}>Close</button></div></div>}
     {deleteId && <div className="esb-modal-backdrop"><div role="dialog" aria-modal="true" aria-label="Delete section" className="esb-modal"><h2>Delete this section?</h2><p>You can add another section later.</p><button onClick={() => setDeleteId(null)}>Cancel</button> <button onClick={() => { change(doc => ({ ...doc, sections: doc.sections.filter(section => section.id !== deleteId) })); setDeleteId(null); }}>Delete</button></div></div>}
     {showUnpublish && <div className="esb-modal-backdrop"><div role="dialog" aria-modal="true" aria-label="Unpublish Event Site" className="esb-modal"><h2>Unpublish this site?</h2><p>The public page will be hidden. Your draft stays saved.</p><button onClick={() => setShowUnpublish(false)}>Cancel</button> <button onClick={() => void unpublish()}>Confirm</button></div></div>}
-    {upgradeOpen && <div className="esb-modal-backdrop"><div role="dialog" aria-modal="true" aria-label="Upgrade to Pro" className="esb-modal"><h2>Publish with Pro</h2><p>Your draft is saved. An active Pro subscription is required to publish your Event Site.</p><button onClick={() => setUpgradeOpen(false)}>Keep editing</button></div></div>}
+    {upgradeOpen && <div className="esb-modal-backdrop"><div role="dialog" aria-modal="true" aria-label="Upgrade to Pro" className="esb-modal"><h2>Publish with Pro</h2><p>Your draft is saved. Pro is {billingPrice}, billed through Bachs. After checkout activates Pro, click Publish to put this draft live.</p>{billingError && <p role="alert">{billingError}</p>}<button disabled={billingBusy} onClick={async () => { setBillingBusy(true); setBillingError(""); try { const result = await startSiteProCheckout(id); window.location.assign(result.checkoutUrl); } catch { setBillingError("Could not start checkout. Please try again."); setBillingBusy(false); } }}>{billingBusy ? "Opening checkout…" : `Upgrade for ${billingPrice}`}</button><button onClick={() => setUpgradeOpen(false)}>Keep editing</button></div></div>}
   </main>;
 }

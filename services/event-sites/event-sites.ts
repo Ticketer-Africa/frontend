@@ -38,3 +38,13 @@ export async function confirmSiteMedia(id: string, key: string): Promise<{ url: 
   const response = await Axios.post(`${root}/${encodeURIComponent(id)}/media`, { key });
   return response.data;
 }
+
+export async function getSiteBillingStatus(id: string): Promise<{ plan: string; proExpiresAt: string | null; subscriptionStatus: string | null; price: { amount: string; currency: string; interval: string } }> {
+  const response = await Axios.get(`${root}/${encodeURIComponent(id)}/billing/status`);
+  return response.data;
+}
+
+export async function startSiteProCheckout(id: string): Promise<{ checkoutUrl: string }> {
+  const response = await Axios.post(`${root}/${encodeURIComponent(id)}/billing/checkout`);
+  return response.data;
+}

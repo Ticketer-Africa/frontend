@@ -1,5 +1,14 @@
 # Validation results — 2026-10-04
 
+## Latest billing and S3 run
+
+- Both `feat/event-sites-analytics` branches were pushed before the billing changes. The follow-up implements a provisional USD 20/month Bachs checkout, signed subscription webhook reconciliation, owner-only billing status, and a Publish-first upgrade dialog.
+- Backend Nest/Prisma/PostgreSQL Event Sites suite: **7/7 passed**, including a local Bachs-compatible HTTP provider, signed webhook replay, Pro activation, cancellation and publication gating.
+- Opt-in real S3 E2E suite: **1/1 passed**. It obtained a presigned URL, uploaded a PNG, confirmed it through the Event Sites API, verified both processed variants, and removed all test objects.
+- Browser suite: **53/53 passed** across desktop and mobile, including the upgrade checkout navigation case. That case intercepts the external Bachs checkout response; it does not charge a card.
+- Next production build completed and E2E TypeScript passed. The backend repository-wide TypeScript check still reports the pre-existing `test/app.e2e-spec.ts` Supertest import error.
+- Direct Bachs sandbox API requests from this host receive Cloudflare error 1010 before API authentication. A sandbox product ID and webhook destination secret must be configured before the real provider checkout can be exercised. CloudFront image delivery remains unverified.
+
 ## Continued runtime validation
 
 - Latest reproducible run: `backend/test/seed-event-sites-browser.mjs` created the disposable accounts/sites/editions; `frontend/e2e/event-sites/run-local.mjs` ran both Chrome projects. Final result: **49/49 Playwright cases passed together** in 2.5 minutes (46 desktop and three mobile-emulation cases). The backend site-list shape was corrected after the first full run exposed a client crash. An Event Site-specific unavailable page, narrow-heading wrap, and missing-event-banner fallback resolved the other runtime findings. The FAQ test now operates the native `<summary>` control, and event-page assertions match its actual heading and Select action.

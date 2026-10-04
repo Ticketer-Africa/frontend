@@ -2,7 +2,7 @@
 
 ## Status
 
-These are **acceptance tests**, not evidence that the complete Event Sites MVP works. The suite covers organizer draft/publish flows, public behavior, responsive builder controls and click-through attribution against isolated local Next.js, NestJS, PostgreSQL and Redis services. A separate Nest/PostgreSQL integration suite verifies free-ticket purchase attribution and analytics. Billing activation, provider-backed paid purchase confirmation and real S3/CloudFront media transfer remain unverified. Browser pages and login use the real applications; application APIs are not intercepted or mocked.
+These are **acceptance tests**, not evidence that the complete Event Sites MVP works. The suite covers organizer draft/publish flows, public behavior, responsive builder controls and click-through attribution against isolated local Next.js, NestJS, PostgreSQL and Redis services. A separate Nest/PostgreSQL integration suite verifies free-ticket purchase attribution, analytics, and the Pro billing lifecycle through a local Bachs-compatible HTTP server. The opt-in S3 E2E test passed with a real presigned PNG upload, image confirmation and both processed variants; CloudFront delivery and a Bachs sandbox charge remain unverified. Browser pages and login use the real applications; the checkout navigation case intercepts its checkout response and external hosted page.
 
 Browser journeys require a disposable database, the repository-owned fixture seeder and a running frontend/backend. Missing configuration is a setup failure, not a detected product bug.
 
