@@ -9,4 +9,8 @@ describe("SiteAnalytics", () => {
     expect(html).toContain('data-testid="unique-visitors">2');
     expect(html).toContain('data-testid="site-views">4');
   });
+  it("formats attributed revenue from a precise kobo string", () => {
+    const html = renderToStaticMarkup(<SiteAnalytics windowDays={30} uniqueVisitors={1} pageViews={1} revenueKobo="900719925474099300" />);
+    expect(html).toContain('data-testid="site-revenue">₦9,007,199,254,740,993.00');
+  });
 });

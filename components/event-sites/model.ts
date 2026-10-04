@@ -21,7 +21,7 @@ export interface SiteDocument {
   seo: Record<string, unknown>;
   sections: SiteSection[];
   linkedEditionIds: string[];
-  ticketTarget: { mode: "NEXT_EVENT" | "SPECIFIC_EVENT" | "EVENT_LIST" | "NO_TICKET_CTA"; eventId?: string };
+  ticketTarget: { mode: "NEXT_EVENT" | "SPECIFIC_EVENT" | "EVENT_LIST" | "NO_TICKET_CTA"; eventId?: string; fallback?: "COMING_SOON" | "HIDE_CTA" };
 }
 export interface SiteRecord {
   id: string;
@@ -37,7 +37,7 @@ export interface PublicSite {
   versionId: string;
   document: SiteDocument;
   editions: Array<{ id: string; name: string; date: string; venueName: string | null; state: "BUY" | "COMING_SOON" | "SOLD_OUT"; url: string | null }>;
-  ticketTarget: { eventId: string | null; eventName: string | null; state: "BUY" | "COMING_SOON" | "SOLD_OUT" | "CANCELLED" | "ENDED" | "MISSING"; url: string | null };
+  ticketTarget: { eventId: string | null; eventName: string | null; startsAt?: string | null; venueName?: string | null; state: "BUY" | "COMING_SOON" | "SOLD_OUT" | "CANCELLED" | "ENDED" | "MISSING" | "HIDDEN"; url: string | null };
 }
 export interface SitePreview extends SiteRecord {
   editions: PublicSite["editions"];

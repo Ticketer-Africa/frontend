@@ -52,6 +52,7 @@ export function useEventCheckout(
         eventName: event.name,
         tickets: checkoutItems,
         occurrenceId: selectedOccurrenceId ?? undefined,
+        siteClickId: new URLSearchParams(window.location.search).get("siteClickId") ?? undefined,
       }),
     );
 

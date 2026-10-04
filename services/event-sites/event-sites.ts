@@ -30,7 +30,11 @@ export async function unpublishSite(id: string) {
   const response = await Axios.post(`${root}/${encodeURIComponent(id)}/unpublish`);
   return response.data;
 }
-export async function getSiteAnalytics(id: string): Promise<{ windowDays: number; uniqueVisitors: number; pageViews: number; ticketCtaClicks: number }> {
+export async function getSiteAnalytics(id: string): Promise<{ windowDays: number; uniqueVisitors: number; pageViews: number; ticketCtaClicks: number; checkouts: number; orders: number; revenueKobo: string }> {
   const response = await Axios.get(`${root}/${encodeURIComponent(id)}/analytics?days=30`);
+  return response.data;
+}
+export async function confirmSiteMedia(id: string, key: string): Promise<{ url: string; width: number; height: number }> {
+  const response = await Axios.post(`${root}/${encodeURIComponent(id)}/media`, { key });
   return response.data;
 }

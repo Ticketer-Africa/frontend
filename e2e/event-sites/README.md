@@ -2,7 +2,7 @@
 
 ## Status
 
-These are **acceptance tests**, not evidence that the complete Event Sites MVP works. The acceptance suite covers organizer draft/publish flows, public behavior and analytics against isolated local Next.js, NestJS, PostgreSQL and Redis services. Ticket CTA clicks are captured and reported. Billing activation, confirmed-purchase attribution, richer controls and payment sandbox coverage remain incomplete. The suite uses real browser pages and real session login; it does not intercept application APIs or mock page rendering.
+These are **acceptance tests**, not evidence that the complete Event Sites MVP works. The suite covers organizer draft/publish flows, public behavior, responsive builder controls and click-through attribution against isolated local Next.js, NestJS, PostgreSQL and Redis services. A separate Nest/PostgreSQL integration suite verifies free-ticket purchase attribution and analytics. Billing activation, provider-backed paid purchase confirmation and real S3/CloudFront media transfer remain unverified. Browser pages and login use the real applications; application APIs are not intercepted or mocked.
 
 Browser journeys require a disposable database, the repository-owned fixture seeder and a running frontend/backend. Missing configuration is a setup failure, not a detected product bug.
 
@@ -15,7 +15,7 @@ Browser journeys require a disposable database, the repository-owned fixture see
 - Installed `playwright` exposes `playwright/test`; no new dependency is required.
 - Backend uses NestJS URI versioning, Prisma and PostgreSQL. Event Site and visit migrations were applied to the isolated test database.
 
-The Event Sites HTTP/Prisma suite also passed 4/4 against PostgreSQL with the production ValidationPipe settings.
+The Event Sites HTTP/Prisma suite passed 6/6 against PostgreSQL with the production ValidationPipe settings.
 
 ## Run
 
@@ -113,16 +113,16 @@ New builder tests create an independent site with a UUID slug, then remove it. A
 
 ## Coverage and limits
 
-The final full desktop/mobile run passed 49 cases: 46 desktop and three mobile-emulation runs. Coverage includes click analytics, repeated-click request deduplication, editor Undo, and typography persistence from preview to publication. These cover six templates, all 14 section operations, saved draft persistence, public snapshot isolation, publication with zero editions, UI/API Free gating, preview privacy, ownership, grace states, nearest/specific edition routing, responsive layouts and anonymous browser uniqueness.
+The expanded full desktop/mobile run passed **52/52 cases**: 49 desktop and three mobile-emulation runs. New browser cases verify click-ID propagation to checkout, drag ordering, and bounded mobile visibility controls in preview and public pages. Coverage includes six templates, all 14 section operations, saved draft persistence, public snapshot isolation, publication with zero editions, UI/API Free gating, preview privacy, ownership, grace states, nearest/specific edition routing, responsive layouts and anonymous browser uniqueness. A later targeted run against the final build passed 15/15 affected browser cases. See `VALIDATION.md` for details.
 
 `@policy` marks assertions based on plan proposals rather than fully settled user decisions: post-grace unavailable page and browser-based visitor identity. They execute by default; review the proposed behavior before implementation.
 
 The following still need executable coverage once their concrete integrations exist; do not treat this initial suite as full MVP certification:
 
 1. Cache invalidation, Pro restoration and preservation of explicit unpublish. The backend HTTP/PostgreSQL suite now checks the exact `expiry + 7 days` cutoff at one millisecond before and at the boundary.
-2. A sandbox paid purchase, authoritative payment webhook, QR issuance/check-in, purchase attribution, retry deduplication and refunds. CTA clicks are now recorded against the published site and linked edition. Current tests reach the existing event page; they do not prove payment succeeds or attribute confirmed purchases/revenue.
+2. A provider-backed sandbox paid purchase, authoritative payment webhook, QR issuance/check-in, retry deduplication and refunds. A real free-ticket purchase now proves that a validated site click persists on a completed transaction and appears in organizer revenue/order analytics; paid confirmation remains unverified.
 3. Edition linking/unlinking persistence and publish isolation, EVENT_LIST, live cancellations/deletion, date ties/timezones, ongoing editions and sales-window transitions.
-4. Broader theme/media/SEO controls; uploaded assets, schema migration, malicious input, broken media, missing assets and self-hosted font loading. Font family choices currently use safe system fallbacks.
+4. Uploaded asset transfer against S3/CloudFront, media crop/overlay, schema migration beyond v1, malformed-media rendering and self-hosted font loading. The builder now has broader bounded theme/SEO controls, image upload fields and broken-image fallback, but real cloud transfer has not been verified.
 5. Concurrent autosaves/publication, slug races, network recovery, stale revisions, granular editor/operations roles and non-cascading deletion.
 6. Analytics reporting-period boundaries, unavailable storage, cookie expiry, bots and duplicate purchase ingestion. Click retries are deduplicated by a unique click ID.
 

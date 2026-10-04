@@ -1,7 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { EventSiteView } from "./event-site-view";
 import { SECTION_OPTIONS, type SiteDocument } from "./model";
+
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
 const document: SiteDocument = {
   schemaVersion: 1,
@@ -53,5 +55,13 @@ describe("EventSiteView", () => {
     expect(html).toContain("Friday One");
     expect(html).toContain('href="/events/friday-one"');
     expect(html).not.toContain('data-testid="primary-ticket-target"');
+  });
+
+  it("keeps a linked edition informational when ticket buttons are disabled", () => {
+    const changed = structuredClone(document);
+    const html = renderToStaticMarkup(<EventSiteView document={changed}
+      editions={[{ id: "one", name: "Friday One", date: "2026-10-10T18:00:00.000Z", venueName: "Hall", state: "BUY", url: "/events/friday-one" }]} />);
+    expect(html).toContain("Friday One");
+    expect(html).not.toContain("Get Tickets");
   });
 });

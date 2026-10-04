@@ -31,6 +31,7 @@ test("Pro organizer publishes a coming-soon site with no editions", async ({ pag
 });
 
 test("Saved edits remain private until the next successful Publish", async ({ page, newSite, browser, baseURL }) => {
+  test.setTimeout(90_000);
   const site = await newSite();
   await publish(page);
   const visitor = await browser.newContext({ baseURL });

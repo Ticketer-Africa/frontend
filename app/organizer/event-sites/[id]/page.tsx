@@ -4,8 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { EventSiteView } from "@/components/event-sites/event-site-view";
-import { newSection, sectionLabel, SECTION_OPTIONS, text, type SiteDocument, type SiteRecord, type SiteSection, type SectionType } from "@/components/event-sites/model";
-import { getSite, getSiteAnalytics, publishSite, saveSite, unpublishSite } from "@/services/event-sites/event-sites";
+import { newSection, sectionLabel, SECTION_OPTIONS, text, type PublicSite, type SiteDocument, type SiteRecord, type SiteSection, type SectionType } from "@/components/event-sites/model";
+import { confirmSiteMedia, getSite, getSiteAnalytics, publishSite, saveSite, unpublishSite } from "@/services/event-sites/event-sites";
+import { uploadImageToS3 } from "@/services/uploads/images";
 import { getOrganizerEventsV2 } from "@/services/events/events-v2";
 import type { EventV2 } from "@/types/events-v2.type";
 import "../site-builder.css";
@@ -14,6 +15,32 @@ const field = (name: string, value: string, onChange: (value: string) => void, m
   ? <textarea aria-label={name} value={value} onChange={event => onChange(event.target.value)} rows={4} />
   : <input aria-label={name} value={value} onChange={event => onChange(event.target.value)} />}</label>;
 const FONT_OPTIONS = ["Inter", "DM Sans", "Space Grotesk", "Playfair Display"] as const;
+function contrastRatio(first: string, second: string) {
+  const luminance = (hex: string) => {
+    if (!/^#[0-9a-f]{6}$/i.test(hex)) return 0;
+    const channels = [1, 3, 5].map(offset => parseInt(hex.slice(offset, offset + 2), 16) / 255)
+      .map(value => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
+    return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+  };
+  const values = [luminance(first), luminance(second)].sort((a, b) => b - a);
+  return (values[0] + 0.05) / (values[1] + 0.05);
+}
+
+function previewCommerce(document: SiteDocument, events: EventV2[]): Pick<PublicSite, "editions" | "ticketTarget"> {
+  const now = Date.now();
+  const linked = events.filter(event => document.linkedEditionIds.includes(event.id));
+  const upcoming = linked.filter(event => event.isActive && event.accessType === "PUBLIC" && new Date(event.date).getTime() > now)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime() || a.id.localeCompare(b.id));
+  const status = (event: EventV2) => !event.ticketCategories?.length ? "COMING_SOON" as const
+    : event.ticketCategories.every(category => (category.minted ?? 0) >= category.maxTickets) ? "SOLD_OUT" as const : "BUY" as const;
+  const editions = upcoming.map(event => ({ id: event.id, name: event.name, date: event.date, venueName: event.venueName ?? null, state: status(event), url: status(event) === "BUY" ? `/events/${event.slug}` : null }));
+  const selected = document.ticketTarget.mode === "SPECIFIC_EVENT"
+    ? linked.find(event => event.id === document.ticketTarget.eventId) : document.ticketTarget.mode === "NEXT_EVENT" ? upcoming[0] : undefined;
+  const state = selected ? !selected.isActive || selected.accessType !== "PUBLIC" ? "CANCELLED" as const
+    : new Date(selected.date).getTime() <= now ? "ENDED" as const : status(selected)
+    : document.ticketTarget.mode === "SPECIFIC_EVENT" ? "MISSING" as const : document.ticketTarget.fallback === "HIDE_CTA" ? "HIDDEN" as const : "COMING_SOON" as const;
+  return { editions, ticketTarget: { eventId: selected?.id ?? null, eventName: selected?.name ?? null, startsAt: selected?.date ?? null, venueName: selected?.venueName ?? null, state, url: selected && state === "BUY" ? `/events/${selected.slug}` : null } };
+}
 
 export default function EventSiteBuilder() {
   const id = String(useParams().id);
@@ -123,9 +150,23 @@ export default function EventSiteBuilder() {
     change(doc => ({ ...doc, sections: doc.sections.map(section => section.id === sectionId ? update(section) : section) }));
   }
   function editItem(section: SiteSection, index: number, key: string, value: string) {
-    const current = Array.isArray(section.content.items) ? section.content.items as Record<string, unknown>[] : [];
-    const next = current.map((item, itemIndex) => itemIndex === index ? { ...item, [key]: value } : item);
-    editSection(section.id, original => ({ ...original, content: { ...original.content, items: next } }));
+    editSection(section.id, original => {
+      const current = Array.isArray(original.content.items) ? original.content.items as Record<string, unknown>[] : [];
+      const next = current.map((item, itemIndex) => itemIndex === index ? { ...item, [key]: value } : item);
+      return { ...original, content: { ...original.content, items: next } };
+    });
+  }
+  async function uploadImage(file: File, onReady: (url: string) => void) {
+    setError("");
+    setStatus("Uploading image");
+    try {
+      const key = await uploadImageToS3(file, "images/event-sites");
+      const media = await confirmSiteMedia(id, key);
+      onReady(media.url);
+    } catch (cause) {
+      setStatus("Upload failed");
+      setError(cause instanceof Error ? cause.message : "Image upload failed. Please try again.");
+    }
   }
   function move(index: number, direction: number) {
     change(doc => {
@@ -136,8 +177,21 @@ export default function EventSiteBuilder() {
       return { ...doc, sections };
     });
   }
+  function dropSection(draggedId: string, targetId: string) {
+    if (!draggedId || draggedId === targetId) return;
+    change(doc => {
+      const sections = [...doc.sections];
+      const from = sections.findIndex(section => section.id === draggedId);
+      const to = sections.findIndex(section => section.id === targetId);
+      if (from < 0 || to < 0) return doc;
+      const [moved] = sections.splice(from, 1);
+      sections.splice(to, 0, moved);
+      return { ...doc, sections };
+    });
+  }
   const selected = document?.sections.find(section => section.id === selectedId);
   if (!document) return <main className="esb-empty">{error || "Loading Event Site..."}</main>;
+  const preview = previewCommerce(document, events);
 
   return <main className="esb-shell">
     <header className="esb-top"><Link href="/organizer/event-sites">← Event Sites</Link><strong>{document.name}</strong><span>{site?.status ?? "DRAFT"}</span><span role="status" aria-label="Save status">{status}</span>
@@ -150,29 +204,43 @@ export default function EventSiteBuilder() {
     </header>
     {error && <p className="esb-error" role="alert">{error}</p>}
     <div className="esb-main">
-      <aside className="esb-panel"><h2>Sections</h2><ol aria-label="Sections" className="esb-section-list">{document.sections.map((section, index) => <li key={section.id} data-section-id={section.id}>
+      <aside className="esb-panel"><h2>Sections</h2><p className="esb-hint">Drag sections to reorder, or use the arrow buttons.</p><ol aria-label="Sections" className="esb-section-list">{document.sections.map((section, index) => <li key={section.id} data-section-id={section.id} draggable onDragStart={event => event.dataTransfer.setData("text/plain", section.id)} onDragOver={event => event.preventDefault()} onDrop={event => { event.preventDefault(); dropSection(event.dataTransfer.getData("text/plain"), section.id); }}>
         <button type="button" className={selectedId === section.id ? "esb-selected" : ""} onClick={() => setSelectedId(section.id)}>{sectionLabel(section.type)}{section.hidden ? " (hidden)" : ""}</button>
         <div className="esb-actions"><button aria-label="Move section up" disabled={index === 0} onClick={() => move(index, -1)}>↑</button><button aria-label="Move section down" disabled={index === document.sections.length - 1} onClick={() => move(index, 1)}>↓</button><button aria-label="Duplicate section" onClick={() => change(doc => { const sections = [...doc.sections]; sections.splice(index + 1, 0, { ...section, id: crypto.randomUUID(), content: { ...section.content }, styles: { ...section.styles } }); return { ...doc, sections }; })}>＋</button><button aria-label={section.hidden ? "Show section" : "Hide section"} onClick={() => editSection(section.id, item => ({ ...item, hidden: !item.hidden }))}>{section.hidden ? "◉" : "◎"}</button><button aria-label="Delete section" onClick={() => setDeleteId(section.id)}>×</button></div>
       </li>)}</ol><button type="button" className="esb-add" onClick={() => setLibraryOpen(true)}>Add section</button></aside>
-      <div className="esb-preview-wrap"><div className="esb-preview-toolbar"><strong>Preview</strong><div>{(["desktop", "tablet", "mobile"] as const).map(option => <button key={option} type="button" aria-pressed={view === option} onClick={() => setView(option)}>{option}</button>)}</div></div><div className={`esb-preview esb-${view}`}><EventSiteView document={document} preview /></div></div>
+      <div className="esb-preview-wrap"><div className="esb-preview-toolbar"><strong>Preview</strong><div>{(["desktop", "tablet", "mobile"] as const).map(option => <button key={option} type="button" aria-pressed={view === option} onClick={() => setView(option)}>{option}</button>)}</div></div><div className={`esb-preview esb-${view}`}><EventSiteView document={document} target={preview.ticketTarget} editions={preview.editions} preview /></div></div>
       <aside className="esb-panel esb-settings"><h2>Settings</h2>
         {analytics && <div className="esb-analytics" aria-label="Site analytics"><strong>Last 30 days</strong><p><b>{analytics.uniqueVisitors.toLocaleString()}</b> unique visitors · <b>{analytics.pageViews.toLocaleString()}</b> page views · <b>{analytics.ticketCtaClicks.toLocaleString()}</b> ticket clicks</p><small>Visitors are estimated from browser IDs. Preview visits are excluded.</small></div>}
         {field("Site name", document.name, value => change(doc => ({ ...doc, name: value })))}
         {field("Site slug", document.slug, value => change(doc => ({ ...doc, slug: value.toLowerCase() })))}
         {field("Page title", text(document.seo.title), value => change(doc => ({ ...doc, seo: { ...doc.seo, title: value } })))}
         {field("Meta description", text(document.seo.description), value => change(doc => ({ ...doc, seo: { ...doc.seo, description: value } })), true)}
+        {field("Social sharing image URL", text(document.seo.imageUrl), value => change(doc => ({ ...doc, seo: { ...doc.seo, imageUrl: value } })))}
+        <label className="esb-field">Upload social sharing image<input type="file" accept="image/jpeg,image/png,image/webp" onChange={event => { const file = event.target.files?.[0]; if (file) void uploadImage(file, url => change(doc => ({ ...doc, seo: { ...doc.seo, imageUrl: url } }))); }} /></label>
         <h3>Theme</h3>{(["background", "text", "accent"] as const).map(key => <label className="esb-field" key={key}>{key}<input aria-label={`${key} color`} type="color" value={/^#[0-9a-fA-F]{6}$/.test(text(document.theme[key])) ? text(document.theme[key]) : "#ffffff"} onChange={event => change(doc => ({ ...doc, theme: { ...doc.theme, [key]: event.target.value } }))} /></label>)}
+        {contrastRatio(text(document.theme.background) || "#ffffff", text(document.theme.text) || "#141414") < 4.5 && <p role="alert" className="esb-warning">Page text may be hard to read against the background. Choose colors with stronger contrast.</p>}
+        {document.theme.buttonStyle !== "outline" && document.theme.buttonStyle !== "text" && contrastRatio(text(document.theme.accent) || "#c74d33", "#ffffff") < 4.5 && <p role="alert" className="esb-warning">Button text may be hard to read. Choose a darker accent color.</p>}
         <label className="esb-field">Body font<select aria-label="Body font" value={FONT_OPTIONS.includes(text(document.theme.fontBody) as typeof FONT_OPTIONS[number]) ? text(document.theme.fontBody) : "Inter"} onChange={event => change(doc => ({ ...doc, theme: { ...doc.theme, fontBody: event.target.value } }))}>{FONT_OPTIONS.map(font => <option key={font} value={font}>{font}</option>)}</select></label>
         <label className="esb-field">Heading font<select aria-label="Heading font" value={FONT_OPTIONS.includes(text(document.theme.fontHeading) as typeof FONT_OPTIONS[number]) ? text(document.theme.fontHeading) : "Space Grotesk"} onChange={event => change(doc => ({ ...doc, theme: { ...doc.theme, fontHeading: event.target.value } }))}>{FONT_OPTIONS.map(font => <option key={font} value={font}>{font}</option>)}</select></label>
+        {([ ["contentWidth", "Content width", ["contained", "wide", "full"]], ["buttonStyle", "Button style", ["filled", "outline", "text"]], ["buttonShape", "Button shape", ["square", "rounded", "pill"]], ["sectionSpacing", "Section spacing", ["compact", "normal", "spacious"]], ["headingCase", "Heading case", ["normal", "uppercase"]], ["typeScale", "Type scale", ["compact", "normal", "large"]], ["cornerRadius", "Corner radius", ["square", "soft", "round"]], ["shadow", "Card shadow", ["none", "subtle"]] ] as const).map(([key, label, options]) => <label className="esb-field" key={key}>{label}<select aria-label={label} value={text(document.theme[key]) || options[0]} onChange={event => change(doc => ({ ...doc, theme: { ...doc.theme, [key]: event.target.value } }))}>{options.map(option => <option key={option} value={option}>{option}</option>)}</select></label>)}
         <h3>Ticket target</h3><label className="esb-field">Target mode<select aria-label="Target mode" value={document.ticketTarget.mode} onChange={event => change(doc => ({ ...doc, ticketTarget: { mode: event.target.value as SiteDocument["ticketTarget"]["mode"] } }))}><option value="NO_TICKET_CTA">No ticket button</option><option value="NEXT_EVENT">Next event</option><option value="SPECIFIC_EVENT">Specific event</option><option value="EVENT_LIST">Event list</option></select></label>
+        {document.ticketTarget.mode === "NEXT_EVENT" && <label className="esb-field">No upcoming edition<select aria-label="No upcoming edition" value={document.ticketTarget.fallback || "COMING_SOON"} onChange={event => change(doc => ({ ...doc, ticketTarget: { ...doc.ticketTarget, fallback: event.target.value as "COMING_SOON" | "HIDE_CTA" } }))}><option value="COMING_SOON">Show coming soon</option><option value="HIDE_CTA">Hide ticket button</option></select></label>}
         <fieldset><legend>Linked editions</legend>{events.length ? events.map(event => <label className="esb-event" key={event.id}><input type="checkbox" checked={document.linkedEditionIds.includes(event.id)} onChange={input => change(doc => ({ ...doc, linkedEditionIds: input.target.checked ? [...doc.linkedEditionIds, event.id] : doc.linkedEditionIds.filter(item => item !== event.id), ticketTarget: doc.ticketTarget.eventId === event.id && !input.target.checked ? { mode: "NO_TICKET_CTA" } : doc.ticketTarget }))} />{event.name}</label>) : <p>No event editions found. You can publish a coming-soon site.</p>}</fieldset>
         {document.ticketTarget.mode === "SPECIFIC_EVENT" && <label className="esb-field">Selected edition<select aria-label="Selected edition" value={document.ticketTarget.eventId ?? ""} onChange={event => change(doc => ({ ...doc, ticketTarget: { mode: "SPECIFIC_EVENT", eventId: event.target.value } }))}><option value="">Select an edition</option>{events.filter(event => document.linkedEditionIds.includes(event.id)).map(event => <option value={event.id} key={event.id}>{event.name}</option>)}</select></label>}
         {selected && <><h3>{sectionLabel(selected.type)}</h3>{(["heading", "subtitle", "body", "address", "imageUrl", "mapUrl"] as const).map(key => selected.content[key] !== undefined || key === "heading" ? <div key={key}>{field(key === "heading" && selected.type === "HERO" ? "Hero heading" : key, text(selected.content[key]), value => editSection(selected.id, section => ({ ...section, content: { ...section.content, [key]: value } })), key === "body")}</div> : null)}
+          {(["HERO", "ABOUT", "RICH_CONTENT"] as SectionType[]).includes(selected.type) && <label className="esb-field">Upload section image<input type="file" accept="image/jpeg,image/png,image/webp" onChange={event => { const file = event.target.files?.[0]; if (file) void uploadImage(file, url => editSection(selected.id, section => ({ ...section, content: { ...section.content, imageUrl: url } }))); }} /></label>}
+          {(["ABOUT", "RICH_CONTENT"] as SectionType[]).includes(selected.type) && <label className="esb-field"><input type="checkbox" checked={selected.content.showCta === true} onChange={event => editSection(selected.id, section => ({ ...section, content: { ...section.content, showCta: event.target.checked } }))} />Show ticket button</label>}
           <label className="esb-field">{selected.type === "HERO" ? "Hero alignment" : "Alignment"}<select aria-label={selected.type === "HERO" ? "Hero alignment" : "Alignment"} value={text(selected.styles.alignment) || "left"} onChange={event => editSection(selected.id, section => ({ ...section, styles: { ...section.styles, alignment: event.target.value } }))}><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></label>
           {(["background", "textColor"] as const).map(key => <label className="esb-field" key={key}>Section {key}<input type="color" aria-label={`Section ${key}`} value={/^#[0-9a-fA-F]{6}$/.test(text(selected.styles[key])) ? text(selected.styles[key]) : key === "background" ? "#ffffff" : "#171717"} onChange={event => editSection(selected.id, section => ({ ...section, styles: { ...section.styles, [key]: event.target.value } }))} /></label>)}
           <label className="esb-field">Section spacing<select aria-label="Section spacing" value={text(selected.styles.spacing) || "normal"} onChange={event => editSection(selected.id, section => ({ ...section, styles: { ...section.styles, spacing: event.target.value } }))}><option value="compact">Compact</option><option value="normal">Normal</option><option value="spacious">Spacious</option></select></label>
+          <label className="esb-field">Section width<select aria-label="Section width" value={text(selected.styles.layout) || "contained"} onChange={event => editSection(selected.id, section => ({ ...section, styles: { ...section.styles, layout: event.target.value } }))}><option value="contained">Contained</option><option value="wide">Wide</option><option value="full">Full width</option></select></label>
+          {(["ABOUT", "RICH_CONTENT"] as SectionType[]).includes(selected.type) && <label className="esb-field">Image layout<select aria-label="Image layout" value={text(selected.styles.variant) || "stacked"} onChange={event => editSection(selected.id, section => ({ ...section, styles: { ...section.styles, variant: event.target.value } }))}><option value="stacked">Stacked</option><option value="image-left">Image left</option><option value="image-right">Image right</option></select></label>}
+          {selected.type === "HERO" && <><label className="esb-field">Image position<select aria-label="Image position" value={text(selected.styles.mediaPosition) || "center"} onChange={event => editSection(selected.id, section => ({ ...section, styles: { ...section.styles, mediaPosition: event.target.value } }))}><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></label><label className="esb-field">Image overlay<select aria-label="Image overlay" value={text(selected.styles.overlay) || "medium"} onChange={event => editSection(selected.id, section => ({ ...section, styles: { ...section.styles, overlay: event.target.value } }))}><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label></>}
+          <label className="esb-field">Mobile alignment<select aria-label="Mobile alignment" value={text(selected.styles.mobileAlignment) || "left"} onChange={event => editSection(selected.id, section => ({ ...section, styles: { ...section.styles, mobileAlignment: event.target.value } }))}><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></label>
+          <label className="esb-field"><input type="checkbox" checked={selected.styles.hideOnMobile === true} onChange={event => editSection(selected.id, section => ({ ...section, styles: { ...section.styles, hideOnMobile: event.target.checked } }))} />Hide on mobile</label>
           {(["FAQ", "SCHEDULE", "LINEUP", "SPONSORS", "GALLERY", "SOCIAL_CONTACT", "FOOTER"] as SectionType[]).includes(selected.type) && <><h3>Items</h3>{(Array.isArray(selected.content.items) ? selected.content.items as Record<string, unknown>[] : []).map((item, index) => <div className="esb-item" key={index}>
             {(selected.type === "FAQ" ? ["question", "answer"] : selected.type === "SCHEDULE" ? ["time", "title", "description"] : selected.type === "GALLERY" ? ["imageUrl", "alt"] : selected.type === "SOCIAL_CONTACT" || selected.type === "FOOTER" ? ["label", "url"] : ["name", "role", "imageUrl", "url"]).map(key => <div key={key}>{field(key, text(item[key]), value => editItem(selected, index, key, value), key === "answer" || key === "description")}</div>)}
+            {(["GALLERY", "LINEUP", "SPONSORS"] as SectionType[]).includes(selected.type) && <label className="esb-field">Upload item image<input type="file" accept="image/jpeg,image/png,image/webp" onChange={event => { const file = event.target.files?.[0]; if (file) void uploadImage(file, url => editItem(selected, index, "imageUrl", url)); }} /></label>}
             <button type="button" onClick={() => editSection(selected.id, section => ({ ...section, content: { ...section.content, items: (Array.isArray(section.content.items) ? section.content.items : []).filter((_, itemIndex) => itemIndex !== index) } }))}>Remove item</button>
           </div>)}<button type="button" onClick={() => editSection(selected.id, section => ({ ...section, content: { ...section.content, items: [...(Array.isArray(section.content.items) ? section.content.items : []), {}] } }))}>Add item</button></>}
         </>}

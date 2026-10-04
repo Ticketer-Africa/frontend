@@ -7,7 +7,7 @@ import { SiteAnalytics } from "@/components/event-sites/site-analytics";
 import { getSiteAnalytics } from "@/services/event-sites/event-sites";
 import "../../site-builder.css";
 
-type Report = { windowDays: number; uniqueVisitors: number; pageViews: number; ticketCtaClicks: number };
+type Report = { windowDays: number; uniqueVisitors: number; pageViews: number; ticketCtaClicks: number; checkouts: number; orders: number; revenueKobo: string };
 
 export default function EventSiteAnalyticsPage() {
   const id = String(useParams().id);

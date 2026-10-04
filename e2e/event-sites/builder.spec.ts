@@ -35,6 +35,34 @@ test("Theme fonts persist to both preview and the published page", async ({ page
   await expect(page.getByRole("heading", { name: site.heading, exact: true })).toHaveCSS("font-family", /Playfair Display/);
 });
 
+test("Bounded layout and mobile visibility controls match preview and publication", async ({ page, newSite }) => {
+  const site = await newSite();
+  await page.getByRole("combobox", { name: "Button shape" }).selectOption("square");
+  await page.getByRole("combobox", { name: "Content width" }).selectOption("wide");
+  await page.getByRole("combobox", { name: "Mobile alignment" }).selectOption("center");
+  await page.getByRole("checkbox", { name: "Hide on mobile" }).check();
+  await page.getByRole("button", { name: "mobile", exact: true }).click();
+  await expect(preview(page).locator('[data-section-type="HERO"]')).toBeHidden();
+  await page.getByRole("button", { name: "desktop", exact: true }).click();
+  await expect(preview(page).locator('[data-section-type="HERO"]')).toBeVisible();
+  await saved(page);
+  await publish(page);
+  await page.goto(publicPath(site.slug));
+  await expect(page.locator('main.es-page')).toHaveAttribute("data-button-shape", "square");
+  await page.setViewportSize({ width: 390, height: 800 });
+  await expect(page.locator('[data-section-type="HERO"]')).toBeHidden();
+});
+
+test("Sections can be reordered by dragging and the order persists", async ({ page, newSite }) => {
+  await newSite();
+  const list = page.getByRole("list", { name: "Sections", exact: true });
+  const firstId = await list.getByRole("listitem").first().getAttribute("data-section-id");
+  await list.getByRole("listitem").first().dragTo(list.getByRole("listitem").last());
+  await saved(page);
+  await page.reload();
+  await expect(list.getByRole("listitem").last()).toHaveAttribute("data-section-id", firstId!);
+});
+
 for (const section of sections) {
   test(`${section} can be added, duplicated, hidden and deleted without losing persisted order`, async ({ page, newSite }) => {
     await newSite();
