@@ -22,7 +22,7 @@ function TicketVisual() {
         className="relative overflow-hidden shadow-2xl"
         style={{ borderColor: "var(--home-border-strong)" }}
       >
-        <div className="p-6 pb-5">
+        <div className="p-4 sm:p-6 pb-5">
           <p
             className="font-['Syne'] text-xs font-bold tracking-[2px] mb-1"
             style={{ color: "var(--home-muted-dim)" }}
@@ -48,7 +48,7 @@ function TicketVisual() {
           />
         </div>
 
-        <div className="p-6 pt-5 flex items-center justify-center">
+        <div className="p-4 sm:p-6 pt-5 flex items-center justify-center">
           <div
             className="p-4 rounded-xl"
             style={{ backgroundColor: "var(--home-card)" }}
@@ -108,10 +108,10 @@ function TicketVisual() {
 export function OrganiserCheckinSection() {
   return (
     <section
-      className="home-theme py-20 px-4 sm:px-6 lg:px-8"
+      className="home-theme py-14 sm:py-20 px-4 sm:px-6 lg:px-8"
       style={{ backgroundColor: "var(--home-bg)" }}
     >
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
         <TicketVisual />
 
         <div>

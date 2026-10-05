@@ -21,13 +21,13 @@ export default function Loading() {
       className="home-theme min-h-screen pt-16"
       style={{ backgroundColor: "var(--home-bg)" }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header - must match page.tsx's <header> exactly (classes + copy),
             otherwise the subtitle wraps differently and shifts everything
             below it once the real page mounts. */}
-        <header className="text-center mb-12">
+        <header className="text-center mb-8 sm:mb-12">
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 leading-[1.05]"
+            className="text-fluid-hero font-extrabold mb-4"
             style={{ color: "var(--home-text)" }}
           >
             Discover Amazing
@@ -35,7 +35,7 @@ export default function Loading() {
             Events
           </h1>
           <p
-            className="text-lg max-w-2xl mx-auto"
+            className="text-base sm:text-lg max-w-2xl mx-auto text-pretty"
             style={{ color: "var(--home-muted)" }}
           >
             Find and book tickets for the best events happening near you across the continent.
@@ -49,11 +49,11 @@ export default function Loading() {
             exactly (same classes, "All" selected) rather than a skeleton
             approximation, since this row's content never changes. */}
         <div
-          className="flex gap-4 items-center overflow-x-auto pb-2 mb-8"
+          className="flex gap-2 sm:gap-4 items-center overflow-x-auto pb-2 mb-6 sm:mb-8 -mx-4 px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           aria-hidden="true"
         >
           <span
-            className="px-8 py-3 rounded-full text-sm font-semibold whitespace-nowrap shrink-0"
+            className="px-5 sm:px-8 py-3 rounded-full text-sm font-semibold whitespace-nowrap shrink-0"
             style={{ backgroundColor: "var(--home-accent)", color: "var(--home-accent-fg)" }}
           >
             All
@@ -61,7 +61,7 @@ export default function Loading() {
           {QUICK_CATEGORIES.map((category) => (
             <span
               key={category}
-              className="px-8 py-3 rounded-full text-sm font-semibold whitespace-nowrap shrink-0"
+              className="px-5 sm:px-8 py-3 rounded-full text-sm font-semibold whitespace-nowrap shrink-0"
               style={{
                 backgroundColor: "var(--home-card-elevated)",
                 color: "var(--home-muted)",

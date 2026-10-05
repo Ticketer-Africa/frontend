@@ -26,7 +26,7 @@ const SIGNALS = [
 export function OrganiserPerformanceSection() {
   return (
     <section
-      className="home-theme py-20 px-4 sm:px-6 lg:px-8"
+      className="home-theme py-14 sm:py-20 px-4 sm:px-6 lg:px-8"
       style={{ backgroundColor: "var(--home-bg)" }}
     >
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[0.8fr_1.2fr] gap-12 lg:gap-20">

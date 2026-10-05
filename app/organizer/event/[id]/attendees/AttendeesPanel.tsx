@@ -147,7 +147,7 @@ export default function AttendeesPanel({ eventId }: AttendeesPanelProps) {
             </SelectContent>
           </Select>
         )}
-        <div className="relative flex-1 max-w-sm">
+        <div className="relative w-full flex-1 sm:max-w-sm">
           <HugeiconsIcon icon={Search01Icon} className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
             className="pl-9 border-[var(--home-border-strong)] bg-[var(--home-card-elevated)] text-[var(--home-text)] placeholder:text-[var(--home-muted-dim)] focus-visible:ring-[var(--home-accent)]"
@@ -162,15 +162,54 @@ export default function AttendeesPanel({ eventId }: AttendeesPanelProps) {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center py-16">
+        <div className="flex items-center justify-center py-12 sm:py-16">
           <HugeiconsIcon icon={Loading03Icon} className="h-8 w-8 animate-spin text-[var(--home-accent)]" />
         </div>
       ) : filteredRows.length === 0 ? (
-        <div className="text-center py-16 text-[var(--home-muted)]">
+        <div className="text-center py-12 sm:py-16 text-[var(--home-muted)]">
           No attendees match your filters.
         </div>
       ) : (
-        <div className="overflow-x-auto">
+        <>
+        {/* Phones: one card per attendee instead of a sideways-scrolling table */}
+        <ul className="flex flex-col gap-3 md:hidden">
+          {rows.map((a) => {
+            const s = STATUS_VARIANT[a.status];
+            return (
+              <li
+                key={`${a.type}-${a.id}`}
+                className="rounded-xl border border-[var(--home-border)] bg-[var(--home-card-elevated)] p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <p className="min-w-0 break-words font-semibold">
+                    {a.name || <span className="text-[var(--home-muted)] italic">No name</span>}
+                  </p>
+                  <span className={`shrink-0 rounded px-2 py-1 text-xs ${s.className}`}>
+                    {s.label}
+                  </span>
+                </div>
+                <div className="mt-2 space-y-1 text-sm">
+                  <p className="break-all">{a.email || "—"}</p>
+                  {a.phone && <p className="text-[var(--home-muted)]">{a.phone}</p>}
+                </div>
+                {(a.ticketCategoryName || a.ticketCode || a.tableNumber) && (
+                  <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-[var(--home-border)] pt-3 text-sm">
+                    {a.ticketCategoryName && <span>{a.ticketCategoryName}</span>}
+                    {a.ticketCode && (
+                      <span className="font-mono text-xs text-[var(--home-muted)]">{a.ticketCode}</span>
+                    )}
+                    {a.tableNumber && (
+                      <span className="text-[var(--home-muted)]">
+                        Table <span className="font-medium text-[var(--home-text)]">{a.tableNumber}</span>
+                      </span>
+                    )}
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+        <div className="hidden overflow-x-auto md:block">
           <Table>
             <TableHeader>
               <TableRow>
@@ -225,6 +264,7 @@ export default function AttendeesPanel({ eventId }: AttendeesPanelProps) {
             </TableBody>
           </Table>
         </div>
+        </>
       )}
 
       {filteredRows.length > 0 && (
@@ -235,7 +275,7 @@ export default function AttendeesPanel({ eventId }: AttendeesPanelProps) {
             {filteredRows.length}
           </p>
           {totalPages > 1 && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-2 sm:justify-start">
               <Button
                 variant="outline"
                 size="sm"

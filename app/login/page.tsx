@@ -71,7 +71,7 @@ export default function LoginPage() {
     <AuthShell>
       <div className="text-center mb-8">
         <h1
-          className="text-3xl font-bold mb-2"
+          className="text-2xl sm:text-3xl font-bold mb-2"
           style={{ color: "var(--home-text)" }}
         >
           Welcome back

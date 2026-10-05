@@ -76,7 +76,7 @@ export function EventCardSkeleton() {
 export function EventsGridSkeleton() {
   return (
     <div
-      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
       role="status"
       aria-label="Loading events"
     >
@@ -99,9 +99,9 @@ export function EventsGridSkeleton() {
  */
 export function FiltersSkeleton() {
   return (
-    <div className="mb-8">
+    <div className="mb-6 sm:mb-8">
       <div
-        className="rounded-2xl p-6 border"
+        className="rounded-2xl p-4 sm:p-6 border"
         style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)" }}
       >
         {/* Search row skeleton - Input (flex-1) + Button, both h-12 */}

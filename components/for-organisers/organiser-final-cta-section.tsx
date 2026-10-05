@@ -19,7 +19,7 @@ export function OrganiserFinalCTASection() {
 
   return (
     <section
-      className="home-theme py-24 px-4 sm:px-6 lg:px-8"
+      className="home-theme py-16 sm:py-24 px-4 sm:px-6 lg:px-8"
       style={{
         background:
           "radial-gradient(circle at 50% 0%, rgba(226,114,91,0.14), transparent 60%), var(--home-bg)",

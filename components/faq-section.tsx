@@ -65,7 +65,7 @@ const FAQItem = memo(function FAQItem({
     <HomeCard tone="elevated" className="faq-item overflow-hidden" style={{ animationDelay: `${index * 50}ms` }}>
       <button
         onClick={onToggle}
-        className="w-full flex justify-between items-center p-6 text-left"
+        className="w-full flex justify-between items-center p-4 sm:p-6 text-left"
         aria-expanded={isOpen}
       >
         <span
@@ -116,11 +116,11 @@ export function FAQSection() {
   return (
     <section
       id="faq"
-      className="home-theme py-20 px-4 sm:px-6 lg:px-8"
+      className="home-theme py-14 sm:py-20 px-4 sm:px-6 lg:px-8"
       style={{ backgroundColor: "var(--home-bg)" }}
     >
       <div className="max-w-4xl mx-auto">
-        <div className="section-animate text-center mb-16">
+        <div className="section-animate text-center mb-10 sm:mb-16">
           <h2
             className="font-['Syne'] font-bold text-3xl sm:text-4xl lg:text-[48px] tracking-[-1.2px]"
             style={{ color: "var(--home-text)" }}

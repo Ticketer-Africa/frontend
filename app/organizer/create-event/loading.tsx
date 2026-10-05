@@ -13,7 +13,7 @@ export default function Loading() {
         <div className="mb-8 flex items-center justify-between">
           {[0, 1, 2, 3].map((item) => <div key={item} className="h-8 w-8 rounded-full bg-[var(--home-card-highlight)]" />)}
         </div>
-        <div className="rounded-3xl border border-[var(--home-border)] bg-[var(--home-card)] p-6 space-y-6">
+        <div className="rounded-3xl border border-[var(--home-border)] bg-[var(--home-card)] p-4 sm:p-6 space-y-6">
           <div className="h-7 w-48 rounded bg-[var(--home-card-highlight)]" />
           {[0, 1, 2].map((item) => (
             <div key={item} className="space-y-2">

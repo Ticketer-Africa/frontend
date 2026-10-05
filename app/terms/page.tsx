@@ -10,7 +10,7 @@ export default function TermsAndConditions() {
         {/* Header */}
         <div className="mb-10 text-center sm:mb-12">
           <h1
-            className="mb-4 text-4xl font-bold sm:text-5xl"
+            className="mb-4 text-fluid-h1 font-bold sm:text-5xl"
             style={{ color: "var(--home-text)" }}
           >
             Terms and Conditions

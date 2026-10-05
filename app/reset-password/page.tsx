@@ -93,7 +93,7 @@ function ResetPasswordForm() {
     <AuthShell>
       <div className="text-center mb-8">
         <h1
-          className="text-3xl font-bold mb-2"
+          className="text-2xl sm:text-3xl font-bold mb-2"
           style={{ color: "var(--home-text)" }}
         >
           Set New Password

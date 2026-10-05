@@ -14,7 +14,7 @@ export function HeroSection() {
 
   return (
     <section
-      className="home-theme relative flex items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 pt-32 pb-24 min-h-[720px]"
+      className="home-theme relative flex items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 pt-28 pb-16 sm:pt-32 sm:pb-24 min-h-[560px] sm:min-h-[720px]"
       style={{
         background:
           "radial-gradient(circle at 50% 0%, rgba(226,114,91,0.16), transparent 60%), var(--home-bg)",
@@ -35,7 +35,7 @@ export function HeroSection() {
         </span>
 
         <h1
-          className="font-['Syne'] font-extrabold text-3xl sm:text-5xl lg:text-[72px] mb-6 leading-tight lg:leading-[80px] tracking-[-1.2px] break-words"
+          className="font-['Syne'] font-extrabold text-fluid-hero mb-6 break-words"
           style={{ color: "var(--home-text)" }}
         >
           Buy. Sell. Enjoy
@@ -46,7 +46,7 @@ export function HeroSection() {
         </h1>
 
         <p
-          className="font-['Hanken_Grotesk'] text-lg mb-10 max-w-3xl mx-auto leading-normal tracking-[0.5px]"
+          className="font-['Hanken_Grotesk'] text-base sm:text-lg mb-8 sm:mb-10 max-w-3xl mx-auto leading-relaxed sm:leading-normal tracking-[0.2px] sm:tracking-[0.5px] text-pretty"
           style={{ color: "var(--home-muted)" }}
         >
           Discover the continent&apos;s most exclusive curated experiences, buy

@@ -36,7 +36,7 @@ export function SplitScreenLayout({ event, mode }: Props) {
         <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--home-accent)" }}>
           {event.category}
         </p>
-        <h1 className="text-3xl font-bold mt-1" style={{ color: "var(--home-text)" }}>{event.name}</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold mt-1" style={{ color: "var(--home-text)" }}>{event.name}</h1>
         <p className="mt-2" style={{ color: "var(--home-muted)" }}>{event.venueName}</p>
 
         <div role="tablist" className="flex gap-2 mt-6 border-b" style={{ borderColor: "var(--home-border)" }}>

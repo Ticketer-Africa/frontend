@@ -163,13 +163,13 @@ export default function EventManagementTabs({ event }: EventManagementTabsProps)
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6">
-      <nav className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible">
+      <nav className="flex md:flex-col gap-1 overflow-x-auto md:overflow-visible -mx-4 px-4 scroll-px-4 md:mx-0 md:px-0 pb-1 md:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x">
         {NAV_ITEMS.map((item) => (
           <button
             key={item.key}
             type="button"
             onClick={() => setNav(item.key)}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors ${
+            className={`flex shrink-0 snap-start items-center gap-2 md:gap-3 px-4 py-3 rounded-xl text-sm font-semibold whitespace-nowrap transition-colors ${
               nav === item.key
                 ? "bg-[var(--home-accent)]/15 text-[var(--home-text-highlight)]"
                 : "text-[var(--home-muted)] hover:bg-[var(--home-card-highlight)] hover:text-[var(--home-text)]"
@@ -207,14 +207,14 @@ export default function EventManagementTabs({ event }: EventManagementTabsProps)
 
               <div className="flex flex-col gap-3">
                 <h3 className="font-semibold">Ticket Tiers</h3>
-                <div className="grid grid-cols-4 pb-2 border-b border-[var(--home-border)] text-xs text-[var(--home-muted)]">
+                <div className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,.7fr)_minmax(0,1fr)] gap-x-2 pb-2 border-b border-[var(--home-border)] text-xs text-[var(--home-muted)]">
                   <span>Tier</span>
                   <span>Price</span>
                   <span>Capacity</span>
                   <span>Sold</span>
                 </div>
                 {ticketCategories?.map((t) => (
-                  <div key={t.id} className="grid grid-cols-4 py-2 border-b border-[var(--home-border)] text-sm">
+                  <div key={t.id} className="grid grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,.7fr)_minmax(0,1fr)] gap-x-2 py-2 border-b border-[var(--home-border)] text-sm break-words">
                     <span className="font-semibold">{t.name}</span>
                     <span>{formatPrice(t.price)}</span>
                     <span>{t.maxTickets}</span>
@@ -225,7 +225,7 @@ export default function EventManagementTabs({ event }: EventManagementTabsProps)
 
               <div className="flex flex-col gap-2">
                 <span className="text-sm text-[var(--home-muted)]">Event URL</span>
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <p className="flex-1 text-sm break-all bg-[var(--home-card-elevated)] text-[var(--home-muted)] px-3 py-2 rounded-xl font-mono">
                     {eventUrl}
                   </p>
@@ -253,7 +253,7 @@ export default function EventManagementTabs({ event }: EventManagementTabsProps)
           {/* ── Attendees ── */}
           {nav === "attendees" && (
             <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <h3 className="text-xl font-bold">Attendees</h3>
                 <Button asChild variant="outline" className="border-[var(--home-border-strong)] bg-transparent text-[var(--home-text)] hover:bg-[var(--home-card-highlight)] hover:text-[var(--home-text)]">
                   <Link href={`/organizer/event/${eventId}/attendees`}>Open full view</Link>
@@ -489,7 +489,7 @@ export default function EventManagementTabs({ event }: EventManagementTabsProps)
               </div>
 
               {analyticsLoading || !analytics ? (
-                <div className="flex justify-center py-12">
+                <div className="flex justify-center py-10 sm:py-12">
                   <HugeiconsIcon icon={Loading03Icon} className="h-6 w-6 animate-spin text-[var(--home-accent)]" />
                 </div>
               ) : (
@@ -510,7 +510,7 @@ export default function EventManagementTabs({ event }: EventManagementTabsProps)
                   </div>
 
                   {analyticsMode === "advanced" && (
-                    <div className="flex flex-col gap-8">
+                    <div className="flex flex-col gap-6 sm:gap-8">
                       <div className="flex flex-col gap-3.5">
                         <span className="text-sm text-[var(--home-muted)]">
                           Tickets sold, last 7 days

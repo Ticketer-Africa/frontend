@@ -39,7 +39,7 @@ export function TimelineLayout({ event, mode }: Props) {
           >
             {event.category}
           </span>
-          <h1 className="text-4xl font-bold text-white">{event.name}</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white">{event.name}</h1>
           <p className="text-white/80 mt-2">
             {eventDate.toLocaleDateString("en-NG", { month: "long", day: "numeric", year: "numeric" })}
             {" · "}{event.venueName}
@@ -48,7 +48,7 @@ export function TimelineLayout({ event, mode }: Props) {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 mt-8">
           <section>
             <h2 className="text-xl font-bold mb-4" style={{ color: "var(--home-text)" }}>Full Show Timeline</h2>
             <ol className="space-y-4">
@@ -83,7 +83,7 @@ export function TimelineLayout({ event, mode }: Props) {
         </div>
 
         {event.relatedEvents.length > 0 && (
-          <section className="mt-12">
+          <section className="mt-8 sm:mt-12">
             <h2 className="text-xl font-bold mb-4" style={{ color: "var(--home-text)" }}>More Events</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {event.relatedEvents.map((related) => (
@@ -113,7 +113,7 @@ export function TimelineLayout({ event, mode }: Props) {
         className="fixed bottom-0 left-0 right-0 border-t backdrop-blur-xl"
         style={{ backgroundColor: "rgba(11,14,20,0.95)", borderColor: "var(--home-border)" }}
       >
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
+        <div className="container mx-auto px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:py-4 flex items-center justify-between gap-4">
           <div>
             <p className="text-xs" style={{ color: "var(--home-muted)" }}>Tickets from</p>
             <p className="text-xl font-bold" style={{ color: "var(--home-text)" }}>₦{fromPrice.toLocaleString()}</p>

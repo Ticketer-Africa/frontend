@@ -30,7 +30,7 @@ export const QuickStats = memo(function QuickStats({
   return (
     <div className="wallet-card-animate wallet-card-delay-1 lg:col-span-2">
       <div
-        className="rounded-xl shadow-lg border grid grid-cols-1 md:grid-cols-3 gap-4 h-full p-6"
+        className="rounded-xl shadow-lg border grid grid-cols-1 md:grid-cols-3 gap-4 h-full p-4 sm:p-6"
         style={{
           backgroundColor: "var(--home-card)",
           borderColor: "var(--home-border)",

@@ -121,7 +121,7 @@ export default function TicketDetailPage({
       >
         <div className="text-center">
           <h1
-            className="text-2xl font-bold mb-2"
+            className="text-xl sm:text-2xl font-bold mb-2 break-words"
             style={{ color: "var(--home-text)" }}
           >
             Ticket Not Found
@@ -150,7 +150,7 @@ export default function TicketDetailPage({
       style={{ backgroundColor: "var(--home-bg)" }}
     >
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6 sm:mb-8">
           <Button
             variant="homeOutline"
             asChild
@@ -176,7 +176,7 @@ export default function TicketDetailPage({
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <CardTitle
-                      className="text-2xl font-bold mb-2"
+                      className="text-xl sm:text-2xl font-bold mb-2 break-words"
                       style={{ color: "var(--home-text)" }}
                     >
                       {event.name}
@@ -202,7 +202,7 @@ export default function TicketDetailPage({
               </CardHeader>
 
               <CardContent>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
                   {/* Event Details */}
                   <div className="space-y-6">
                     <div>
@@ -222,7 +222,7 @@ export default function TicketDetailPage({
                           </div>
                         </div>
                         <div className="flex items-center space-x-3">
-                          <HugeiconsIcon icon={Location01Icon} className="h-5 w-5" style={{ color: "var(--home-text-highlight)" }} />
+                          <HugeiconsIcon icon={Location01Icon} className="h-5 w-5 shrink-0" style={{ color: "var(--home-text-highlight)" }} />
                           <p style={{ color: "var(--home-text)" }}>{event.venueName}</p>
                         </div>
                         <div className="flex items-center space-x-3">
@@ -242,10 +242,10 @@ export default function TicketDetailPage({
                         Ticket Information
                       </h3>
                       <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span style={{ color: "var(--home-muted)" }}>Ticket Code:</span>
+                        <div className="flex justify-between gap-4">
+                          <span className="shrink-0" style={{ color: "var(--home-muted)" }}>Ticket Code:</span>
                           <code
-                            className="text-sm px-2 py-1 rounded"
+                            className="text-sm px-2 py-1 rounded break-all text-right"
                             style={{
                               backgroundColor: "var(--home-card-highlight)",
                               color: "var(--home-text)",
@@ -254,13 +254,13 @@ export default function TicketDetailPage({
                             {ticket.code}
                           </code>
                         </div>
-                        <div className="flex justify-between">
+                        <div className="flex justify-between gap-4">
                           <span style={{ color: "var(--home-muted)" }}>Category:</span>
-                          <span className="font-semibold" style={{ color: "var(--home-text)" }}>
+                          <span className="font-semibold text-right" style={{ color: "var(--home-text)" }}>
                             {ticket.ticketCategory.name}
                           </span>
                         </div>
-                        <div className="flex justify-between">
+                        <div className="flex justify-between gap-4">
                           <span style={{ color: "var(--home-muted)" }}>Original Price:</span>
                           <span className="font-semibold" style={{ color: "var(--home-text)" }}>
                             {originalPrice > 0
@@ -269,7 +269,7 @@ export default function TicketDetailPage({
                           </span>
                         </div>
                         {ticket.isListed && ticket.resalePrice && (
-                          <div className="flex justify-between">
+                          <div className="flex justify-between gap-4">
                             <span style={{ color: "var(--home-muted)" }}>Listed for:</span>
                             <span className="font-semibold" style={{ color: "var(--home-text-highlight)" }}>
                               {formatPrice(ticket.resalePrice)}
@@ -301,8 +301,8 @@ export default function TicketDetailPage({
                     </div>
                   </div>
 
-                  {/* QR Code */}
-                  <div className="space-y-6">
+                  {/* QR Code - first on phones: it's what gets scanned at the gate */}
+                  <div className="space-y-6 order-first lg:order-none">
                     <div>
                       <h3
                         className="font-semibold text-lg mb-4"

@@ -9,7 +9,7 @@ import { HomeCard } from "@/components/home/home-card";
 function SectionSkeleton({ height }: { height: string }) {
   return (
     <div
-      className="home-theme py-20 px-4 sm:px-6 lg:px-8"
+      className="home-theme py-14 sm:py-20 px-4 sm:px-6 lg:px-8"
       style={{ backgroundColor: "var(--home-bg)" }}
       aria-hidden="true"
     >

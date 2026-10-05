@@ -44,7 +44,7 @@ function PaginationControlsComponent({
 
   return (
     <nav
-      className="flex items-center justify-center gap-4 mt-12"
+      className="flex items-center justify-center gap-4 mt-8 sm:mt-12"
       aria-label="Event pagination"
     >
       <Button

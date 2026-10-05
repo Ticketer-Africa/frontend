@@ -371,14 +371,14 @@ export default function EventsPage() {
       className="home-theme min-h-screen pt-16"
       style={{ backgroundColor: "var(--home-bg)" }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/*
          * Header - renders immediately without animation
          * Performance: No JS animation delay, text is LCP candidate
          */}
-        <header className="text-center mb-12">
+        <header className="text-center mb-8 sm:mb-12">
           <h1
-            className="font-['Syne'] text-5xl sm:text-6xl lg:text-[72px] font-extrabold tracking-[-1.2px] mb-4 leading-[1.05] lg:leading-[80px]"
+            className="font-['Syne'] text-fluid-hero font-extrabold mb-4"
             style={{ color: "var(--home-text)" }}
           >
             Discover Amazing
@@ -386,7 +386,7 @@ export default function EventsPage() {
             Events
           </h1>
           <p
-            className="font-['Hanken_Grotesk'] text-lg max-w-2xl mx-auto tracking-[0.5px]"
+            className="font-['Hanken_Grotesk'] text-base sm:text-lg max-w-2xl mx-auto tracking-[0.2px] sm:tracking-[0.5px] text-pretty"
             style={{ color: "var(--home-muted)" }}
           >
             Find and book tickets for the best events happening near you across the continent.
@@ -436,14 +436,14 @@ export default function EventsPage() {
          * Category panel toggled by the "Filters" button above.
          */}
         <div
-          className="flex gap-4 items-center overflow-x-auto pb-2 mb-8"
+          className="flex gap-2 sm:gap-4 items-center overflow-x-auto pb-2 mb-6 sm:mb-8 -mx-4 px-4 scroll-px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden snap-x"
           role="group"
           aria-label="Quick category filters"
         >
           <button
             type="button"
             onClick={() => handleQuickCategorySelect("")}
-            className="px-8 py-3 rounded-full text-sm font-semibold whitespace-nowrap transition-colors shrink-0"
+            className="px-5 sm:px-8 py-3 rounded-full text-sm font-semibold whitespace-nowrap transition-colors shrink-0 snap-start"
             style={
               selectedCategory === ""
                 ? { backgroundColor: "var(--home-accent)", color: "var(--home-accent-fg)" }
@@ -457,7 +457,7 @@ export default function EventsPage() {
               key={category}
               type="button"
               onClick={() => handleQuickCategorySelect(category)}
-              className="px-8 py-3 rounded-full text-sm font-semibold whitespace-nowrap transition-colors shrink-0"
+              className="px-5 sm:px-8 py-3 rounded-full text-sm font-semibold whitespace-nowrap transition-colors shrink-0 snap-start"
               style={
                 selectedCategory === category
                   ? { backgroundColor: "var(--home-accent)", color: "var(--home-accent-fg)" }

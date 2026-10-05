@@ -43,7 +43,7 @@ export function EventCard({ event }: EventCardProps) {
           </div> */}
         </div>
 
-        <CardContent className="p-6">
+        <CardContent className="p-4 sm:p-6">
           <div className="space-y-4">
             <div>
               <h3 className="font-semibold text-lg text-foreground line-clamp-2 mb-2">

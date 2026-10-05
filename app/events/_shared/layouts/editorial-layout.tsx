@@ -29,12 +29,12 @@ export function EditorialLayout({ event, mode }: Props) {
 
   return (
     <div className="home-theme min-h-screen pt-16" style={{ backgroundColor: "var(--home-bg)" }}>
-      <div className="container mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <div className="container mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
         <article className="lg:col-span-8">
           <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--home-accent)" }}>
             {event.category}
           </p>
-          <h1 className="text-4xl font-bold mt-2" style={{ color: "var(--home-text)" }}>{event.name}</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold mt-2" style={{ color: "var(--home-text)" }}>{event.name}</h1>
           <p className="mt-2 text-sm" style={{ color: "var(--home-muted)" }}>
             {eventDate.toLocaleDateString("en-NG", { month: "long", day: "numeric", year: "numeric" })}
             {" · "}{event.venueName}{" · "}Presented by {event.organizerName}
@@ -68,7 +68,7 @@ export function EditorialLayout({ event, mode }: Props) {
           )}
 
           {event.relatedEvents.length > 0 && (
-            <section className="mt-12">
+            <section className="mt-8 sm:mt-12">
               <h2 className="text-xl font-bold mb-4" style={{ color: "var(--home-text)" }}>You Might Also Like</h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {event.relatedEvents.map((related) => (

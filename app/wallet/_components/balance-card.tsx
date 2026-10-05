@@ -36,7 +36,7 @@ export const BalanceCard = memo(function BalanceCard({
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <p className="text-4xl font-bold" style={{ color: "var(--home-text)" }}>
+            <p className="text-3xl sm:text-4xl font-bold" style={{ color: "var(--home-text)" }}>
               {formatPrice(balance)}
             </p>
             <div className="space-y-2">

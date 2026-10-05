@@ -19,11 +19,11 @@ export function PricingSection() {
   return (
     <section
       id="pricing"
-      className="home-theme py-24 px-4 sm:px-6 lg:px-8"
+      className="home-theme py-16 sm:py-24 px-4 sm:px-6 lg:px-8"
       style={{ backgroundColor: "var(--home-bg)" }}
     >
       <div className="max-w-5xl mx-auto text-center">
-        <div className="section-animate mb-12">
+        <div className="section-animate mb-8 sm:mb-12">
           <h2
             className="font-['Syne'] font-bold text-3xl sm:text-4xl lg:text-[48px] tracking-[-1.2px] mb-4"
             style={{ color: "var(--home-text)" }}
@@ -38,11 +38,11 @@ export function PricingSection() {
           </p>
         </div>
 
-        <div className="section-animate section-delay-1 grid grid-cols-1 md:grid-cols-2 gap-12 items-stretch">
+        <div className="section-animate section-delay-1 grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-stretch">
           <HomeCard
             tone="highlight"
             radius="card-lg"
-            className="relative p-10 flex flex-col justify-center lg:h-[292px]"
+            className="relative p-6 sm:p-10 flex flex-col justify-center lg:h-[292px]"
             style={{ borderWidth: 2, borderColor: "var(--home-accent)" }}
           >
             <span
@@ -60,7 +60,7 @@ export function PricingSection() {
             </h3>
             <p className="mb-4">
               <span
-                className="font-['Syne'] font-medium text-4xl"
+                className="font-['Syne'] font-medium text-3xl sm:text-4xl"
                 style={{ color: "var(--home-accent)" }}
               >
                 5%
@@ -86,7 +86,7 @@ export function PricingSection() {
             </p>
           </HomeCard>
 
-          <HomeCard tone="card" radius="card-lg" className="p-10 flex flex-col justify-center lg:h-[292px]">
+          <HomeCard tone="card" radius="card-lg" className="p-6 sm:p-10 flex flex-col justify-center lg:h-[292px]">
             <h3
               className="font-['Syne'] text-2xl tracking-[0.5px] mb-2"
               style={{ color: "var(--home-text)" }}
@@ -95,7 +95,7 @@ export function PricingSection() {
             </h3>
             <p className="mb-4">
               <span
-                className="font-['Syne'] font-medium text-4xl"
+                className="font-['Syne'] font-medium text-3xl sm:text-4xl"
                 style={{ color: "var(--home-highlight-yellow)" }}
               >
                 15%
@@ -123,7 +123,7 @@ export function PricingSection() {
           </HomeCard>
         </div>
 
-        <div className="section-animate section-delay-2 mt-16">
+        <div className="section-animate section-delay-2 mt-10 sm:mt-16">
           <Button
             variant="homeAccent"
             asChild

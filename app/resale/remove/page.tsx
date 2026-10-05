@@ -38,14 +38,14 @@ export default function GuestResaleRemovePage() {
     >
       <section className="mx-auto max-w-xl">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold" style={{ color: "var(--home-text)" }}>
+          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: "var(--home-text)" }}>
             Remove a resale listing
           </h1>
           <p className="mt-2 text-sm" style={{ color: "var(--home-muted)" }}>
             No login needed. Enter the ticket code and purchase email used for the ticket.
           </p>
         </div>
-        <HomeCard tone="card" className="p-6">
+        <HomeCard tone="card" className="p-4 sm:p-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-2">
               <label className="text-sm font-medium" style={{ color: "var(--home-text)" }}>

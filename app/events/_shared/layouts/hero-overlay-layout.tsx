@@ -34,7 +34,7 @@ export function HeroOverlayLayout({ event, mode }: Props) {
           >
             {event.category}
           </span>
-          <h1 className="text-4xl font-bold text-white">{event.name}</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white">{event.name}</h1>
           <p className="text-white/80 mt-2">
             {eventDate.toLocaleDateString("en-NG", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
             {" · "}
@@ -44,8 +44,8 @@ export function HeroOverlayLayout({ event, mode }: Props) {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
-        <div className="lg:col-span-7 space-y-10">
+      <div className="container mx-auto px-4 py-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+        <div className="lg:col-span-7 space-y-8 sm:space-y-10">
           <section>
             <h2 className="text-2xl font-bold mb-4" style={{ color: "var(--home-text)" }}>About This Event</h2>
             <p style={{ color: "var(--home-muted)" }}>{event.description}</p>

@@ -311,7 +311,7 @@ export function Header() {
             variant="outline"
             size="icon"
             className={clsx(
-              "ml-auto md:hidden",
+              "ml-auto h-11 w-11 md:hidden",
               isHome && "border-[var(--home-border-strong)] bg-transparent text-[var(--home-text)]"
             )}
             onClick={toggleMenu}
@@ -333,7 +333,7 @@ export function Header() {
         {isMenuOpen && (
           <div
             className={clsx(
-              "mobile-menu-slide-in relative z-50 border-t py-4 md:hidden",
+              "mobile-menu-slide-in relative z-50 -mx-4 max-h-[calc(100dvh-60px)] overflow-y-auto overscroll-contain rounded-b-2xl border-t px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-2xl sm:-mx-6 sm:px-6 md:hidden",
               isHome
                 ? "border-[var(--home-border)] bg-[var(--home-bg)]"
                 : "border-border bg-background"
@@ -345,7 +345,7 @@ export function Header() {
                   key={item.name}
                   href={item.href}
                   className={clsx(
-                    "flex h-11 items-center rounded-full px-4 text-sm",
+                    "flex h-12 items-center rounded-full px-4 text-base",
                     isHome
                       ? isActive(item.href)
                         ? "text-[var(--home-text-highlight)]"

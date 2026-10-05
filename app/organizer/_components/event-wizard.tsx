@@ -423,7 +423,7 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-8 min-w-0">
+        <div className="flex flex-col gap-6 sm:gap-8 min-w-0">
           <div className="flex flex-col gap-1.5">
             <h1 className="text-2xl md:text-[26px] font-bold" style={{ color: "var(--home-text)" }}>
               {currentStep === 6 && layout ? `${layout.replace("_", " ")} Details` : STEP_LABELS[currentStep - 1]}
@@ -434,7 +434,7 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
           </div>
 
           <Card className="bg-[var(--home-card)] text-[var(--home-text)] rounded-3xl shadow-none border border-[var(--home-border)]">
-            <CardContent className="space-y-6 pt-6">
+            <CardContent className="space-y-6 px-4 pt-5 sm:px-6 sm:pt-6">
               <form id="event-wizard-form">
               {currentStep === 1 && (
                 <EventFormStepLayout

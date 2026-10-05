@@ -82,7 +82,7 @@ export function PinSetupScreen() {
       style={{ backgroundColor: "var(--home-bg)" }}
     >
       <div className="section-animate text-center">
-        <h1 className="text-4xl font-bold mb-4" style={{ color: "var(--home-text)" }}>
+        <h1 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: "var(--home-text)" }}>
           Wallet Setup
         </h1>
         <p className="text-lg mb-6 max-w-md" style={{ color: "var(--home-muted)" }}>

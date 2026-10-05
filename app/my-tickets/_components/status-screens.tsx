@@ -29,7 +29,7 @@ export function MyTicketsLoading() {
  */
 export function EmptyTicketsState() {
   return (
-    <div className="text-center py-12 section-animate">
+    <div className="text-center py-10 sm:py-12 section-animate">
       <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
         <HugeiconsIcon icon={Calendar01Icon} className="h-12 w-12 text-gray-400" />
       </div>

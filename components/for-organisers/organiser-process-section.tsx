@@ -34,7 +34,7 @@ const STEPS = [
 
 function StepVisualOne() {
   return (
-    <HomeCard tone="elevated" radius="card-lg" className="p-6 w-full">
+    <HomeCard tone="elevated" radius="card-lg" className="p-4 sm:p-6 w-full">
       <div className="space-y-3">
         <div className="h-3 w-24 rounded-full" style={{ backgroundColor: "var(--home-border-strong)" }} />
         <div className="h-10 rounded-lg border" style={{ borderColor: "var(--home-border)", backgroundColor: "var(--home-card)" }} />
@@ -63,7 +63,7 @@ function StepVisualOne() {
 
 function StepVisualTwo() {
   return (
-    <HomeCard tone="elevated" radius="card-lg" className="p-6 w-full">
+    <HomeCard tone="elevated" radius="card-lg" className="p-4 sm:p-6 w-full">
       <div className="rounded-lg overflow-hidden border mb-3" style={{ borderColor: "var(--home-border)" }}>
         <div className="h-24" style={{ background: "linear-gradient(135deg, rgba(226,114,91,0.35), rgba(244,208,63,0.25))" }} />
       </div>
@@ -87,7 +87,7 @@ function StepVisualThree() {
     { name: "Kemi T.", status: "Paid" },
   ];
   return (
-    <HomeCard tone="elevated" radius="card-lg" className="p-6 w-full space-y-3">
+    <HomeCard tone="elevated" radius="card-lg" className="p-4 sm:p-6 w-full space-y-3">
       {rows.map((row) => (
         <div key={row.name} className="flex items-center gap-3">
           <div
@@ -118,7 +118,7 @@ function StepVisualThree() {
 
 function StepVisualFour() {
   return (
-    <HomeCard tone="elevated" radius="card-lg" className="p-8 w-full flex items-center justify-center">
+    <HomeCard tone="elevated" radius="card-lg" className="p-5 sm:p-8 w-full flex items-center justify-center">
       <div
         className="relative w-40 h-40 rounded-2xl flex items-center justify-center"
         style={{ backgroundColor: "var(--home-card)" }}
@@ -170,7 +170,7 @@ const StepRow = memo(function StepRow({ step, index }: StepRowProps) {
     >
       <div>
         <span
-          className="block font-['Syne'] font-extrabold text-6xl sm:text-7xl leading-none mb-4 tracking-[-2px]"
+          className="block font-['Syne'] font-extrabold text-5xl sm:text-7xl leading-none mb-3 sm:mb-4 tracking-[-2px]"
           style={{ color: "var(--home-border-strong)" }}
           aria-hidden="true"
         >
@@ -197,11 +197,11 @@ const StepRow = memo(function StepRow({ step, index }: StepRowProps) {
 export function OrganiserProcessSection() {
   return (
     <section
-      className="home-theme py-20 px-4 sm:px-6 lg:px-8"
+      className="home-theme py-14 sm:py-20 px-4 sm:px-6 lg:px-8"
       style={{ backgroundColor: "var(--home-bg)" }}
     >
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-20">
+        <div className="text-center mb-12 sm:mb-20">
           <h2
             className="font-['Syne'] font-bold text-3xl sm:text-[40px] tracking-[-1.2px] mb-4"
             style={{ color: "var(--home-text-highlight)" }}

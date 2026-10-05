@@ -55,8 +55,8 @@ export function ErrorScreen({
       className="home-theme min-h-screen flex items-center justify-center px-4"
       style={{ backgroundColor: "var(--home-bg)" }}
     >
-      <div className="text-center max-w-md mx-auto p-8 error-screen-animate">
-        <h1 className="text-3xl font-bold mb-4" style={{ color: "var(--home-text)" }}>
+      <div className="text-center max-w-md mx-auto p-5 sm:p-8 error-screen-animate">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4" style={{ color: "var(--home-text)" }}>
           {title}
         </h1>
         <p className="mb-6" style={{ color: "var(--home-muted)" }}>

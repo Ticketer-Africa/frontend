@@ -57,11 +57,11 @@ const FAQSection = dynamic(
 function EventsSectionSkeleton() {
   return (
     <section
-      className="home-theme py-16 px-4 sm:px-6 lg:px-8"
+      className="home-theme py-12 sm:py-16 px-4 sm:px-6 lg:px-8"
       style={{ backgroundColor: "var(--home-bg)" }}
     >
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 sm:mb-12">
           <div
             className="h-12 w-64 rounded-lg mx-auto mb-3 animate-pulse"
             style={{ backgroundColor: "var(--home-card)" }}
@@ -71,7 +71,7 @@ function EventsSectionSkeleton() {
             style={{ backgroundColor: "var(--home-card)" }}
           />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-12">
           {[1, 2, 3].map((i) => (
             <div
               key={i}

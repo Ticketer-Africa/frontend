@@ -31,14 +31,14 @@ export function EventSuccessScreen({
       className="home-theme min-h-screen flex items-center justify-center px-4"
       style={{ backgroundColor: "var(--home-bg)" }}
     >
-      <div className="text-center max-w-md mx-auto p-8 event-success-animate">
+      <div className="text-center max-w-md mx-auto p-5 sm:p-8 event-success-animate">
         <div
           className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
           style={{ backgroundColor: "rgba(66,167,59,0.1)" }}
         >
           <HugeiconsIcon icon={Tick01Icon} className="h-10 w-10" style={{ color: "var(--home-success)" }} />
         </div>
-        <h1 className="text-3xl font-bold mb-4" style={{ color: "var(--home-text)" }}>
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4" style={{ color: "var(--home-text)" }}>
           {title}
         </h1>
         <p className="mb-6" style={{ color: "var(--home-muted)" }}>

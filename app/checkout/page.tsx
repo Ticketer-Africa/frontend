@@ -335,7 +335,7 @@ export default function CheckoutPage() {
       </div>
 
       <div className="container mx-auto px-4 py-8 lg:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 sm:gap-8 items-start">
 
           {/* ── LEFT: Main form ─────────────────────────────── */}
           <div className="space-y-6">
@@ -359,7 +359,7 @@ export default function CheckoutPage() {
                   <CardTitle className="text-base" style={{ color: "var(--home-text)" }}>Your Details</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="p-6 space-y-4">
+              <CardContent className="p-4 sm:p-6 space-y-4">
                 {user ? (
                   <div
                     className="flex items-center gap-3 p-3 rounded-xl border"
@@ -444,7 +444,7 @@ export default function CheckoutPage() {
                     <CardTitle className="text-base" style={{ color: "var(--home-text)" }}>Ticket Recipients</CardTitle>
                   </div>
                 </CardHeader>
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   <label className="flex items-start gap-3 cursor-pointer group">
                     <div className="relative mt-0.5">
                       <input
@@ -576,7 +576,7 @@ export default function CheckoutPage() {
                     <CardTitle className="text-base" style={{ color: "var(--home-text)" }}>Additional Information</CardTitle>
                   </div>
                 </CardHeader>
-                <CardContent className="p-6 space-y-5">
+                <CardContent className="p-4 sm:p-6 space-y-5">
                   {[...checkoutData.customFields]
                     .sort((a, b) => a.position - b.position)
                     .map((field) => {

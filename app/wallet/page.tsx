@@ -111,7 +111,7 @@ export default function WalletPage() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-4xl font-bold" style={{ color: "var(--home-text)" }}>
+              <h1 className="text-3xl sm:text-4xl font-bold" style={{ color: "var(--home-text)" }}>
                 Wallet
               </h1>
               <p className="mt-1" style={{ color: "var(--home-muted)" }}>

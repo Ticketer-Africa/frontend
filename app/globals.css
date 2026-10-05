@@ -131,9 +131,45 @@
   * {
     @apply border-border;
   }
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     @apply bg-background text-foreground font-sans text-base leading-relaxed;
     font-family: "Syne", ui-sans-serif, system-ui, sans-serif;
+    /* Never let one rogue element create a sideways-scrolling page on phones */
+    overflow-x: clip;
+    overflow-wrap: break-word;
+  }
+
+  img,
+  video,
+  svg {
+    max-width: 100%;
+  }
+
+  /*
+   * Phones: 16px minimum on form controls stops iOS Safari auto-zooming the
+   * viewport on focus, and a 44px floor keeps every control thumb-friendly.
+   */
+  @media (max-width: 767px) {
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
+
+  @media (pointer: coarse) {
+    button:not([data-compact]),
+    [role="button"]:not([data-compact]),
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    select {
+      min-height: 44px;
+    }
   }
 
   h1,
@@ -148,15 +184,15 @@
   }
 
   h1 {
-    @apply text-4xl font-semibold;
+    @apply text-fluid-h1 font-semibold;
   }
 
   h2 {
-    @apply text-3xl font-semibold;
+    @apply text-fluid-h2 font-semibold;
   }
 
   h3 {
-    @apply text-2xl font-semibold;
+    @apply text-fluid-h3 font-semibold;
   }
 
   h4 {

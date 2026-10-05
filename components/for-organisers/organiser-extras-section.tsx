@@ -36,7 +36,7 @@ const EXTRAS = [
 export function OrganiserExtrasSection() {
   return (
     <section
-      className="home-theme px-4 py-20 sm:px-6 lg:px-8"
+      className="home-theme px-4 py-14 sm:py-20 sm:px-6 lg:px-8"
       style={{ backgroundColor: "var(--home-card)" }}
     >
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:gap-20">

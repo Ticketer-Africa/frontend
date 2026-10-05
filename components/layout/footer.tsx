@@ -43,10 +43,10 @@ export function Footer() {
         borderColor: "var(--home-border-subtle)",
       }}
     >
-      <div className={useWideLayout ? "px-4 sm:px-6 lg:px-8 py-16" : "container mx-auto px-4 py-16"}>
+      <div className={useWideLayout ? "px-4 sm:px-6 lg:px-8 py-12 sm:py-16" : "container mx-auto px-4 py-12 sm:py-16"}>
         <div className={useWideLayout ? "max-w-7xl mx-auto" : undefined}>
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-16">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10 lg:gap-12 mb-10 sm:mb-16">
+          <div className="col-span-2 space-y-5 sm:space-y-6">
             <Logo
               showImage
               textClassName="text-[#E2725B] font-['Syne']"
@@ -67,7 +67,7 @@ export function Footer() {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center w-10 h-10 rounded-full transition-opacity hover:opacity-80"
+                  className="flex items-center justify-center w-11 h-11 rounded-full transition-opacity hover:opacity-80"
                   style={{ backgroundColor: "var(--home-social-bg)" }}
                   aria-label={label}
                 >
@@ -79,17 +79,17 @@ export function Footer() {
 
           <div>
             <h3
-              className="font-['Hanken_Grotesk'] font-semibold text-sm tracking-[1.4px] uppercase mb-6"
+              className="font-['Hanken_Grotesk'] font-semibold text-sm tracking-[1.4px] uppercase mb-3 sm:mb-6"
               style={{ color: "var(--home-text)" }}
             >
               Platform
             </h3>
-            <nav className="space-y-4" aria-label="Platform links">
+            <nav className="-my-2.5 sm:my-0 sm:space-y-4" aria-label="Platform links">
               {PLATFORM_LINKS.map((link, i) => (
                 <Link
                   key={`${link.label}-${i}`}
                   href={link.href}
-                  className="block font-['Hanken_Grotesk'] text-base transition-colors hover:opacity-80"
+                  className="block py-2.5 sm:py-0 font-['Hanken_Grotesk'] text-base transition-colors hover:opacity-80"
                   style={{ color: "var(--home-muted)" }}
                 >
                   {link.label}
@@ -100,17 +100,17 @@ export function Footer() {
 
           <div>
             <h3
-              className="font-['Hanken_Grotesk'] font-semibold text-sm tracking-[1.4px] uppercase mb-6"
+              className="font-['Hanken_Grotesk'] font-semibold text-sm tracking-[1.4px] uppercase mb-3 sm:mb-6"
               style={{ color: "var(--home-text)" }}
             >
               Support
             </h3>
-            <nav className="space-y-4" aria-label="Support links">
+            <nav className="-my-2.5 sm:my-0 sm:space-y-4" aria-label="Support links">
               {SUPPORT_LINKS.map((link, i) => (
                 <Link
                   key={`${link.label}-${i}`}
                   href={link.href}
-                  className="block font-['Hanken_Grotesk'] text-base transition-colors hover:opacity-80"
+                  className="block py-2.5 sm:py-0 font-['Hanken_Grotesk'] text-base transition-colors hover:opacity-80"
                   style={{ color: "var(--home-muted)" }}
                 >
                   {link.label}
@@ -121,11 +121,11 @@ export function Footer() {
         </div>
 
         <div
-          className="border-t pt-8 text-center"
+          className="border-t pt-6 sm:pt-8 text-center"
           style={{ borderColor: "var(--home-border-subtle)" }}
         >
           <p
-            className="font-['Hanken_Grotesk'] font-semibold text-sm tracking-[0.7px]"
+            className="font-['Hanken_Grotesk'] font-semibold text-xs sm:text-sm tracking-[0.4px] sm:tracking-[0.7px]"
             style={{ color: "var(--home-muted-dim)" }}
           >
             © {new Date().getFullYear()} Ticketer Africa. All rights reserved.

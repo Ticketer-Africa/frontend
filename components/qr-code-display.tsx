@@ -105,7 +105,7 @@ export function QRCodeDisplay({ ticket, userId, showControls = true }: QRCodeDis
             <img
               src={qrCodeUrl || "/placeholder.svg"}
               alt={`QR Code for ${ticket.event.name}`}
-              className="w-full h-auto max-w-[200px] mx-auto"
+              className="w-full h-auto max-w-[240px] mx-auto"
             />
           </div>
         ) : (

@@ -13,7 +13,7 @@ interface EmptyStateProps {
  */
 export function EmptyState({ onClearFilters }: EmptyStateProps) {
   return (
-    <div className="text-center py-16">
+    <div className="text-center py-12 sm:py-16">
       <div className="text-6xl mb-4" aria-hidden="true">
         🎭
       </div>

@@ -96,9 +96,9 @@ function FilterSectionComponent({
   ].filter(Boolean).length;
 
   return (
-    <div className="mb-8">
+    <div className="mb-6 sm:mb-8">
       <div
-        className="rounded-2xl p-6 border"
+        className="rounded-2xl p-4 sm:p-6 border"
         style={{
           backgroundColor: "var(--home-card)",
           borderColor: "var(--home-border)",
@@ -114,10 +114,10 @@ function FilterSectionComponent({
             />
             <Input
               type="text"
-              placeholder="Search events, locations, artists..."
+              placeholder="Search events…"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-12 h-12 rounded-full"
+              className="pl-12 h-12 rounded-full text-base"
               style={{
                 backgroundColor: "var(--home-bg)",
                 borderColor: "var(--home-border-strong)",
@@ -129,20 +129,20 @@ function FilterSectionComponent({
           <Button
             type="submit"
             variant="homeAccent"
-            className="h-12 px-5"
+            className="h-12 px-5 shrink-0"
             disabled={!canSubmitSearch}
           >
             Search
           </Button>
         </form>
         {!canSubmitSearch && (
-          <p className="mt-1 text-xs" style={{ color: "var(--home-muted)" }}>
+          <p className="mt-1 mb-3 text-xs" style={{ color: "var(--home-muted)" }}>
             Enter at least 3 letters to search.
           </p>
         )}
 
         {/* Filter toggle and results count */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3">
           <Button
             variant="homeOutline"
             onClick={onToggleFilters}
@@ -165,7 +165,7 @@ function FilterSectionComponent({
               </Badge>
             )}
           </Button>
-          <p className="text-sm" style={{ color: "var(--home-muted)" }} aria-live="polite">
+          <p className="text-sm text-right" style={{ color: "var(--home-muted)" }} aria-live="polite">
             {resultsCount} events found
           </p>
         </div>
@@ -199,7 +199,7 @@ function FilterSectionComponent({
                   id="location-filter"
                   value={tempLocation}
                   onChange={(e) => onTempLocationChange(e.target.value)}
-                  className="w-full h-10 px-3 rounded-lg"
+                  className="w-full h-12 sm:h-10 px-3 rounded-lg"
                   style={{
                     backgroundColor: "var(--home-bg)",
                     borderColor: "var(--home-border)",
@@ -260,7 +260,7 @@ function FilterSectionComponent({
                   id="category-filter"
                   value={tempCategory}
                   onChange={(e) => onTempCategoryChange(e.target.value)}
-                  className="w-full h-10 px-3 rounded-lg"
+                  className="w-full h-12 sm:h-10 px-3 rounded-lg"
                   style={{
                     backgroundColor: "var(--home-bg)",
                     borderColor: "var(--home-border)",
@@ -282,7 +282,7 @@ function FilterSectionComponent({
                 <Button
                   onClick={onApplyFilters}
                   variant="homeAccent"
-                  className="flex-1 h-10"
+                  className="flex-1 h-12 sm:h-10"
                 >
                   <HugeiconsIcon icon={FilterHorizontalIcon}
                     className="w-4 h-4 mr-2"
@@ -293,7 +293,7 @@ function FilterSectionComponent({
                 <Button
                   onClick={onClearFilters}
                   variant="homeOutline"
-                  className="px-6 h-10"
+                  className="px-5 sm:px-6 h-12 sm:h-10"
                 >
                   Clear All
                 </Button>

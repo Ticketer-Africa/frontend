@@ -74,7 +74,7 @@ const FAQItem = memo(function FAQItem({ faq, index, isOpen, onToggle }: FAQItemP
       <button
         id={buttonId}
         onClick={onToggle}
-        className="w-full flex justify-between items-center p-6 text-left"
+        className="w-full flex justify-between items-center p-4 sm:p-6 text-left"
         aria-expanded={isOpen}
         aria-controls={panelId}
       >
@@ -125,11 +125,11 @@ export function OrganiserFAQSection() {
   return (
     <section
       id="faq"
-      className="home-theme py-20 px-4 sm:px-6 lg:px-8"
+      className="home-theme py-14 sm:py-20 px-4 sm:px-6 lg:px-8"
       style={{ backgroundColor: "var(--home-bg)" }}
     >
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 sm:mb-16">
           <h2
             className="font-['Syne'] font-bold text-3xl sm:text-4xl lg:text-[48px] tracking-[-1.2px]"
             style={{ color: "var(--home-text)" }}

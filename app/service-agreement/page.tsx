@@ -120,7 +120,7 @@ export default function ServiceAgreementPage() {
   return (
     <div className="home-theme min-h-screen" style={{ backgroundColor: "var(--home-bg)" }}>
     <main
-      className="px-4 py-16 sm:px-6 lg:px-8"
+      className="px-4 py-12 sm:py-16 sm:px-6 lg:px-8"
     >
       <div className="mx-auto max-w-4xl">
         <div className="rounded-2xl border border-[var(--home-border)] bg-[var(--home-card)] p-6 shadow-sm sm:p-10">

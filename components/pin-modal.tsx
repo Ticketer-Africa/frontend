@@ -77,7 +77,7 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md bg-background shadow-lg rounded-xl flex flex-col items-center p-6">
+      <DialogContent className="max-w-md bg-background shadow-lg rounded-xl flex flex-col items-center p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="text-foreground text-center">
             {hasPin ? "Update Wallet PIN" : "Set Wallet PIN"}

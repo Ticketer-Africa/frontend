@@ -87,14 +87,14 @@ export function EventsSection() {
 
   return (
     <section
-      className="home-theme py-16 px-4 sm:px-6 lg:px-8"
+      className="home-theme py-12 sm:py-16 px-4 sm:px-6 lg:px-8"
       style={{ backgroundColor: "var(--home-bg)" }}
     >
       <div className="max-w-7xl mx-auto">
-        <div className="section-animate flex items-center justify-between mb-8">
+        <div className="section-animate flex items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
             <h2
-              className="font-['Syne'] font-bold text-3xl sm:text-[32px] tracking-[-1.2px]"
+              className="font-['Syne'] font-bold text-2xl min-[360px]:text-3xl sm:text-[32px] tracking-[-1.2px]"
               style={{ color: "var(--home-text)" }}
             >
               Trending Events
@@ -107,7 +107,7 @@ export function EventsSection() {
           </div>
           <Link
             href="/explore"
-            className="font-['Hanken_Grotesk'] text-base font-semibold border-b pb-1.5"
+            className="shrink-0 whitespace-nowrap font-['Hanken_Grotesk'] text-base font-semibold border-b py-2"
             style={{ color: "var(--home-text-highlight)", borderColor: "var(--home-text-highlight)" }}
           >
             View All

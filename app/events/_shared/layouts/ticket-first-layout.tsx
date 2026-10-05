@@ -111,7 +111,7 @@ export function TicketFirstLayout({ event, mode }: Props) {
         </section>
 
         {event.faq.length > 0 && (
-          <section className="mt-12">
+          <section className="mt-8 sm:mt-12">
             <h2 className="text-xl font-bold mb-4" style={{ color: "var(--home-text)" }}>
               FAQ
             </h2>

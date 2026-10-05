@@ -108,7 +108,7 @@ export default function GuestResaleListPage() {
     >
       <section className="mx-auto max-w-xl">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold" style={{ color: "var(--home-text)" }}>
+          <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: "var(--home-text)" }}>
             List a ticket for resale
           </h1>
           <p className="mt-2 text-sm" style={{ color: "var(--home-muted)" }}>
@@ -116,7 +116,7 @@ export default function GuestResaleListPage() {
           </p>
         </div>
 
-        <HomeCard tone="card" className="p-6">
+        <HomeCard tone="card" className="p-4 sm:p-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <FormField label="Ticket code" error={errors.ticketCode?.message}>
               <Input

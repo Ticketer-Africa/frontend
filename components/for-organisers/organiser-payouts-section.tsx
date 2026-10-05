@@ -28,11 +28,11 @@ const STEPS = [
 export function OrganiserPayoutsSection() {
   return (
     <section
-      className="home-theme py-20 px-4 sm:px-6 lg:px-8"
+      className="home-theme py-14 sm:py-20 px-4 sm:px-6 lg:px-8"
       style={{ backgroundColor: "var(--home-bg)" }}
     >
       <div className="max-w-7xl mx-auto">
-        <div className="max-w-2xl mb-16">
+        <div className="max-w-2xl mb-10 sm:mb-16">
           <h2
             className="font-['Syne'] font-bold text-3xl sm:text-[40px] tracking-[-1.2px] mb-4"
             style={{ color: "var(--home-text-highlight)" }}

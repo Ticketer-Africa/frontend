@@ -55,7 +55,7 @@ const FeatureCard = memo(function FeatureCard({
 }: FeatureCardProps) {
   return (
     <HomeCard
-      className="relative p-8 feature-card lg:aspect-square lg:size-[292px]"
+      className="relative p-5 sm:p-8 feature-card lg:aspect-square lg:size-[292px]"
       style={{ animationDelay: `${index * 100}ms`, borderColor: "var(--home-border-strong)" }}
     >
       {feature.isNew && (
@@ -94,11 +94,11 @@ const FeatureCard = memo(function FeatureCard({
 export function FeaturesSection() {
   return (
     <section
-      className="home-theme py-20 px-4 sm:px-6 lg:px-8"
+      className="home-theme py-14 sm:py-20 px-4 sm:px-6 lg:px-8"
       style={{ backgroundColor: "var(--home-bg)" }}
     >
       <div className="max-w-7xl mx-auto">
-        <div className="section-animate text-center mb-16">
+        <div className="section-animate text-center mb-10 sm:mb-16">
           <h2
             className="font-['Syne'] font-bold text-3xl sm:text-[32px] tracking-[-1.2px] mb-4"
             style={{ color: "var(--home-text-highlight)" }}

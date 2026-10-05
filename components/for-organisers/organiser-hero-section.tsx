@@ -22,7 +22,7 @@ export function OrganiserHeroSection() {
 
   return (
     <section
-      className="home-theme relative overflow-hidden px-4 sm:px-6 lg:px-8 pt-32 pb-24"
+      className="home-theme relative overflow-hidden px-4 sm:px-6 lg:px-8 pt-24 sm:pt-32 pb-16 sm:pb-24"
       style={{
         background:
           "radial-gradient(circle at 50% 0%, rgba(226,114,91,0.16), transparent 60%), var(--home-bg)",
@@ -30,7 +30,7 @@ export function OrganiserHeroSection() {
     >
       <EmberParticles className="z-0" count={18} />
 
-      <div className="relative z-10 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-16 items-center">
+      <div className="relative z-10 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-10 lg:gap-16 items-center">
         <div>
           <span
             className="inline-block mb-6 px-4 py-1 rounded-full border text-sm tracking-[0.5px] font-['Hanken_Grotesk'] font-semibold backdrop-blur-[2px]"
@@ -44,7 +44,7 @@ export function OrganiserHeroSection() {
           </span>
 
           <h1
-            className="font-['Syne'] font-extrabold text-4xl sm:text-5xl lg:text-[64px] mb-6 leading-tight lg:leading-[68px] tracking-[-1.2px]"
+            className="font-['Syne'] font-extrabold text-fluid-hero lg:text-[64px] mb-6"
             style={{ color: "var(--home-text)" }}
           >
             From <span style={{ color: "var(--home-accent)" }}>Setup</span> to
@@ -53,7 +53,7 @@ export function OrganiserHeroSection() {
           </h1>
 
           <p
-            className="font-['Hanken_Grotesk'] text-lg mb-10 max-w-xl leading-normal tracking-[0.5px]"
+            className="font-['Hanken_Grotesk'] text-base sm:text-lg mb-8 sm:mb-10 max-w-xl leading-relaxed sm:leading-normal tracking-[0.2px] sm:tracking-[0.5px] text-pretty"
             style={{ color: "var(--home-muted)" }}
           >
             Create your event, sell tickets, manage attendees and check

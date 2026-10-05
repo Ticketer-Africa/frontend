@@ -18,6 +18,32 @@ const config: Config = {
       },
       fontSize: {
         caption: ["10px", { lineHeight: "1.4" }],
+        // Fluid display scale for Syne ExtraBold, whose glyphs are ~11.2x the font
+        // size wide for a 16-char line: capped by viewport (7.8vw) on phones so the
+        // line never touches the screen edge, easing up to the 72px desktop hero.
+        "fluid-hero": [
+          "clamp(1.5rem, min(7.8vw, 0.45rem + 6.3vw), 4.5rem)",
+          { lineHeight: "1.1", letterSpacing: "-0.02em" },
+        ],
+        "fluid-h1": [
+          "clamp(1.875rem, 1.3rem + 2.9vw, 3rem)",
+          { lineHeight: "1.12", letterSpacing: "-0.015em" },
+        ],
+        "fluid-h2": [
+          "clamp(1.625rem, 1.2rem + 2vw, 2.5rem)",
+          { lineHeight: "1.15", letterSpacing: "-0.01em" },
+        ],
+        "fluid-h3": [
+          "clamp(1.25rem, 1.05rem + 1vw, 1.75rem)",
+          { lineHeight: "1.25" },
+        ],
+        "fluid-lead": [
+          "clamp(1rem, 0.92rem + 0.45vw, 1.25rem)",
+          { lineHeight: "1.6" },
+        ],
+      },
+      screens: {
+        xs: "420px",
       },
       spacing: {
         navbar: "60px",

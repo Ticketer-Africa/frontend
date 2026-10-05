@@ -160,7 +160,7 @@ const EmptyTransactions = memo(function EmptyTransactions({
   hasSearch,
 }: EmptyTransactionsProps) {
   return (
-    <div className="text-center py-12">
+    <div className="text-center py-10 sm:py-12">
       <HugeiconsIcon icon={Wallet01Icon} className="h-12 w-12 mx-auto mb-4" style={{ color: "var(--home-muted-dim)" }} />
       <h3 className="text-xl font-semibold mb-2" style={{ color: "var(--home-text)" }}>
         No transactions found

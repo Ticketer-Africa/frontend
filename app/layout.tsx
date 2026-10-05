@@ -88,6 +88,10 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#E2725B",
+  width: "device-width",
+  initialScale: 1,
+  // Lets env(safe-area-inset-*) work so fixed bars clear the iPhone home indicator
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

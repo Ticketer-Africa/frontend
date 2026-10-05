@@ -32,8 +32,8 @@ function LoadingSkeleton() {
           className="h-72 w-full rounded-2xl mb-10"
           style={{ backgroundColor: "var(--home-card-elevated)" }}
         />
-        <div className="grid lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-8 space-y-10">
+        <div className="grid lg:grid-cols-12 gap-6 sm:gap-8">
+          <div className="lg:col-span-8 space-y-8 sm:space-y-10">
             <Skeleton className="h-10 w-3/4" style={{ backgroundColor: "var(--home-card-elevated)" }} />
             <Skeleton className="h-48 w-full" style={{ backgroundColor: "var(--home-card-elevated)" }} />
             <Skeleton className="h-48 w-full" style={{ backgroundColor: "var(--home-card-elevated)" }} />

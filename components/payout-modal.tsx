@@ -153,7 +153,7 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
       isOpen={isOpen}
       onClose={handleClose}
       title={step === "details" ? "Request Payout" : "Enter PIN"}
-      className="max-w-md bg-background shadow-lg rounded-xl flex flex-col items-center p-6"
+      className="max-w-md bg-background shadow-lg rounded-xl flex flex-col items-center p-4 sm:p-6"
     >
       <div className="w-full flex flex-col items-center space-y-5">
         {step === "details" ? (

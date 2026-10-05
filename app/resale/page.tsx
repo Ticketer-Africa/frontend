@@ -84,9 +84,9 @@ export default function ResalePage() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 sm:mb-12">
           <h1
-            className="text-4xl sm:text-5xl font-bold mb-4"
+            className="text-fluid-h1 sm:text-5xl font-bold mb-4"
             style={{ color: "var(--home-text)" }}
           >
             Resale Marketplace
@@ -105,7 +105,7 @@ export default function ResalePage() {
         {/* Search */}
         <div className="mb-8">
           <div
-            className="rounded-2xl p-6 border"
+            className="rounded-2xl p-4 sm:p-6 border"
             style={{
               backgroundColor: "var(--home-card)",
               borderColor: "var(--home-border)",
@@ -161,7 +161,7 @@ export default function ResalePage() {
         </div>
 
         {/* Resale Tickets Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {filteredTickets?.map((ticket: TicketResale) => {
             const originalPrice = ticket?.ticketCategory?.price ?? 0;
             const resalePrice = ticket.resalePrice || 0;
@@ -239,7 +239,7 @@ export default function ResalePage() {
                   )}
                 </div>
 
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                   <h3
                     className="text-xl font-semibold mb-3 line-clamp-2"
                     style={{ color: "var(--home-text)" }}
@@ -365,7 +365,7 @@ export default function ResalePage() {
         </div>
 
         {filteredTickets?.length === 0 && (
-          <div className="text-center py-16">
+          <div className="text-center py-12 sm:py-16">
             <div className="text-6xl mb-4" aria-hidden="true">
               🎫
             </div>
@@ -392,7 +392,7 @@ export default function ResalePage() {
         )}
 
         {/* Trust & Safety Info */}
-        <HomeCard tone="card" className="mt-16 p-8">
+        <HomeCard tone="card" className="mt-10 sm:mt-16 p-5 sm:p-8">
           <h3
             className="text-2xl font-bold mb-6 text-center"
             style={{ color: "var(--home-text)" }}
@@ -400,7 +400,7 @@ export default function ResalePage() {
             Safe & Secure Resale
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             <div className="text-center">
               <div
                 className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"

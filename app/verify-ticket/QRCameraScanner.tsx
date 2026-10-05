@@ -92,7 +92,7 @@ export function QRCameraScanner({ onScan, active }: QRCameraScannerProps) {
 
   if (permissionDenied) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 bg-[var(--home-card-elevated)] rounded-xl border border-[var(--home-border)] space-y-4">
+      <div className="flex flex-col items-center justify-center p-5 sm:p-8 bg-[var(--home-card-elevated)] rounded-xl border border-[var(--home-border)] space-y-4">
         <HugeiconsIcon icon={CameraOff01Icon} className="h-12 w-12 text-[var(--home-muted-dim)]" />
         <p className="text-[var(--home-text)] font-medium text-center">
           Camera access denied
