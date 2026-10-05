@@ -113,7 +113,7 @@ function applyLayoutContentValidation(
   data: { layout: string; lineup?: unknown[]; faq?: unknown[]; timelineSlots?: unknown[] },
   ctx: z.RefinementCtx,
 ) {
-  const needsLineup = ["HERO_OVERLAY", "SPLIT_SCREEN", "TIMELINE"].includes(data.layout);
+  const needsLineup = ["SPLIT_SCREEN", "TIMELINE"].includes(data.layout);
   if (needsLineup && (!data.lineup || data.lineup.length === 0)) {
     ctx.addIssue({ code: "custom", path: ["lineup"], message: "Add at least one artist" });
   }
