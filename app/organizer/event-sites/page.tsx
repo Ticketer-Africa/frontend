@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSite, listSites, saveSite } from "@/services/event-sites/event-sites";
-import { TEMPLATE_SECTIONS, newSection, type SiteRecord } from "@/components/event-sites/model";
+import { makeTemplateSections, type SiteRecord } from "@/components/event-sites/model";
 
 export default function EventSitesIndex() {
   const router = useRouter();
@@ -28,8 +28,11 @@ export default function EventSitesIndex() {
     try {
       const site = await createSite(name.trim(), slug.trim().toLowerCase());
       setSites((current) => [site, ...current]);
-      const document = { ...site.document, sections: TEMPLATE_SECTIONS[template].map(newSection) };
-      document.sections[0].content.heading = name.trim();
+      const document = {
+        ...site.document,
+        ticketTarget: { mode: "NEXT_EVENT" as const, fallback: "COMING_SOON" as const },
+        sections: makeTemplateSections(template, name.trim()),
+      };
       try {
         await saveSite(site.id, document, site.draftRevision);
       } catch {

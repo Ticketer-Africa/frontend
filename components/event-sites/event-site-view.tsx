@@ -80,8 +80,16 @@ export function EventSiteView({ document, target, editions, preview = false, slu
   const sectionSpacing = ["compact", "spacious"].includes(text(document.theme.sectionSpacing)) ? text(document.theme.sectionSpacing) : "normal";
   const typeScale = ["compact", "large"].includes(text(document.theme.typeScale)) ? text(document.theme.typeScale) : "normal";
   const cornerRadius = ["square", "round"].includes(text(document.theme.cornerRadius)) ? text(document.theme.cornerRadius) : "soft";
-  return <main className="es-page" style={style} data-button-style={buttonStyle} data-button-shape={buttonShape} data-section-spacing={sectionSpacing} data-heading-case={document.theme.headingCase === "uppercase" ? "uppercase" : "normal"} data-type-scale={typeScale} data-corner-radius={cornerRadius} data-shadow={document.theme.shadow === "subtle" ? "subtle" : "none"} data-testid={preview ? "site-preview" : undefined}>
-    {document.sections.filter(section => !section.hidden).map(section => {
+  const sections = document.sections.filter(section => !section.hidden);
+  const navSections = sections.filter(section => ["UPCOMING_EDITIONS", "LINEUP", "SCHEDULE", "VENUE"].includes(section.type)).slice(0, 3);
+  const ticketSection = sections.find(section => section.type === "TICKET_CTA");
+  return <main className="es-page" id="site-top" style={style} data-button-style={buttonStyle} data-button-shape={buttonShape} data-section-spacing={sectionSpacing} data-heading-case={document.theme.headingCase === "uppercase" ? "uppercase" : "normal"} data-type-scale={typeScale} data-corner-radius={cornerRadius} data-shadow={document.theme.shadow === "subtle" ? "subtle" : "none"} data-testid={preview ? "site-preview" : undefined}>
+    <header className="es-site-nav">
+      <a className="es-site-brand" href="#site-top"><span>{document.name}</span><small>EVENTS · COMMUNITY · CULTURE</small></a>
+      <nav aria-label="Event site sections">{navSections.map(section => <a key={section.id} href={`#section-${section.id}`}>{sectionLabel(section.type)}</a>)}</nav>
+      <a className="es-nav-cta" href={ticketSection ? `#section-${ticketSection.id}` : "#site-top"}>Tickets <span aria-hidden="true">↗</span></a>
+    </header>
+    {sections.map(section => {
       const sectionStyle: CSSProperties & Record<string, unknown> = { textAlign: align(section.styles.alignment) };
       if (section.styles.background) sectionStyle.backgroundColor = color(section.styles.background, "transparent");
       if (section.styles.textColor) sectionStyle.color = color(section.styles.textColor, "inherit");
@@ -96,7 +104,8 @@ export function EventSiteView({ document, target, editions, preview = false, slu
       if (section.styles.layout === "wide") sectionStyle["--es-section-width" as string] = "1440px";
       if (section.styles.layout === "full") sectionStyle["--es-section-width" as string] = "none";
       if (section.styles.layout === "contained") sectionStyle["--es-section-width" as string] = "1120px";
-      return <section key={section.id} data-section-type={section.type} data-hide-mobile={section.styles.hideOnMobile === true ? "true" : undefined} data-mobile-alignment={align(section.styles.mobileAlignment)} aria-label={sectionLabel(section.type)} className={`es-section es-${section.type.toLowerCase().replaceAll("_", "-")}`} style={sectionStyle}>
+      const heroImage = section.type === "HERO" && safeUrl(section.content.imageUrl);
+      return <section key={section.id} id={`section-${section.id}`} data-section-type={section.type} data-hide-mobile={section.styles.hideOnMobile === true ? "true" : undefined} data-mobile-alignment={align(section.styles.mobileAlignment)} aria-label={sectionLabel(section.type)} className={`es-section es-${section.type.toLowerCase().replaceAll("_", "-")}${section.type === "HERO" ? heroImage ? " es-hero--image" : " es-hero--brand" : ""}${section.type === "TICKET_CTA" ? " es-ticket-section" : ""}`} style={sectionStyle}>
         <div className="es-inner"><SectionContent section={section} target={document.ticketTarget.mode === "NEXT_EVENT" || document.ticketTarget.mode === "SPECIFIC_EVENT" ? target : undefined} editions={editions} slug={preview ? undefined : slug} ticketMode={document.ticketTarget.mode} /></div>
       </section>;
     })}
