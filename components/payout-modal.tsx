@@ -19,12 +19,11 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { useWithdrawWallet } from "@/services/wallet/wallet.queries";
+import { usePayoutBanks, usePayoutDestinations, useRegisterPayoutDestination, useResolvePayoutAccount, useWithdrawWallet } from "@/services/wallet/wallet.queries";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/helpers";
 import { useUser } from "@/lib/auth-context";
-import { useBankCodes } from "@/services/banks/bank.queries";
-import { Bank } from "@/types/bank.type";
+import type { PayoutDestination } from "@/services/wallet/payout";
 
 const createWithdrawPayloadSchema = (availableBalance: number) =>
   z.object({
@@ -32,18 +31,11 @@ const createWithdrawPayloadSchema = (availableBalance: number) =>
       .number({ invalid_type_error: "Enter a valid amount" })
       .positive("Amount must be greater than 0")
       .max(availableBalance, `Amount cannot exceed ${formatPrice(availableBalance)}`),
-    account_number: z
-      .string()
-      .regex(/^\d{10}$/, "Enter a valid 10-digit account number"),
-    bank_code: z.string().min(1, "Select a bank"),
-    narration: z.string().optional(),
+    destinationId: z.string().min(1, "Select an approved bank account"),
     pin: z.string().regex(/^\d{4}$/, "PIN must be exactly 4 digits"),
   });
 
-type WithdrawPayload = z.infer<ReturnType<typeof createWithdrawPayloadSchema>> & {
-  email: string;
-  name: string;
-};
+type WithdrawPayload = z.infer<ReturnType<typeof createWithdrawPayloadSchema>>;
 
 interface PayoutModalProps {
   isOpen: boolean;
@@ -51,7 +43,7 @@ interface PayoutModalProps {
   availableBalance: number;
 }
 
-const emptyForm = { amount: 0, account_number: "", bank_code: "", narration: "", pin: "" };
+const emptyForm = { amount: 0, destinationId: "", pin: "" };
 
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
@@ -65,12 +57,20 @@ function FieldError({ message }: { message?: string }) {
 
 export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalProps) {
   const { user } = useUser();
+  const [addingDestination, setAddingDestination] = useState(false);
+  const [newLabel, setNewLabel] = useState("");
+  const [newBankCode, setNewBankCode] = useState("");
+  const [newAccountNumber, setNewAccountNumber] = useState("");
+  const [resolvedName, setResolvedName] = useState("");
   const [step, setStep] = useState<"details" | "pin">("details");
   const [formData, setFormData] = useState<Omit<WithdrawPayload, "email" | "name">>(emptyForm);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [pinError, setPinError] = useState("");
   const { mutateAsync: requestPayout, isPending } = useWithdrawWallet();
-  const { data: banks } = useBankCodes();
+  const { data: banks } = usePayoutBanks();
+  const { data: destinations, refetch: refetchDestinations } = usePayoutDestinations();
+  const { mutateAsync: registerDestination, isPending: registering } = useRegisterPayoutDestination();
+  const { mutateAsync: resolveAccount, isPending: resolving } = useResolvePayoutAccount();
 
   const clearFieldError = (field: string) =>
     setFieldErrors((prev) => { const next = { ...prev }; delete next[field]; return next; });
@@ -116,21 +116,44 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
 
     setPinError("");
     try {
-      const response = await requestPayout({
-        ...formData,
-        email: user!.email,
-        name: user!.name,
-        narration: formData.narration || undefined,
-      });
-      toast.success("Payout request submitted", {
-        description: "Redirecting you to checkout…",
-      });
-      window.location.href = response.checkoutUrl;
+      await requestPayout(formData);
+      toast.success("Payout request submitted", { description: "Your payout is being processed." });
       handleClose();
     } catch (error: any) {
       toast.error("Payout request failed", {
-        description: error?.message || "Please try again.",
+        description: "We couldn’t process your payout. Check your account and balance, then try again. If the problem continues, contact support.",
       });
+    }
+  };
+
+  const handleResolveDestination = async () => {
+    if (!newLabel.trim() || !newBankCode || !/^\d{10}$/.test(newAccountNumber)) {
+      toast.error("Check the account details", { description: "Enter a label, bank, and valid 10-digit account number." });
+      return;
+    }
+    try {
+      const resolved = await resolveAccount({ bankCode: newBankCode, accountNumber: newAccountNumber });
+      setResolvedName(resolved.accountName);
+    } catch {
+      toast.error("Couldn’t verify this bank account", { description: "Check the details and try again. Contact support if the problem continues." });
+    }
+  };
+
+  const handleRegisterDestination = async () => {
+    try {
+      const destination = await registerDestination({ label: newLabel.trim(), bankCode: newBankCode, accountNumber: newAccountNumber });
+      await refetchDestinations();
+      if (destination.isUsable) {
+        setFormData((prev) => ({ ...prev, destinationId: destination.id }));
+        toast.success("Bank account added", { description: "The account is ready for payouts." });
+      } else {
+        toast.message("Account sent for review", { description: "We’ll notify you when it’s ready to use." });
+      }
+      setAddingDestination(false);
+      setNewLabel(""); setNewBankCode(""); setNewAccountNumber("");
+      setResolvedName("");
+    } catch {
+      toast.error("Couldn’t add this bank account", { description: "Check the details and try again. Contact support if the problem continues." });
     }
   };
 
@@ -178,60 +201,24 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
             </div>
 
             <div className="w-full">
-              <label className="block text-sm font-medium text-foreground mb-1">Bank</label>
-              <Select
-                value={formData.bank_code}
-                onValueChange={(value) => {
-                  setFormData((prev) => ({ ...prev, bank_code: value }));
-                  clearFieldError("bank_code");
-                }}
-                disabled={isPending}
-              >
-                <SelectTrigger className={`bg-muted border-border rounded-xl ${fieldErrors.bank_code ? "border-red-500" : ""}`}>
-                  <SelectValue placeholder="Select a bank" />
-                </SelectTrigger>
-                <SelectContent>
-                  {banks?.map((bank: Bank) => (
-                    <SelectItem key={bank.code} value={bank.code}>{bank.name}</SelectItem>
-                  ))}
-                </SelectContent>
+              <label className="block text-sm font-medium text-foreground mb-1">Bank account</label>
+              <Select value={formData.destinationId} onValueChange={(destinationId) => setFormData((prev) => ({ ...prev, destinationId }))} disabled={isPending}>
+                <SelectTrigger className={`bg-muted border-border rounded-xl ${fieldErrors.destinationId ? "border-red-500" : ""}`}><SelectValue placeholder="Select an approved account" /></SelectTrigger>
+                <SelectContent>{destinations?.filter((d: PayoutDestination) => d.isUsable).map((d: PayoutDestination) => <SelectItem key={d.id} value={d.id}>{d.label} · {d.bankName || "Bank"} •••• {d.last4}</SelectItem>)}</SelectContent>
               </Select>
-              <FieldError message={fieldErrors.bank_code} />
+              <FieldError message={fieldErrors.destinationId} />
+              <button type="button" className="mt-2 text-sm text-home-accent underline" onClick={() => setAddingDestination((value) => !value)}>Add a bank account</button>
             </div>
-
-            <div className="w-full">
-              <label className="block text-sm font-medium text-foreground mb-1">Account Number</label>
-              <Input
-                type="text"
-                name="account_number"
-                value={formData.account_number}
-                onChange={handleInputChange}
-                placeholder="10-digit account number"
-                maxLength={10}
-                className={`bg-muted border-border rounded-xl ${fieldErrors.account_number ? "border-red-500" : ""}`}
-                disabled={isPending}
-              />
-              <FieldError message={fieldErrors.account_number} />
-            </div>
-
-            <div className="w-full">
-              <label className="block text-sm font-medium text-foreground mb-1">
-                Narration <span className="text-muted-foreground font-normal">(optional)</span>
-              </label>
-              <Input
-                type="text"
-                name="narration"
-                value={formData.narration}
-                onChange={handleInputChange}
-                placeholder="e.g. Event proceeds"
-                className="bg-muted border-border rounded-xl"
-                disabled={isPending}
-              />
-            </div>
+            {addingDestination && <div className="w-full space-y-3 rounded-lg border border-border p-3">
+              <Input value={newLabel} onChange={(e) => { setNewLabel(e.target.value); setResolvedName(""); }} placeholder="Account label" disabled={registering || resolving} />
+              <Select value={newBankCode} onValueChange={(value) => { setNewBankCode(value); setResolvedName(""); }} disabled={registering || resolving}><SelectTrigger><SelectValue placeholder="Select a bank" /></SelectTrigger><SelectContent>{banks?.map((bank) => <SelectItem key={bank.code} value={bank.code}>{bank.name}</SelectItem>)}</SelectContent></Select>
+              <Input value={newAccountNumber} onChange={(e) => { setNewAccountNumber(e.target.value.replace(/\D/g, "").slice(0, 10)); setResolvedName(""); }} placeholder="10-digit account number" inputMode="numeric" disabled={registering || resolving} />
+              {resolvedName ? <><p className="text-sm text-foreground">Account holder: <strong>{resolvedName}</strong></p><Button type="button" onClick={handleRegisterDestination} disabled={registering}>{registering ? "Adding…" : "Confirm and add account"}</Button></> : <Button type="button" onClick={handleResolveDestination} disabled={registering || resolving}>{resolving ? "Verifying…" : "Verify account"}</Button>}
+            </div>}
 
             <div className="bg-accent border border-border rounded-lg p-3 w-full">
               <p className="text-sm text-accent-foreground text-center">
-                <strong>Note:</strong> Payout requests are processed as soon as they&apos;re received. Ensure your bank details are correct to avoid delays.
+                <strong>Note:</strong> Only approved bank accounts can receive payouts. New accounts are checked before they can be used.
               </p>
             </div>
 
