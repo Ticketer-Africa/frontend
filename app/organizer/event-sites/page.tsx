@@ -39,18 +39,23 @@ export default function EventSitesIndex() {
       router.push(`/organizer/event-sites/${site.id}`);
     } catch (cause: any) {
       const responseMessage = cause?.response?.data?.message;
-      const message = Array.isArray(responseMessage)
+      const backendMessage = Array.isArray(responseMessage)
         ? responseMessage.join(" ")
         : typeof responseMessage === "string"
           ? responseMessage
-          : "Could not create the draft. Check the name and slug and try again.";
+          : "";
+      const message = Array.isArray(responseMessage)
+        ? backendMessage
+        : /cannot\s+post\s+\/v1\/event-sites/i.test(backendMessage)
+          ? "Event site creation is unavailable on this server right now. The staging API needs the Event Sites route deployed."
+          : backendMessage || "Could not create the draft. Check the name and slug and try again.";
       setError(message);
     } finally {
       setSubmitting(false);
     }
   }
 
-  return <main className="home-theme dark min-h-screen" style={{ maxWidth: 1100, margin: "0 auto", padding: "3rem 1rem", color: "var(--home-text)", background: "var(--home-bg)" }}>
+  return <main className="home-theme dark min-h-screen" style={{ maxWidth: 1100, margin: "0 auto", padding: "6rem 1rem 3rem", color: "var(--home-text)", background: "var(--home-bg)" }}>
     <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
       <div><p style={{ textTransform: "uppercase", letterSpacing: ".15em", fontSize: 12 }}>Organizer workspace</p><h1 style={{ fontSize: "clamp(2rem,4vw,3.5rem)", fontWeight: 750 }}>Event Sites</h1><p>One website for your event brand. Keep it as editions come and go.</p></div>
       <button type="button" disabled={loading} onClick={() => setCreating(true)} style={{ background: "var(--home-accent)", color: "var(--home-accent-fg)", padding: ".85rem 1.2rem", borderRadius: 999, fontWeight: 700 }}>Create Event Site</button>
