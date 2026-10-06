@@ -23,6 +23,15 @@ export interface SiteDocument {
   linkedEditionIds: string[];
   ticketTarget: { mode: "NEXT_EVENT" | "SPECIFIC_EVENT" | "EVENT_LIST" | "NO_TICKET_CTA"; eventId?: string; fallback?: "COMING_SOON" | "HIDE_CTA" };
 }
+const LEGACY_DEFAULT_THEME = { background: "#ffffff", text: "#141414", accent: "#c74d33" };
+export const TICKETER_SITE_THEME = { background: "#0b0e14", text: "#dce2f7", accent: "#e2725b" };
+
+/** Upgrade the original generic template palette while preserving organizer custom themes. */
+export function applySiteThemeDefaults(document: SiteDocument): SiteDocument {
+  const theme = document.theme;
+  if (theme.background !== LEGACY_DEFAULT_THEME.background || theme.text !== LEGACY_DEFAULT_THEME.text || theme.accent !== LEGACY_DEFAULT_THEME.accent) return document;
+  return { ...document, theme: { ...theme, ...TICKETER_SITE_THEME } };
+}
 export interface SiteRecord {
   id: string;
   status: "DRAFT" | "PUBLISHED" | "UNPUBLISHED" | "ARCHIVED";

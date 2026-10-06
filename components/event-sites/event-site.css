@@ -1,8 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap");
-.es-page{--es-accent:#c74d33;min-height:100vh;font-family:var(--es-font-body,Inter,Arial,sans-serif);line-height:1.55}
+.es-page{--es-accent:#e2725b;--es-accent-fg:#5a0d02;min-height:100vh;font-family:var(--es-font-body,Inter,Arial,sans-serif);line-height:1.55}
 .es-page *{box-sizing:border-box}
 .es-section{padding:clamp(3.5rem,8vw,7rem) 1.25rem}
-.es-section:nth-of-type(even){background:rgba(0,0,0,.035)}
+.es-section:nth-of-type(even){background:color-mix(in srgb,currentColor 3.5%,transparent)}
 .es-inner{max-width:var(--es-section-width,var(--es-content-width,1120px));margin-inline:auto}
 .es-hero{min-height:560px;display:flex;align-items:center;background-size:cover;background-position:center}
 .es-hero-inner{max-width:850px}
@@ -14,7 +14,7 @@
 .es-page p{max-width:65ch;margin:.5rem 0 1.5rem}
 .es-lead{font-size:clamp(1.1rem,2vw,1.5rem)}
 .es-eyebrow{text-transform:uppercase;letter-spacing:.18em;font-size:.75rem;font-weight:700}
-.es-button{display:inline-flex;padding:.9rem 1.35rem;border-radius:999px;background:var(--es-accent);color:white!important;font-weight:700;text-decoration:none;min-height:44px;align-items:center}
+.es-button{display:inline-flex;padding:.9rem 1.35rem;border-radius:999px;background:var(--es-accent);color:var(--es-accent-fg)!important;font-weight:700;text-decoration:none;min-height:44px;align-items:center}
 .es-button:hover{filter:brightness(.9)}
 .es-page[data-button-style="outline"] .es-button{background:transparent;border:2px solid var(--es-accent);color:var(--es-accent)!important}
 .es-page[data-button-style="text"] .es-button{background:transparent;color:var(--es-accent)!important;text-decoration:underline}
@@ -33,18 +33,18 @@
 .es-event-summary{font-size:.95rem;font-weight:650}
 .es-muted{opacity:.7}
 .es-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:1.25rem;margin-top:2rem}
-.es-card{border:1px solid rgba(0,0,0,.15);border-radius:16px;padding:1.2rem;min-width:0}
+.es-card{border:1px solid color-mix(in srgb,currentColor 18%,transparent);border-radius:16px;padding:1.2rem;min-width:0}
 .es-card img,.es-copy img{max-width:100%;height:auto;object-fit:cover;border-radius:10px;margin-bottom:1rem}
 .es-copy[data-variant="image-left"],.es-copy[data-variant="image-right"]{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:center;gap:clamp(1.5rem,4vw,4rem)}
 .es-copy[data-variant="image-left"] img{grid-column:1;grid-row:1}.es-copy[data-variant="image-left"]>div{grid-column:2;grid-row:1}
-.es-image-fallback{display:grid;place-items:center;min-height:180px;background:rgba(0,0,0,.07);border-radius:10px;margin-bottom:1rem;font-size:.85rem;opacity:.7}
+.es-image-fallback{display:grid;place-items:center;min-height:180px;background:color-mix(in srgb,currentColor 7%,transparent);border-radius:10px;margin-bottom:1rem;font-size:.85rem;opacity:.85}
 .es-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:1rem;margin-top:2rem}
 .es-gallery figure{margin:0;min-width:0}.es-gallery img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px}.es-gallery figcaption{font-size:.9rem;opacity:.75;margin-top:.5rem}
 .es-list{list-style:none;padding:0;margin:2rem 0}
-.es-list li{padding:1rem 0;border-bottom:1px solid rgba(0,0,0,.16)}
+.es-list li{padding:1rem 0;border-bottom:1px solid color-mix(in srgb,currentColor 16%,transparent)}
 .es-list li strong{display:inline-block;min-width:7rem}
 .es-faq{margin-top:1.5rem}
-.es-faq details{border-bottom:1px solid rgba(0,0,0,.16);padding:1rem 0}
+.es-faq details{border-bottom:1px solid color-mix(in srgb,currentColor 16%,transparent);padding:1rem 0}
 .es-faq summary{cursor:pointer;font-weight:600}
 .es-links{display:flex;gap:1.5rem;flex-wrap:wrap}
 .es-page a:not(.es-button){color:inherit;text-decoration:underline;text-underline-offset:.2em}

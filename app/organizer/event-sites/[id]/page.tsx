@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { EventSiteView } from "@/components/event-sites/event-site-view";
-import { newSection, sectionLabel, SECTION_OPTIONS, text, type PublicSite, type SiteDocument, type SiteRecord, type SiteSection, type SectionType } from "@/components/event-sites/model";
+import { applySiteThemeDefaults, newSection, sectionLabel, SECTION_OPTIONS, TICKETER_SITE_THEME, text, type PublicSite, type SiteDocument, type SiteRecord, type SiteSection, type SectionType } from "@/components/event-sites/model";
 import { confirmSiteMedia, getSite, getSiteAnalytics, getSiteBillingStatus, startSiteProCheckout, publishSite, saveSite, unpublishSite } from "@/services/event-sites/event-sites";
 import { uploadImageToS3 } from "@/services/uploads/images";
 import { getOrganizerEventsV2 } from "@/services/events/events-v2";
@@ -24,6 +24,9 @@ function contrastRatio(first: string, second: string) {
   };
   const values = [luminance(first), luminance(second)].sort((a, b) => b - a);
   return (values[0] + 0.05) / (values[1] + 0.05);
+}
+function accentForeground(accent: string) {
+  return contrastRatio(accent, "#5a0d02") > contrastRatio(accent, "#ffffff") ? "#5a0d02" : "#ffffff";
 }
 
 function previewCommerce(document: SiteDocument, events: EventV2[]): Pick<PublicSite, "editions" | "ticketTarget"> {
@@ -69,7 +72,8 @@ export default function EventSiteBuilder() {
 
   useEffect(() => {
     getSite(id).then(value => {
-      setSite(value); setDocument(value.document); docRef.current = value.document;
+      const initialDocument = applySiteThemeDefaults(value.document);
+      setSite({ ...value, document: initialDocument }); setDocument(initialDocument); docRef.current = initialDocument;
       revisionRef.current = value.draftRevision;
       savedJsonRef.current = JSON.stringify(value.document);
       setSelectedId(value.document.sections[0]?.id ?? null);
@@ -249,9 +253,9 @@ export default function EventSiteBuilder() {
         {field("Meta description", text(document.seo.description), value => change(doc => ({ ...doc, seo: { ...doc.seo, description: value } })), true)}
         {field("Social sharing image URL", text(document.seo.imageUrl), value => change(doc => ({ ...doc, seo: { ...doc.seo, imageUrl: value } })))}
         <label className="esb-field">Upload social sharing image<input type="file" accept="image/jpeg,image/png,image/webp" onChange={event => { const file = event.target.files?.[0]; if (file) void uploadImage(file, url => change(doc => ({ ...doc, seo: { ...doc.seo, imageUrl: url } }))); }} /></label>
-        <h3>Theme</h3>{(["background", "text", "accent"] as const).map(key => <label className="esb-field" key={key}>{key}<input aria-label={`${key} color`} type="color" value={/^#[0-9a-fA-F]{6}$/.test(text(document.theme[key])) ? text(document.theme[key]) : "#ffffff"} onChange={event => change(doc => ({ ...doc, theme: { ...doc.theme, [key]: event.target.value } }))} /></label>)}
-        {contrastRatio(text(document.theme.background) || "#ffffff", text(document.theme.text) || "#141414") < 4.5 && <p role="alert" className="esb-warning">Page text may be hard to read against the background. Choose colors with stronger contrast.</p>}
-        {document.theme.buttonStyle !== "outline" && document.theme.buttonStyle !== "text" && contrastRatio(text(document.theme.accent) || "#c74d33", "#ffffff") < 4.5 && <p role="alert" className="esb-warning">Button text may be hard to read. Choose a darker accent color.</p>}
+        <h3>Theme</h3>{(["background", "text", "accent"] as const).map(key => <label className="esb-field" key={key}>{key}<input aria-label={`${key} color`} type="color" value={/^#[0-9a-fA-F]{6}$/.test(text(document.theme[key])) ? text(document.theme[key]) : TICKETER_SITE_THEME[key]} onChange={event => change(doc => ({ ...doc, theme: { ...doc.theme, [key]: event.target.value } }))} /></label>)}
+        {contrastRatio(text(document.theme.background) || TICKETER_SITE_THEME.background, text(document.theme.text) || TICKETER_SITE_THEME.text) < 4.5 && <p role="alert" className="esb-warning">Page text may be hard to read against the background. Choose colors with stronger contrast.</p>}
+        {document.theme.buttonStyle !== "outline" && document.theme.buttonStyle !== "text" && contrastRatio(text(document.theme.accent) || TICKETER_SITE_THEME.accent, accentForeground(text(document.theme.accent) || TICKETER_SITE_THEME.accent)) < 4.5 && <p role="alert" className="esb-warning">Button text may be hard to read. Choose a darker accent color.</p>}
         <label className="esb-field">Body font<select aria-label="Body font" value={FONT_OPTIONS.includes(text(document.theme.fontBody) as typeof FONT_OPTIONS[number]) ? text(document.theme.fontBody) : "Inter"} onChange={event => change(doc => ({ ...doc, theme: { ...doc.theme, fontBody: event.target.value } }))}>{FONT_OPTIONS.map(font => <option key={font} value={font}>{font}</option>)}</select></label>
         <label className="esb-field">Heading font<select aria-label="Heading font" value={FONT_OPTIONS.includes(text(document.theme.fontHeading) as typeof FONT_OPTIONS[number]) ? text(document.theme.fontHeading) : "Space Grotesk"} onChange={event => change(doc => ({ ...doc, theme: { ...doc.theme, fontHeading: event.target.value } }))}>{FONT_OPTIONS.map(font => <option key={font} value={font}>{font}</option>)}</select></label>
         {([ ["contentWidth", "Content width", ["contained", "wide", "full"]], ["buttonStyle", "Button style", ["filled", "outline", "text"]], ["buttonShape", "Button shape", ["square", "rounded", "pill"]], ["sectionSpacing", "Section spacing", ["compact", "normal", "spacious"]], ["headingCase", "Heading case", ["normal", "uppercase"]], ["typeScale", "Type scale", ["compact", "normal", "large"]], ["cornerRadius", "Corner radius", ["square", "soft", "round"]], ["shadow", "Card shadow", ["none", "subtle"]] ] as const).map(([key, label, options]) => <label className="esb-field" key={key}>{label}<select aria-label={label} value={text(document.theme[key]) || options[0]} onChange={event => change(doc => ({ ...doc, theme: { ...doc.theme, [key]: event.target.value } }))}>{options.map(option => <option key={option} value={option}>{option}</option>)}</select></label>)}

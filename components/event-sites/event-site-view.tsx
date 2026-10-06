@@ -3,7 +3,7 @@ import Link from "next/link";
 import { TrackedTicketLink } from "./tracked-ticket-link";
 import { EventCountdown } from "./event-countdown";
 import { SiteImage } from "./site-image";
-import { sectionLabel, text, type PublicSite, type SiteDocument, type SiteSection } from "./model";
+import { applySiteThemeDefaults, sectionLabel, text, type PublicSite, type SiteDocument, type SiteSection } from "./model";
 import "./event-site.css";
 
 const color = (value: unknown, fallback: string) => typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value) ? value : fallback;
@@ -59,10 +59,18 @@ function SectionContent({ section, target, editions = [], slug, ticketMode }: { 
 }
 
 export function EventSiteView({ document, target, editions, preview = false, slug }: { document: SiteDocument; target?: PublicSite["ticketTarget"]; editions?: PublicSite["editions"]; preview?: boolean; slug?: string }) {
+  document = applySiteThemeDefaults(document);
+  const accent = color(document.theme.accent, "#e2725b");
+  const accentLuminance = (() => {
+    const channels = [1, 3, 5].map(offset => parseInt(accent.slice(offset, offset + 2), 16) / 255)
+      .map(value => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
+    return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+  })();
   const style: CSSProperties = {
-    backgroundColor: color(document.theme.background, "#fffaf2"),
-    color: color(document.theme.text, "#171717"),
-    ["--es-accent" as string]: color(document.theme.accent, "#c74d33"),
+    backgroundColor: color(document.theme.background, "#0b0e14"),
+    color: color(document.theme.text, "#dce2f7"),
+    ["--es-accent" as string]: accent,
+    ["--es-accent-fg" as string]: accentLuminance > 0.18 ? "#5a0d02" : "#ffffff",
     ["--es-font-body" as string]: fontStack(document.theme.fontBody, "Inter"),
     ["--es-font-heading" as string]: fontStack(document.theme.fontHeading, "Space Grotesk"),
     ["--es-content-width" as string]: document.theme.contentWidth === "full" ? "none" : document.theme.contentWidth === "wide" ? "1440px" : "1120px",
