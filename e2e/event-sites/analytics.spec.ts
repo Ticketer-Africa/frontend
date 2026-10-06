@@ -1,0 +1,48 @@
+import { test, expect, login, publish, publicPath } from "./support";
+
+test("@policy Repeat page loads count once; a separate browser adds one unique visitor", async ({ page, newSite, browser, baseURL }) => {
+  const site = await newSite();
+  await publish(page);
+  // The builder/preview must not count as visitor traffic. Each test owns a new
+  // site so absolute expected counts are independent of other test runs.
+  const analyticsURL = `/organizer/event-sites/${site.id}/analytics`;
+  await page.goto(analyticsURL);
+  await expect(page.getByTestId("unique-visitors")).toHaveText("0");
+  const first = await browser.newContext({ baseURL });
+  const second = await browser.newContext({ baseURL });
+  try {
+    const a = await first.newPage();
+    await a.goto(publicPath(site.slug));
+    await expect.poll(async () => {
+      await page.reload();
+      return page.getByTestId("unique-visitors").textContent();
+    }, { timeout: 30_000 }).toBe("1");
+    await a.reload();
+    await a.reload();
+    await expect.poll(async () => {
+      await page.reload();
+      return page.getByTestId("site-views").textContent();
+    }, { timeout: 30_000 }).toBe("3");
+    await expect(page.getByTestId("unique-visitors")).toHaveText("1");
+    const b = await second.newPage();
+    await b.goto(publicPath(site.slug));
+    await expect.poll(async () => {
+      await page.reload();
+      return page.getByTestId("site-views").textContent();
+    }, { timeout: 30_000 }).toBe("4");
+    await expect(page.getByTestId("unique-visitors")).toHaveText("2");
+  } finally { await first.close(); await second.close(); }
+});
+
+test("@policy a published ticket CTA increments organizer click analytics", async ({ page, seed }) => {
+  await login(page.context(), "PRO");
+  const site = seed.sites.nearest;
+  await page.goto(`/organizer/event-sites/${encodeURIComponent(site.id)}/analytics`);
+  const before = Number(await page.getByTestId("ticket-cta-clicks").textContent());
+  const response = page.waitForResponse(r => r.request().method() === "POST" && r.url().includes(`/v1/public/event-sites/${site.slug}/click`));
+  await page.goto(publicPath(site.slug));
+  await page.getByRole("link", { name: "Get Tickets" }).first().click();
+  expect((await response).status()).toBe(204);
+  await page.goto(`/organizer/event-sites/${encodeURIComponent(site.id)}/analytics`);
+  await expect.poll(async () => Number(await page.getByTestId("ticket-cta-clicks").textContent())).toBe(before + 1);
+});

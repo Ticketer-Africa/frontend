@@ -11,7 +11,8 @@ export type AllowedImageContentType = (typeof ALLOWED_IMAGE_CONTENT_TYPES)[numbe
 export type ImageUploadFolder =
   | "images/events"
   | "images/avatars"
-  | "images/organizers";
+  | "images/organizers"
+  | "images/event-sites";
 
 interface PresignUploadResponse {
   uploadUrl: string;

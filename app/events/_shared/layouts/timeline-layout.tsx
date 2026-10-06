@@ -30,7 +30,7 @@ export function TimelineLayout({ event, mode }: Props) {
   return (
     <div className="home-theme min-h-screen pt-16 pb-28" style={{ backgroundColor: "var(--home-bg)" }}>
       <div className="relative h-[360px] w-full overflow-hidden">
-        <Image src={event.bannerUrl} alt={event.name} fill className="object-cover" priority />
+        <Image src={event.bannerUrl || "/placeholder.jpg"} alt={event.name} fill className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent" />
         <div className="absolute bottom-8 left-0 right-0 container mx-auto px-4">
           <span
@@ -95,7 +95,7 @@ export function TimelineLayout({ event, mode }: Props) {
                   style={{ borderColor: "var(--home-border)" }}
                 >
                   <div className="relative h-28">
-                    <Image src={related.bannerUrl} alt={related.name} fill className="object-cover" />
+                    <Image src={related.bannerUrl || "/placeholder.jpg"} alt={related.name} fill className="object-cover" />
                   </div>
                   <div className="p-3">
                     <p className="text-xs uppercase" style={{ color: "var(--home-accent)" }}>{related.category}</p>

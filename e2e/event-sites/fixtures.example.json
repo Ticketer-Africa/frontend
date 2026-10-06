@@ -1,0 +1,67 @@
+{
+  "sites": {
+    "published": {
+      "id": "replace-with-real-published-id",
+      "slug": "e2e-published",
+      "heading": "E2E published"
+    },
+    "grace": {
+      "id": "replace-with-real-grace-id",
+      "slug": "e2e-grace",
+      "heading": "E2E grace"
+    },
+    "expired": {
+      "id": "replace-with-real-expired-id",
+      "slug": "e2e-expired",
+      "heading": "E2E expired"
+    },
+    "nearest": {
+      "id": "replace-with-real-nearest-id",
+      "slug": "e2e-nearest",
+      "heading": "E2E nearest"
+    },
+    "comingSoon": {
+      "id": "replace-with-real-comingSoon-id",
+      "slug": "e2e-comingsoon",
+      "heading": "E2E comingSoon"
+    },
+    "soldOut": {
+      "id": "replace-with-real-soldOut-id",
+      "slug": "e2e-soldout",
+      "heading": "E2E soldOut"
+    },
+    "specific": {
+      "id": "replace-with-real-specific-id",
+      "slug": "e2e-specific",
+      "heading": "E2E specific"
+    },
+    "cancelled": {
+      "id": "replace-with-real-cancelled-id",
+      "slug": "e2e-cancelled",
+      "heading": "E2E cancelled"
+    },
+    "noUpcoming": {
+      "id": "replace-with-real-noUpcoming-id",
+      "slug": "e2e-noupcoming",
+      "heading": "E2E noUpcoming"
+    },
+    "allSections": {
+      "id": "replace-with-real-allSections-id",
+      "slug": "e2e-allsections",
+      "heading": "E2E allSections"
+    },
+    "foreign": {
+      "id": "replace-with-real-foreign-id",
+      "slug": "e2e-foreign",
+      "heading": "E2E foreign"
+    }
+  },
+  "events": {
+    "nearestName": "Nearest edition",
+    "laterName": "Later edition",
+    "nearestPath": "/events/e2e-nearest",
+    "specificPath": "/events/e2e-selected",
+    "basicPath": "/events/e2e-expired-organizer-event",
+    "foreignId": "replace-with-real-foreign-event-id"
+  }
+}

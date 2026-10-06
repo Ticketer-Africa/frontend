@@ -224,6 +224,9 @@ export default function OrganizerDashboard() {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              <Button asChild variant="outline" className="w-full sm:w-auto border-[var(--home-border-strong)] bg-transparent text-[var(--home-text)] rounded-full px-6 py-2 shadow-none hover:bg-[var(--home-card)]">
+                <Link href="/organizer/event-sites">Event Sites</Link>
+              </Button>
               <Button
                 asChild
                 variant="outline"

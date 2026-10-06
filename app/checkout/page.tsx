@@ -32,6 +32,7 @@ import { toast } from "sonner";
 
 interface CheckoutData {
   eventId: string;
+  siteClickId?: string;
   eventName: string;
   tickets: Array<{
     ticketCategoryId: string;
@@ -205,6 +206,7 @@ export default function CheckoutPage() {
     try {
       const payload: BuyTicketsV2Payload = {
         eventId: checkoutData.eventId,
+        ...(checkoutData.siteClickId && { siteClickId: checkoutData.siteClickId }),
         ticketCategories: checkoutData.tickets.map((t) => ({
           ticketCategoryId: t.ticketCategoryId,
           quantity: t.quantity,

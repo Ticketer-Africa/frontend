@@ -15,12 +15,15 @@ export interface TicketPurchaseItemV2 {
 }
 
 export interface CustomFieldResponse {
-  customFieldId: string;
+  fieldId: string;
   value: string;
 }
 
 export interface BuyTicketsV2Payload {
   eventId: string;
+  siteClickId?: string;
+  buyerEmail?: string;
+  buyerName?: string;
   ticketCategories: TicketPurchaseItemV2[];
   discountCode?: string;
   occurrenceId?: string;

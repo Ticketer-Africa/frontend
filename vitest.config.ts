@@ -11,7 +11,7 @@ export default defineConfig({
     globals: true,
     // bank.test.ts targets Node's built-in test runner (node:test), not
     // Vitest — exclude it so it isn't double-collected here.
-    exclude: ["**/node_modules/**", ".claude/**", "services/banks/bank.test.ts"],
+    exclude: ["**/node_modules/**", ".claude/**", "services/banks/bank.test.ts", "e2e/**"],
   },
   resolve: {
     alias: {

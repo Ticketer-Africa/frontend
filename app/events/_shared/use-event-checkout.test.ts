@@ -22,6 +22,7 @@ const ticketCategories = [
 beforeEach(() => {
   push.mockClear();
   sessionStorage.clear();
+  window.history.replaceState({}, "", "/events/example");
 });
 
 describe("useEventCheckout", () => {
@@ -49,5 +50,13 @@ describe("useEventCheckout", () => {
 
     expect(push).not.toHaveBeenCalled();
     expect(sessionStorage.getItem("checkoutData")).toBeNull();
+  });
+
+  it("passes the Event Site click through to checkout data", () => {
+    const clickId = "123e4567-e89b-42d3-a456-426614174000";
+    window.history.replaceState({}, "", `/events/example?siteClickId=${clickId}`);
+    const { result } = renderHook(() => useEventCheckout(event, "live", selection, ticketCategories));
+    result.current.handleCheckout();
+    expect(JSON.parse(sessionStorage.getItem("checkoutData")!).siteClickId).toBe(clickId);
   });
 });
