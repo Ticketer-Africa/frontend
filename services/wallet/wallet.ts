@@ -1,5 +1,4 @@
 import axiosInstance from "../axios";
-import { toast } from "sonner";
 import {
   WithdrawPayload,
   WalletBalanceResponse,
@@ -28,14 +27,10 @@ export const withdrawFromWallet = async (
       buildEndpoint(API_VERSION, "wallet/withdraw"),
       data
     );
-    toast.success("Withdrawal requested", {
-      description: res.data.message || "Your withdrawal request has been submitted.",
-    });
     return res.data;
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to process withdrawal";
-    toast.error("Withdrawal failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };

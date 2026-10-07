@@ -122,10 +122,15 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
         name: user!.name,
         narration: formData.narration || undefined,
       });
+      toast.success("Payout request submitted", {
+        description: "Redirecting you to checkout…",
+      });
       window.location.href = response.checkoutUrl;
       handleClose();
-    } catch {
-      // withdrawFromWallet already reports the API error.
+    } catch (error: any) {
+      toast.error("Payout request failed", {
+        description: error?.message || "Please try again.",
+      });
     }
   };
 
