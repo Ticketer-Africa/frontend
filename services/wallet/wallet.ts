@@ -66,7 +66,6 @@ export const setWalletPin = async (
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to update wallet PIN";
-    toast.error("PIN update failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };
@@ -81,7 +80,6 @@ export const checkWalletPinStatus = async (): Promise<PinStatusResponse> => {
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to check wallet PIN status";
-    toast.error("Couldn't check PIN status", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };

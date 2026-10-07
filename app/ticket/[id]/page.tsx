@@ -77,24 +77,11 @@ export default function TicketDetailPage({
     };
 
     try {
-      await listResale(resalePayload, {
-        onSuccess: () => {
-          toast.success("Ticket listed for resale", {
-            description: "Your ticket is now visible to other buyers.",
-          });
-          setIsResaleModalOpen(false);
-          setSelectedTicket(null);
-        },
-        onError: (error) => {
-          toast.error("Listing failed", {
-            description: error.message || "Failed to list ticket for resale.",
-          });
-        },
-      });
-    } catch (err: any) {
-      toast.error("Listing failed", {
-        description: err.message || "Failed to list ticket for resale.",
-      });
+      await listResale(resalePayload);
+      setIsResaleModalOpen(false);
+      setSelectedTicket(null);
+    } catch {
+      // listTicketForResale already reports the API error.
     }
   };
 

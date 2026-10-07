@@ -148,7 +148,6 @@ export const toggleEventStatus = async (eventId: string) => {
   } catch (error: any) {
     const errorMessage =
       error.response?.data?.message || "Failed to toggle event status";
-    toast.error("Status update failed", { description: errorMessage });
     throw new Error(errorMessage);
   }
 };

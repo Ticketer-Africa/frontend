@@ -109,9 +109,7 @@ export function TicketPurchaseModal({
       }
     } catch (err: any) {
       console.error("Purchase failed:", err);
-      toast.error("Purchase failed", {
-        description: err.message || "Please try again.",
-      });
+      // buyTicket already reports the API error.
     }
   };
 

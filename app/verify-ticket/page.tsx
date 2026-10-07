@@ -63,6 +63,7 @@ export default function VerifyTicketPage() {
   const [scannerActive, setScannerActive] = useState(false);
   // Guards against re-verifying when we update the URL ourselves after a camera scan.
   const skipNextSearchParamsEffect = useRef(false);
+  const lastAutomaticVerification = useRef<string | null>(null);
 
   const { data: event } = useEventById(ticketData?.eventId || "");
 
@@ -107,9 +108,7 @@ export default function VerifyTicketPage() {
       });
     } catch (err: any) {
       setError(err?.message || "Verification failed. Please try again.");
-      toast.error("Verification failed", {
-        description: err?.message || "Please try again.",
-      });
+      // verifyTicket already reports the API error.
     }
   };
 
@@ -129,6 +128,7 @@ export default function VerifyTicketPage() {
     // Keep the URL in sync with the most recently scanned ticket, without
     // re-triggering the searchParams-driven verification effect below.
     skipNextSearchParamsEffect.current = true;
+    lastAutomaticVerification.current = dataParam;
     router.replace(`${pathname}?data=${encodeURIComponent(dataParam)}`, {
       scroll: false,
     });
@@ -145,6 +145,7 @@ export default function VerifyTicketPage() {
     setMode("camera");
     setScannerActive(true);
     skipNextSearchParamsEffect.current = true;
+    lastAutomaticVerification.current = null;
     router.replace(pathname, { scroll: false });
   };
 
@@ -157,10 +158,13 @@ export default function VerifyTicketPage() {
     }
     const dataParam = searchParams.get("data");
     if (dataParam) {
+      if (lastAutomaticVerification.current === dataParam) return;
+      lastAutomaticVerification.current = dataParam;
       setMode("url-param");
       setScannerActive(false);
       handleVerify(dataParam);
     } else {
+      lastAutomaticVerification.current = null;
       setMode("camera");
       setScannerActive(true);
     }
