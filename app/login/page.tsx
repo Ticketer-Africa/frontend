@@ -25,6 +25,8 @@ type LoginSchema = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState("");
+  const [loginError, setLoginError] = useState("");
   const searchParams = useSearchParams();
   const loginMutation = useLogin();
   const redirect =
@@ -50,17 +52,30 @@ export default function LoginPage() {
   });
 
   const onSubmit = (data: LoginSchema) => {
+    setLoginError("");
+    setUnverifiedEmail("");
     loginMutation.mutate(
       { ...data, email: data.email.toLowerCase() },
       {
-        onSuccess: () => {
+        onSuccess: (result) => {
+          if (result.user.role === "ORGANIZER") {
+            location.href = "/organizer";
+            return;
+          }
           const returnUrl =
             searchParams.get("redirect") ?? searchParams.get("returnUrl");
 
-          if (returnUrl && !returnUrl.includes("/login")) {
+          if (returnUrl?.startsWith("/") && !returnUrl.startsWith("//") && !returnUrl.startsWith("/login")) {
             location.href = returnUrl;
           } else {
             location.href = "/explore";
+          }
+        },
+        onError: (error: any) => {
+          if (error?.response?.data?.code === "EMAIL_NOT_VERIFIED") {
+            setUnverifiedEmail(data.email.trim().toLowerCase());
+          } else {
+            setLoginError(error?.response?.data?.message ?? "We couldn't sign you in. Check your details and try again.");
           }
         },
       }
@@ -80,6 +95,10 @@ export default function LoginPage() {
           Sign in to your account to continue
         </p>
       </div>
+
+      {searchParams.get("verified") === "1" && <p role="status" className="mb-5 rounded-lg border border-green-500/40 bg-green-500/10 p-3 text-sm text-green-300">Email verified. Sign in to continue.</p>}
+      {unverifiedEmail && <div role="alert" className="mb-5 rounded-lg border border-[var(--home-border-strong)] bg-[var(--home-card-elevated)] p-4 text-sm text-[var(--home-text)]"><p>Finish verifying your email to sign in.</p><Link href={`/verify-otp?email=${encodeURIComponent(unverifiedEmail)}&intent=organizer`} className="mt-2 inline-block font-semibold text-[var(--home-text-highlight)] underline">Enter or resend your code</Link></div>}
+      {loginError && <p role="alert" className="mb-5 rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-300">{loginError}</p>}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div className="space-y-2">

@@ -2,9 +2,10 @@
 
 import type React from "react";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +22,7 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPasswordPage() {
-  const router = useRouter();
+  const [sent, setSent] = useState(false);
   const forgotPasswordMutation = useForgotPassword();
 
   const {
@@ -37,15 +38,7 @@ export default function ForgotPasswordPage() {
       { email: data.email.toLowerCase() },
       {
         onSuccess: () => {
-          localStorage.setItem(
-            "otpPayload",
-            JSON.stringify({
-              email: data.email,
-              context: "forgot-password",
-            })
-          );
-
-          router.push("/verify-otp");
+          setSent(true);
         },
       }
     );
@@ -61,10 +54,18 @@ export default function ForgotPasswordPage() {
           Forgot Password?
         </h1>
         <p style={{ color: "var(--home-muted)" }}>
-          Enter your email to receive an OTP
+          Enter your email to receive a password reset link
         </p>
       </div>
 
+      {sent ? (
+        <div role="status" className="rounded-xl border border-[var(--home-border-strong)] bg-[var(--home-card-elevated)] p-5 text-center text-[var(--home-text)]">
+          <p className="font-semibold">Check your email</p>
+          <p className="mt-2 text-sm text-[var(--home-muted)]">We sent a password reset link. It expires in 30 minutes.</p>
+          <Link href="/login" className="mt-4 inline-block font-semibold text-[var(--home-text-highlight)] underline">Back to sign in</Link>
+        </div>
+      ) : (
+      <>
       {errors.email && (
         <div
           className="mb-6 p-4 rounded-lg flex items-center space-x-2 border"
@@ -113,9 +114,11 @@ export default function ForgotPasswordPage() {
           disabled={forgotPasswordMutation.isPending}
           className="w-full h-14 rounded-lg disabled:opacity-50"
         >
-          {forgotPasswordMutation.isPending ? "Sending..." : "Send OTP"}
+          {forgotPasswordMutation.isPending ? "Sending..." : "Send reset link"}
         </Button>
       </form>
+      </>
+      )}
     </AuthShell>
   );
 }

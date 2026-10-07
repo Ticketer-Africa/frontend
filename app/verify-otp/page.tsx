@@ -1,278 +1,100 @@
 "use client";
 
-import type React from "react";
-import { useState, useEffect } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { AuthShell } from "@/components/auth/auth-shell";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-  InputOTPSeparator,
-} from "@/components/ui/input-otp";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
-import { REGEXP_ONLY_DIGITS } from "input-otp";
-import { toast } from "sonner";
-import { useVerifyOtp, useResendOtp } from "@/services/auth/auth.queries";
-import { ResendOtpDto } from "@/types/auth.type";
-import { z } from "zod";
-
-const otpSchema = z.object({
-  email: z.string().email(),
-  otp: z.string().length(6, "OTP must be 6 digits"),
-});
+import { Input } from "@/components/ui/input";
+import { useResendOtp, useVerifyOtp } from "@/services/auth/auth.queries";
 
 export default function VerifyOTPPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [otp, setOtp] = useState("");
-  const [secondsLeft, setSecondsLeft] = useState(60);
-  const { mutate: verifyOtp, isPending } = useVerifyOtp();
-  const { mutate: resendOtp, isPending: isResending } = useResendOtp();
-  const [otpPayload, setOtpPayload] = useState<ResendOtpDto | null>(null);
-  const redirect =
-    searchParams.get("redirect") ?? searchParams.get("returnUrl");
-  const intent = searchParams.get("intent");
+  const [email, setEmail] = useState(searchParams.get("email") ?? "");
+  const [code, setCode] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [resendAfter, setResendAfter] = useState(0);
+  const verify = useVerifyOtp();
+  const resend = useResendOtp();
+
+  useEffect(() => {
+    if (!resendAfter) return;
+    const timer = window.setTimeout(() => setResendAfter(0), Math.max(0, resendAfter - Date.now()));
+    return () => window.clearTimeout(timer);
+  }, [resendAfter]);
 
   const loginParams = new URLSearchParams();
-  if (intent === "organizer") {
-    loginParams.set("intent", "organizer");
-  }
-  if (redirect) {
-    loginParams.set("redirect", redirect);
-  }
-  const loginHref = loginParams.toString()
-    ? `/login?${loginParams.toString()}`
-    : "/login";
+  if (searchParams.get("intent") === "organizer") loginParams.set("intent", "organizer");
+  const redirect = searchParams.get("redirect") ?? searchParams.get("returnUrl");
+  if (redirect?.startsWith("/") && !redirect.startsWith("//")) loginParams.set("redirect", redirect);
+  const loginHref = `/login${loginParams.size ? `?${loginParams}` : ""}`;
 
-  useEffect(() => {
-    const stored = localStorage.getItem("otpPayload");
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (parsed?.email && parsed?.context) {
-          setOtpPayload(parsed);
-        } else {
-          throw new Error("Incomplete OTP payload");
-        }
-      } catch (e) {
-        console.error("Failed to parse otpPayload:", e);
-        toast.error("Invalid OTP session", {
-          description: "We couldn't read your verification details. Please try again.",
-        });
-      }
-    } else {
-      toast.error("No OTP session found", {
-        description: "Please register again to receive a new verification code.",
-      });
-      const registerParams = new URLSearchParams();
-      if (intent === "organizer") {
-        registerParams.set("intent", "organizer");
-      }
-      if (redirect) {
-        registerParams.set("redirect", redirect);
-      }
-
-      router.push(
-        registerParams.toString()
-          ? `/register?${registerParams.toString()}`
-          : "/register"
-      );
-    }
-  }, [router, intent, redirect]);
-
-  useEffect(() => {
-    if (secondsLeft <= 0) return;
-    const timer = setInterval(() => setSecondsLeft((s) => s - 1), 1000);
-    return () => clearInterval(timer);
-  }, [secondsLeft]);
-
-  const formatTime = (secs: number) => {
-    const m = Math.floor(secs / 60)
-      .toString()
-      .padStart(2, "0");
-    const s = (secs % 60).toString().padStart(2, "0");
-    return `${m}:${s}`;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const email = otpPayload?.email;
-    const result = otpSchema.safeParse({ email, otp });
-
-    if (!result.success) {
-      toast.error("Invalid code", {
-        description: result.error.issues[0].message,
-      });
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    setError("");
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!/^\S+@\S+\.\S+$/.test(normalizedEmail) || !/^\d{6}$/.test(code)) {
+      setError("Enter your email and the six-digit code we sent you.");
       return;
     }
-
-    verifyOtp(result.data, {
-      onSuccess: () => {
-        toast.success("OTP verified", {
-          description: "Your code has been confirmed successfully.",
-        });
-        const context = otpPayload?.context;
-        localStorage.removeItem("otpPayload");
-        // const role = user?.role || "user";
-        if (context === "forgot-password") {
-          localStorage.setItem("resetEmail", email!);
-          localStorage.setItem("resetOtp", otp);
-          router.push("/reset-password");
-        } else {
-          router.push(loginHref);
-        }
-      },
-      onError: (err: any) => {
-        toast.error("Verification failed", {
-          description:
-            err?.response?.data?.message || "Failed to verify OTP. Please try again.",
-        });
-      },
-    });
+    try {
+      await verify.mutateAsync({ email: normalizedEmail, otp: code });
+      router.push(`${loginHref}${loginHref.includes("?") ? "&" : "?"}verified=1`);
+    } catch (cause: any) {
+      setError(cause?.response?.data?.message ?? "That code could not be verified. Try again or request a new one.");
+    }
   };
 
-  const handleResend = () => {
-    if (!otpPayload) {
-      toast.error("Missing OTP details", {
-        description: "We couldn't find your verification session. Please register again.",
-      });
+  const requestCode = async () => {
+    setError("");
+    setMessage("");
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
+      setError("Enter your email address first.");
       return;
     }
-    resendOtp(otpPayload, {
-      onSuccess: () => {
-        localStorage.removeItem("otpPayload");
-        setSecondsLeft(60);
-      },
-    });
+    if (Date.now() < resendAfter) return;
+    try {
+      await resend.mutateAsync({ email: normalizedEmail, context: "register" });
+      setCode("");
+      setMessage("A new code is on its way. Check your inbox and spam folder.");
+      setResendAfter(Date.now() + 60_000);
+    } catch (cause: any) {
+      setError(cause?.response?.data?.message ?? "We couldn't send a new code. Please try again.");
+    }
   };
 
   return (
-    <div
-      className="home-theme min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
-      style={{ backgroundColor: "var(--home-bg)" }}
-    >
-      <div className="absolute inset-0 overflow-hidden">
-        <div
-          className="my-tickets-bg-circle absolute -top-40 -right-40 w-80 h-80 rounded-full filter blur-xl opacity-20"
-          style={{ backgroundColor: "var(--home-accent)" }}
-        />
-        <div
-          className="my-tickets-bg-circle-alt absolute -bottom-40 -left-40 w-80 h-80 rounded-full filter blur-xl opacity-30"
-          style={{ backgroundColor: "var(--home-card-highlight)" }}
-        />
+    <AuthShell>
+      <div className="mx-auto w-full max-w-md min-w-0">
+        <p className="mb-3 text-sm font-semibold tracking-wide text-[var(--home-accent)]">ONE LAST STEP</p>
+        <h1 className="text-3xl font-bold leading-tight text-[var(--home-text)] sm:text-4xl">Verify your email</h1>
+        <p className="mt-3 text-sm leading-6 text-[var(--home-muted)] sm:text-base">Enter the six-digit code sent to your inbox. You can finish this later or on another device.</p>
+
+        <form onSubmit={submit} className="mt-8 space-y-5">
+          <div className="space-y-2">
+            <label htmlFor="verify-email" className="block text-sm font-medium text-[var(--home-text)]">Email address</label>
+            <Input id="verify-email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" className="h-12 w-full min-w-0 rounded-lg border-[var(--home-border-strong)] bg-[var(--home-bg)] px-4 text-base text-[var(--home-text)]" required />
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="verification-code" className="block text-sm font-medium text-[var(--home-text)]">Verification code</label>
+            <Input id="verification-code" type="text" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="000000" className="h-14 w-full min-w-0 rounded-lg border-[var(--home-border-strong)] bg-[var(--home-bg)] px-4 text-center font-mono text-2xl tracking-[0.35em] text-[var(--home-text)]" required />
+            <p className="text-xs text-[var(--home-muted)]">Codes expire after 10 minutes.</p>
+          </div>
+
+          {error && <p role="alert" className="rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-300">{error}</p>}
+          {message && <p role="status" className="rounded-lg border border-green-500/40 bg-green-500/10 p-3 text-sm text-green-300">{message}</p>}
+
+          <Button type="submit" variant="homeAccent" disabled={verify.isPending || code.length !== 6} className="h-12 w-full rounded-lg">{verify.isPending ? "Verifying..." : "Verify email"}</Button>
+        </form>
+
+        <div className="mt-5 flex flex-col gap-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+          <button type="button" onClick={requestCode} disabled={resend.isPending || Date.now() < resendAfter} className="text-left font-semibold text-[var(--home-text-highlight)] underline disabled:opacity-50">{resend.isPending ? "Sending..." : "Send a new code"}</button>
+          <Link href={loginHref} className="text-[var(--home-muted)] underline">Back to sign in</Link>
+        </div>
       </div>
-
-      <div className="auth-form-animate w-full max-w-md relative">
-        <Card
-          className="backdrop-blur-md shadow-2xl border"
-          style={{
-            backgroundColor: "rgba(20, 27, 43, 0.92)",
-            borderColor: "var(--home-border)",
-            borderRadius: "var(--home-radius-card-lg)",
-          }}
-        >
-          <CardHeader className="text-center">
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              <div
-                className="h-8 w-8 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: "var(--home-accent)" }}
-              >
-                <span
-                  className="font-bold text-sm"
-                  style={{ color: "var(--home-accent-fg)" }}
-                >
-                  T
-                </span>
-              </div>
-              <span
-                className="font-bold text-xl"
-                style={{ color: "var(--home-text)" }}
-              >
-                Ticketer Africa
-              </span>
-            </div>
-            <CardTitle className="text-2xl" style={{ color: "var(--home-text)" }}>
-              Verify Your Email
-            </CardTitle>
-            <p style={{ color: "var(--home-muted)" }}>
-              Enter the 6-digit code sent to your email
-            </p>
-          </CardHeader>
-
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="flex justify-center">
-                <InputOTP
-                  maxLength={6}
-                  pattern={REGEXP_ONLY_DIGITS}
-                  value={otp}
-                  onChange={(val) => setOtp(val)}
-                >
-                  <InputOTPGroup>
-                    <InputOTPSlot index={0} className="border-[var(--home-border-strong)] text-[var(--home-text)] bg-[var(--home-bg)]" />
-                    <InputOTPSlot index={1} className="border-[var(--home-border-strong)] text-[var(--home-text)] bg-[var(--home-bg)]" />
-                    <InputOTPSlot index={2} className="border-[var(--home-border-strong)] text-[var(--home-text)] bg-[var(--home-bg)]" />
-                  </InputOTPGroup>
-                  <InputOTPSeparator className="text-[var(--home-muted)]" />
-                  <InputOTPGroup>
-                    <InputOTPSlot index={3} className="border-[var(--home-border-strong)] text-[var(--home-text)] bg-[var(--home-bg)]" />
-                    <InputOTPSlot index={4} className="border-[var(--home-border-strong)] text-[var(--home-text)] bg-[var(--home-bg)]" />
-                    <InputOTPSlot index={5} className="border-[var(--home-border-strong)] text-[var(--home-text)] bg-[var(--home-bg)]" />
-                  </InputOTPGroup>
-                </InputOTP>
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full h-12 font-semibold shadow-lg transition-[background-color,color,border-color,opacity,transform] duration-150 hover:brightness-110 disabled:opacity-50"
-                style={{
-                  backgroundColor: "var(--home-accent)",
-                  color: "var(--home-accent-fg)",
-                  borderRadius: "var(--home-radius-card)",
-                }}
-                disabled={otp.length < 6 || isPending}
-              >
-                {isPending ? "Verifying..." : "Verify Code"}
-              </Button>
-
-              <div className="text-center space-y-2">
-                <p className="text-sm" style={{ color: "var(--home-muted)" }}>
-                  Didn&apos;t receive the code?{" "}
-                  <button
-                    disabled={isResending || secondsLeft > 0}
-                    onClick={handleResend}
-                    className="hover:underline disabled:opacity-50"
-                    style={{ color: "var(--home-text-highlight)" }}
-                  >
-                    Resend Code
-                  </button>
-                  {secondsLeft > 0 && (
-                    <span className="ml-2" style={{ color: "var(--home-muted-dim)" }}>
-                      ({formatTime(secondsLeft)})
-                    </span>
-                  )}
-                </p>
-              </div>
-
-              <Button
-                variant="ghost"
-                className="w-full hover:bg-[var(--home-card-elevated)] hover:text-[var(--home-text-highlight)]"
-                style={{ color: "var(--home-muted)" }}
-                asChild
-              >
-                <Link href={loginHref}>
-                  <HugeiconsIcon icon={ArrowLeft01Icon} className="h-4 w-4 mr-2" />
-                  Back to Login
-                </Link>
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+    </AuthShell>
   );
 }
