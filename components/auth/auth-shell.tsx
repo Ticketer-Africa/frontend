@@ -10,11 +10,11 @@ import type React from "react";
 export function AuthShell({ children }: { children: React.ReactNode }) {
   return (
     <div
-      className="home-theme min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-24 pb-12"
+      className="home-theme min-h-screen flex items-start sm:items-center justify-center px-3 sm:px-6 lg:px-8 pt-20 sm:pt-24 pb-8 sm:pb-12"
       style={{ backgroundColor: "var(--home-bg)" }}
     >
       <div
-        className="auth-form-animate relative z-10 w-full max-w-2xl overflow-hidden rounded-xl border backdrop-blur-md shadow-2xl"
+        className="auth-form-animate relative z-10 w-full max-w-2xl min-w-0 overflow-hidden rounded-xl border backdrop-blur-md shadow-2xl"
         style={{
           backgroundColor: "rgba(17,24,39,0.6)",
           borderColor: "rgba(226,114,91,0.2)",
@@ -30,7 +30,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
           style={{ backgroundColor: "rgba(226,114,91,0.2)" }}
           aria-hidden="true"
         />
-        <div className="relative p-8 sm:p-10 md:p-12">{children}</div>
+        <div className="relative min-w-0 p-4 min-[390px]:p-6 sm:p-10 md:p-12">{children}</div>
       </div>
     </div>
   );

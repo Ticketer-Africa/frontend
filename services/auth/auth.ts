@@ -10,12 +10,13 @@ import {
   AuthResponse,
   BasicResponse,
   ChangePasswordDto,
+  RegisterResponse,
 } from "@/types/auth.type";
 import { buildEndpoint } from "../api-config";
 
 const API_VERSION = "v1";
 // REGISTER user
-export const register = async (dto: RegisterDto): Promise<BasicResponse> => {
+export const register = async (dto: RegisterDto): Promise<RegisterResponse> => {
   try {
     const res = await axios.post(
       buildEndpoint(API_VERSION, "auth/register"),
@@ -26,9 +27,7 @@ export const register = async (dto: RegisterDto): Promise<BasicResponse> => {
     });
     return res.data;
   } catch (error: any) {
-    const errorMessage = error.response?.data?.message || "Failed to register";
-    toast.error("Registration failed", { description: errorMessage });
-    throw new Error(errorMessage);
+    throw error;
   }
 };
 
@@ -41,9 +40,7 @@ export const login = async (dto: LoginDto): Promise<AuthResponse> => {
     });
     return res.data;
   } catch (error: any) {
-    const errorMessage = error.response?.data?.message || "Failed to login";
-    toast.error("Login failed", { description: errorMessage });
-    throw new Error(errorMessage);
+    throw error;
   }
 };
 
@@ -59,10 +56,7 @@ export const verifyOtp = async (dto: VerifyOtpDto): Promise<BasicResponse> => {
     });
     return res.data;
   } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message || "Failed to verify OTP";
-    toast.error("Verification failed", { description: errorMessage });
-    throw new Error(errorMessage);
+    throw error;
   }
 };
 
@@ -78,10 +72,7 @@ export const resendOtp = async (dto: ResendOtpDto): Promise<BasicResponse> => {
     });
     return res.data;
   } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message || "Failed to resend OTP";
-    toast.error("Resend failed", { description: errorMessage });
-    throw new Error(errorMessage);
+    throw error;
   }
 };
 

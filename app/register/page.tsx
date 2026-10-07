@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
@@ -20,7 +20,7 @@ const registerSchema = z
   .object({
     name: z.string().min(2, "Enter your full name (at least 2 characters)"),
     email: z.string().email("Enter a valid email address (e.g. you@example.com)"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    password: z.string().min(8, "Password must be at least 8 characters").regex(/[A-Z]/, "Add an uppercase letter").regex(/[0-9]/, "Add a number").regex(/[^A-Za-z0-9]/, "Add a special character"),
     confirmPassword: z.string().min(1, "Please confirm your password"),
     agreementAccepted: z.boolean().refine((value) => value, {
       message: "You must accept the Service Agreement to continue",
@@ -46,6 +46,7 @@ export default function RegisterPage() {
   const [step, setStep] = useState<1 | 2>(1);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [existingAccount, setExistingAccount] = useState(false);
   const intent = searchParams.get("intent");
   const redirect =
     searchParams.get("redirect") ?? searchParams.get("returnUrl");
@@ -59,6 +60,12 @@ export default function RegisterPage() {
   const loginHref = loginParams.toString()
     ? `/login?${loginParams.toString()}`
     : "/login";
+
+  useEffect(() => {
+    if (!existingAccount) return;
+    const timer = window.setTimeout(() => router.push(loginHref), 3000);
+    return () => window.clearTimeout(timer);
+  }, [existingAccount, loginHref, router]);
 
   const {
     register,
@@ -97,14 +104,10 @@ export default function RegisterPage() {
         role: "ORGANIZER" as const,
       };
 
-      await registerUser(payload);
-
-      localStorage.setItem(
-        "otpPayload",
-        JSON.stringify({ email: data.email, context: "register" })
-      );
+      const result = await registerUser(payload);
 
       const verifyOtpParams = new URLSearchParams();
+      verifyOtpParams.set("email", result.email);
       if (intent === "organizer") {
         verifyOtpParams.set("intent", "organizer");
       }
@@ -118,6 +121,10 @@ export default function RegisterPage() {
           : "/verify-otp"
       );
     } catch (err: any) {
+      if (err?.response?.data?.code === "ACCOUNT_EXISTS") {
+        setExistingAccount(true);
+        return;
+      }
       const msg =
         err?.response?.data?.message ?? "Please check your details and try again.";
       toast.error("Registration failed", { description: msg });
@@ -126,7 +133,7 @@ export default function RegisterPage() {
 
   return (
     <AuthShell>
-      <div className="flex flex-col items-center text-center mb-8">
+      <div className="flex flex-col items-center text-center mb-6 sm:mb-8">
         <div
           className="flex items-center justify-center rounded-full p-3 mb-2"
           style={{ backgroundColor: "#362222" }}
@@ -143,12 +150,20 @@ export default function RegisterPage() {
             color: "#DCE2F7",
           }}
         >
-          Sign Up
+          Create your account
         </h1>
         <p style={{ color: "var(--home-muted)" }}>
           Create your organizer account to start hosting events
         </p>
       </div>
+
+      {existingAccount && (
+        <div role="status" className="mb-6 rounded-xl border border-[var(--home-border-strong)] bg-[var(--home-card-elevated)] p-4 text-sm text-[var(--home-text)]">
+          <p className="font-semibold">You already have an account.</p>
+          <p className="mt-1 text-[var(--home-muted)]">We’ll take you to sign in in a moment.</p>
+          <Link href={loginHref} className="mt-3 inline-block font-semibold text-[var(--home-text-highlight)] underline">Go to sign in</Link>
+        </div>
+      )}
 
       <div className="space-y-2 mb-6">
         <div
@@ -328,7 +343,7 @@ export default function RegisterPage() {
               <p className="text-xs mb-2.5" style={{ color: "var(--home-muted)" }}>
                 REQUIREMENTS:
               </p>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+              <div className="grid grid-cols-1 min-[390px]:grid-cols-2 gap-x-4 gap-y-2">
                 {PASSWORD_REQUIREMENTS.map((req) => {
                   const met = req.test(passwordValue ?? "");
                   return (
@@ -399,12 +414,12 @@ export default function RegisterPage() {
               )}
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4">
               <Button
                 type="button"
                 variant="homeOutline"
                 onClick={() => setStep(1)}
-                className="h-14 rounded-lg px-8 w-[160px] shrink-0"
+                className="h-12 sm:h-14 rounded-lg w-full sm:w-36 shrink-0"
               >
                 Back
               </Button>
@@ -412,7 +427,7 @@ export default function RegisterPage() {
                 type="submit"
                 variant="homeAccent"
                 disabled={isPending}
-                className="h-14 rounded-lg flex-1"
+                className="min-h-14 h-auto rounded-lg flex-1 min-w-0 whitespace-normal px-4 py-3 text-center"
               >
                 {isPending ? "Creating account..." : "Create Organizer Account"}
               </Button>

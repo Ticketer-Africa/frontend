@@ -1,9 +1,14 @@
-import { User } from "./user.type";
-
 export interface RegisterDto {
   name: string;
   email: string;
   password: string;
+  role: "ORGANIZER";
+}
+
+export interface RegisterResponse {
+  message: string;
+  email: string;
+  state: "PENDING_CREATED" | "PENDING_REUSED";
 }
 
 export interface LoginDto {
@@ -33,8 +38,13 @@ export interface ResetPasswordDto {
 }
 
 export interface AuthResponse {
-  access_token: string;
-  user: User;
+  message: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: "USER" | "ORGANIZER" | "ADMIN" | "SUPERADMIN";
+  };
 }
 
 export interface BasicResponse {
