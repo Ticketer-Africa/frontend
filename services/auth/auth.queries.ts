@@ -11,12 +11,15 @@ import {
 import {
   RegisterDto,
   LoginDto,
+  AuthResponse,
   VerifyOtpDto,
   ResendOtpDto,
   ForgotPasswordDto,
   ResetPasswordDto,
   ChangePasswordDto,
 } from "@/types/auth.type";
+import Axios from "@/services/axios";
+import { buildEndpoint } from "@/services/api-config";
 
 export const useRegister = () =>
   useMutation({
@@ -24,11 +27,18 @@ export const useRegister = () =>
   });
 export const useLogin = () =>
   useMutation({
-    mutationFn: async (dto: LoginDto) => {
+    mutationFn: async (dto: LoginDto): Promise<AuthResponse> => {
       const data = await login(dto);
-      localStorage.setItem("ticketer-user", JSON.stringify(data.user));
+      // The session is the source of truth for role-based navigation. In
+      // particular, an organizer's current role may differ from the login
+      // response used by older API deployments.
+      const session = await Axios.get<{ user: AuthResponse["user"] }>(
+        buildEndpoint("v1", "auth/me"),
+      );
+      const user = session.data.user;
+      localStorage.setItem("ticketer-user", JSON.stringify(user));
 
-      return data;
+      return { ...data, user };
     },
   });
 
