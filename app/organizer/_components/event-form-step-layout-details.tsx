@@ -34,7 +34,6 @@ export function EventFormStepLayoutDetails({ layout, values, onChange, isDisable
           artists={values.lineup}
           onChange={(lineup) => onChange({ lineup })}
           isDisabled={isDisabled}
-          required={layout !== "HERO_OVERLAY"}
         />
       )}
 

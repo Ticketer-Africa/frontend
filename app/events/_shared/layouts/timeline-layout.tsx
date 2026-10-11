@@ -66,20 +66,22 @@ export function TimelineLayout({ event, mode }: Props) {
             </ol>
           </section>
 
-          <section>
-            <h2 className="text-xl font-bold mb-4" style={{ color: "var(--home-text)" }}>Lineup</h2>
-            <div className="grid grid-cols-2 gap-3">
-              {event.lineup.map((artist) => (
-                <div
-                  key={artist}
-                  className="rounded-xl border px-4 py-3 text-center font-medium"
-                  style={{ borderColor: "var(--home-border)", backgroundColor: "var(--home-card)", color: "var(--home-text)" }}
-                >
-                  {artist}
-                </div>
-              ))}
-            </div>
-          </section>
+          {event.lineup.length > 0 && (
+            <section>
+              <h2 className="text-xl font-bold mb-4" style={{ color: "var(--home-text)" }}>Lineup</h2>
+              <div className="grid grid-cols-2 gap-3">
+                {event.lineup.map((artist) => (
+                  <div
+                    key={artist}
+                    className="rounded-xl border px-4 py-3 text-center font-medium"
+                    style={{ borderColor: "var(--home-border)", backgroundColor: "var(--home-card)", color: "var(--home-text)" }}
+                  >
+                    {artist}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
 
         {event.relatedEvents.length > 0 && (

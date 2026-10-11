@@ -18,6 +18,7 @@ const TABS = ["Overview", "Lineup", "Location"] as const;
 
 export function SplitScreenLayout({ event, mode }: Props) {
   const [activeTab, setActiveTab] = useState<(typeof TABS)[number]>("Overview");
+  const tabs = TABS.filter((tab) => tab !== "Lineup" || event.lineup.length > 0);
   const selection = useTicketSelection(event.ticketCategories, event.id);
   const { handleCheckout } = useEventCheckout(
     event,
@@ -40,7 +41,7 @@ export function SplitScreenLayout({ event, mode }: Props) {
         <p className="mt-2" style={{ color: "var(--home-muted)" }}>{event.venueName}</p>
 
         <div role="tablist" className="flex gap-2 mt-6 border-b" style={{ borderColor: "var(--home-border)" }}>
-          {TABS.map((tab) => (
+          {tabs.map((tab) => (
             <button
               key={tab}
               type="button"
@@ -64,7 +65,7 @@ export function SplitScreenLayout({ event, mode }: Props) {
           {activeTab === "Overview" && (
             <p style={{ color: "var(--home-muted)" }}>{event.description}</p>
           )}
-          {activeTab === "Lineup" && (
+          {activeTab === "Lineup" && event.lineup.length > 0 && (
             <div className="grid grid-cols-2 gap-3">
               {event.lineup.map((artist) => (
                 <div

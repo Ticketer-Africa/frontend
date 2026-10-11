@@ -16,6 +16,14 @@ describe("SplitScreenLayout", () => {
     expect(screen.getByText("Burna Boy")).toBeInTheDocument();
   });
 
+  it("hides the Lineup tab when there is no lineup", () => {
+    const event = { ...buildDummyEventLayoutViewModel("SPLIT_SCREEN"), lineup: [] };
+    render(<SplitScreenLayout event={event} mode="preview" />);
+
+    expect(screen.queryByRole("tab", { name: "Lineup" })).not.toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Location" })).toBeInTheDocument();
+  });
+
   it("renders trust badges next to the buy panel", () => {
     const event = buildDummyEventLayoutViewModel("SPLIT_SCREEN");
     render(<SplitScreenLayout event={event} mode="preview" />);

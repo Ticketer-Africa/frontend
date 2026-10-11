@@ -16,6 +16,13 @@ describe("TimelineLayout", () => {
     expect(screen.getByText("Lineup")).toBeInTheDocument();
   });
 
+  it("hides the Lineup section when there is no lineup", () => {
+    const event = { ...buildDummyEventLayoutViewModel("TIMELINE"), lineup: [] };
+    render(<TimelineLayout event={event} mode="preview" />);
+
+    expect(screen.queryByText("Lineup")).not.toBeInTheDocument();
+  });
+
   it("suggests other events to explore", () => {
     const event = buildDummyEventLayoutViewModel("TIMELINE");
     render(<TimelineLayout event={event} mode="preview" />);

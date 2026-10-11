@@ -110,14 +110,9 @@ const layoutContentFields = {
 };
 
 function applyLayoutContentValidation(
-  data: { layout: string; lineup?: unknown[]; faq?: unknown[]; timelineSlots?: unknown[] },
+  data: { layout: string; faq?: unknown[]; timelineSlots?: unknown[] },
   ctx: z.RefinementCtx,
 ) {
-  const needsLineup = ["SPLIT_SCREEN", "TIMELINE"].includes(data.layout);
-  if (needsLineup && (!data.lineup || data.lineup.length === 0)) {
-    ctx.addIssue({ code: "custom", path: ["lineup"], message: "Add at least one artist" });
-  }
-
   const needsFaq = ["HERO_OVERLAY", "SPLIT_SCREEN", "EDITORIAL", "TICKET_FIRST"].includes(data.layout);
   if (needsFaq && (!data.faq || data.faq.length === 0)) {
     ctx.addIssue({ code: "custom", path: ["faq"], message: "Add at least one FAQ entry" });

@@ -185,7 +185,6 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
   const timelineSlots = watch("timelineSlots") || [];
   const editorialPullQuote = watch("editorialPullQuote") || "";
 
-  const needsLineup = ["SPLIT_SCREEN", "TIMELINE"].includes(layout ?? "");
   const needsFaq = ["HERO_OVERLAY", "SPLIT_SCREEN", "EDITORIAL", "TICKET_FIRST"].includes(layout ?? "");
 
   const stepBlockingReasons = useMemo(() => {
@@ -214,8 +213,7 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
     });
 
     const details: string[] = [];
-    if (needsLineup && lineup.length === 0) details.push("At least one lineup artist");
-    else if (lineup.some((a) => !a.name.trim())) details.push("Artist name (remove or fill in blank rows)");
+    if (lineup.some((a) => !a.name.trim())) details.push("Artist name (remove or fill in blank rows)");
     if (needsFaq) {
       if (faq.length === 0) details.push("At least one FAQ entry");
       else if (faq.some((f) => !f.question.trim() || !f.answer.trim())) {
@@ -238,7 +236,7 @@ export function EventWizard({ mode, eventId, initialEvent }: EventWizardProps) {
       details, // 6 [Layout] Details
       [], // 7 Preview
     ];
-  }, [layout, name, description, category, bannerFile, mode, venueName, venueAddress, date, time, ticketCategories, lineup, faq, timelineSlots, needsLineup, needsFaq]);
+  }, [layout, name, description, category, bannerFile, mode, venueName, venueAddress, date, time, ticketCategories, lineup, faq, timelineSlots, needsFaq]);
 
   const canProceed = stepBlockingReasons[currentStep - 1].length === 0;
 
