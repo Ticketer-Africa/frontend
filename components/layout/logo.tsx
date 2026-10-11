@@ -6,6 +6,11 @@ type LogoProps = {
   size?: "sm" | "md" | "lg" | number; // pre-defined or custom number (in rem)
   withText?: boolean;
   showImage?: boolean;
+  /**
+   * Show only the mark below the `sm` breakpoint and only the wordmark from
+   * `sm` up. Both switch at the same breakpoint so they never show together.
+   */
+  markOnlyOnMobile?: boolean;
   text?: string;
   imgSrc?: string;
   className?: string;
@@ -24,6 +29,7 @@ export const Logo: React.FC<LogoProps> = ({
   size = "md",
   withText = true,
   showImage = true,
+  markOnlyOnMobile = false,
   text = "Ticketer Africa",
   imgSrc = "/logo.png",
   className = "",
@@ -42,7 +48,7 @@ export const Logo: React.FC<LogoProps> = ({
   return (
     <div className={clsx("flex items-center gap-2", className)}>
       {showImage && (
-        <div className={clsx(imageClasses, "shrink-0")}>
+        <div className={clsx(imageClasses, "shrink-0", markOnlyOnMobile && "sm:hidden")}>
           <img
             src={imgSrc}
             alt={`${text} Logo`}
@@ -55,6 +61,7 @@ export const Logo: React.FC<LogoProps> = ({
           className={cn(
             "font-bold",
             fontClasses,
+            markOnlyOnMobile && "hidden sm:inline-block",
             textClassName ?? "text-[#E2725B]"
           )}
         >

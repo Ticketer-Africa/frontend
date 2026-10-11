@@ -144,7 +144,7 @@ export function Header() {
           <Link href="/" className="flex items-center">
             <Logo
               size="md"
-              showImage={false}
+              markOnlyOnMobile
               textClassName={
                 isHome
                   ? "text-[#E2725B] font-['Syne'] text-[28px] tracking-[-0.8px]"
