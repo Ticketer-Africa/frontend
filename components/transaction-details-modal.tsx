@@ -2,7 +2,8 @@
 
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
-import { formatPrice, formatDate } from "@/lib/helpers";
+import { formatDate } from "@/lib/helpers";
+import { formatAmount } from "@/app/wallet/_components/transaction-utils";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Calendar01Icon, Ticket01Icon } from "@hugeicons/core-free-icons";
 
@@ -64,8 +65,7 @@ export function TransactionDetailsModal({
                     : "text-foreground"
                 }`}
               >
-                {transaction.type === "RESALE" ? "+" : "+"}
-                {formatPrice(Math.abs(transaction.amount))}
+                {formatAmount(transaction.amount, transaction.type)}
               </p>
             </div>
             <div>
