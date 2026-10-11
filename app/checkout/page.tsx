@@ -313,7 +313,7 @@ export default function CheckoutPage() {
     <div className="home-theme min-h-screen pt-16" style={{ backgroundColor: "var(--home-bg)" }}>
       {/* Top bar */}
       <div
-        className="border-b backdrop-blur sticky top-[60px] z-40"
+        className="border-b backdrop-blur sticky top-0 z-40"
         style={{ borderColor: "var(--home-border)", backgroundColor: "rgba(11,14,20,0.8)" }}
       >
         <div className="container mx-auto px-4 h-14 flex items-center gap-4">
@@ -655,7 +655,7 @@ export default function CheckoutPage() {
           </div>
 
           {/* ── RIGHT: Order Summary ─────────────────────────────── */}
-          <div className="space-y-4 lg:sticky lg:top-[112px]">
+          <div className="space-y-4 lg:sticky lg:top-20">
 
             {/* Order summary card */}
             <Card className="overflow-hidden" style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)" }}>
