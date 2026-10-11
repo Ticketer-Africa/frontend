@@ -2,9 +2,11 @@ import { formatPrice } from "@/lib/helpers";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ChartDownIcon, ChartUpIcon, Download02Icon, Wallet01Icon } from "@hugeicons/core-free-icons";
 
+// The API sends every amount as positive; the type says which way it moved.
+// A withdrawal leaves the wallet; ticket sales and resale fees come in.
 export const formatAmount = (amount: number, type: string) => {
   const formattedAmount = formatPrice(Math.abs(amount));
-  return `+${formattedAmount}`;
+  return `${type === "WITHDRAW" ? "−" : "+"}${formattedAmount}`;
 };
 
 export const getTransactionIcon = (type: string) => {
