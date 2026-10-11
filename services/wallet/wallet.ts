@@ -1,6 +1,5 @@
 import axiosInstance from "../axios";
 import {
-  WithdrawPayload,
   WalletBalanceResponse,
   Transaction,
   PinStatusResponse,
@@ -16,23 +15,6 @@ export const checkWalletBalance = async (): Promise<WalletBalanceResponse> => {
     buildEndpoint(API_VERSION, "wallet/balance")
   );
   return res.data;
-};
-
-// WITHDRAW from wallet
-export const withdrawFromWallet = async (
-  data: WithdrawPayload
-): Promise<any> => {
-  try {
-    const res = await axiosInstance.post(
-      buildEndpoint(API_VERSION, "wallet/withdraw"),
-      data
-    );
-    return res.data;
-  } catch (error: any) {
-    const errorMessage =
-      error.response?.data?.message || "Failed to process withdrawal";
-    throw new Error(errorMessage);
-  }
 };
 
 // FETCH wallet transactions

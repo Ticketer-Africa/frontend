@@ -1,15 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   checkWalletBalance,
-  withdrawFromWallet,
   getWalletTransactions,
   checkWalletPinStatus,
   setWalletPin,
 } from "./wallet";
-import type {
-  SetWalletPinPayload,
-  WithdrawPayload,
-} from "@/types/wallet.type";
+import type { SetWalletPinPayload } from "@/types/wallet.type";
+import { createWalletPayout, listPayoutBanks, listPayoutDestinations, registerPayoutDestination, resolvePayoutAccount } from "./payout";
 
 
 // Get wallet balance
@@ -24,13 +21,21 @@ export const useWalletBalance = () =>
 export const useWithdrawWallet = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: WithdrawPayload) => withdrawFromWallet(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["wallet-balance"] });
-      queryClient.invalidateQueries({ queryKey: ["wallet-transactions"] });
+    mutationFn: (data: { destinationId: string; amount: number; pin: string }) => createWalletPayout(data),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["wallet-balance"] }),
+        queryClient.invalidateQueries({ queryKey: ["wallet-transactions"] }),
+        queryClient.invalidateQueries({ queryKey: ["payouts"] }),
+      ]);
     },
   });
 };
+
+export const usePayoutBanks = () => useQuery({ queryKey: ["payout-banks"], queryFn: listPayoutBanks });
+export const usePayoutDestinations = () => useQuery({ queryKey: ["payout-destinations"], queryFn: listPayoutDestinations });
+export const useRegisterPayoutDestination = () => useMutation({ mutationFn: registerPayoutDestination });
+export const useResolvePayoutAccount = () => useMutation({ mutationFn: resolvePayoutAccount });
 
 // Get all wallet transactions
 export const useWalletTransactions = () =>
