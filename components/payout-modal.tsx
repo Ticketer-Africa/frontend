@@ -45,6 +45,17 @@ interface PayoutModalProps {
 
 const emptyForm = { amount: 0, destinationId: "", pin: "" };
 
+// Accounts that can't take payouts yet stay listed (disabled) so a newly added
+// account doesn't vanish while it's in review.
+function destinationNote(destination: PayoutDestination) {
+  if (destination.isUsable) return null;
+  switch (destination.status?.toUpperCase()) {
+    case "PENDING_REVIEW": return "In review";
+    case "REJECTED": return "Not approved";
+    default: return "Unavailable";
+  }
+}
+
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
   return (
@@ -204,7 +215,12 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
               <label className="block text-sm font-medium text-foreground mb-1">Bank account</label>
               <Select value={formData.destinationId} onValueChange={(destinationId) => setFormData((prev) => ({ ...prev, destinationId }))} disabled={isPending}>
                 <SelectTrigger className={`bg-muted border-border rounded-xl ${fieldErrors.destinationId ? "border-red-500" : ""}`}><SelectValue placeholder="Select an approved account" /></SelectTrigger>
-                <SelectContent>{destinations?.filter((d: PayoutDestination) => d.isUsable).map((d: PayoutDestination) => <SelectItem key={d.id} value={d.id}>{d.label} · {d.bankName || "Bank"} •••• {d.last4}</SelectItem>)}</SelectContent>
+                <SelectContent>
+                  {destinations?.length ? destinations.map((d: PayoutDestination) => {
+                    const note = destinationNote(d);
+                    return <SelectItem key={d.id} value={d.id} disabled={!d.isUsable}>{d.label} · {d.bankName || "Bank"} •••• {d.last4}{note && ` · ${note}`}</SelectItem>;
+                  }) : <SelectItem value="none" disabled>No bank accounts yet. Add one below.</SelectItem>}
+                </SelectContent>
               </Select>
               <FieldError message={fieldErrors.destinationId} />
               <button type="button" className="mt-2 text-sm text-home-accent underline" onClick={() => setAddingDestination((value) => !value)}>Add a bank account</button>

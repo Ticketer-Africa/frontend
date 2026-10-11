@@ -26,7 +26,7 @@ const usableDestination: Destination = {
   bankName: "GTBank",
   last4: "6789",
   resolvedAccountName: "ADA OBI",
-  status: "approved",
+  status: "APPROVED",
   statusReason: null,
   isUsable: true,
   isDefault: true,
@@ -36,7 +36,7 @@ const pendingDestination: Destination = {
   id: "dest_pending",
   label: "Pending account",
   last4: "1111",
-  status: "pending_review",
+  status: "PENDING_REVIEW",
   isUsable: false,
   isDefault: false,
 };
@@ -81,8 +81,8 @@ vi.mock("@/components/ui/select", () => ({
     </select>
   ),
   SelectContent: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  SelectItem: ({ value, children }: { value: string; children: React.ReactNode }) => (
-    <option value={value}>{children}</option>
+  SelectItem: ({ value, disabled, children }: { value: string; disabled?: boolean; children: React.ReactNode }) => (
+    <option value={value} disabled={disabled}>{children}</option>
   ),
   SelectTrigger: () => null,
   SelectValue: () => null,
@@ -140,11 +140,43 @@ describe("PayoutModal", () => {
     Object.defineProperty(window, "location", { configurable: true, value: originalLocation });
   });
 
-  it("only offers usable destinations in the account select", () => {
+  it("lists accounts in review but only lets usable ones be chosen", () => {
     render(<PayoutModal isOpen onClose={onClose} availableBalance={50000} />);
 
-    expect(screen.getByRole("option", { name: /Main account/ })).toBeInTheDocument();
-    expect(screen.queryByRole("option", { name: /Pending account/ })).not.toBeInTheDocument();
+    expect(screen.getByRole("option", { name: /Main account/ })).toBeEnabled();
+    const pending = screen.getByRole("option", { name: /Pending account/ });
+    expect(pending).toHaveTextContent("In review");
+    expect(pending).toBeDisabled();
+  });
+
+  it("says so when there are no bank accounts yet", () => {
+    destinations = [];
+    render(<PayoutModal isOpen onClose={onClose} availableBalance={50000} />);
+
+    expect(screen.getByText("No bank accounts yet. Add one below.")).toBeInTheDocument();
+  });
+
+  it("keeps a newly added account visible while it is in review", async () => {
+    const reviewed: Destination = { ...pendingDestination, id: "dest_review", label: "New account" };
+    destinations = [];
+    resolveAccount.mockResolvedValue({ accountName: "ADA OBI" });
+    registerDestination.mockResolvedValue(reviewed);
+    refetchDestinations.mockImplementation(async () => {
+      destinations = [reviewed];
+      return {};
+    });
+
+    const { rerender } = render(<PayoutModal isOpen onClose={onClose} availableBalance={50000} />);
+    fireEvent.click(screen.getByRole("button", { name: "Add a bank account" }));
+    fireEvent.change(screen.getByPlaceholderText("Account label"), { target: { value: "New account" } });
+    fireEvent.change(bankSelect(), { target: { value: "058" } });
+    fireEvent.change(screen.getByPlaceholderText("10-digit account number"), { target: { value: "0123456789" } });
+    fireEvent.click(screen.getByRole("button", { name: "Verify account" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Confirm and add account" }));
+
+    await waitFor(() => expect(toast.message).toHaveBeenCalledWith("Account sent for review", expect.anything()));
+    rerender(<PayoutModal isOpen onClose={onClose} availableBalance={50000} />);
+    expect(screen.getByRole("option", { name: /New account/ })).toHaveTextContent("In review");
   });
 
   it("withdraws to an existing destination, stays on the page and closes after success", async () => {
