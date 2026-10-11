@@ -14,7 +14,13 @@ export async function generateMetadata({
     const description = truncateDescription(
       event.description || seoConfig.defaultDescription
     );
-    const image = event.bannerUrl || seoConfig.defaultImage;
+    // Point previews at the resized copy; the banner filename changes when
+    // the organizer uploads a new one, so it doubles as a cache buster.
+    const image = event.bannerUrl
+      ? generateCanonicalUrl(
+          `/api/og/events/${event.slug}?v=${encodeURIComponent(event.bannerUrl.split("/").pop() ?? "")}`
+        )
+      : seoConfig.defaultImage;
     const url = generateCanonicalUrl(`/events/${event.slug}`);
 
     return {
@@ -27,7 +33,7 @@ export async function generateMetadata({
         url,
         siteName: seoConfig.siteName,
         type: "website",
-        images: [{ url: image, width: 1200, height: 630, alt: event.name }],
+        images: [{ url: image, alt: event.name }],
       },
       twitter: {
         card: "summary_large_image",
