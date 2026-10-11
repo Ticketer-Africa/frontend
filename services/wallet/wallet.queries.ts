@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   checkWalletBalance,
   withdrawFromWallet,
@@ -21,10 +21,16 @@ export const useWalletBalance = () =>
   });
 
 // Withdraw from wallet
-export const useWithdrawWallet = () =>
-  useMutation({
+export const useWithdrawWallet = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
     mutationFn: (data: WithdrawPayload) => withdrawFromWallet(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wallet-balance"] });
+      queryClient.invalidateQueries({ queryKey: ["wallet-transactions"] });
+    },
   });
+};
 
 // Get all wallet transactions
 export const useWalletTransactions = () =>
