@@ -116,16 +116,15 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
 
     setPinError("");
     try {
-      const response = await requestPayout({
+      await requestPayout({
         ...formData,
         email: user!.email,
         name: user!.name,
         narration: formData.narration || undefined,
       });
       toast.success("Payout request submitted", {
-        description: "Redirecting you to checkout…",
+        description: "Your withdrawal is on its way to your bank account.",
       });
-      window.location.href = response.checkoutUrl;
       handleClose();
     } catch (error: any) {
       toast.error("Payout request failed", {
