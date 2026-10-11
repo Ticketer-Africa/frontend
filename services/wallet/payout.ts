@@ -18,7 +18,7 @@ export async function listPayoutDestinations(): Promise<PayoutDestination[]> {
 export async function resolvePayoutAccount(input: {bankCode:string; accountNumber:string}): Promise<{accountName:string; bankName?:string}> {
   return (await axiosInstance.post(endpoint("resolve-account"), input)).data;
 }
-export async function registerPayoutDestination(input: {label:string; bankCode:string; accountNumber:string}): Promise<PayoutDestination> {
+export async function registerPayoutDestination(input: {label:string; bankCode:string; accountNumber:string; pin:string}): Promise<PayoutDestination> {
   return (await axiosInstance.post(endpoint("destinations"), input)).data;
 }
 export async function createWalletPayout(input: {destinationId:string; amount:number; pin:string}) {
