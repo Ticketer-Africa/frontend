@@ -2,15 +2,6 @@ export interface FundWalletPayload {
   amount: number;
 }
 
-export interface WithdrawPayload {
-  email: string;
-  name: string;
-  amount: number;
-  account_number: string;
-  bank_code: string;
-  narration?: string;
-}
-
 export interface CheckoutUrlResponse {
   checkoutUrl: string;
 }
