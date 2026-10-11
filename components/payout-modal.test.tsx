@@ -172,7 +172,8 @@ describe("PayoutModal", () => {
     fireEvent.change(bankSelect(), { target: { value: "058" } });
     fireEvent.change(screen.getByPlaceholderText("10-digit account number"), { target: { value: "0123456789" } });
     fireEvent.click(screen.getByRole("button", { name: "Verify account" }));
-    fireEvent.click(await screen.findByRole("button", { name: "Confirm and add account" }));
+    fireEvent.change(await screen.findByLabelText("Wallet PIN"), { target: { value: "1234" } });
+    fireEvent.click(screen.getByRole("button", { name: "Confirm and add account" }));
 
     await waitFor(() => expect(toast.message).toHaveBeenCalledWith("Account sent for review", expect.anything()));
     rerender(<PayoutModal isOpen onClose={onClose} availableBalance={50000} />);
@@ -239,11 +240,12 @@ describe("PayoutModal", () => {
     expect(resolveAccount).toHaveBeenCalledWith({ bankCode: "058", accountNumber: "0123454321" });
     expect(registerDestination).not.toHaveBeenCalled();
 
-    // Step 2: the user confirms the resolved name and the destination is registered.
+    // Step 2: the user confirms the resolved name with their wallet PIN and the destination is registered.
+    fireEvent.change(screen.getByLabelText("Wallet PIN"), { target: { value: "9876" } });
     fireEvent.click(screen.getByRole("button", { name: "Confirm and add account" }));
 
     await waitFor(() => expect(registerDestination).toHaveBeenCalledTimes(1));
-    expect(registerDestination).toHaveBeenCalledWith({ label: "Savings", bankCode: "058", accountNumber: "0123454321" });
+    expect(registerDestination).toHaveBeenCalledWith({ label: "Savings", bankCode: "058", accountNumber: "0123454321", pin: "9876" });
     expect(resolveAccount.mock.invocationCallOrder[0]).toBeLessThan(registerDestination.mock.invocationCallOrder[0]);
     await waitFor(() => expect(toast.success).toHaveBeenCalledWith("Bank account added", expect.anything()));
     expect(refetchDestinations).toHaveBeenCalled();
@@ -259,6 +261,39 @@ describe("PayoutModal", () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(requestPayout).toHaveBeenCalledWith({ destinationId: "dest_new", amount: 2500, pin: "4321" });
     expect(assignedHrefs).toEqual([]);
+  });
+
+  async function verifyNewAccount() {
+    resolveAccount.mockResolvedValue({ accountName: "ADA OBI" });
+    render(<PayoutModal isOpen onClose={onClose} availableBalance={50000} />);
+    fireEvent.click(screen.getByRole("button", { name: "Add a bank account" }));
+    fireEvent.change(screen.getByPlaceholderText("Account label"), { target: { value: "Savings" } });
+    fireEvent.change(bankSelect(), { target: { value: "058" } });
+    fireEvent.change(screen.getByPlaceholderText("10-digit account number"), { target: { value: "0123456789" } });
+    fireEvent.click(screen.getByRole("button", { name: "Verify account" }));
+    await screen.findByLabelText("Wallet PIN");
+  }
+
+  it("won't add an account without a 4-digit wallet PIN", async () => {
+    await verifyNewAccount();
+
+    fireEvent.change(screen.getByLabelText("Wallet PIN"), { target: { value: "12" } });
+    fireEvent.click(screen.getByRole("button", { name: "Confirm and add account" }));
+
+    expect(await screen.findByText("Enter your 4-digit wallet PIN")).toBeInTheDocument();
+    expect(registerDestination).not.toHaveBeenCalled();
+  });
+
+  it("tells the user when the wallet PIN is wrong", async () => {
+    registerDestination.mockRejectedValue({ response: { data: { message: "Invalid PIN provided." } } });
+    await verifyNewAccount();
+
+    fireEvent.change(screen.getByLabelText("Wallet PIN"), { target: { value: "0000" } });
+    fireEvent.click(screen.getByRole("button", { name: "Confirm and add account" }));
+
+    expect(await screen.findByText("Incorrect wallet PIN")).toBeInTheDocument();
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(screen.getByLabelText("Wallet PIN")).toHaveValue("");
   });
 
   it("shows an error toast and stays open when the withdrawal fails", async () => {

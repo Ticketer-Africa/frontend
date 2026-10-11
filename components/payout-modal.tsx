@@ -73,6 +73,8 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
   const [newBankCode, setNewBankCode] = useState("");
   const [newAccountNumber, setNewAccountNumber] = useState("");
   const [resolvedName, setResolvedName] = useState("");
+  const [newPin, setNewPin] = useState("");
+  const [newPinError, setNewPinError] = useState("");
   const [step, setStep] = useState<"details" | "pin">("details");
   const [formData, setFormData] = useState<Omit<WithdrawPayload, "email" | "name">>(emptyForm);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -151,8 +153,13 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
   };
 
   const handleRegisterDestination = async () => {
+    if (!/^\d{4}$/.test(newPin)) {
+      setNewPinError("Enter your 4-digit wallet PIN");
+      return;
+    }
+    setNewPinError("");
     try {
-      const destination = await registerDestination({ label: newLabel.trim(), bankCode: newBankCode, accountNumber: newAccountNumber });
+      const destination = await registerDestination({ label: newLabel.trim(), bankCode: newBankCode, accountNumber: newAccountNumber, pin: newPin });
       await refetchDestinations();
       if (destination.isUsable) {
         setFormData((prev) => ({ ...prev, destinationId: destination.id }));
@@ -163,8 +170,17 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
       setAddingDestination(false);
       setNewLabel(""); setNewBankCode(""); setNewAccountNumber("");
       setResolvedName("");
-    } catch {
-      toast.error("Couldn’t add this bank account", { description: "Check the details and try again. Contact support if the problem continues." });
+      setNewPin("");
+    } catch (error: any) {
+      const message: string = error?.response?.data?.message ?? "";
+      if (/invalid pin/i.test(message)) {
+        setNewPin("");
+        setNewPinError("Incorrect wallet PIN");
+      } else if (/pin not set/i.test(message)) {
+        setNewPinError("Set a wallet PIN before adding a bank account");
+      } else {
+        toast.error("Couldn’t add this bank account", { description: "Check the details and try again. Contact support if the problem continues." });
+      }
     }
   };
 
@@ -229,7 +245,7 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
               <Input value={newLabel} onChange={(e) => { setNewLabel(e.target.value); setResolvedName(""); }} placeholder="Account label" disabled={registering || resolving} />
               <Select value={newBankCode} onValueChange={(value) => { setNewBankCode(value); setResolvedName(""); }} disabled={registering || resolving}><SelectTrigger><SelectValue placeholder="Select a bank" /></SelectTrigger><SelectContent>{banks?.map((bank) => <SelectItem key={bank.code} value={bank.code}>{bank.name}</SelectItem>)}</SelectContent></Select>
               <Input value={newAccountNumber} onChange={(e) => { setNewAccountNumber(e.target.value.replace(/\D/g, "").slice(0, 10)); setResolvedName(""); }} placeholder="10-digit account number" inputMode="numeric" disabled={registering || resolving} />
-              {resolvedName ? <><p className="text-sm text-foreground">Account holder: <strong>{resolvedName}</strong></p><Button type="button" onClick={handleRegisterDestination} disabled={registering}>{registering ? "Adding…" : "Confirm and add account"}</Button></> : <Button type="button" onClick={handleResolveDestination} disabled={registering || resolving}>{resolving ? "Verifying…" : "Verify account"}</Button>}
+              {resolvedName ? <><p className="text-sm text-foreground">Account holder: <strong>{resolvedName}</strong></p><div><Input type="password" aria-label="Wallet PIN" placeholder="Wallet PIN" inputMode="numeric" autoComplete="off" value={newPin} onChange={(e) => { setNewPin(e.target.value.replace(/\D/g, "").slice(0, 4)); setNewPinError(""); }} className={newPinError ? "border-red-500" : ""} disabled={registering} /><FieldError message={newPinError} /></div><Button type="button" onClick={handleRegisterDestination} disabled={registering}>{registering ? "Adding…" : "Confirm and add account"}</Button></> : <Button type="button" onClick={handleResolveDestination} disabled={registering || resolving}>{resolving ? "Verifying…" : "Verify account"}</Button>}
             </div>}
 
             <div className="bg-accent border border-border rounded-lg p-3 w-full">
