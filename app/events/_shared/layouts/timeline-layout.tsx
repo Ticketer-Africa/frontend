@@ -147,7 +147,6 @@ export function TimelineLayout({ event, mode }: Props) {
                 }
                 isPreview={mode === "preview"}
                 feeMode={event.feeMode}
-                primaryFeeBps={event.primaryFeeBps}
               />
             ))}
           </div>

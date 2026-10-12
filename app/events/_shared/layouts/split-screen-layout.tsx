@@ -99,7 +99,6 @@ export function SplitScreenLayout({ event, mode }: Props) {
               }
               isPreview={mode === "preview"}
               feeMode={event.feeMode}
-              primaryFeeBps={event.primaryFeeBps}
             />
           ))}
           <Button

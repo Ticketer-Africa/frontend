@@ -12,7 +12,6 @@ type Props = {
   onToggle: () => void;
   onQuantityChange: (delta: number) => void;
   feeMode: "ORGANIZER" | "ATTENDEE";
-  primaryFeeBps: number;
   isPreview?: boolean;
 };
 
@@ -23,15 +22,13 @@ export function TicketCategoryCardV2({
   onToggle,
   onQuantityChange,
   feeMode,
-  primaryFeeBps,
   isPreview = false,
 }: Props) {
   const available = category.maxTickets - (category.minted ?? 0);
   const outOfStock = available <= 0;
-  const fee =
-    feeMode === "ATTENDEE"
-      ? Math.floor((category.displayPrice * primaryFeeBps) / 10000)
-      : 0;
+  // displayPrice already carries every attendee-side fee (platform plus the
+  // gateway's, with VAT), so the fee is just the difference.
+  const fee = feeMode === "ATTENDEE" ? category.displayPrice - category.price : 0;
 
   return (
     <div

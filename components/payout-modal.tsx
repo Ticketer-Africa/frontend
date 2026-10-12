@@ -19,17 +19,22 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { usePayoutBanks, usePayoutDestinations, useRegisterPayoutDestination, useResolvePayoutAccount, useWithdrawWallet } from "@/services/wallet/wallet.queries";
+import { usePayoutBanks, usePayoutDestinations, useQuoteWithdrawal, useRegisterPayoutDestination, useResolvePayoutAccount, useWithdrawWallet } from "@/services/wallet/wallet.queries";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/helpers";
 import { useUser } from "@/lib/auth-context";
-import type { PayoutDestination } from "@/services/wallet/payout";
+import type { PayoutDestination, WithdrawalQuote } from "@/services/wallet/payout";
+
+// Matches MIN_WITHDRAWAL_KOBO on the backend: below this the transfer fee
+// would be more than 5% of the withdrawal.
+const MIN_WITHDRAWAL = 1000;
 
 const createWithdrawPayloadSchema = (availableBalance: number) =>
   z.object({
     amount: z
       .number({ invalid_type_error: "Enter a valid amount" })
       .positive("Amount must be greater than 0")
+      .min(MIN_WITHDRAWAL, `The minimum withdrawal is ${formatPrice(MIN_WITHDRAWAL)}`)
       .max(availableBalance, `Amount cannot exceed ${formatPrice(availableBalance)}`),
     destinationId: z.string().min(1, "Select an approved bank account"),
     pin: z.string().regex(/^\d{4}$/, "PIN must be exactly 4 digits"),
@@ -79,16 +84,18 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
   const [formData, setFormData] = useState<Omit<WithdrawPayload, "email" | "name">>(emptyForm);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [pinError, setPinError] = useState("");
+  const [quote, setQuote] = useState<WithdrawalQuote | null>(null);
   const { mutateAsync: requestPayout, isPending } = useWithdrawWallet();
   const { data: banks } = usePayoutBanks();
   const { data: destinations, refetch: refetchDestinations } = usePayoutDestinations();
   const { mutateAsync: registerDestination, isPending: registering } = useRegisterPayoutDestination();
   const { mutateAsync: resolveAccount, isPending: resolving } = useResolvePayoutAccount();
+  const { mutateAsync: quoteWithdrawal, isPending: quoting } = useQuoteWithdrawal();
 
   const clearFieldError = (field: string) =>
     setFieldErrors((prev) => { const next = { ...prev }; delete next[field]; return next; });
 
-  const handleDetailsSubmit = () => {
+  const handleDetailsSubmit = async () => {
     if (!user) {
       toast.error("Login required", {
         description: "You must be logged in to request a payout.",
@@ -110,6 +117,14 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
     }
 
     setFieldErrors({});
+    // The transfer fee comes out of the withdrawal, so show what actually
+    // lands in the account before asking for the PIN.
+    try {
+      setQuote(await quoteWithdrawal(formData.amount));
+    } catch {
+      toast.error("Couldn’t work out the transfer fee", { description: "Check your connection and try again." });
+      return;
+    }
     setStep("pin");
   };
 
@@ -190,6 +205,7 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
     setFormData(emptyForm);
     setFieldErrors({});
     setPinError("");
+    setQuote(null);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -258,13 +274,30 @@ export function PayoutModal({ isOpen, onClose, availableBalance }: PayoutModalPr
               <Button variant="outline" className="flex-1 bg-transparent border-border hover:bg-accent text-foreground rounded-xl" onClick={handleClose} disabled={isPending}>
                 Cancel
               </Button>
-              <Button variant="homeAccent" className="flex-1 px-6 shadow-lg" onClick={handleDetailsSubmit} disabled={isPending}>
-                Next
+              <Button variant="homeAccent" className="flex-1 px-6 shadow-lg" onClick={handleDetailsSubmit} disabled={isPending || quoting}>
+                {quoting ? "Checking…" : "Next"}
               </Button>
             </div>
           </>
         ) : (
           <>
+            {quote && (
+              <dl className="w-full space-y-2 rounded-lg border border-border p-3 text-sm">
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">Withdrawal</dt>
+                  <dd className="text-foreground">{formatPrice(quote.amount)}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground">Transfer fee</dt>
+                  <dd className="text-foreground">−{formatPrice(quote.fee)}</dd>
+                </div>
+                <div className="flex justify-between border-t border-border pt-2 font-semibold">
+                  <dt className="text-foreground">You&rsquo;ll receive</dt>
+                  <dd className="text-foreground">{formatPrice(quote.netAmount)}</dd>
+                </div>
+              </dl>
+            )}
+
             <div className="flex flex-col items-center gap-2 w-full">
               <label htmlFor="pin" className="text-sm font-medium text-foreground text-center">
                 Enter Your PIN
