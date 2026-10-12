@@ -1,9 +1,22 @@
 import { TicketCategory } from "@/app/events/[id]/_components/ticket-cards";
 import { TicketResale } from "@/types/tickets.type";
 
-// Constants matching Backend Logic
-export const GATEWAY_FEE_BPS = 150; // 1.5%
+// Constants matching Backend Logic (backend/src/common/helpers/fee.helper.ts)
+export const GATEWAY_FEE_BPS = 150; // Kora's 1.5% pay-in fee
+export const GATEWAY_FEE_VAT_BPS = 750; // 7.5% VAT Kora adds to that fee
 export const DEFAULT_PLATFORM_FEE_BPS = 350; // 3.5% (Matches backend default)
+
+/**
+ * Kora's pay-in fee plus VAT on a Naira amount, rounded up to the kobo the
+ * same way the backend charges it (₦3,500 → ₦56.44).
+ */
+export function calculateGatewayFee(amount: number): number {
+  const kobo = Math.round(amount * 100);
+  const feeKobo = Math.ceil(
+    (kobo * GATEWAY_FEE_BPS * (10000 + GATEWAY_FEE_VAT_BPS)) / 1e8
+  );
+  return feeKobo / 100;
+}
 
 export interface Event {
   id: string;
@@ -51,22 +64,15 @@ export function calculateCosts(
       }, 0) || 0;
   }
 
-  // 2. Determine Fee Rates
+  // 2. Fees, in kobo like the backend: platform fee floors, gateway fee
+  // (with VAT) rounds up.
   const platformBps = primaryFee ?? DEFAULT_PLATFORM_FEE_BPS;
-  const totalFeeBps = platformBps + GATEWAY_FEE_BPS;
+  const baseKobo = Math.round(baseAmount * 100);
+  const platformFee = Math.floor((baseKobo * platformBps) / 10000) / 100;
+  const gatewayFee = calculateGatewayFee(baseAmount);
 
-  // 3. Calculate Total Fee (Combined)
-  const totalFees =
-    baseAmount > 0 ? Math.floor((baseAmount * totalFeeBps) / 10000) : 0;
-
-  // 4. Split for Display
-  const gatewayFee =
-    baseAmount > 0 ? Math.floor((baseAmount * GATEWAY_FEE_BPS) / 10000) : 0;
-
-  const platformFee = totalFees - gatewayFee;
-
-  // 5. Final Total
-  const totalAmount = baseAmount + totalFees;
+  // 3. Final Total
+  const totalAmount = (baseKobo + Math.round((platformFee + gatewayFee) * 100)) / 100;
 
   return {
     baseAmount,

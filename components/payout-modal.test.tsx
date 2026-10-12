@@ -18,6 +18,7 @@ const requestPayout = vi.fn();
 const resolveAccount = vi.fn();
 const registerDestination = vi.fn();
 const refetchDestinations = vi.fn();
+const quoteWithdrawal = vi.fn();
 const onClose = vi.fn();
 
 const usableDestination: Destination = {
@@ -54,6 +55,7 @@ vi.mock("@/services/wallet/wallet.queries", () => ({
   usePayoutDestinations: () => ({ data: destinations, refetch: refetchDestinations }),
   useRegisterPayoutDestination: () => ({ mutateAsync: registerDestination, isPending: false }),
   useResolvePayoutAccount: () => ({ mutateAsync: resolveAccount, isPending: false }),
+  useQuoteWithdrawal: () => ({ mutateAsync: quoteWithdrawal, isPending: false }),
 }));
 
 vi.mock("sonner", () => ({ toast: { success: vi.fn(), error: vi.fn(), message: vi.fn() } }));
@@ -105,8 +107,8 @@ function enterAmount(value: string) {
   fireEvent.change(screen.getByPlaceholderText("Enter amount"), { target: { name: "amount", value } });
 }
 
-function submitPin(pin: string) {
-  fireEvent.change(screen.getByLabelText("PIN"), { target: { value: pin } });
+async function submitPin(pin: string) {
+  fireEvent.change(await screen.findByLabelText("PIN"), { target: { value: pin } });
   fireEvent.click(screen.getByRole("button", { name: "Submit" }));
 }
 
@@ -121,6 +123,13 @@ describe("PayoutModal", () => {
     registerDestination.mockReset();
     refetchDestinations.mockReset();
     refetchDestinations.mockResolvedValue({});
+    quoteWithdrawal.mockReset();
+    quoteWithdrawal.mockImplementation(async (amount: number) => ({
+      amount,
+      fee: 53.75,
+      netAmount: amount - 53.75,
+      minimumAmount: 1000,
+    }));
     destinations = [usableDestination, pendingDestination];
 
     // Any navigation (window.location.href = ...) would be recorded here.
@@ -189,7 +198,7 @@ describe("PayoutModal", () => {
     enterAmount("1000");
     fireEvent.change(destinationSelect(), { target: { value: "dest_ok" } });
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    submitPin("1234");
+    await submitPin("1234");
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(requestPayout).toHaveBeenCalledTimes(1);
@@ -197,6 +206,30 @@ describe("PayoutModal", () => {
     expect(toast.success).toHaveBeenCalledWith("Payout request submitted", expect.anything());
     expect(toast.error).not.toHaveBeenCalled();
     expect(assignedHrefs).toEqual([]);
+  });
+
+  it("shows the transfer fee and what the account receives before the PIN is entered", async () => {
+    render(<PayoutModal isOpen onClose={onClose} availableBalance={50000} />);
+
+    enterAmount("1000");
+    fireEvent.change(destinationSelect(), { target: { value: "dest_ok" } });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+
+    await screen.findByLabelText("PIN");
+    expect(quoteWithdrawal).toHaveBeenCalledWith(1000);
+    expect(screen.getByText("Transfer fee")).toBeInTheDocument();
+    expect(screen.getByText("You’ll receive")).toBeInTheDocument();
+  });
+
+  it("won't withdraw less than the minimum", () => {
+    render(<PayoutModal isOpen onClose={onClose} availableBalance={50000} />);
+
+    enterAmount("500");
+    fireEvent.change(destinationSelect(), { target: { value: "dest_ok" } });
+    fireEvent.click(screen.getByRole("button", { name: "Next" }));
+
+    expect(screen.getByText(/The minimum withdrawal is/)).toBeInTheDocument();
+    expect(quoteWithdrawal).not.toHaveBeenCalled();
   });
 
   it("does not advance to the PIN step without a destination", () => {
@@ -256,7 +289,7 @@ describe("PayoutModal", () => {
 
     enterAmount("2500");
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    submitPin("4321");
+    await submitPin("4321");
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(requestPayout).toHaveBeenCalledWith({ destinationId: "dest_new", amount: 2500, pin: "4321" });
@@ -304,7 +337,7 @@ describe("PayoutModal", () => {
     enterAmount("1000");
     fireEvent.change(destinationSelect(), { target: { value: "dest_ok" } });
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    submitPin("1234");
+    await submitPin("1234");
 
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith("Payout request failed", expect.anything()));
     expect(requestPayout).toHaveBeenCalledWith({ destinationId: "dest_ok", amount: 1000, pin: "1234" });

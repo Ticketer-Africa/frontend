@@ -101,7 +101,6 @@ export function HeroOverlayLayout({ event, mode }: Props) {
                   }
                   isPreview={mode === "preview"}
                   feeMode={event.feeMode}
-                  primaryFeeBps={event.primaryFeeBps}
                 />
               ))}
             </div>

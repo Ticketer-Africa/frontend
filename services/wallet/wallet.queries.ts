@@ -6,7 +6,7 @@ import {
   setWalletPin,
 } from "./wallet";
 import type { SetWalletPinPayload } from "@/types/wallet.type";
-import { createWalletPayout, listPayoutBanks, listPayoutDestinations, registerPayoutDestination, resolvePayoutAccount } from "./payout";
+import { createWalletPayout, listPayoutBanks, listPayoutDestinations, quoteWalletPayout, registerPayoutDestination, resolvePayoutAccount } from "./payout";
 
 
 // Get wallet balance
@@ -36,6 +36,7 @@ export const usePayoutBanks = () => useQuery({ queryKey: ["payout-banks"], query
 export const usePayoutDestinations = () => useQuery({ queryKey: ["payout-destinations"], queryFn: listPayoutDestinations });
 export const useRegisterPayoutDestination = () => useMutation({ mutationFn: registerPayoutDestination });
 export const useResolvePayoutAccount = () => useMutation({ mutationFn: resolvePayoutAccount });
+export const useQuoteWithdrawal = () => useMutation({ mutationFn: quoteWalletPayout });
 
 // Get all wallet transactions
 export const useWalletTransactions = () =>

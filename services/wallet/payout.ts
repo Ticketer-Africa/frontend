@@ -21,6 +21,18 @@ export async function resolvePayoutAccount(input: {bankCode:string; accountNumbe
 export async function registerPayoutDestination(input: {label:string; bankCode:string; accountNumber:string; pin:string}): Promise<PayoutDestination> {
   return (await axiosInstance.post(endpoint("destinations"), input)).data;
 }
+export interface WithdrawalQuote {
+  /** Debited from the wallet. */
+  amount: number;
+  /** The provider's transfer fee, kept back from the withdrawal. */
+  fee: number;
+  /** What the bank account receives. */
+  netAmount: number;
+  minimumAmount: number;
+}
+export async function quoteWalletPayout(amount: number): Promise<WithdrawalQuote> {
+  return (await axiosInstance.get(endpoint("withdraw/quote"), { params: { amount } })).data;
+}
 export async function createWalletPayout(input: {destinationId:string; amount:number; pin:string}) {
   return (await axiosInstance.post(endpoint("withdraw"), input)).data;
 }
