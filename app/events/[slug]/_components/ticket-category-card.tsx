@@ -2,6 +2,7 @@
 import { TicketCategoryV2 } from "@/types/events-v2.type";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { MAX_TICKETS_PER_ORDER } from "@/lib/ticket-limits";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Add01Icon, MinusSignIcon, UserGroupIcon } from "@hugeicons/core-free-icons";
 
@@ -88,7 +89,7 @@ export function TicketCategoryCardV2({
               variant="ghost"
               className="h-8 w-8 text-[var(--home-text)] hover:bg-[var(--home-card-elevated)] hover:text-[var(--home-text-highlight)]"
               onClick={() => onQuantityChange(1)}
-              disabled={isPreview || quantity >= available || quantity >= 10}
+              disabled={isPreview || quantity >= available || quantity >= MAX_TICKETS_PER_ORDER}
             >
               <HugeiconsIcon icon={Add01Icon} className="h-4 w-4" />
             </Button>

@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useUser } from "@/lib/auth-context";
 import { useBuyTicket } from "@/services/tickets/tickets.queries";
 import { toast } from "sonner";
+import { MAX_TICKETS_PER_ORDER } from "@/lib/ticket-limits";
 import { BuyTicketPayload } from "@/types/tickets.type";
 
 import { TicketPurchaseModalProps, ModalStep, calculateCosts } from "./types";
@@ -48,16 +49,16 @@ export function TicketPurchaseModal({
         if (newQty < 0) return prev;
         if (resaleTicket && newQty < 1) return prev;
 
-        // Can't exceed 10 per category or 10 total
-        if (newQty > 10) {
+        // Can't exceed the per-order cap in one category or in total
+        if (newQty > MAX_TICKETS_PER_ORDER) {
           toast.error("Ticket limit reached", {
-            description: "You can select up to 10 tickets per category.",
+            description: `You can select up to ${MAX_TICKETS_PER_ORDER} tickets per category.`,
           });
           return prev;
         }
-        if (currentTotal - currentQty + newQty > 10) {
+        if (currentTotal - currentQty + newQty > MAX_TICKETS_PER_ORDER) {
           toast.error("Ticket limit reached", {
-            description: "You can select up to 10 tickets per purchase.",
+            description: `You can select up to ${MAX_TICKETS_PER_ORDER} tickets per purchase.`,
           });
           return prev;
         }
