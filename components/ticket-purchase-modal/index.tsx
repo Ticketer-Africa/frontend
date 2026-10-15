@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { useUser } from "@/lib/auth-context";
 import { useBuyTicket } from "@/services/tickets/tickets.queries";
 import { toast } from "sonner";
-import { MAX_TICKETS_PER_ORDER } from "@/lib/ticket-limits";
+import { MAX_TICKETS_PER_CATEGORY } from "@/lib/ticket-limits";
 import { BuyTicketPayload } from "@/types/tickets.type";
 
 import { TicketPurchaseModalProps, ModalStep, calculateCosts } from "./types";
@@ -38,10 +38,6 @@ export function TicketPurchaseModal({
   const handleQuantityChange = useCallback(
     (categoryId: string, delta: number) => {
       setQuantities((prev) => {
-        const currentTotal = Object.values(prev).reduce(
-          (sum, qty) => sum + qty,
-          0,
-        );
         const currentQty = prev[categoryId] || 0;
         const newQty = currentQty + delta;
 
@@ -49,16 +45,10 @@ export function TicketPurchaseModal({
         if (newQty < 0) return prev;
         if (resaleTicket && newQty < 1) return prev;
 
-        // Can't exceed the per-order cap in one category or in total
-        if (newQty > MAX_TICKETS_PER_ORDER) {
+        // Can't exceed the per-category cap
+        if (newQty > MAX_TICKETS_PER_CATEGORY) {
           toast.error("Ticket limit reached", {
-            description: `You can select up to ${MAX_TICKETS_PER_ORDER} tickets per category.`,
-          });
-          return prev;
-        }
-        if (currentTotal - currentQty + newQty > MAX_TICKETS_PER_ORDER) {
-          toast.error("Ticket limit reached", {
-            description: `You can select up to ${MAX_TICKETS_PER_ORDER} tickets per purchase.`,
+            description: `You can select up to ${MAX_TICKETS_PER_CATEGORY} tickets per category.`,
           });
           return prev;
         }

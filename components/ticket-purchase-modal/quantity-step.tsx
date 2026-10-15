@@ -4,7 +4,7 @@ import { memo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { formatDate, formatPrice, formatTime } from "@/lib/helpers";
-import { MAX_TICKETS_PER_ORDER } from "@/lib/ticket-limits";
+import { MAX_TICKETS_PER_CATEGORY } from "@/lib/ticket-limits";
 import {
   Tooltip,
   TooltipContent,
@@ -71,7 +71,7 @@ const CategoryQuantityRow = memo(function CategoryQuantityRow({
           size="sm"
           onClick={handleIncrement}
           disabled={
-            quantity >= MAX_TICKETS_PER_ORDER ||
+            quantity >= MAX_TICKETS_PER_CATEGORY ||
             category.maxTickets - (category.minted ?? 0) <= quantity
           }
           className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
@@ -131,7 +131,7 @@ export function QuantityStep({
               variant="outline"
               size="sm"
               onClick={() => onQuantityChange(resaleTicket.id, 1)}
-              disabled={(quantities[resaleTicket.id] || 1) >= MAX_TICKETS_PER_ORDER}
+              disabled={(quantities[resaleTicket.id] || 1) >= MAX_TICKETS_PER_CATEGORY}
               className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
             >
               <HugeiconsIcon icon={Add01Icon} className="w-4 h-4" />
@@ -152,7 +152,7 @@ export function QuantityStep({
       {/* Disclaimer */}
       <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
         <p className="text-xs text-amber-800">
-          <strong>Note:</strong> Maximum of {MAX_TICKETS_PER_ORDER} tickets per purchase. Tickets are
+          <strong>Note:</strong> Maximum of {MAX_TICKETS_PER_CATEGORY} tickets per ticket type. Tickets are
           non-refundable once purchased. Please verify your selection before
           proceeding.
         </p>

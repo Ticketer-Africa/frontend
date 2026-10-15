@@ -20,18 +20,7 @@ describe("useTicketSelection", () => {
     expect(result.current.totalAmount).toBe(15000);
   });
 
-  it("caps combined quantity across categories at 3", () => {
-    const { result } = renderHook(() => useTicketSelection(categories));
-
-    act(() => result.current.toggleCategory(categories[0]));
-    act(() => result.current.updateQuantity("t1", () => 2));
-    act(() => result.current.toggleCategory(categories[1]));
-    act(() => result.current.updateQuantity("t2", (q) => q + 5));
-
-    expect(result.current.totalTickets).toBe(3);
-  });
-
-  it("caps a single category at 3", () => {
+  it("caps each category at 3", () => {
     const { result } = renderHook(() => useTicketSelection(categories));
 
     act(() => result.current.toggleCategory(categories[0]));
@@ -41,45 +30,19 @@ describe("useTicketSelection", () => {
     expect(result.current.quantities.t1).toBe(3);
   });
 
-  it("won't select another category once the order is full", () => {
+  it("allows 3 in every category, with no cap on the order total", () => {
     const { result } = renderHook(() => useTicketSelection(categories));
 
     act(() => result.current.toggleCategory(categories[0]));
     act(() => result.current.updateQuantity("t1", () => 3));
     act(() => result.current.toggleCategory(categories[1]));
-
-    expect(result.current.selected.has("t2")).toBe(false);
-    expect(result.current.totalTickets).toBe(3);
-  });
-
-  it("doesn't count deselected categories toward the cap", () => {
-    const { result } = renderHook(() => useTicketSelection(categories));
-
-    act(() => result.current.toggleCategory(categories[0]));
-    act(() => result.current.updateQuantity("t1", () => 3));
-    act(() => result.current.toggleCategory(categories[0]));
-    act(() => result.current.toggleCategory(categories[1]));
-    act(() => result.current.updateQuantity("t2", () => 3));
+    act(() => result.current.updateQuantity("t2", (q) => q + 5));
 
     expect(result.current.quantities.t2).toBe(3);
-    expect(result.current.totalTickets).toBe(3);
+    expect(result.current.totalTickets).toBe(6);
   });
 
-  it("re-selecting a category trims its old quantity to what's left", () => {
-    const { result } = renderHook(() => useTicketSelection(categories));
-
-    act(() => result.current.toggleCategory(categories[0]));
-    act(() => result.current.updateQuantity("t1", () => 3));
-    act(() => result.current.toggleCategory(categories[0]));
-    act(() => result.current.toggleCategory(categories[1]));
-    act(() => result.current.updateQuantity("t2", () => 2));
-    act(() => result.current.toggleCategory(categories[0]));
-
-    expect(result.current.quantities.t1).toBe(1);
-    expect(result.current.totalTickets).toBe(3);
-  });
-
-  it("drops a saved checkout that holds more than 3 tickets", () => {
+  it("drops a saved checkout with more than 3 in a category", () => {
     sessionStorage.setItem(
       "checkoutData",
       JSON.stringify({ eventId: "e1", tickets: [{ ticketCategoryId: "t1", quantity: 5 }] }),
@@ -88,6 +51,24 @@ describe("useTicketSelection", () => {
     const { result } = renderHook(() => useTicketSelection(categories, "e1"));
 
     expect(result.current.selected.size).toBe(0);
+    sessionStorage.removeItem("checkoutData");
+  });
+
+  it("keeps a saved checkout with 3 in each category", () => {
+    sessionStorage.setItem(
+      "checkoutData",
+      JSON.stringify({
+        eventId: "e1",
+        tickets: [
+          { ticketCategoryId: "t1", quantity: 3 },
+          { ticketCategoryId: "t2", quantity: 3 },
+        ],
+      }),
+    );
+
+    const { result } = renderHook(() => useTicketSelection(categories, "e1"));
+
+    expect(result.current.totalTickets).toBe(6);
     sessionStorage.removeItem("checkoutData");
   });
 

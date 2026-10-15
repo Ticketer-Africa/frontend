@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { TicketCategoryV2 } from "@/types/events-v2.type";
-import { toast } from "sonner";
-import { MAX_TICKETS_PER_ORDER } from "@/lib/ticket-limits";
+import { MAX_TICKETS_PER_CATEGORY } from "@/lib/ticket-limits";
 
 function restoreFromCheckoutData(eventId?: string) {
   if (!eventId || typeof window === "undefined") return null;
@@ -16,8 +15,7 @@ function restoreFromCheckoutData(eventId?: string) {
       quantities[t.ticketCategoryId] = t.quantity;
     });
     // A selection saved before the cap was lowered would be rejected at checkout.
-    const total = Object.values(quantities).reduce((sum, qty) => sum + qty, 0);
-    if (total > MAX_TICKETS_PER_ORDER) return null;
+    if (Object.values(quantities).some((qty) => qty > MAX_TICKETS_PER_CATEGORY)) return null;
     return { selected, quantities };
   } catch {
     return null;
@@ -28,18 +26,6 @@ export function useTicketSelection(ticketCategories: TicketCategoryV2[], eventId
   const restored = restoreFromCheckoutData(eventId);
   const [selected, setSelected] = useState<Set<string>>(restored?.selected ?? new Set());
   const [quantities, setQuantities] = useState<Record<string, number>>(restored?.quantities ?? {});
-
-  // Deselected categories keep their quantity for re-selection, so only
-  // selected ones count toward the cap.
-  const selectedTotal = (q: Record<string, number>, excludeId?: string) =>
-    Array.from(selected)
-      .filter((id) => id !== excludeId)
-      .reduce((sum, id) => sum + (q[id] ?? 1), 0);
-
-  const showLimitToast = () =>
-    toast.error("Ticket limit reached", {
-      description: `You can select up to ${MAX_TICKETS_PER_ORDER} tickets per purchase.`,
-    });
 
   const toggleCategory = (category: TicketCategoryV2) => {
     const id = category.id;
@@ -52,13 +38,8 @@ export function useTicketSelection(ticketCategories: TicketCategoryV2[], eventId
       return;
     }
 
-    const remaining = MAX_TICKETS_PER_ORDER - selectedTotal(quantities);
-    if (remaining <= 0) {
-      showLimitToast();
-      return;
-    }
     setSelected((prev) => new Set(prev).add(id));
-    setQuantities((q) => ({ ...q, [id]: Math.min(q[id] || 1, remaining) }));
+    setQuantities((q) => (q[id] ? q : { ...q, [id]: 1 }));
   };
 
   const updateQuantity = (
@@ -68,15 +49,10 @@ export function useTicketSelection(ticketCategories: TicketCategoryV2[], eventId
     const category = ticketCategories.find((c) => c.id === id);
     if (!category) return;
 
-    const max = Math.min(category.maxTickets - (category.minted ?? 0), MAX_TICKETS_PER_ORDER);
+    const max = Math.min(category.maxTickets - (category.minted ?? 0), MAX_TICKETS_PER_CATEGORY);
     setQuantities((prev) => {
       const current = prev[id] ?? 1;
       const next = typeof value === "function" ? value(current) : value;
-
-      if (selectedTotal(prev, id) + next > MAX_TICKETS_PER_ORDER) {
-        showLimitToast();
-        return prev;
-      }
 
       return {
         ...prev,

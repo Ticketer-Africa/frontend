@@ -1,2 +1,2 @@
-/** Most tickets one order can hold, counted across all categories. The backend enforces the same cap. */
-export const MAX_TICKETS_PER_ORDER = 3;
+/** Most tickets of one category a single order can hold. The backend enforces the same cap. */
+export const MAX_TICKETS_PER_CATEGORY = 3;
