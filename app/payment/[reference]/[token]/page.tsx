@@ -136,10 +136,16 @@ export default function PaymentStatusPage({
               ))}
             </div>
 
-            <p className="mt-6 flex items-center justify-center gap-2 text-sm" style={{ color: "var(--home-muted)" }}>
-              <HugeiconsIcon icon={Mail01Icon} className="w-4 h-4" />
-              We&apos;ve also emailed your tickets.
-            </p>
+            <div
+              className="mt-6 flex items-start gap-3 rounded-2xl border p-4 text-sm"
+              style={{ backgroundColor: "var(--home-card)", borderColor: "var(--home-border)" }}
+            >
+              <HugeiconsIcon icon={Mail01Icon} className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "var(--home-accent)" }} />
+              <p style={{ color: "var(--home-text)" }}>
+                Check your email: we&apos;ve sent your tickets there too. If you don&apos;t see them
+                within a few minutes, look in your spam or promotions folder.
+              </p>
+            </div>
 
             {event && (
               <div className="mt-6 flex justify-center">

@@ -63,3 +63,31 @@ describe("PaymentStatusPage while the payment stays pending", () => {
     expect(vi.mocked(getPaymentStatus).mock.calls.length).toBe(calls);
   });
 });
+
+describe("PaymentStatusPage once the payment is confirmed", () => {
+  afterEach(() => {
+    vi.mocked(getPaymentStatus).mockReset();
+  });
+
+  it("tells the buyer to check their email, including spam", async () => {
+    vi.mocked(getPaymentStatus).mockResolvedValue({
+      ...pending,
+      status: "success",
+      tickets: [
+        {
+          id: "ticket-1",
+          code: "TCK-1",
+          categoryName: "Regular",
+          recipientName: null,
+          qrValue: "https://www.ticketer.africa/verify-ticket?data=x",
+        },
+      ],
+    });
+
+    renderPage();
+
+    expect(await screen.findByText("Payment confirmed")).toBeTruthy();
+    expect(screen.getByText(/check your email/i)).toBeTruthy();
+    expect(screen.getByText(/spam/i)).toBeTruthy();
+  });
+});
