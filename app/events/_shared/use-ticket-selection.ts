@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { TicketCategoryV2 } from "@/types/events-v2.type";
-import { toast } from "sonner";
+import { MAX_TICKETS_PER_CATEGORY } from "@/lib/ticket-limits";
 
 function restoreFromCheckoutData(eventId?: string) {
   if (!eventId || typeof window === "undefined") return null;
@@ -14,6 +14,8 @@ function restoreFromCheckoutData(eventId?: string) {
     data.tickets.forEach((t: { ticketCategoryId: string; quantity: number }) => {
       quantities[t.ticketCategoryId] = t.quantity;
     });
+    // A selection saved before the cap was lowered would be rejected at checkout.
+    if (Object.values(quantities).some((qty) => qty > MAX_TICKETS_PER_CATEGORY)) return null;
     return { selected, quantities };
   } catch {
     return null;
@@ -27,18 +29,17 @@ export function useTicketSelection(ticketCategories: TicketCategoryV2[], eventId
 
   const toggleCategory = (category: TicketCategoryV2) => {
     const id = category.id;
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
+    if (selected.has(id)) {
+      setSelected((prev) => {
+        const next = new Set(prev);
         next.delete(id);
-      } else {
-        next.add(id);
-        if (!quantities[id]) {
-          setQuantities((q) => ({ ...q, [id]: 1 }));
-        }
-      }
-      return next;
-    });
+        return next;
+      });
+      return;
+    }
+
+    setSelected((prev) => new Set(prev).add(id));
+    setQuantities((q) => (q[id] ? q : { ...q, [id]: 1 }));
   };
 
   const updateQuantity = (
@@ -48,21 +49,10 @@ export function useTicketSelection(ticketCategories: TicketCategoryV2[], eventId
     const category = ticketCategories.find((c) => c.id === id);
     if (!category) return;
 
-    const max = Math.min(category.maxTickets - (category.minted ?? 0), 10);
+    const max = Math.min(category.maxTickets - (category.minted ?? 0), MAX_TICKETS_PER_CATEGORY);
     setQuantities((prev) => {
       const current = prev[id] ?? 1;
       const next = typeof value === "function" ? value(current) : value;
-
-      const otherTotal = Object.entries(prev)
-        .filter(([key]) => key !== id)
-        .reduce((sum, [, qty]) => sum + qty, 0);
-
-      if (otherTotal + next > 10) {
-        toast.error("Ticket limit reached", {
-          description: "You can select up to 10 tickets per purchase.",
-        });
-        return prev;
-      }
 
       return {
         ...prev,
