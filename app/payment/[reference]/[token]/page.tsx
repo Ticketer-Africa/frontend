@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -35,6 +35,10 @@ export default function PaymentStatusPage({
   const token = decodeURIComponent(params.token);
   const startedAt = useRef(Date.now());
   const [notFound, setNotFound] = useState(false);
+  // Re-render on a clock, not only when the answer changes: identical
+  // "pending" answers don't re-render, and the slow/gave-up screens depend on
+  // elapsed time.
+  const [now, setNow] = useState(() => Date.now());
 
   const { data } = useQuery({
     queryKey: ["payment-status", reference, token],
@@ -63,8 +67,15 @@ export default function PaymentStatusPage({
   const view = derivePaymentView({
     status: data?.status,
     notFound,
-    elapsedMs: Date.now() - startedAt.current,
+    elapsedMs: now - startedAt.current,
   });
+  const waiting = !isFinalView(view);
+
+  useEffect(() => {
+    if (!waiting) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [waiting]);
   const event = data?.event ?? null;
 
   return (
